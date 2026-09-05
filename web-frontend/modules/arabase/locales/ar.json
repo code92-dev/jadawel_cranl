@@ -331,5 +331,23 @@
     "rowLimitHelp": "عدد الصفوف التي تُسلَّم إلى الصفحة، بحد أقصى 1000.",
     "externalResourcesLabel": "السماح بالمصادر الخارجية",
     "externalResourcesWarning": "يتيح للصفحة تحميل النصوص البرمجية والأنماط والخطوط من شبكات توصيل محتوى معروفة. يبقى إرسال البيانات إلى الخارج ممنوعًا، لكن أي نص برمجي خارجي سيرى بيانات الصفوف المعروضة."
+  },
+  "rowColoring": {
+    "backgroundColorName": "لون الخلفية",
+    "backgroundColorDescription": "اطلِ الصف كاملاً بلون خيار من اختيار مفرد.",
+    "singleSelectName": "اختيار مفرد",
+    "singleSelectDescription": "استخدم لون خيار حقل الاختيار المفرد لتلوين الصف.",
+    "backgroundAlreadyAdded": "يحتوي هذا العرض على لون خلفية.",
+    "chooseField": "اختر حقل الاختيار المفرد الذي يتحكم في لون الصف.",
+    "leftBorderColorName": "لون الحد الجانبي",
+    "leftBorderColorDescription": "أضِف شريطًا لونيًا رقيقًا على بداية الصف.",
+    "leftBorderAlreadyAdded": "يحتوي هذا العرض على لون حد جانبي.",
+    "conditionsName": "شروط",
+    "conditionsDescription": "لوّن الصفوف التي تطابق مجموعة شروط بناءً على قيم الحقول.",
+    "conditionsHelp": "تُطبَّق القواعد بالترتيب، ويُلوَّن الصف بأول قاعدة تطابقه.",
+    "addRule": "إضافة قاعدة",
+    "removeRule": "إزالة القاعدة",
+    "chooseColor": "اختر اللون",
+    "defaultRuleLabel": "افتراضي"
   }
 }

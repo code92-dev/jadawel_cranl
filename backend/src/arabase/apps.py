@@ -62,6 +62,31 @@ class ArabaseConfig(AppConfig):
         # core builds that urlconf from `view_type_registry.api_urls`.
         view_type_registry.register(HtmlPageViewType())
 
+        from arabase.row_coloring.decorator_types import (
+            BackgroundColorDecoratorType,
+            LeftBorderColorDecoratorType,
+        )
+        from arabase.row_coloring.value_providers import (
+            ConditionalColorValueProviderType,
+            SingleSelectColorValueProviderType,
+        )
+        from jadawel.contrib.database.views.registries import (
+            decorator_type_registry,
+            decorator_value_provider_type_registry,
+        )
+
+        # Row coloring: the OSS re-implementation of upstream's premium row
+        # colors. Concrete decorator and value provider types plug into
+        # core's decoration framework, so no core edit is needed.
+        decorator_type_registry.register(BackgroundColorDecoratorType())
+        decorator_type_registry.register(LeftBorderColorDecoratorType())
+        decorator_value_provider_type_registry.register(
+            SingleSelectColorValueProviderType()
+        )
+        decorator_value_provider_type_registry.register(
+            ConditionalColorValueProviderType()
+        )
+
         from arabase.template_catalog import (
             LOCAL_TEMPLATE_PATTERN,
             reconcile_local_template_catalog_after_migrate,

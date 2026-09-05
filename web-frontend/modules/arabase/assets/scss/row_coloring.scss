@@ -1,0 +1,74 @@
+// Row coloring (#28). Registered by modules/arabase/module.js as a standalone
+// stylesheet, so it must import the palette itself: nothing is in scope for a
+// file outside core's aggregated default.scss.
+@import '@jadawel/modules/core/assets/scss/colors';
+
+// Row coloring (#28): decorations resolved client-side by the arabase value
+// providers. The bar positions itself for the two places it renders in, and
+// both use logical properties so RTL mirrors the bar to the inline-start
+// (right) edge automatically.
+
+// Grid rows: the component renders inside `.grid-view__row-info` (a flex
+// row), so stretch it into a full-height bar at the start edge.
+.grid-view__row-info .row-coloring__border-bar {
+  align-self: stretch;
+  flex-shrink: 0;
+  inline-size: 5px;
+  border-start-start-radius: 3px;
+  border-end-start-radius: 3px;
+}
+
+// Cards (gallery): the component renders as the first child of `.card`
+// (position: relative), so pin a full-height bar to the card's start edge.
+.card .row-coloring__border-bar {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  inline-size: 5px;
+  border-start-start-radius: 3px;
+  border-end-start-radius: 3px;
+}
+
+// Conditional color form (#31): rule list shown inside the decorator context.
+.conditional-color-form {
+  &__help {
+    margin-block: 0 12px;
+    color: $palette-neutral-600;
+    font-size: 12px;
+  }
+
+  &__rule {
+    border: solid 1px $palette-neutral-200;
+    border-radius: 6px;
+    padding: 8px;
+    margin-block-end: 8px;
+    background-color: $palette-neutral-50;
+  }
+
+  &__header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-block-end: 8px;
+  }
+
+  &__color {
+    inline-size: 20px;
+    block-size: 20px;
+    border-radius: 4px;
+    border: solid 1px $palette-neutral-300;
+    flex-shrink: 0;
+  }
+
+  &__operator {
+    inline-size: 110px;
+  }
+
+  &__default-badge {
+    font-size: 11px;
+    color: $palette-neutral-600;
+    border: dashed 1px $palette-neutral-300;
+    border-radius: 10px;
+    padding: 0 8px;
+  }
+}

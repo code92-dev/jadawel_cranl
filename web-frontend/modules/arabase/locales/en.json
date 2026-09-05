@@ -331,5 +331,23 @@
     "rowLimitHelp": "How many rows are handed to the page, up to 1000.",
     "externalResourcesLabel": "Allow external resources",
     "externalResourcesWarning": "Lets the page load scripts, styles and fonts from known CDNs. Sending data out stays blocked, but an external script will see the row data on the page."
+  },
+  "rowColoring": {
+    "backgroundColorName": "Background color",
+    "backgroundColorDescription": "Paint the whole row with the color of a single select option.",
+    "singleSelectName": "Single select",
+    "singleSelectDescription": "Use the color of a single select option to color the row.",
+    "backgroundAlreadyAdded": "This view already has a background color.",
+    "chooseField": "Choose the single select field that controls the row color.",
+    "leftBorderColorName": "Left border color",
+    "leftBorderColorDescription": "Add a subtle color bar at the start of the row.",
+    "leftBorderAlreadyAdded": "This view already has a left border color.",
+    "conditionsName": "Conditions",
+    "conditionsDescription": "Color rows matching a group of conditions on field values.",
+    "conditionsHelp": "Rules apply in order and the first matching rule colors the row.",
+    "addRule": "Add rule",
+    "removeRule": "Remove rule",
+    "chooseColor": "Choose color",
+    "defaultRuleLabel": "Default"
   }
 }

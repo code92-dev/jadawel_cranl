@@ -852,7 +852,10 @@ def test_field_type_single_field_num_queries(data_fixture, django_assert_num_que
     handler = ViewHandler()
 
     # Keep this bounded independently of how many fields are changed.
-    with django_assert_num_queries(9, exact=False):
+    # +2 over upstream: the arabase row-coloring value providers run one
+    # batched cleanup query each (single select DELETE, conditional SELECT)
+    # when a referenced field changes type or is deleted.
+    with django_assert_num_queries(11, exact=False):
         handler.fields_type_changed([password_field_1])
 
     assert ViewFilter.objects.all().count() == 0
@@ -899,7 +902,9 @@ def test_field_type_changed_two_fields_num_queries(
     handler = ViewHandler()
 
     # Keep this bounded independently of how many fields are changed.
-    with django_assert_num_queries(9, exact=False):
+    # +2 over upstream: see test_field_type_single_field_num_queries; the
+    # arabase cleanup queries are batched, so two fields cost no more.
+    with django_assert_num_queries(11, exact=False):
         handler.fields_type_changed([password_field_1, password_field_2])
 
     assert ViewFilter.objects.all().count() == 0
