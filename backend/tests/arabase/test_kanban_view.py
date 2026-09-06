@@ -17,7 +17,9 @@ from rest_framework.status import (
 )
 
 from jadawel.contrib.database.rows.handler import RowHandler
+from jadawel.contrib.database.views.actions import UpdateViewActionType
 from jadawel.contrib.database.views.registries import view_type_registry
+from jadawel.core.action.handler import ActionHandler
 
 
 @pytest.fixture
@@ -222,6 +224,43 @@ def test_kanban_field_delete_clears_grouping_reference(
     response = api_client.get(kanban_url(view_id), **auth(setup["token"]))
     assert response.status_code == HTTP_200_OK
     assert response.json()["stacks"] == []
+
+
+@pytest.mark.django_db
+def test_kanban_grouping_field_can_be_set_via_view_endpoint(api_client, kanban_setup):
+    """Setting the grouping field after creation must not 500.
+
+    The core view endpoint records an ``update_view`` undo/redo action whose
+    params come from ``export_prepared_values``; exporting the field
+    reference as a model instance instead of an id crashed the action's JSON
+    serialization (user-reported: selecting the kanban grouping field from
+    the toolbar returned 500 and the board never grouped).
+    """
+
+    setup = kanban_setup
+    view_id = create_kanban_view(api_client, setup).json()["id"]
+
+    response = api_client.patch(
+        reverse("api:database:views:item", kwargs={"view_id": view_id}),
+        {"single_select_field": setup["status"].id},
+        format="json",
+        HTTP_CLIENTSESSIONID="test-session",
+        **auth(setup["token"]),
+    )
+    assert response.status_code == HTTP_200_OK, response.content
+    assert response.json()["single_select_field"] == setup["status"].id
+
+    board = api_client.get(kanban_url(view_id), **auth(setup["token"]))
+    assert board.status_code == HTTP_200_OK, board.content
+    assert [stack["count"] for stack in board.json()["stacks"]] == [2, 1, 0, 1]
+
+    # Undo must round-trip the exported ids back through prepare_values.
+    ActionHandler.undo(
+        setup["user"], [UpdateViewActionType.scope(view_id)], "test-session"
+    )
+    board = api_client.get(kanban_url(view_id), **auth(setup["token"]))
+    # Ungrouped again: the board reports its not-configured empty shape.
+    assert board.json()["stacks"] == []
 
 
 @pytest.mark.django_db

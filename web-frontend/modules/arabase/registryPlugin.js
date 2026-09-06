@@ -11,6 +11,7 @@ import {
 import { BackupAdminType } from '@jadawel/modules/arabase/adminTypes'
 import { ArabasePlugin } from '@jadawel/modules/arabase/plugins'
 import { ViewerRoleType } from '@jadawel/modules/arabase/roleTypes'
+import { ViewerRoleTranslationsPermissionManagerType } from '@jadawel/modules/arabase/permissions'
 import { KanbanViewType } from '@jadawel/modules/arabase/kanban/viewType'
 import kanbanStore from '@jadawel/modules/arabase/kanban/store'
 import publicDashboardApplicationStore from '@jadawel/modules/arabase/dashboard/store/publicDashboardApplication'
@@ -87,8 +88,14 @@ export default defineNuxtPlugin({
 
     // Workspace VIEWER role (#36): enforced server-side by the additive
     // `viewer_role` permission manager; registered here so the role appears
-    // in the invite form and the members table role dropdown.
+    // in the invite form and the members table role dropdown. The labels
+    // come from the translations manager below: the roles service never
+    // calls the role type's getName().
     $registry.register('roles', new ViewerRoleType(context))
+    $registry.register(
+      'permissionManager',
+      new ViewerRoleTranslationsPermissionManagerType(context)
+    )
 
     // Row coloring (#28): decorators fed by single select colors or
     // conditional rules. Core's toolbar menu and row/card rendering pick
