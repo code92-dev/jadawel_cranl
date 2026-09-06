@@ -110,8 +110,10 @@ export default {
         return
       }
 
-      if (this.selector.length > 0) {
-        const elements = this.getElements(this.selector)
+      const elements =
+        this.selector.length > 0 ? this.getElements(this.selector) : []
+
+      if (elements.length > 0) {
         const parentRect = this._getParent().getBoundingClientRect()
         const elementRect = getCombinedBoundingClientRect(elements)
         position.top = elementRect.top - parentRect.top - this.padding + 'px'
@@ -119,6 +121,7 @@ export default {
         position.width = elementRect.width + this.padding * 2 + 'px'
         position.height = elementRect.height + this.padding * 2 + 'px'
       } else {
+        // Fall back to centered when no targets match
         position.top = '50%'
         position.left = '50%'
       }
