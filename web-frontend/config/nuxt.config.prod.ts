@@ -15,6 +15,16 @@
 import baseConfig from './nuxt.config.base.ts'
 export default {
   ...baseConfig,
+  i18n: {
+    ...baseConfig.i18n,
+    experimental: {
+      ...baseConfig.i18n?.experimental,
+      // Translation messages are bundled public assets, with a deployment hash
+      // in their URL. Cache them across reloads instead of reloading both locales.
+      cacheLifetime: 86400,
+      httpCacheDuration: 86400,
+    },
+  },
   nitro: {
     ...baseConfig.nitro,
     // A single SSR process serializes CPU-heavy document rendering and causes

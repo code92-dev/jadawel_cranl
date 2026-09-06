@@ -12,6 +12,11 @@ describe('production runtime configuration', () => {
     vi.resetModules()
   })
 
+  test('caches bundled translations across page reloads', () => {
+    expect(productionConfig.i18n.experimental.cacheLifetime).toBe(86400)
+    expect(productionConfig.i18n.experimental.httpCacheDuration).toBe(86400)
+  })
+
   test('builds a clustered Nitro server', () => {
     expect(productionConfig.nitro.preset).toBe('node-cluster')
   })
