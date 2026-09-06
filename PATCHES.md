@@ -1280,3 +1280,19 @@ additive Arabase module.
 | File | Change | Reason | Merge risk |
 |------|--------|--------|------------|
 | `web-frontend/modules/core/assets/scss/components/modal.scss` | Stack sidebar modals and remove fixed sidebar/content sizing below 720px | Prevent the authenticated Arabic/English settings modal from creating an internal horizontal strip at 390×844 while preserving the desktop two-column layout | low |
+
+## Phase — Drop the notification panel below the content header (2026-09-06)
+
+User-reported: opening the bell's notification panel covered the whole content
+header, hiding search and settings the moment it opened. Upstream's
+`inset-block: 8px` made the panel span the full viewport because the bell lived
+in the sidebar, where a full-height drawer reads as a sidebar panel. This fork
+moved the bell into the content header (2026-07-28), so the drawer now hangs
+from a control in a 51px bar and must not swallow it. Anchored at
+`inset-block: 59px 8px` — header height plus the same 8px gap the other edges
+keep. The taller 74px workspace-home header centres its controls (bell spans
+22–52px), so they stay clear without a per-page exception.
+
+| File | Change | Reason | Merge risk |
+|------|--------|--------|------------|
+| `web-frontend/modules/core/assets/scss/components/notification_panel.scss` | `inset-block: 8px` → `inset-block: 59px 8px` | The panel opened over the header that hosts the bell opening it | low — upstream touches this rule only if it redesigns the panel |

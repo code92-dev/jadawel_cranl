@@ -1,7 +1,14 @@
 .notification-panel {
   position: fixed;
   inline-size: 400px;
-  inset-block: 8px;
+
+  // Block axis: drop below the content header instead of spanning the whole
+  // viewport. The shared header is 51px (layout.scss), so 59px keeps the same
+  // 8px gap on top that the sides already have; covering the bar hid the
+  // search, bell and settings buttons the moment the panel opened. The taller
+  // 74px workspace-home header centres its controls (the bell spans 22–52px),
+  // so they clear the panel too.
+  inset-block: 59px 8px;
 
   // Anchored to the same corner as the bell that opens it. Upstream put the
   // bell in the sidebar, so the panel sat just past the sidebar's edge at
