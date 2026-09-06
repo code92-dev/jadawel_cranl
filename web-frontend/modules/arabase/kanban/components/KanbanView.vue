@@ -4,7 +4,7 @@
       <p class="kanban-view__empty-title">
         {{ $t('kanbanView.chooseGroupingField') }}
       </p>
-      <Dropdown ref="groupingDropdown" :value="null" small>
+      <Dropdown ref="groupingDropdown" :value="null">
         <DropdownItem
           v-for="singleSelectField in singleSelectFields"
           :key="singleSelectField.id"

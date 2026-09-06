@@ -27,6 +27,12 @@
   color: $color-neutral-700;
 }
 
+// The dropdown has no intrinsic width of its own, and `align-items: center`
+// above stops it from stretching, so it would collapse to icon width.
+.kanban-view__empty .dropdown {
+  inline-size: 240px;
+}
+
 .kanban-view__board {
   display: flex;
   align-items: flex-start;
