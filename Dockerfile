@@ -17,11 +17,15 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-06 from commit 274e7e2, tag 2.3.3-refresh-performance.
+# Published 2026-09-06 from commit 0ac3513, tag 2.3.4-kanban-grouping-dropdown.
+# Keeps the kanban board's grouping-field dropdown at a full 240px width in
+# the empty state instead of collapsing to icon width.
+# Previous deployment pin (2.3.3-refresh-performance):
+# sha256:6e95488e08c9fd2cfe47aa401468e0ea63a28cfd3cfc4693724fe5db8da2b725.
+#
+# Previously published 2026-09-06 from commit 274e7e2, tag 2.3.3-refresh-performance.
 # Caches bundled translations across reloads and loads workspace/application
 # startup data concurrently, including all changes through 2.3.2.
-# Previous deployment pin (2.3.2):
-# sha256:5d00d3b4113368488ec0bcdaf0a28892c18e5bd0cf5d6155b64e8e2a2f00bbbc.
 #
 # Previously published 2026-09-03 by publish-image.yml from commit ca0573c (dependency
 # updates), tag 2.9.18-deps-updates, digest
@@ -195,7 +199,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:6e95488e08c9fd2cfe47aa401468e0ea63a28cfd3cfc4693724fe5db8da2b725
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:b17643feb1d24daa98921b7de1dc1cc35c6d01cb77b62558f8f16a73b5a5089d
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
