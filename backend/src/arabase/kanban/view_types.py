@@ -125,6 +125,21 @@ class KanbanViewType(ViewType):
 
         return super().prepare_values(values, table, user)
 
+    def export_prepared_values(self, view: KanbanView) -> Dict[str, Any]:
+        """Export the two field references as ids, not model instances.
+
+        ``prepare_values`` swaps the incoming id for a ``Field`` instance so
+        the handler can assign it to the model, and the base export then
+        hands those instances to the undo/redo action recorder, whose JSON
+        serialization 500s on them. Mirror the gallery: export the ids, which
+        ``prepare_values`` accepts back on undo/redo.
+        """
+
+        values = super().export_prepared_values(view)
+        values["single_select_field"] = view.single_select_field_id
+        values["card_cover_image_field"] = view.card_cover_image_field_id
+        return values
+
     def after_field_delete(self, field):
         """Drop the two field references when their field is deleted.
 
