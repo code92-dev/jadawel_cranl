@@ -85,3 +85,30 @@ domain is `app.jadawl.site`. Do not treat local timings as a production speedup.
 Authenticated table refresh, row updates, and large-workspace API timings were not
 measured without a specific affected page/session. Those remain separate profiling
 work if the reported delay persists after these startup fixes.
+
+## Production verification
+
+CranL deployed `09c63e3` successfully in 55 seconds on 2026-09-06 at 13:43
+Asia/Riyadh. Actions -> Reload was completed, followed by CDN cache purge.
+The live login HTML now loads the published image's `rgtQjN9A` translation bundle.
+The signed-in workspace dashboard renders after reload. Health returns HTTP 200
+with `OK`; templates returns HTTP 200. Startup logs report migration completion
+and six reconciled templates.
+
+Six jobs on release CI run `34027457893` passed, including the full frontend suite,
+Docker builds, and desktop browser/production load checks. The full backend rerun
+was still running at deployment. The backend, shared test, and formula Git trees
+are identical to `9fa65da`, whose complete CI run `34021844611` passed earlier that
+day; 390 fork-specific backend tests also passed locally on this revision.
+
+**Remaining performance limit:** the published image, run directly, returns
+`Cache-Control: max-age=86400` for both translations, but CranL's public CDN response
+returns `Cache-Control: no-cache` even for the new bundle after purge. Thus the
+application startup concurrency improvement is deployed, but browser translation
+cache reuse is not yet verified in production. CranL's CDN dashboard exposes no
+existing editable CDN zones for this application. A provider cache-policy change
+for public `/_i18n/*/messages.json` assets is still needed; private HTML and API
+responses must remain uncached. No production refresh percentage is claimed.
+
+The runtime also logs pre-existing model/migration drift and unavailable pgvector;
+health and template checks pass, but this release does not resolve those warnings.
