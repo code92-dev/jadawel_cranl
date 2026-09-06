@@ -1296,3 +1296,21 @@ keep. The taller 74px workspace-home header centres its controls (bell spans
 | File | Change | Reason | Merge risk |
 |------|--------|--------|------------|
 | `web-frontend/modules/core/assets/scss/components/notification_panel.scss` | `inset-block: 8px` → `inset-block: 59px 8px` | The panel opened over the header that hosts the bell opening it | low — upstream touches this rule only if it redesigns the panel |
+
+## Phase — Fix the onboarding preview highlight crash (2026-09-06)
+
+User-reported: a fresh user's onboarding (first login after signup) crashed
+the database step's preview with `TypeError: Cannot read properties of null
+(reading 'top')` at `Highlight.vue:117`. Two causes compounded. The sidebar
+simplification (2026-07-28) removed the per-type application groups whose
+wrapper carried `data-highlight="applications-${type}"`, but the database
+onboarding step still asked for `applications-database` — a selector that
+matches nothing, so `Highlight.update()` received an empty element list. And
+`getCombinedBoundingClientRect([])` returns `null`, whose `.top` the un-guarded
+updater then read.
+
+| File | Change | Reason | Merge risk |
+|------|--------|--------|------------|
+| `web-frontend/modules/database/onboardingTypes.js` | `highlightDataName: 'applications-database'` → `'applications'` | The flat sidebar still tags its applications section with `data-highlight="applications"`; upstream's per-type group element no longer exists in this fork | low — reverts to upstream's pre-grouping value |
+| `web-frontend/modules/core/components/Highlight.vue` | Guard `update()` when no elements match; fall back to a centered box | Port of upstream's own fix — a stale selector crashed the whole preview instead of degrading | low — matches upstream develop verbatim |
+| `web-frontend/test/unit/core/components/highlight.spec.js` and `web-frontend/test/unit/database/components/onboarding/databaseAppLayoutPreview.spec.js` | Cover the no-match fallback and pin the highlight target to an element the preview's sidebar renders | Both went red on the original crash; keeps the selector and the sidebar in lock-step | low |
