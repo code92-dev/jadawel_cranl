@@ -70,10 +70,17 @@ Local timings are not comparable to production network timings.
 
 ## Release status and limits
 
-Changes are local and have not been committed, pushed, or deployed. Production
-still needs the published-image/pin/redeploy procedure in `DEPLOY_CRANL.md`,
-followed by the same browser check on the deployed app. Do not treat a local cache
-check as a measured production speedup.
+Source changes were rebased onto current main and pushed as `274e7e2`. The
+combined revision passed 390 fork-specific backend tests (one skipped), all 20
+focused frontend tests, and locale parity. A fresh production backup succeeded
+at 13:17 Asia/Riyadh (3.4 MB, eight seconds).
+
+GitHub Actions run `34027054273` published `2.3.3-refresh-performance` with digest
+`sha256:6e95488e08c9fd2cfe47aa401468e0ea63a28cfd3cfc4693724fe5db8da2b725`.
+Anonymous registry access returned HTTP 200 with the same digest. The deployment
+Dockerfile pins it; CranL deployment and live verification follow the CI gate.
+The target is `jadawel-org` (`8ff2d656-4fde-4513-adf3-6b9c20434867`), whose custom
+domain is `app.jadawl.site`. Do not treat local timings as a production speedup.
 
 Authenticated table refresh, row updates, and large-workspace API timings were not
 measured without a specific affected page/session. Those remain separate profiling
