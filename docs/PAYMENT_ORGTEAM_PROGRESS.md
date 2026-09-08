@@ -29,7 +29,7 @@ slices; the issues remain open until a maintainer reviews and lands the branch.
 Focused backend verification, with both plugin paths loaded, currently passes:
 
 ```text
-79 passed
+82 passed
 ```
 
 The same run covers complimentary access, role authority, seat reservation for
@@ -39,8 +39,11 @@ handling, paid-Team idempotent provisioning, per-seat Team quotes, payment
 verification, webhook reconciliation, active Moyasar token/payment binding,
 payment methods, refunds, and renewal task behavior. It also covers suspended
 owner recovery, safe Moyasar provider-health statuses, and the paginated/search
-filters used by the billing and organization APIs. The focused frontend run
-passes 32 tests across six files, and strict repository locale parity reports
+filters used by the billing and organization APIs. Renewal retries stop at the
+configured grace boundary, administrator subscription cancellation is exposed,
+and account-kind checkout prices, historical receipts, and organization action
+confirmations are covered by the frontend tests. The focused frontend run
+passes 13 tests across five files, and strict repository locale parity reports
 3,787/3,787 keys.
 
 The organization UI now previews workspace outsiders before binding, supports

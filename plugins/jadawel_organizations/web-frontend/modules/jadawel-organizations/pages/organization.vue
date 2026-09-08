@@ -509,6 +509,15 @@ export default {
         this.busy = false;
       }
     },
+    confirmAction(key, params) {
+      if (
+        typeof window === "undefined" ||
+        typeof window.confirm !== "function"
+      ) {
+        return true;
+      }
+      return window.confirm(this.$t(key, params));
+    },
     async loadMembers() {
       const { data } = await this.$client.get(
         `/organizations/${this.currentOrganizationId}/members/`,
@@ -600,6 +609,7 @@ export default {
       });
     },
     async revokeInvitation(invitation) {
+      if (!this.confirmAction("organizations.confirmRevokeInvitation")) return;
       await this.run(() =>
         this.$client.delete(
           `/organizations/${this.organization.id}/invitations/${invitation.id}/`,
@@ -607,6 +617,12 @@ export default {
       );
     },
     async remove(member) {
+      if (
+        !this.confirmAction("organizations.confirmRemoveMember", {
+          email: member.email,
+        })
+      )
+        return;
       await this.run(() =>
         this.$client.delete(
           `/organizations/${this.organization.id}/members/${member.id}/`,
@@ -614,6 +630,10 @@ export default {
       );
     },
     async suspend(member, suspended) {
+      const key = suspended
+        ? "organizations.confirmSuspendMember"
+        : "organizations.confirmReactivateMember";
+      if (!this.confirmAction(key, { email: member.email })) return;
       await this.run(() =>
         this.$client.patch(
           `/organizations/${this.organization.id}/members/${member.id}/`,
@@ -622,6 +642,13 @@ export default {
       );
     },
     async updateRole(member, role) {
+      if (
+        role === "owner" &&
+        !this.confirmAction("organizations.confirmTransferOwnership", {
+          email: member.email,
+        })
+      )
+        return;
       await this.run(() =>
         this.$client.patch(
           `/organizations/${this.organization.id}/members/${member.id}/`,
@@ -668,6 +695,12 @@ export default {
       );
     },
     async unassignWorkspace(binding, assignment) {
+      if (
+        !this.confirmAction("organizations.confirmUnassignWorkspaceMember", {
+          email: assignment.email,
+        })
+      )
+        return;
       await this.run(() =>
         this.$client.delete(
           `/organizations/${this.organization.id}/workspaces/${binding.id}/members/${assignment.membership_id}/`,
@@ -675,6 +708,7 @@ export default {
       );
     },
     async unbindWorkspace(binding) {
+      if (!this.confirmAction("organizations.confirmUnbindWorkspace")) return;
       await this.run(() =>
         this.$client.delete(
           `/organizations/${this.organization.id}/workspaces/${binding.id}/`,
@@ -682,6 +716,9 @@ export default {
       );
     },
     async changeLifecycle(action) {
+      if (!this.confirmAction(`organizations.confirmLifecycle.${action}`)) {
+        return;
+      }
       await this.run(() =>
         this.$client.post(`/organizations/${this.organization.id}/lifecycle/`, {
           action,
@@ -689,6 +726,9 @@ export default {
       );
     },
     async transitionToPersonal() {
+      if (!this.confirmAction("organizations.confirmTransitionToPersonal")) {
+        return;
+      }
       await this.run(async () => {
         await this.$client.post(
           `/organizations/${this.organization.id}/transition-to-personal/`,

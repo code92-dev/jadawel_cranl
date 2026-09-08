@@ -4,7 +4,8 @@ from uuid import UUID
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
-from rest_framework import serializers
+from rest_framework import generics, serializers
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -203,6 +204,70 @@ class ExternalPaymentSerializer(serializers.ModelSerializer[Any]):
             "actor",
             "created_at",
         ]
+
+
+class AdminSubscriptionSerializer(serializers.ModelSerializer[Any]):
+    account_id = serializers.UUIDField(read_only=True)
+    owner_email = serializers.EmailField(
+        source="account.responsible_user.email", read_only=True
+    )
+    plan = serializers.CharField(source="price.plan.name", read_only=True)
+    price_amount = serializers.IntegerField(source="price.amount", read_only=True)
+    currency = serializers.CharField(source="price.currency", read_only=True)
+    interval = serializers.CharField(source="price.interval", read_only=True)
+
+    class Meta:
+        model = Subscription
+        fields = [
+            "id",
+            "account_id",
+            "owner_email",
+            "plan",
+            "price_amount",
+            "currency",
+            "interval",
+            "seats",
+            "period_start",
+            "period_end",
+            "status",
+            "cancel_at_period_end",
+            "retry_count",
+            "next_retry_at",
+        ]
+
+
+class AdminSubscriptionUpdateInput(serializers.Serializer[Any]):
+    cancel_at_period_end = serializers.BooleanField()
+
+
+class AdminSubscriptionsView(generics.ListAPIView[Any]):
+    permission_classes = [IsAdminUser]
+    serializer_class = AdminSubscriptionSerializer
+    pagination_class = BillingPagination
+    filter_backends = [SearchFilter]
+    search_fields = [
+        "account__responsible_user__email",
+        "price__plan__name",
+        "status",
+    ]
+    queryset = Subscription.objects.select_related(
+        "account__responsible_user", "price__plan"
+    ).order_by("-period_end", "-id")
+
+
+class AdminSubscriptionView(APIView):
+    permission_classes = [IsAdminUser]
+
+    def patch(self, request: Request, subscription_id: int) -> Response:
+        subscription = get_object_or_404(Subscription, pk=subscription_id)
+        data = AdminSubscriptionUpdateInput(data=request.data)
+        data.is_valid(raise_exception=True)
+        updated = set_cancellation(
+            request.user,
+            subscription,
+            data.validated_data["cancel_at_period_end"],
+        )
+        return Response(AdminSubscriptionSerializer(updated).data)
 
 
 class AdminExternalPaymentView(APIView):

@@ -91,6 +91,60 @@ def test_admin_provider_health_is_safe_when_moyasar_is_not_configured(
 
 
 @pytest.mark.django_db
+def test_admin_lists_and_controls_subscription_renewal(api_client, data_fixture):
+    from datetime import timedelta
+
+    from jadawel_billing.handlers import create_account, create_plan, create_price
+    from jadawel_billing.models import BillingOrder, Subscription
+
+    admin, token = data_fixture.create_user_and_token(is_staff=True)
+    account = create_account(admin, kind="INDIVIDUAL", responsible_user=admin)
+    plan = create_plan(
+        admin,
+        code="admin-renewal",
+        name="Admin renewal",
+        kind="INDIVIDUAL",
+        available=True,
+    )
+    price = create_price(
+        admin, plan=plan, amount=5000, interval="MONTH", available=True
+    )
+    order = BillingOrder.objects.create(
+        account=account,
+        price=price,
+        seats=1,
+        amount=price.amount,
+        currency=price.currency,
+        interval=price.interval,
+        mode="test",
+        status="paid",
+    )
+    subscription = Subscription.objects.create(
+        account=account,
+        price=price,
+        seats=1,
+        period_start=timezone.now(),
+        period_end=timezone.now() + timedelta(days=30),
+        source_order=order,
+        cancel_at_period_end=False,
+    )
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+
+    listing = api_client.get("/api/billing/admin/subscriptions/")
+    assert listing.status_code == 200
+    assert listing.data["results"][0]["id"] == subscription.id
+    assert listing.data["results"][0]["owner_email"] == admin.email
+
+    updated = api_client.patch(
+        f"/api/billing/admin/subscriptions/{subscription.pk}/",
+        {"cancel_at_period_end": True},
+        format="json",
+    )
+    assert updated.status_code == 200
+    assert updated.data["cancel_at_period_end"] is True
+
+
+@pytest.mark.django_db
 def test_duplicate_personal_account_is_rejected_but_team_accounts_are_independent(
     api_client, data_fixture
 ):

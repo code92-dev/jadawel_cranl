@@ -1,11 +1,12 @@
 from datetime import timedelta
-from decimal import Decimal, ROUND_CEILING
+from decimal import ROUND_CEILING, Decimal
 from typing import Any
 
 from django.conf import settings
 from django.db import transaction
 from django.db.models import Q
 from django.utils import timezone
+
 from rest_framework.exceptions import ValidationError
 
 from .entitlements import get_effective_entitlements, validate_capacity
@@ -147,6 +148,7 @@ def renew_due_subscriptions() -> int:
     mode = billing_mode()
     renewed = 0
     now = timezone.now()
+    grace_days = max(0, int(getattr(settings, "JADAWEL_BILLING_GRACE_DAYS", 7)))
     for subscription in (
         Subscription.objects.select_related("account", "price")
         .filter(
@@ -165,6 +167,11 @@ def renew_due_subscriptions() -> int:
                 pk=subscription.account_id
             )
             if get_effective_entitlements(account.pk).get("source") == "manual":
+                continue
+            if now >= subscription.period_end + timedelta(days=grace_days):
+                subscription.status = Subscription.Status.CANCELED
+                subscription.next_retry_at = None
+                subscription.save(update_fields=["status", "next_retry_at"])
                 continue
             method = PaymentMethod.objects.filter(
                 account=account, revoked_at__isnull=True

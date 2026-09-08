@@ -194,3 +194,53 @@ def test_order_retries_rotate_after_provider_failure(data_fixture, settings):
         reconcile.reset_mock()
         reconcile_payments.run()
         assert reconcile.call_args_list[0].args[0].pk == orders[-1].pk
+
+
+@pytest.mark.django_db
+def test_renewal_stops_after_the_configured_grace_window(data_fixture, settings):
+    from datetime import timedelta
+
+    from django.utils import timezone
+
+    from jadawel_billing.handlers import create_account, create_plan, create_price
+    from jadawel_billing.models import BillingOrder, Subscription
+    from jadawel_billing.subscriptions import renew_due_subscriptions
+
+    settings.JADAWEL_BILLING_MODE = "test"
+    settings.JADAWEL_BILLING_GRACE_DAYS = 7
+    admin = data_fixture.create_user(is_staff=True)
+    account = create_account(admin, kind="INDIVIDUAL", responsible_user=admin)
+    plan = create_plan(
+        admin, code="renewal-cutoff", name="Renewal cutoff", kind="INDIVIDUAL"
+    )
+    price = create_price(admin, plan=plan, amount=5000, interval="MONTH")
+    now = timezone.now()
+    order = BillingOrder.objects.create(
+        account=account,
+        price=price,
+        seats=1,
+        amount=price.amount,
+        currency=price.currency,
+        interval=price.interval,
+        mode="test",
+        status="paid",
+    )
+    subscription = Subscription.objects.create(
+        account=account,
+        price=price,
+        seats=1,
+        period_start=now - timedelta(days=38),
+        period_end=now - timedelta(days=8),
+        source_order=order,
+        status=Subscription.Status.GRACE,
+        cancel_at_period_end=False,
+        next_retry_at=now - timedelta(minutes=1),
+    )
+
+    with patch("jadawel_billing.subscriptions.MoyasarClient") as client:
+        assert renew_due_subscriptions() == 0
+        client.assert_not_called()
+
+    subscription.refresh_from_db()
+    assert subscription.status == Subscription.Status.CANCELED
+    assert subscription.next_retry_at is None

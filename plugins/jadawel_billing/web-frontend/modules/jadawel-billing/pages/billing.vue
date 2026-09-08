@@ -296,6 +296,12 @@
             @click="resume(item)"
             >{{ $t("billing.verifyPayment") }}</Button
           >
+          <Button
+            v-if="item.status === 'paid' && item.receipt"
+            type="secondary"
+            @click="showReceipt(item)"
+            >{{ $t("billing.viewReceipt") }}</Button
+          >
         </li>
       </ul>
       <p v-else-if="!historyLoading">{{ $t("billing.emptyHistory") }}</p>
@@ -367,8 +373,9 @@ export default {
       this.historyNext = history.data.next || null;
       this.account =
         this.$route.query.account || this.options.accounts[0]?.id || "";
-      this.price = this.options.prices[0]?.id || "";
+      this.price = this.availablePrices[0]?.id || "";
       await this.loadAccount();
+      this.subscriptionChange.price = this.availablePrices[0]?.id || null;
       const returnedOrder = this.$route.query.order;
       if (returnedOrder) {
         this.order =
@@ -419,6 +426,12 @@ export default {
         };
         this.seatIncrease = {
           seats: this.accountState.subscription.seats + 1,
+        };
+      } else {
+        this.price = this.availablePrices[0]?.id || "";
+        this.subscriptionChange = {
+          price: this.availablePrices[0]?.id || null,
+          seats: 1,
         };
       }
     },
@@ -569,6 +582,11 @@ export default {
       this.order = order;
       this.submitted = true;
       await this.verify(order.provider_payment_id);
+    },
+    showReceipt(order) {
+      this.order = order;
+      this.submitted = true;
+      this.error = false;
     },
     async loadHistory() {
       this.historyLoading = true;

@@ -194,6 +194,57 @@
         </p>
       </section>
       <section>
+        <h2>{{ $t("billing.subscriptions") }}</h2>
+        <form
+          class="billing-history-search"
+          @submit.prevent="loadSubscriptions"
+        >
+          <label>
+            {{ $t("billing.searchHistory") }}
+            <input
+              v-model.trim="subscriptionSearch"
+              type="search"
+              class="input"
+              :placeholder="$t('billing.searchHistory')"
+            />
+          </label>
+          <Button type="secondary" :disabled="loading">
+            {{ $t("billing.search") }}
+          </Button>
+        </form>
+        <ul data-testid="subscription-list">
+          <li v-for="item in subscriptions" :key="item.id">
+            <bdi>{{ item.owner_email }}</bdi> · <bdi>{{ item.plan }}</bdi> ·
+            {{ $t("billing.seats") }}: {{ item.seats }} ·
+            {{ $t("billing.subscriptionStatus." + item.status) }} ·
+            {{ $t("billing.renewalThrough") }}:
+            <time>{{ formatDate(item.period_end) }}</time>
+            <Button
+              v-if="item.status !== 'canceled'"
+              type="secondary"
+              :disabled="saving"
+              @click="toggleSubscription(item)"
+            >
+              {{
+                item.cancel_at_period_end
+                  ? $t("billing.resumeRenewal")
+                  : $t("billing.cancelRenewal")
+              }}
+            </Button>
+          </li>
+        </ul>
+        <p v-if="!loading && !subscriptions.length">
+          {{ $t("billing.emptySubscriptions") }}
+        </p>
+        <Button
+          v-if="subscriptionsNext"
+          type="secondary"
+          @click="loadMoreSubscriptions"
+        >
+          {{ $t("billing.more") }}
+        </Button>
+      </section>
+      <section>
         <h2>{{ $t("billing.externalPayments") }}</h2>
         <form
           class="billing-history-search"
@@ -419,6 +470,9 @@ export default {
       orders: [],
       ordersNext: null,
       orderSearch: "",
+      subscriptions: [],
+      subscriptionsNext: null,
+      subscriptionSearch: "",
       providerEvents: [],
       providerEventsNext: null,
       providerEventSearch: "",
@@ -465,6 +519,7 @@ export default {
           accounts,
           plans,
           orders,
+          subscriptions,
           providerEvents,
           externalPayments,
           health,
@@ -474,6 +529,13 @@ export default {
           this.$client.get("/billing/admin/orders/", {
             params: this.orderSearch ? { search: this.orderSearch } : {},
           }),
+          this.$client
+            .get("/billing/admin/subscriptions/", {
+              params: this.subscriptionSearch
+                ? { search: this.subscriptionSearch }
+                : {},
+            })
+            .catch(() => ({ data: { results: [], next: null } })),
           this.$client.get("/billing/admin/provider-events/", {
             params: this.providerEventSearch
               ? { search: this.providerEventSearch }
@@ -494,6 +556,8 @@ export default {
         this.plansNext = plans.data.next;
         this.orders = orders.data.results;
         this.ordersNext = orders.data.next;
+        this.subscriptions = subscriptions.data.results;
+        this.subscriptionsNext = subscriptions.data.next;
         this.providerEvents = providerEvents.data.results;
         this.providerEventsNext = providerEvents.data.next;
         this.externalPayments = externalPayments.data.results;
@@ -589,6 +653,39 @@ export default {
     },
     async loadMoreOrders() {
       await this.loadPage(this.ordersNext, "orders", "ordersNext");
+    },
+    async loadSubscriptions() {
+      await this.mutate(async () => {
+        const { data } = await this.$client.get(
+          "/billing/admin/subscriptions/",
+          {
+            params: this.subscriptionSearch
+              ? { search: this.subscriptionSearch }
+              : {},
+          },
+        );
+        this.subscriptions = data.results;
+        this.subscriptionsNext = data.next;
+      });
+    },
+    async loadMoreSubscriptions() {
+      await this.loadPage(
+        this.subscriptionsNext,
+        "subscriptions",
+        "subscriptionsNext",
+      );
+    },
+    async toggleSubscription(subscription) {
+      await this.mutate(async () => {
+        const { data } = await this.$client.patch(
+          "/billing/admin/subscriptions/" + subscription.id + "/",
+          { cancel_at_period_end: !subscription.cancel_at_period_end },
+        );
+        const index = this.subscriptions.findIndex(
+          (item) => item.id === subscription.id,
+        );
+        if (index !== -1) this.subscriptions.splice(index, 1, data);
+      });
     },
     async loadProviderEvents() {
       await this.mutate(async () => {

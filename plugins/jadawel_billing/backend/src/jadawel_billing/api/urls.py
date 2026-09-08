@@ -22,6 +22,8 @@ from jadawel_billing.api.payments import (
 from jadawel_billing.api.subscriptions import (
     AdminExternalPaymentView,
     AdminRefundView,
+    AdminSubscriptionsView,
+    AdminSubscriptionView,
     CancellationView,
     PaymentMethodDeleteView,
     PaymentMethodsView,
@@ -115,6 +117,16 @@ urlpatterns = [
         "admin/provider-health/",
         AdminProviderHealthView.as_view(),
         name="admin_provider_health",
+    ),
+    path(
+        "admin/subscriptions/",
+        AdminSubscriptionsView.as_view(),
+        name="admin_subscriptions",
+    ),
+    path(
+        "admin/subscriptions/<int:subscription_id>/",
+        AdminSubscriptionView.as_view(),
+        name="admin_subscription",
     ),
     path(
         "admin/orders/<uuid:order_id>/reconcile/",
