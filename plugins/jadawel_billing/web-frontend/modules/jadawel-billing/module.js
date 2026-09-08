@@ -17,11 +17,13 @@ export default defineNuxtModule({
           name: "customer-billing",
           path: "/billing",
           file: resolve("./pages/billing.vue"),
+          meta: { layout: "app", middleware: "authenticated" },
         },
         {
           name: "admin-billing",
           path: "/admin/billing",
           file: resolve("./pages/admin.vue"),
+          meta: { layout: "app", middleware: "staff" },
         },
       ),
     );

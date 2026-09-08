@@ -450,13 +450,18 @@
   </div>
 </template>
 
+<script setup>
+definePageMeta({
+  layout: "app",
+  middleware: "staff",
+});
+</script>
+
 <script>
 import GrantPanel from "../components/GrantPanel.vue";
 export default {
   name: "BillingAdmin",
   components: { GrantPanel },
-  layout: "app",
-  middleware: "staff",
   data() {
     return {
       selectedAccount: null,

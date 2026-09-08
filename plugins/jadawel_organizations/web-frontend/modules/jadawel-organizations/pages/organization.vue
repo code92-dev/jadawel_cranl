@@ -404,11 +404,16 @@
   <p v-else role="status">{{ $t("organizations.loading") }}</p>
 </template>
 
+<script setup>
+definePageMeta({
+  layout: "app",
+  middleware: "authenticated",
+});
+</script>
+
 <script>
 export default {
   name: "OrganizationDetail",
-  layout: "app",
-  middleware: "authenticated",
   props: {
     routeOrganizationId: { type: String, default: "" },
   },

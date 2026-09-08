@@ -23,11 +23,16 @@
   </main>
 </template>
 
+<script setup>
+definePageMeta({
+  layout: "app",
+  middleware: "authenticated",
+});
+</script>
+
 <script>
 export default {
   name: "AcceptOrganizationInvitation",
-  layout: "app",
-  middleware: "authenticated",
   data() {
     return {
       token: this.$route.query.token || "",

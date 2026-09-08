@@ -131,13 +131,18 @@
   </main>
 </template>
 
+<script setup>
+definePageMeta({
+  layout: "app",
+  middleware: "staff",
+});
+</script>
+
 <script>
 import { uuid } from "@jadawel/modules/core/utils/string";
 
 export default {
   name: "OrganizationsAdmin",
-  layout: "app",
-  middleware: "staff",
   data() {
     return {
       name: "",

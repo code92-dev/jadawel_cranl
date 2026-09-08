@@ -317,13 +317,18 @@
   </div>
 </template>
 
+<script setup>
+definePageMeta({
+  layout: "app",
+  middleware: "authenticated",
+});
+</script>
+
 <script>
 import { submitPayment } from "../payment";
 
 export default {
   name: "CustomerBilling",
-  layout: "app",
-  middleware: "authenticated",
   data() {
     return {
       options: null,

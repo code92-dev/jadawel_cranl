@@ -20,21 +20,25 @@ export default defineNuxtModule({
           name: "accept-organization-invitation",
           path: "/organizations/invitations/accept",
           file: resolve("./pages/accept.vue"),
+          meta: { layout: "app", middleware: "authenticated" },
         },
         {
           name: "organizations",
           path: "/organizations",
           file: resolve("./pages/index.vue"),
+          meta: { layout: "app", middleware: "authenticated" },
         },
         {
           name: "organization",
           path: "/organizations/:id",
           file: resolve("./pages/organization.vue"),
+          meta: { layout: "app", middleware: "authenticated" },
         },
         {
           name: "admin-organizations",
           path: "/admin/organizations",
           file: resolve("./pages/admin.vue"),
+          meta: { layout: "app", middleware: "staff" },
         },
       ];
       pages.unshift(...routes);

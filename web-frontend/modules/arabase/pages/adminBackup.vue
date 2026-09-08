@@ -139,6 +139,13 @@
   </div>
 </template>
 
+<script setup>
+definePageMeta({
+  layout: 'app',
+  middleware: 'staff',
+})
+</script>
+
 <script>
 import AdminBackupRestoreModal from '@jadawel/modules/arabase/components/AdminBackupRestoreModal'
 import BackupService from '@jadawel/modules/arabase/services/backup'
@@ -148,8 +155,6 @@ import { notifyIf } from '@jadawel/modules/core/utils/error'
 export default {
   name: 'AdminBackup',
   components: { AdminBackupRestoreModal },
-  layout: 'app',
-  middleware: 'staff',
   data() {
     return {
       loading: true,

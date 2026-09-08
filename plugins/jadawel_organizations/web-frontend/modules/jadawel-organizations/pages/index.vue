@@ -48,13 +48,18 @@
   </main>
 </template>
 
+<script setup>
+definePageMeta({
+  layout: "app",
+  middleware: "authenticated",
+});
+</script>
+
 <script>
 import { uuid } from "@jadawel/modules/core/utils/string";
 
 export default {
   name: "OrganizationsIndex",
-  layout: "app",
-  middleware: "authenticated",
   data() {
     return {
       organizations: [],
