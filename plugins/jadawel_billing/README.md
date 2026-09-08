@@ -23,6 +23,14 @@ Run the plugin migrations with the normal Jadawel migration command. The
 frontend module is loaded by the standalone plugin installer; it depends on the
 core Nuxt module and registers `/billing` and `/admin/billing`.
 
+For a source checkout, include the module in the Nuxt build and restart the
+frontend after dependencies are installed:
+
+```bash
+export ADDITIONAL_MODULES="$PWD/plugins/jadawel_billing/web-frontend/modules/jadawel-billing/module.js"
+yarn --cwd web-frontend build
+```
+
 ## Configuration
 
 Set these values outside the repository when enabling Moyasar:
@@ -61,10 +69,12 @@ never exposed in API responses.
 
 ## Removal and upgrades
 
-Upgrade by running normal migrations before restarting workers and the frontend.
-Removing the package does not delete billing records. Disable customer billing
-traffic and preserve the database and payment evidence before uninstalling the
-plugin from a deployment.
+Upgrade by installing the matching backend/frontend revision, running normal
+migrations before restarting workers and the frontend, and keeping Billing
+installed before any Organizations upgrade. Removing the package does not
+delete billing records. Disable customer billing traffic, preserve the database
+and payment evidence, and complete a backup before uninstalling the plugin from
+a deployment.
 
 Focused backend checks are run with:
 

@@ -24,6 +24,26 @@ from .models import (
 User = get_user_model()
 
 
+def reject_legacy_workspace_membership_mutation(
+    actor: Any,
+    workspace: Workspace,
+    operation: str,
+    target_user: Any | None = None,
+) -> None:
+    """Keep legacy workspace invitation flows out of managed workspaces.
+
+    Organization membership and workspace assignments are the source of truth once a
+    workspace is bound.  The core invitation handlers are still used by unmanaged
+    workspaces, so the check is deliberately scoped to an existing organization
+    binding and does not alter the normal Jadawel path elsewhere.
+    """
+
+    if OrganizationWorkspace.objects.filter(workspace=workspace).exists():
+        from jadawel.core.exceptions import PermissionDenied
+
+        raise PermissionDenied(actor)
+
+
 def _require_actor(actor: Any) -> None:
     if not actor or not actor.is_authenticated or not actor.is_active:
         raise PermissionDenied()
@@ -202,6 +222,20 @@ def _sync_workspace_user(
         workspace_user.save(update_fields=["permissions"])
 
 
+def _disconnect_user_after_commit(user_id: int) -> None:
+    """End active realtime sessions after managed access is revoked.
+
+    Workspace permission checks protect subsequent requests, while the existing
+    websocket consumer can otherwise keep a subscribed page open.  Schedule the
+    disconnect after the transaction so a rolled-back membership change cannot
+    log a user out of an unrelated session.
+    """
+
+    from jadawel.ws.tasks import force_disconnect_users
+
+    transaction.on_commit(lambda: force_disconnect_users.delay([user_id]))
+
+
 def _remove_workspace_user(
     binding: OrganizationWorkspace,
     membership: OrganizationMembership,
@@ -209,6 +243,7 @@ def _remove_workspace_user(
     preserve_for_restore: bool = False,
 ) -> None:
     if membership.user_id in binding.managed_user_ids:
+        _disconnect_user_after_commit(membership.user_id)
         previous = dict(binding.managed_user_permissions)
         previous_permission = previous.get(str(membership.user_id))
         workspace_user = WorkspaceUser.objects.filter(
@@ -959,6 +994,13 @@ def unassign_workspace_member(
 
 def organization_snapshot(organization: Organization) -> dict[str, Any]:
     effective = _billing_account_for(organization)
+    from jadawel_billing.models import Subscription
+
+    subscription = (
+        Subscription.objects.filter(account_id=organization.billing_account_id)
+        .order_by("-period_start", "-id")
+        .first()
+    )
     pending_owner = organization.invitations.filter(
         role=OrganizationMembership.Role.OWNER,
         accepted_at__isnull=True,
@@ -976,6 +1018,15 @@ def organization_snapshot(organization: Organization) -> dict[str, Any]:
         ),
         "pending_owner_email": pending_owner.email if pending_owner else None,
         "billing_account": str(organization.billing_account_id),
+        "billing_subscription": (
+            None
+            if subscription is None
+            else {
+                "status": subscription.status,
+                "period_end": subscription.period_end,
+                "cancel_at_period_end": subscription.cancel_at_period_end,
+            }
+        ),
         "members_count": organization.memberships.filter(suspended=False).count(),
         "effective_entitlement": effective,
     }

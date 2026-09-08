@@ -26,6 +26,8 @@ describe('Organization Team administration', () => {
       effective_entitlement: { source: 'manual', seat_limit: 5 },
     })
     app.mock.onGet('/organizations/org-1/invitations/').reply(200, [])
+    app.mock.onGet('/organizations/org-1/members/').reply(200, [])
+    app.mock.onGet('/organizations/org-1/workspaces/').reply(200, [])
     app.mock.onPost('/organizations/org-1/members/').reply(201, {
       id: 2,
       email: 'member@example.com',
@@ -66,6 +68,12 @@ describe('Organization Team administration', () => {
     app.mock.onGet('/organizations/org-1/').reply(200, organization)
     app.mock.onGet('/organizations/org-1/invitations/').reply(200, [])
     app.mock
+      .onGet('/organizations/org-1/members/')
+      .reply(200, organization.members)
+    app.mock
+      .onGet('/organizations/org-1/workspaces/')
+      .reply(200, organization.workspaces)
+    app.mock
       .onGet('/organizations/org-1/workspaces/bind/?workspace=7')
       .reply(200, {
         workspace: 7,
@@ -98,7 +106,12 @@ describe('Organization Team administration', () => {
       provisioning_status: 'ready',
       members: [
         { id: 1, email: 'owner@example.com', role: 'owner', suspended: false },
-        { id: 2, email: 'member@example.com', role: 'member', suspended: false },
+        {
+          id: 2,
+          email: 'member@example.com',
+          role: 'member',
+          suspended: false,
+        },
       ],
       workspaces: [
         {
@@ -118,12 +131,20 @@ describe('Organization Team administration', () => {
     }
     app.mock.onGet('/organizations/org-1/').reply(200, organization)
     app.mock.onGet('/organizations/org-1/invitations/').reply(200, [])
+    app.mock
+      .onGet('/organizations/org-1/members/')
+      .reply(200, organization.members)
+    app.mock
+      .onGet('/organizations/org-1/workspaces/')
+      .reply(200, organization.workspaces)
     app.mock.onDelete('/organizations/org-1/workspaces/4/members/2/').reply(204)
 
     const wrapper = await app.mount(OrganizationDetail, {
       props: { routeOrganizationId: 'org-1' },
     })
-    await wrapper.find('[data-testid="unassign-workspace-member"]').trigger('click')
+    await wrapper
+      .find('[data-testid="unassign-workspace-member"]')
+      .trigger('click')
     await flushPromises()
 
     expect(app.mock.history.delete).toHaveLength(1)

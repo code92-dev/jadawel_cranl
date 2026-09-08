@@ -284,7 +284,7 @@ export default {
 
 <style scoped>
 .billing-grant {
-  border-block: 1px solid #e5e7eb;
+  border-block: 1px solid var(--jadawel-border-color, #e0f1e7);
   padding-block: 24px;
 }
 .billing-grant form {

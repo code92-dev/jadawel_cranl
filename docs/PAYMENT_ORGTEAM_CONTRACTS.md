@@ -46,8 +46,13 @@ public-view policy are wired. Workspace bindings require a general administrator
 to explicitly confirm a preview when existing outsiders are present. Assignments
 support ADMIN, MEMBER, and read-only VIEWER enforcement, including per-member
 unassignment while retaining organization membership. Workspace
-attachment/import and delegated-job coverage still require dedicated integration
-tests. Websocket page checks reuse the same CoreHandler operation path; public
-view websocket access is denied when the optional public-view policy reports a
-suspended or restricted organization. Any necessary core patch is narrow and
-documented in PATCHES.md.
+attachment/import entry points now call the shared permission path, and focused
+tests cover workspace import, application copy, and Airtable import rejection in
+restricted workspaces. Delegated-job execution and end-to-end websocket/public
+delivery still require dedicated integration tests. Legacy workspace invitation
+and membership mutation endpoints are rejected for bound workspaces;
+organization handlers remain the supported mutation path. Websocket page checks
+reuse the same CoreHandler operation path, and access revocation schedules the
+existing force-disconnect task after commit. Public view websocket access is
+denied when the optional public-view policy reports a suspended or restricted
+organization. Any necessary core patch is narrow and documented in PATCHES.md.

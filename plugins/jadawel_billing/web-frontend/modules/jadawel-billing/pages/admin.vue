@@ -124,7 +124,7 @@
             <Button
               v-if="
                 item.status === 'paid' &&
-                !['succeeded', 'pending'].includes(item.refund_status)
+                !['succeeded', 'processing'].includes(item.refund_status)
               "
               type="secondary"
               :disabled="saving"
@@ -508,10 +508,12 @@ export default {
             ...this.orders[index],
             refund_status: data.status,
             refunded_amount: data.amount,
-            refundable_amount: Math.max(
-              0,
-              this.orders[index].amount - data.amount,
-            ),
+            refund_attempts: data.attempts,
+            refund_last_error: data.last_error,
+            refundable_amount:
+              data.status === "succeeded"
+                ? Math.max(0, this.orders[index].amount - data.amount)
+                : data.amount,
           });
         }
         this.selectedRefundOrder = null;

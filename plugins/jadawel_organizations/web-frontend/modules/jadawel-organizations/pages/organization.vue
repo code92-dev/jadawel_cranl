@@ -14,6 +14,21 @@
       · {{ $t("organizations.seats") }}:
       {{ organization.effective_entitlement.seat_limit }}
     </p>
+    <p v-if="organization.billing_subscription" role="status">
+      {{ $t("organizations.paymentStatus") }}:
+      {{
+        $t(
+          `organizations.subscriptionStatuses.${organization.billing_subscription.status}`,
+        )
+      }}
+      <span v-if="organization.billing_subscription.period_end">
+        · {{ $t("organizations.renewalThrough") }}:
+        <time>{{
+          formatDate(organization.billing_subscription.period_end)
+        }}</time>
+      </span>
+    </p>
+    <p v-else role="status">{{ $t("organizations.noPaidRenewal") }}</p>
 
     <section class="organization-settings">
       <h2>{{ $t("organizations.settings") }}</h2>
@@ -36,6 +51,19 @@
 
     <section>
       <h2>{{ $t("organizations.members") }}</h2>
+      <form class="organization-search" @submit.prevent="loadMembers">
+        <label>
+          {{ $t("organizations.search") }}
+          <input
+            v-model.trim="memberSearch"
+            type="search"
+            :placeholder="$t('organizations.searchMembers')"
+          />
+        </label>
+        <Button type="secondary" :disabled="busy">
+          {{ $t("organizations.search") }}
+        </Button>
+      </form>
       <form @submit.prevent="invite">
         <label>
           {{ $t("organizations.email") }}
@@ -119,10 +147,31 @@
           </Button>
         </li>
       </ul>
+      <Button
+        v-if="membersNext"
+        type="secondary"
+        :disabled="busy"
+        @click="loadMoreMembers"
+      >
+        {{ $t("organizations.more") }}
+      </Button>
     </section>
 
     <section>
       <h2>{{ $t("organizations.invitations") }}</h2>
+      <form class="organization-search" @submit.prevent="loadInvitations">
+        <label>
+          {{ $t("organizations.search") }}
+          <input
+            v-model.trim="invitationSearch"
+            type="search"
+            :placeholder="$t('organizations.searchInvitations')"
+          />
+        </label>
+        <Button type="secondary" :disabled="busy">
+          {{ $t("organizations.search") }}
+        </Button>
+      </form>
       <p v-if="!invitations.length">{{ $t("organizations.empty") }}</p>
       <ul v-else>
         <li v-for="invitation in invitations" :key="invitation.id">
@@ -144,10 +193,31 @@
           </Button>
         </li>
       </ul>
+      <Button
+        v-if="invitationsNext"
+        type="secondary"
+        :disabled="busy"
+        @click="loadMoreInvitations"
+      >
+        {{ $t("organizations.more") }}
+      </Button>
     </section>
 
     <section>
       <h2>{{ $t("organizations.workspaces") }}</h2>
+      <form class="organization-search" @submit.prevent="loadWorkspaces">
+        <label>
+          {{ $t("organizations.search") }}
+          <input
+            v-model.trim="workspaceSearch"
+            type="search"
+            :placeholder="$t('organizations.searchWorkspaces')"
+          />
+        </label>
+        <Button type="secondary" :disabled="busy">
+          {{ $t("organizations.search") }}
+        </Button>
+      </form>
       <form data-testid="workspace-bind-form" @submit.prevent="bindWorkspace">
         <label>
           {{ $t("organizations.workspaceId") }}
@@ -259,6 +329,14 @@
           </Button>
         </li>
       </ul>
+      <Button
+        v-if="workspacesNext"
+        type="secondary"
+        :disabled="busy"
+        @click="loadMoreWorkspaces"
+      >
+        {{ $t("organizations.more") }}
+      </Button>
     </section>
 
     <section>
@@ -301,6 +379,12 @@ export default {
       organization: null,
       organizationName: "",
       invitations: [],
+      invitationsNext: null,
+      invitationSearch: "",
+      membersNext: null,
+      memberSearch: "",
+      workspacesNext: null,
+      workspaceSearch: "",
       email: "",
       role: "member",
       userId: null,
@@ -328,17 +412,34 @@ export default {
     await this.load();
   },
   methods: {
+    formatDate(value) {
+      return value ? new Date(value).toLocaleString(this.$i18n.locale) : "";
+    },
     async load() {
       try {
-        const [organization, invitations] = await Promise.all([
-          this.$client.get(`/organizations/${this.currentOrganizationId}/`),
-          this.$client.get(
-            `/organizations/${this.currentOrganizationId}/invitations/`,
-          ),
-        ]);
+        const [organization, invitations, members, workspaces] =
+          await Promise.all([
+            this.$client.get(`/organizations/${this.currentOrganizationId}/`),
+            this.$client.get(
+              `/organizations/${this.currentOrganizationId}/invitations/`,
+            ),
+            this.$client.get(
+              `/organizations/${this.currentOrganizationId}/members/`,
+            ),
+            this.$client.get(
+              `/organizations/${this.currentOrganizationId}/workspaces/`,
+            ),
+          ]);
         this.organization = organization.data;
         this.organizationName = organization.data.name;
-        this.invitations = invitations.data;
+        this.invitations = invitations.data.results || invitations.data;
+        this.invitationsNext = invitations.data.next || null;
+        const memberData = members.data;
+        this.organization.members = memberData.results || memberData;
+        this.membersNext = memberData.next || null;
+        const workspaceData = workspaces.data;
+        this.organization.workspaces = workspaceData.results || workspaceData;
+        this.workspacesNext = workspaceData.next || null;
       } catch {
         this.error = true;
       }
@@ -354,6 +455,54 @@ export default {
       } finally {
         this.busy = false;
       }
+    },
+    async loadMembers() {
+      const { data } = await this.$client.get(
+        `/organizations/${this.currentOrganizationId}/members/`,
+        { params: this.memberSearch ? { search: this.memberSearch } : {} },
+      );
+      this.organization.members = data.results || data;
+      this.membersNext = data.next || null;
+    },
+    async loadInvitations() {
+      const { data } = await this.$client.get(
+        `/organizations/${this.currentOrganizationId}/invitations/`,
+        {
+          params: this.invitationSearch
+            ? { search: this.invitationSearch }
+            : {},
+        },
+      );
+      this.invitations = data.results || data;
+      this.invitationsNext = data.next || null;
+    },
+    async loadWorkspaces() {
+      const { data } = await this.$client.get(
+        `/organizations/${this.currentOrganizationId}/workspaces/`,
+        {
+          params: this.workspaceSearch ? { search: this.workspaceSearch } : {},
+        },
+      );
+      this.organization.workspaces = data.results || data;
+      this.workspacesNext = data.next || null;
+    },
+    async loadMoreMembers() {
+      if (!this.membersNext || this.busy) return;
+      const { data } = await this.$client.get(this.membersNext);
+      this.organization.members.push(...(data.results || data));
+      this.membersNext = data.next || null;
+    },
+    async loadMoreInvitations() {
+      if (!this.invitationsNext || this.busy) return;
+      const { data } = await this.$client.get(this.invitationsNext);
+      this.invitations.push(...(data.results || data));
+      this.invitationsNext = data.next || null;
+    },
+    async loadMoreWorkspaces() {
+      if (!this.workspacesNext || this.busy) return;
+      const { data } = await this.$client.get(this.workspacesNext);
+      this.organization.workspaces.push(...(data.results || data));
+      this.workspacesNext = data.next || null;
     },
     async invite() {
       await this.run(async () => {
@@ -505,6 +654,18 @@ export default {
   gap: 12px;
   max-inline-size: 480px;
   margin-block: 16px;
+}
+
+.organization-page .organization-search {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+  max-inline-size: 640px;
+}
+
+.organization-page .organization-search label {
+  flex: 1 1 280px;
 }
 
 .organization-page label {

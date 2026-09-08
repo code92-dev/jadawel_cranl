@@ -29,7 +29,7 @@ slices; the issues remain open until a maintainer reviews and lands the branch.
 Focused backend verification, with both plugin paths loaded, currently passes:
 
 ```text
-64 passed
+69 passed
 ```
 
 The same run covers complimentary access, role authority, seat reservation for
@@ -38,7 +38,8 @@ restoration, preservation of pre-existing workspace access, restricted operation
 handling, paid-Team idempotent provisioning, per-seat Team quotes, payment
 verification, webhook reconciliation, active Moyasar token/payment binding,
 payment methods, refunds, and renewal task behavior. The focused frontend run
-passes 9 tests, and strict repository locale parity reports 3,787/3,787 keys.
+passes 31 tests across six files, and strict repository locale parity reports
+3,787/3,787 keys.
 
 The organization UI now previews workspace outsiders before binding, supports
 pending-owner reassignment, and exposes the guarded Team-to-Individual
@@ -48,6 +49,21 @@ can be renamed with an audit record; bindings require explicit outsider
 confirmation for general administrators and support ADMIN, MEMBER, and
 read-only VIEWER assignments, including per-member unassignment without
 removing the organization membership.
+
+Organization, member, invitation, workspace, audit, and administrator list APIs
+now support the standard pagination envelope and `search` filtering. Customer
+and administrator organization pages expose search and **Load more** controls.
+Organization snapshots expose payment renewal state separately from effective
+access. Refund records retain an operation UUID, attempt count, processing lease,
+provider status reconciliation, and a single safe retry path.
+
+The Billing checkout capability response now hides Team prices when the
+Organizations provisioner is absent, and the Organizations Nuxt module declares
+Billing as a required frontend dependency. Managed workspace import, application
+copy, Airtable import, and legacy invitation/membership mutation entry points are
+covered by the organization permission adapter. Revocations schedule the existing
+Jadawel websocket disconnect task after commit, so stale realtime sessions cannot
+continue using managed workspace pages.
 
 Additional checks completed during implementation include scoped Ruff checks,
 Django system checks, Nuxt `prepare`, standalone locale parity, and Prettier
@@ -85,6 +101,6 @@ prices, tax/invoice treatment, refund policy, recurring-payment eligibility,
 grace policy, and Moyasar webhook configuration. Run the disposable-image fresh
 install/upgrade checks and a browser-authenticated Arabic/English pass with
 Moyasar sandbox credentials. The organization adapter still needs a dedicated
-integration pass for public-share, websocket, delegated-job and legacy import
-surfaces before those paths are described as fully managed. Do not mark these
+integration pass for public-share, websocket delivery, and delegated-job
+execution before those paths are described as fully managed. Do not mark these
 provider- or integration-dependent checks as passed from the local no-key run.

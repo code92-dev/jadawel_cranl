@@ -32,6 +32,12 @@ class AdminOrderSerializer(ReceiptSerializer):
     refund_status = serializers.SerializerMethodField()
     refunded_amount = serializers.SerializerMethodField()
     refundable_amount = serializers.SerializerMethodField()
+    refund_attempts = serializers.IntegerField(
+        source="refund.attempts", read_only=True, allow_null=True
+    )
+    refund_last_error = serializers.CharField(
+        source="refund.last_error", read_only=True, allow_blank=True
+    )
 
     def _refund(self, order: BillingOrder) -> BillingRefund | None:
         return getattr(order, "refund", None)
@@ -46,9 +52,9 @@ class AdminOrderSerializer(ReceiptSerializer):
 
     def get_refundable_amount(self, order: BillingOrder) -> int:
         refund = self._refund(order)
-        if refund and refund.status == BillingRefund.Status.FAILED:
-            # An uncertain or failed provider attempt can be retried, but it
-            # must keep the same amount as the recorded operation identity.
+        if refund and refund.status != BillingRefund.Status.SUCCEEDED:
+            # An uncertain or failed provider attempt can be retried only with
+            # the same amount as the recorded operation identity.
             return refund.amount
         return max(0, order.amount - (refund.amount if refund else 0))
 
@@ -72,6 +78,8 @@ class AdminOrderSerializer(ReceiptSerializer):
             "refund_status",
             "refunded_amount",
             "refundable_amount",
+            "refund_attempts",
+            "refund_last_error",
             "mode",
             "status",
             "created_at",

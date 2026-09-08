@@ -164,7 +164,13 @@ class AdminRefundView(APIView):
         data.is_valid(raise_exception=True)
         refund = refund_order(request.user, order, **data.validated_data)
         return Response(
-            {"id": refund.pk, "status": refund.status, "amount": refund.amount}
+            {
+                "id": refund.pk,
+                "status": refund.status,
+                "amount": refund.amount,
+                "attempts": refund.attempts,
+                "last_error": refund.last_error,
+            }
         )
 
 

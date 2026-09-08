@@ -10,6 +10,19 @@
         {{ $t("organizations.create") }}
       </button>
     </form>
+    <form class="organization-search" @submit.prevent="load">
+      <label>
+        {{ $t("organizations.search") }}
+        <input
+          v-model.trim="search"
+          type="search"
+          :placeholder="$t('organizations.searchOrganizations')"
+        />
+      </label>
+      <button type="submit" :disabled="loading">
+        {{ $t("organizations.search") }}
+      </button>
+    </form>
     <p v-if="loading" role="status">{{ $t("organizations.loading") }}</p>
     <p v-else-if="!organizations.length">{{ $t("organizations.empty") }}</p>
     <ul v-else>
@@ -22,6 +35,14 @@
         </span>
       </li>
     </ul>
+    <button
+      v-if="organizationsNext"
+      type="button"
+      :disabled="loading"
+      @click="loadMore"
+    >
+      {{ $t("organizations.more") }}
+    </button>
     <p v-if="error" role="alert">{{ $t("organizations.error") }}</p>
   </main>
 </template>
@@ -34,7 +55,9 @@ export default {
   data() {
     return {
       organizations: [],
+      organizationsNext: null,
       teamName: "",
+      search: "",
       loading: true,
       busy: false,
       error: false,
@@ -46,8 +69,29 @@ export default {
   methods: {
     async load() {
       this.error = false;
+      this.loading = true;
       try {
-        this.organizations = (await this.$client.get("/organizations/")).data;
+        const response = await this.$client.get("/organizations/", {
+          params: this.search ? { search: this.search } : {},
+        });
+        const data = response.data;
+        this.organizations = data.results || data;
+        this.organizationsNext = data.next || null;
+      } catch {
+        this.error = true;
+      } finally {
+        this.loading = false;
+      }
+    },
+    async loadMore() {
+      if (!this.organizationsNext || this.loading) return;
+      this.loading = true;
+      this.error = false;
+      try {
+        const response = await this.$client.get(this.organizationsNext);
+        const data = response.data;
+        this.organizations.push(...(data.results || data));
+        this.organizationsNext = data.next || null;
       } catch {
         this.error = true;
       } finally {
@@ -87,6 +131,17 @@ export default {
   gap: 12px;
   max-inline-size: 480px;
   margin-block: 24px;
+}
+
+.organizations-page .organization-search {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+}
+
+.organizations-page .organization-search label {
+  flex: 1 1 280px;
 }
 
 .organizations-page label {

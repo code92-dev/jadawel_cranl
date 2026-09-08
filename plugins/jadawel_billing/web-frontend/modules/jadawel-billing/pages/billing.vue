@@ -321,7 +321,9 @@ export default {
     },
     availablePrices() {
       return (this.options?.prices || []).filter(
-        (item) => item.kind === this.selectedAccountKind,
+        (item) =>
+          item.kind === this.selectedAccountKind &&
+          (item.kind !== "TEAM" || this.options?.team_available),
       );
     },
   },

@@ -2,6 +2,7 @@ from typing import Any
 from uuid import UUID
 
 from django.conf import settings
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
@@ -10,8 +11,11 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jadawel_billing.api.receipts import ReceiptSerializer
+from jadawel_billing.entitlements import (
+    get_effective_entitlements,
+    has_team_provisioner,
+)
 from jadawel_billing.errors import ProviderUnavailable
-from jadawel_billing.entitlements import get_effective_entitlements
 from jadawel_billing.models import BillingAccount, BillingOrder, PlanPrice, Subscription
 from jadawel_billing.payments import (
     billing_mode,
@@ -143,13 +147,18 @@ class CheckoutOptionsView(APIView):
         if not key.startswith(f"pk_{mode}_"):
             raise ProviderUnavailable()
         accounts = BillingAccount.objects.filter(responsible_user_id=request.user.pk)
+        team_available = has_team_provisioner()
         prices = PlanPrice.objects.filter(
             available=True, plan__available=True, amount__gt=0
-        ).select_related("plan")
+        )
+        if not team_available:
+            prices = prices.filter(~Q(plan__kind="TEAM"))
+        prices = prices.select_related("plan")
         return Response(
             {
                 "publishable_key": key,
                 "mode": mode,
+                "team_available": team_available,
                 "accounts": [{"id": str(a.pk), "kind": a.kind} for a in accounts],
                 "prices": [
                     {

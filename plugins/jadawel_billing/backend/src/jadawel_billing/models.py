@@ -218,12 +218,14 @@ class SubscriptionChange(models.Model):
 class BillingRefund(models.Model):
     class Status(models.TextChoices):
         PENDING = "pending"
+        PROCESSING = "processing"
         SUCCEEDED = "succeeded"
         FAILED = "failed"
 
     order = models.OneToOneField(
         BillingOrder, on_delete=models.PROTECT, related_name="refund"
     )
+    operation_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     amount = models.PositiveIntegerField()
     currency = models.CharField(max_length=3)
     status = models.CharField(
@@ -232,6 +234,8 @@ class BillingRefund(models.Model):
     provider_refund_id = models.CharField(
         max_length=120, unique=True, null=True, blank=True
     )
+    attempts = models.PositiveSmallIntegerField(default=0)
+    last_error = models.CharField(max_length=120, blank=True)
     reason = models.CharField(max_length=500)
     actor = models.ForeignKey(
         settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL

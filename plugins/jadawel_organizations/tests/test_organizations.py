@@ -216,6 +216,47 @@ def test_managed_workspace_uses_organization_permission_and_restricted_mode(
 
 
 @pytest.mark.django_db
+def test_restricted_workspace_blocks_import_copy_and_airtable_jobs(data_fixture):
+    from jadawel.core.exceptions import PermissionException
+    from jadawel.core.handler import CoreHandler
+    from jadawel.core.job_types import ImportApplicationsJobType
+    from jadawel_organizations.handlers import bind_workspace, create_organization
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    organization = create_organization(staff, name="Import boundaries", owner=owner)
+    workspace = data_fixture.create_workspace(user=owner, name="Protected data")
+    bind_workspace(owner, organization, workspace)
+    application = data_fixture.create_database_application(workspace=workspace)
+    resource = data_fixture.create_import_export_resource(
+        created_by=owner, original_name="protected.zip", is_valid=True
+    )
+
+    with pytest.raises(PermissionException):
+        CoreHandler().check_permissions(
+            owner,
+            "application.duplicate",
+            workspace=workspace,
+            context=application,
+        )
+    with pytest.raises(PermissionException):
+        ImportApplicationsJobType().prepare_values(
+            {"workspace_id": workspace.pk, "resource_id": resource.pk}, owner
+        )
+
+    from jadawel.contrib.database.airtable.job_types import AirtableImportJobType
+
+    with pytest.raises(PermissionException):
+        AirtableImportJobType().prepare_values(
+            {
+                "workspace_id": workspace.pk,
+                "airtable_share_url": "https://airtable.com/shr123456789",
+            },
+            owner,
+        )
+
+
+@pytest.mark.django_db
 def test_viewer_workspace_assignment_is_read_only(data_fixture):
     from django.utils import timezone
     from jadawel.core.exceptions import PermissionException
@@ -329,6 +370,92 @@ def test_workspace_assignment_delete_api_keeps_membership(api_client, data_fixtu
     assert response.status_code == 204
     assert OrganizationMembership.objects.filter(pk=membership.pk).exists()
     assert not WorkspaceUser.objects.filter(workspace=workspace, user=member).exists()
+
+
+@pytest.mark.django_db
+def test_legacy_workspace_membership_mutations_are_rejected_for_bound_workspaces(
+    data_fixture,
+):
+    from jadawel.core.exceptions import PermissionException
+    from jadawel.core.handler import CoreHandler
+    from jadawel.core.models import WorkspaceInvitation, WorkspaceUser
+    from jadawel_organizations.handlers import bind_workspace, create_organization
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user(email="legacy-owner@example.com")
+    outsider = data_fixture.create_user(email="legacy-outsider@example.com")
+    organization = create_organization(staff, name="Legacy boundary", owner=owner)
+    workspace = data_fixture.create_workspace(user=owner, name="Managed legacy")
+    bind_workspace(owner, organization, workspace)
+
+    with pytest.raises(PermissionException):
+        CoreHandler().create_workspace_invitation(
+            owner,
+            workspace,
+            outsider.email,
+            "MEMBER",
+            "https://localhost/accept",
+        )
+    assert not WorkspaceInvitation.objects.filter(workspace=workspace).exists()
+
+    invitation = WorkspaceInvitation.objects.create(
+        workspace=workspace,
+        email=outsider.email,
+        permissions="MEMBER",
+        invited_by=owner,
+    )
+    with pytest.raises(PermissionException):
+        CoreHandler().accept_workspace_invitation(outsider, invitation)
+    assert WorkspaceInvitation.objects.filter(pk=invitation.pk).exists()
+    assert not WorkspaceUser.objects.filter(workspace=workspace, user=outsider).exists()
+
+
+@pytest.mark.django_db
+def test_organization_lists_support_search_and_pagination(api_client, data_fixture):
+    from jadawel_organizations.handlers import (
+        bind_workspace,
+        create_organization,
+        invite_member,
+    )
+    from jadawel_organizations.models import OrganizationMembership
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner, token = data_fixture.create_user_and_token(email="lists-owner@example.com")
+    member = data_fixture.create_user(email="lists-member@example.com")
+    organization = create_organization(staff, name="Alpha organization", owner=owner)
+    create_organization(
+        staff, name="Beta organization", owner=data_fixture.create_user()
+    )
+    membership = OrganizationMembership.objects.create(
+        organization=organization, user=member
+    )
+    invite_member(owner, organization, email="pending@example.com")
+    workspace = data_fixture.create_workspace(user=owner, name="Alpha workspace")
+    bind_workspace(owner, organization, workspace)
+
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+    organization_response = api_client.get(
+        "/api/organizations/?search=Alpha&page_size=1"
+    )
+    assert organization_response.status_code == 200
+    assert len(organization_response.data["results"]) == 1
+    assert organization_response.data["results"][0]["name"] == "Alpha organization"
+
+    for path, expected_key in (
+        (f"/api/organizations/{organization.pk}/members/?page_size=1", "results"),
+        (
+            f"/api/organizations/{organization.pk}/invitations/?page_size=1",
+            "results",
+        ),
+        (f"/api/organizations/{organization.pk}/workspaces/?page_size=1", "results"),
+        (f"/api/organizations/{organization.pk}/audit/?page_size=1", "results"),
+    ):
+        response = api_client.get(path)
+        assert response.status_code == 200
+        assert expected_key in response.data
+        assert len(response.data[expected_key]) <= 1
+
+    assert membership.organization_id == organization.pk
 
 
 @pytest.mark.django_db
@@ -681,6 +808,41 @@ def test_lifecycle_revokes_and_restores_managed_workspace_access(data_fixture):
         )
     change_organization_lifecycle(staff, organization, action="reactivate")
     assert WorkspaceUser.objects.filter(workspace=workspace, user=owner).exists()
+
+
+@pytest.mark.django_db(transaction=True)
+def test_access_revocation_disconnects_realtime_sessions_after_commit(
+    data_fixture, monkeypatch
+):
+    from jadawel_organizations.handlers import (
+        bind_workspace,
+        create_organization,
+        remove_member,
+    )
+    from jadawel_organizations.models import OrganizationMembership
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    member = data_fixture.create_user()
+    organization = create_organization(staff, name="Realtime revoke", owner=owner)
+    membership = OrganizationMembership.objects.create(
+        organization=organization, user=member
+    )
+    workspace = data_fixture.create_workspace(user=owner, name="Realtime data")
+    bind_workspace(staff, organization, workspace)
+
+    disconnected = []
+    monkeypatch.setattr(
+        "jadawel.ws.tasks.force_disconnect_users.delay",
+        lambda user_ids: disconnected.append(user_ids),
+    )
+    from jadawel_organizations.handlers import assign_workspace_member
+
+    assign_workspace_member(
+        owner, organization, organization.workspaces.get(), membership
+    )
+    remove_member(staff, organization, membership)
+    assert disconnected == [[member.id]]
 
 
 @pytest.mark.django_db

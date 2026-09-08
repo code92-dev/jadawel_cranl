@@ -13,7 +13,7 @@ command:
 ```bash
 uv pip install ./plugins/jadawel_billing/backend ./plugins/jadawel_organizations/backend
 export JADAWEL_PLUGIN_DIR="$PWD/plugins"
-export ADDITIONAL_MODULES="../plugins/jadawel_billing/web-frontend/modules/jadawel-billing/module.js,../plugins/jadawel_organizations/web-frontend/modules/jadawel-organizations/module.js"
+export ADDITIONAL_MODULES="$PWD/plugins/jadawel_billing/web-frontend/modules/jadawel-billing/module.js,$PWD/plugins/jadawel_organizations/web-frontend/modules/jadawel-organizations/module.js"
 ```
 
 Configure `JADAWEL_MOYASAR_SECRET_KEY`,
@@ -73,6 +73,9 @@ changes do not refund a payment or silently cancel a paid renewal. **Suspend
 account access** overrides both manual and paid access until restored.
 
 ## Manage people
+
+Use the search field in each list to find an organization, member, invitation,
+or workspace. Long lists load additional pages with **Load more**.
 
 From an organization detail page, an owner, administrator, or general admin
 can:

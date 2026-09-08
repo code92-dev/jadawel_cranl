@@ -7,7 +7,10 @@ import {
 
 export default defineNuxtModule({
   meta: { name: "jadawel-organizations" },
-  dependsOn: ["core"],
+  // Organization checkout and entitlement state are supplied by Billing.
+  // Keep the standalone module's dependency contract explicit so an invalid
+  // frontend installation fails during Nuxt setup instead of at runtime.
+  dependsOn: ["core", "jadawel-billing"],
   setup(_, nuxt) {
     const { resolve } = createResolver(import.meta.url);
     addPlugin({ src: resolve("./plugin.js") });

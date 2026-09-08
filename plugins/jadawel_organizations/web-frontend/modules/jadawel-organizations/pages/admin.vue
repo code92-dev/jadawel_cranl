@@ -2,6 +2,19 @@
   <main class="organizations-admin-page">
     <h1>{{ $t("organizations.adminTitle") }}</h1>
     <p>{{ $t("organizations.freeNote") }}</p>
+    <form class="organization-search" @submit.prevent="load">
+      <label>
+        {{ $t("organizations.search") }}
+        <input
+          v-model.trim="search"
+          type="search"
+          :placeholder="$t('organizations.searchOrganizations')"
+        />
+      </label>
+      <Button type="secondary" :disabled="loading">
+        {{ $t("organizations.search") }}
+      </Button>
+    </form>
     <form @submit.prevent="create">
       <label>
         {{ $t("organizations.name") }}
@@ -64,6 +77,14 @@
           {{ $t(`organizations.sources.${organization.effective_source}`) }}
           · {{ $t("organizations.seats") }}:
           {{ organization.effective_seat_limit }}
+          <span v-if="organization.subscription_status">
+            — {{ $t("organizations.paymentStatus") }}:
+            {{
+              $t(
+                `organizations.subscriptionStatuses.${organization.subscription_status}`,
+              )
+            }}
+          </span>
         </span>
         <span v-if="organization.pending_owner_email">
           — {{ $t("organizations.pendingOwner") }}:
@@ -88,6 +109,14 @@
         </span>
       </li>
     </ul>
+    <Button
+      v-if="organizationsNext"
+      type="secondary"
+      :disabled="loading"
+      @click="loadMoreOrganizations"
+    >
+      {{ $t("organizations.more") }}
+    </Button>
     <p v-if="ownerSetupToken" role="status">
       {{ $t("organizations.ownerSetupToken") }}:
       <code dir="ltr">{{ ownerSetupToken }}</code>
@@ -110,6 +139,8 @@ export default {
       plans: [],
       grant: { plan: "", seat_limit: 1, expires_at: "", reason: "" },
       organizations: [],
+      organizationsNext: null,
+      search: "",
       reassignEmails: {},
       loading: true,
       busy: false,
@@ -123,10 +154,13 @@ export default {
     async load() {
       try {
         const [organizations, plans] = await Promise.all([
-          this.$client.get("/organizations/admin/"),
+          this.$client.get("/organizations/admin/", {
+            params: this.search ? { search: this.search } : {},
+          }),
           this.$client.get("/billing/admin/plans/"),
         ]);
         this.organizations = organizations.data.results || organizations.data;
+        this.organizationsNext = organizations.data.next || null;
         this.plans = (plans.data.results || plans.data).filter(
           (plan) => plan.kind === "TEAM",
         );
@@ -180,6 +214,21 @@ export default {
         this.error = true;
       }
     },
+    async loadMoreOrganizations() {
+      if (!this.organizationsNext || this.loading) return;
+      this.loading = true;
+      this.error = false;
+      try {
+        const response = await this.$client.get(this.organizationsNext);
+        const data = response.data;
+        this.organizations.push(...(data.results || data));
+        this.organizationsNext = data.next || null;
+      } catch {
+        this.error = true;
+      } finally {
+        this.loading = false;
+      }
+    },
   },
 };
 </script>
@@ -197,6 +246,18 @@ export default {
   gap: 12px;
   max-inline-size: 480px;
   margin-block: 24px;
+}
+
+.organizations-admin-page .organization-search {
+  display: flex;
+  gap: 12px;
+  align-items: end;
+  flex-wrap: wrap;
+  max-inline-size: 640px;
+}
+
+.organizations-admin-page .organization-search label {
+  flex: 1 1 280px;
 }
 
 .organizations-admin-page label {

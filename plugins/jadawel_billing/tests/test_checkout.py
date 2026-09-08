@@ -129,6 +129,34 @@ def test_individual_subscription_activates_only_after_provider_verification(
 
 
 @pytest.mark.django_db
+def test_checkout_options_hide_team_until_organizations_is_loaded(
+    api_client, data_fixture, settings
+):
+    import jadawel_billing.entitlements as entitlements
+    from jadawel_billing.handlers import create_account, create_plan, create_price
+
+    settings.JADAWEL_MOYASAR_SECRET_KEY = "sk_test_fixture"
+    settings.JADAWEL_MOYASAR_PUBLISHABLE_KEY = "pk_test_fixture"
+    settings.JADAWEL_BILLING_MODE = "test"
+    user, token = data_fixture.create_user_and_token(is_staff=True)
+    create_account(user, kind="INDIVIDUAL", responsible_user=user)
+    team_plan = create_plan(
+        user, code="team-hidden", name="Team", kind="TEAM", available=True
+    )
+    create_price(user, plan=team_plan, amount=5000, interval="MONTH", available=True)
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+    previous = entitlements._team_provisioner
+    entitlements._team_provisioner = None
+    try:
+        response = api_client.get("/api/billing/checkout/")
+    finally:
+        entitlements._team_provisioner = previous
+    assert response.status_code == 200
+    assert response.data["team_available"] is False
+    assert response.data["prices"] == []
+
+
+@pytest.mark.django_db
 def test_staff_can_reconcile_an_order_when_payer_is_no_longer_active(
     api_client, data_fixture, settings
 ):

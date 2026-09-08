@@ -20,6 +20,14 @@ class OrganizationPermissionManagerType(PermissionManagerType):
     type = "organization"
     supported_actor_types = [UserSubjectType.type, TokenSubjectType.type]
 
+    LEGACY_MEMBERSHIP_MUTATIONS = {
+        "workspace.create_invitation",
+        "workspace_user.update",
+        "workspace_user.delete",
+        "invitation.update",
+        "invitation.delete",
+    }
+
     READ_OPERATIONS = {
         "application.integration.read",
         "application.list_integrations",
@@ -189,6 +197,12 @@ class OrganizationPermissionManagerType(PermissionManagerType):
             access = self._access(check.actor, organization, workspace)
             if access is None:
                 result[check] = UserNotInWorkspace(check.actor, workspace)
+            elif check.operation_name in self.LEGACY_MEMBERSHIP_MUTATIONS:
+                # Organization APIs are the only supported membership mutation path
+                # after binding.  This prevents a workspace admin from adding or
+                # changing users through legacy endpoints without changing unmanaged
+                # workspace behavior.
+                result[check] = PermissionDenied(check.actor)
             elif restricted and (
                 source == "suspended"
                 or not self.is_read_operation(check.operation_name)

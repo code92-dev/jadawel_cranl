@@ -1337,3 +1337,9 @@ updater then read.
 | File | Change | Reason | Risk |
 | --- | --- | --- | --- |
 | `backend/src/jadawel/contrib/database/views/handler.py`, `backend/src/arabase/dashboard/share/handler.py` | Call the optional organization public-workspace policy before resolving a public view or dashboard share | Organization suspension must disable existing public links without deleting their share configuration; unmanaged workspaces keep the upstream path | Low; optional imports are guarded by installed-app detection |
+
+## Phase — Reject legacy membership mutations for managed workspaces (2026-09-08)
+
+| File | Change | Reason | Risk |
+| --- | --- | --- | --- |
+| `backend/src/jadawel/core/handler.py` | Invoke an optional plugin callback before creating or accepting a legacy workspace invitation | Bound organization workspaces must use organization invitations so seat locking, roles and audit records cannot be bypassed; unmanaged workspaces retain the core flow | Low; callback is optional and only installed plugins implement it |

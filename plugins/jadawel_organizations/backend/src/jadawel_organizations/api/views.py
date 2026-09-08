@@ -6,8 +6,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import generics, serializers, status
 from rest_framework.exceptions import PermissionDenied, ValidationError
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.pagination import PageNumberPagination
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
 
 from ..handlers import (
@@ -73,6 +75,12 @@ def require_viewer(request: Request, organization: Organization) -> None:
         raise PermissionDenied("organization_membership_required")
 
 
+class OrganizationPagination(PageNumberPagination):
+    page_size = 25
+    page_size_query_param = "page_size"
+    max_page_size = 100
+
+
 class OrganizationListView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -84,7 +92,17 @@ class OrganizationListView(APIView):
             .distinct()
             .select_related("owner")
         )
-        return Response([organization_snapshot(org) for org in organizations])
+        search = request.query_params.get("search", "").strip()
+        if search:
+            organizations = organizations.filter(
+                Q(name__icontains=search) | Q(owner__email__icontains=search)
+            )
+        organizations = organizations.order_by("name", "id")
+        paginator = OrganizationPagination()
+        page = paginator.paginate_queryset(organizations, request, view=self)
+        return paginator.get_paginated_response(
+            [organization_snapshot(org) for org in page]
+        )
 
 
 class OrganizationDetailView(APIView):
@@ -116,6 +134,9 @@ class OrganizationDetailView(APIView):
 class AdminOrganizationListView(generics.ListAPIView[Any]):
     permission_classes = [IsAdminUser]
     serializer_class = OrganizationSerializer
+    pagination_class = OrganizationPagination
+    filter_backends = [SearchFilter]
+    search_fields = ["name", "owner__email"]
     queryset = Organization.objects.select_related("owner").annotate(
         members_count=Count("memberships", filter=Q(memberships__suspended=False))
     )
@@ -171,10 +192,18 @@ class MemberListView(APIView):
     def get(self, request: Request, organization_id: UUID) -> Response:
         organization = get_org(organization_id)
         require_viewer(request, organization)
-        return Response(
-            MembershipSerializer(
-                organization.memberships.select_related("user"), many=True
-            ).data
+        memberships = organization.memberships.select_related("user").order_by(
+            "role", "id"
+        )
+        search = request.query_params.get("search", "").strip()
+        if search:
+            memberships = memberships.filter(
+                Q(user__email__icontains=search) | Q(user__username__icontains=search)
+            )
+        paginator = OrganizationPagination()
+        page = paginator.paginate_queryset(memberships, request, view=self)
+        return paginator.get_paginated_response(
+            MembershipSerializer(page, many=True).data
         )
 
     def post(self, request: Request, organization_id: UUID) -> Response:
@@ -218,7 +247,14 @@ class InvitationListCreateView(APIView):
         organization = get_org(organization_id)
         require_viewer(request, organization)
         invitations = organization.invitations.order_by("-created_at")
-        return Response(InvitationSerializer(invitations, many=True).data)
+        search = request.query_params.get("search", "").strip()
+        if search:
+            invitations = invitations.filter(email__icontains=search)
+        paginator = OrganizationPagination()
+        page = paginator.paginate_queryset(invitations, request, view=self)
+        return paginator.get_paginated_response(
+            InvitationSerializer(page, many=True).data
+        )
 
     def post(self, request: Request, organization_id: UUID) -> Response:
         organization = get_org(organization_id)
@@ -260,10 +296,16 @@ class WorkspaceListView(APIView):
     def get(self, request: Request, organization_id: UUID) -> Response:
         organization = get_org(organization_id)
         require_viewer(request, organization)
-        return Response(
-            OrganizationWorkspaceSerializer(
-                organization.workspaces.select_related("workspace"), many=True
-            ).data
+        workspaces = organization.workspaces.select_related("workspace").order_by(
+            "workspace__name", "id"
+        )
+        search = request.query_params.get("search", "").strip()
+        if search:
+            workspaces = workspaces.filter(workspace__name__icontains=search)
+        paginator = OrganizationPagination()
+        page = paginator.paginate_queryset(workspaces, request, view=self)
+        return paginator.get_paginated_response(
+            OrganizationWorkspaceSerializer(page, many=True).data
         )
 
 
@@ -375,12 +417,20 @@ class AuditView(generics.ListAPIView[Any]):
     def get_queryset(self) -> Any:
         organization = get_org(self.kwargs["organization_id"])
         require_viewer(self.request, organization)
-        return OrganizationAuditEvent.objects.filter(
+        events = OrganizationAuditEvent.objects.filter(
             organization=organization
-        ).order_by("-created_at")
+        ).order_by("-created_at", "-id")
+        search = self.request.query_params.get("search", "").strip()
+        if search:
+            events = events.filter(
+                Q(action__icontains=search) | Q(target__icontains=search)
+            )
+        return events
 
     def list(self, request: Request, *args: Any, **kwargs: Any) -> Response:
+        paginator = OrganizationPagination()
         rows = self.get_queryset().values(
             "id", "actor_id", "action", "target", "details", "created_at"
         )
-        return Response(list(rows))
+        page = paginator.paginate_queryset(rows, request, view=self)
+        return paginator.get_paginated_response(list(page))

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 from django.conf import settings
@@ -6,6 +6,7 @@ from django.db import transaction
 from django.utils import timezone
 from rest_framework.exceptions import ValidationError
 
+from .errors import ProviderUnavailable
 from .handlers import audit, require_admin
 from .models import BillingAccount, BillingOrder, BillingRefund, ExternalPayment
 from .payments import billing_mode
@@ -38,14 +39,70 @@ def refund_order(
         if not created:
             if refund.status == BillingRefund.Status.SUCCEEDED:
                 return refund
-            if refund.status == BillingRefund.Status.PENDING:
-                raise ValidationError({"refund": "already_processing"})
+            if refund.status == BillingRefund.Status.PROCESSING:
+                if refund.updated_at > timezone.now() - timedelta(minutes=5):
+                    raise ValidationError({"refund": "already_processing"})
+                # A worker may have exited after the state transition and
+                # before the provider response. Re-enter the reconciliation
+                # path after the short processing lease expires.
+                refund.status = BillingRefund.Status.PENDING
+                refund.save(update_fields=["status", "updated_at"])
             if refund.amount != requested_amount:
                 raise ValidationError({"amount": "must_match_previous_attempt"})
         amount = refund.amount
     provider_id = getattr(order.payment_attempt, "provider_payment_id", None)
     if not provider_id:
         raise ValidationError({"payment": "provider_id_required"})
+
+    # Moyasar documents refund recovery as a payment status fetch followed by
+    # one retry only when the original payment is still refundable. Do this
+    # outside the database transaction so provider I/O never holds a DB lock.
+    if not created and refund.attempts:
+        try:
+            payment = MoyasarClient(
+                secret_key=settings.JADAWEL_MOYASAR_SECRET_KEY, mode=billing_mode()
+            ).fetch(provider_id)
+        except ProviderUnavailable as exc:
+            raise ValidationError({"refund": "reconciliation_unavailable"}) from exc
+        provider_status = payment.get("status")
+        if provider_status == "refunded":
+            with transaction.atomic():
+                refund = BillingRefund.objects.select_for_update().get(pk=refund.pk)
+                refund.status = BillingRefund.Status.SUCCEEDED
+                refund.last_error = ""
+                refund.updated_at = timezone.now()
+                refund.save(update_fields=["status", "last_error", "updated_at"])
+                audit(
+                    actor,
+                    "payment.refund_reconciled",
+                    order.account_id,
+                    {"order": str(order.pk), "amount": refund.amount},
+                )
+                return refund
+        if provider_status not in {"paid", "captured"}:
+            with transaction.atomic():
+                refund = BillingRefund.objects.select_for_update().get(pk=refund.pk)
+                refund.status = BillingRefund.Status.FAILED
+                refund.last_error = f"payment_status:{provider_status or 'unknown'}"[
+                    :120
+                ]
+                refund.updated_at = timezone.now()
+                refund.save(update_fields=["status", "last_error", "updated_at"])
+            raise ValidationError({"refund": "payment_not_refundable"})
+
+    with transaction.atomic():
+        refund = BillingRefund.objects.select_for_update().get(pk=refund.pk)
+        if refund.status == BillingRefund.Status.SUCCEEDED:
+            return refund
+        if refund.status == BillingRefund.Status.PROCESSING:
+            raise ValidationError({"refund": "already_processing"})
+        if refund.attempts >= 2:
+            raise ValidationError({"refund": "retry_limit_reached"})
+        refund.status = BillingRefund.Status.PROCESSING
+        refund.attempts += 1
+        refund.last_error = ""
+        refund.save(update_fields=["status", "attempts", "last_error", "updated_at"])
+        amount = refund.amount
     try:
         payload = MoyasarClient(
             secret_key=settings.JADAWEL_MOYASAR_SECRET_KEY, mode=billing_mode()
@@ -57,13 +114,27 @@ def refund_order(
                 if status in {"refunded", "succeeded", "paid"}
                 else BillingRefund.Status.FAILED
             )
+            refund.last_error = (
+                ""
+                if refund.status == BillingRefund.Status.SUCCEEDED
+                else str(
+                    payload.get("message") or payload.get("error") or "provider_failed"
+                )[:120]
+            )
             refund.provider_refund_id = (
                 str(payload.get("id"))
                 if payload.get("id")
                 else refund.provider_refund_id
             )
             refund.updated_at = timezone.now()
-            refund.save(update_fields=["status", "provider_refund_id", "updated_at"])
+            refund.save(
+                update_fields=[
+                    "status",
+                    "provider_refund_id",
+                    "last_error",
+                    "updated_at",
+                ]
+            )
             audit(
                 actor,
                 "payment.refunded",
@@ -71,11 +142,13 @@ def refund_order(
                 {"order": str(order.pk), "amount": amount},
             )
             return refund
-    except Exception:
+    except ProviderUnavailable as exc:
         BillingRefund.objects.filter(pk=refund.pk).update(
-            status=BillingRefund.Status.PENDING
+            status=BillingRefund.Status.PENDING,
+            last_error="provider_unavailable",
+            updated_at=timezone.now(),
         )
-        raise
+        raise exc
 
 
 @transaction.atomic

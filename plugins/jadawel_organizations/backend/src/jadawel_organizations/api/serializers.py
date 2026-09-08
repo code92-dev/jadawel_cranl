@@ -20,6 +20,9 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
     effective_source = serializers.SerializerMethodField()
     effective_seat_limit = serializers.SerializerMethodField()
     pending_owner_email = serializers.SerializerMethodField()
+    subscription_status = serializers.SerializerMethodField()
+    subscription_period_end = serializers.SerializerMethodField()
+    subscription_cancel_at_period_end = serializers.SerializerMethodField()
 
     def _effective(self, organization: Organization) -> dict[str, Any]:
         from jadawel_billing.entitlements import get_effective_entitlements
@@ -40,6 +43,29 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
         ).first()
         return invitation.email if invitation else None
 
+    def _subscription(self, organization: Organization):
+        from jadawel_billing.models import Subscription
+
+        return (
+            Subscription.objects.filter(account_id=organization.billing_account_id)
+            .order_by("-period_start", "-id")
+            .first()
+        )
+
+    def get_subscription_status(self, organization: Organization) -> str | None:
+        subscription = self._subscription(organization)
+        return subscription.status if subscription else None
+
+    def get_subscription_period_end(self, organization: Organization):
+        subscription = self._subscription(organization)
+        return subscription.period_end if subscription else None
+
+    def get_subscription_cancel_at_period_end(
+        self, organization: Organization
+    ) -> bool | None:
+        subscription = self._subscription(organization)
+        return subscription.cancel_at_period_end if subscription else None
+
     class Meta:
         model = Organization
         fields = [
@@ -54,6 +80,9 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
             "members_count",
             "effective_source",
             "effective_seat_limit",
+            "subscription_status",
+            "subscription_period_end",
+            "subscription_cancel_at_period_end",
             "created_at",
         ]
         read_only_fields = fields
