@@ -24,7 +24,7 @@ def save_payment_method(
     actor: Any,
     account: BillingAccount,
     *,
-    provider_token: str,
+    provider_token: str | None = None,
     provider_payment_id: str,
     consent: bool,
     brand: str = "",
@@ -35,9 +35,10 @@ def save_payment_method(
     _can_manage(actor, account)
     if not consent:
         raise ValidationError({"consent": "required"})
-    provider_token = provider_token.strip()
-    if not provider_token or len(provider_token) > 160:
-        raise ValidationError({"provider_token": "invalid"})
+    if provider_token is not None:
+        provider_token = provider_token.strip()
+        if not provider_token or len(provider_token) > 160:
+            raise ValidationError({"provider_token": "invalid"})
     order = (
         BillingOrder.objects.filter(
             account=account,
@@ -53,25 +54,40 @@ def save_payment_method(
         secret_key=settings.JADAWEL_MOYASAR_SECRET_KEY,
         mode=billing_mode(),
     )
-    token = client.fetch_token(provider_token)
     payment = client.fetch(provider_payment_id)
     payment_source = payment.get("source") or {}
+    provider_token = provider_token or payment_source.get("token")
+    if not isinstance(provider_token, str):
+        raise ValidationError({"provider_payment_id": "payment_token_missing"})
+    provider_token = provider_token.strip()
+    if not provider_token or len(provider_token) > 160:
+        raise ValidationError({"provider_token": "invalid"})
     if (
         payment.get("status") not in {"paid", "captured"}
         or payment_source.get("token") != provider_token
     ):
         raise ValidationError({"provider_token": "payment_token_mismatch"})
+    token = client.fetch_token(provider_token)
     if token.get("status") != "active":
         raise ValidationError({"provider_token": "token_not_active"})
+    provider_brand = payment_source.get("brand") or payment_source.get("company") or ""
+    provider_last4 = (
+        payment_source.get("last4")
+        or payment_source.get("last_four")
+        or payment_source.get("lastFour")
+        or ""
+    )
+    provider_exp_month = payment_source.get("month")
+    provider_exp_year = payment_source.get("year")
     with transaction.atomic():
         method, _ = PaymentMethod.objects.update_or_create(
             provider_token=provider_token,
             defaults={
                 "account": account,
-                "brand": brand[:40],
-                "last4": last4[-4:],
-                "exp_month": exp_month,
-                "exp_year": exp_year,
+                "brand": str(provider_brand or brand)[:40],
+                "last4": str(provider_last4 or last4)[-4:],
+                "exp_month": provider_exp_month or exp_month,
+                "exp_year": provider_exp_year or exp_year,
                 "consent_at": timezone.now(),
                 "revoked_at": None,
             },

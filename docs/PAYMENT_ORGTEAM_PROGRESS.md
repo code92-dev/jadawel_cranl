@@ -86,6 +86,12 @@ successfully.
 Provider HTTP calls for saved payment methods are outside the database write
 transaction.
 
+Saved-card consent is now sent to Moyasar as `source.save_card`. For immediate
+and 3-D Secure payments, the callback remembers only the opt-in flag and asks
+the server to derive and validate the token from the verified paid payment;
+usable provider tokens are never stored in browser storage or accepted from a
+callback URL.
+
 The organization tests also cover pending-owner acceptance, reserved owner
 capacity, concurrent last-seat acceptance on PostgreSQL, idempotent organization
 creation retries, restricted workspace creation, queued-job rechecks after

@@ -33,7 +33,7 @@ from jadawel_billing.subscriptions import (
 
 
 class PaymentMethodInput(serializers.Serializer[Any]):
-    provider_token = serializers.CharField(max_length=160)
+    provider_token = serializers.CharField(max_length=160, required=False)
     provider_payment_id = serializers.CharField(max_length=100)
     consent = serializers.BooleanField()
     brand = serializers.CharField(max_length=40, required=False, default="")

@@ -382,9 +382,18 @@ export default {
           this.history.find((item) => item.id === returnedOrder) || null;
         this.submitted = true;
         if (this.order) {
-          await this.verify(
-            this.$route.query.provider_payment_id || this.$route.query.id,
-          );
+          const providerPaymentId =
+            this.$route.query.provider_payment_id || this.$route.query.id;
+          const saveCard = this.takeSaveCardPreference(returnedOrder);
+          const verifiedOrder = await this.verify(providerPaymentId);
+          if (
+            saveCard &&
+            verifiedOrder?.status === "paid" &&
+            providerPaymentId
+          ) {
+            await this.savePaymentMethod(providerPaymentId);
+            this.clearSaveCardPreference(returnedOrder);
+          }
         }
       }
     } catch {
@@ -405,6 +414,43 @@ export default {
     },
     clearCard() {
       this.card = { name: "", number: "", month: "", year: "", cvc: "" };
+    },
+    saveCardPreferenceKey(orderId) {
+      return "jadawel.billing.save-card:" + orderId;
+    },
+    rememberSaveCardPreference(orderId) {
+      if (!this.saveCard || !orderId) return;
+      try {
+        window.sessionStorage.setItem(this.saveCardPreferenceKey(orderId), "1");
+      } catch {
+        // Storage can be disabled; the immediate payment path still works.
+      }
+    },
+    takeSaveCardPreference(orderId) {
+      if (!orderId) return false;
+      try {
+        return (
+          window.sessionStorage.getItem(this.saveCardPreferenceKey(orderId)) ===
+          "1"
+        );
+      } catch {
+        return false;
+      }
+    },
+    clearSaveCardPreference(orderId) {
+      if (!orderId) return;
+      try {
+        window.sessionStorage.removeItem(this.saveCardPreferenceKey(orderId));
+      } catch {
+        // Storage can be disabled.
+      }
+    },
+    async savePaymentMethod(providerPaymentId) {
+      await this.$client.post(
+        "/billing/accounts/" + this.account + "/payment-methods/",
+        { provider_payment_id: providerPaymentId, consent: true },
+      );
+      await this.loadAccount();
     },
     formatDate(value) {
       return value ? new Date(value).toLocaleString(this.$i18n.locale) : "";
@@ -517,14 +563,18 @@ export default {
       try {
         const callback = new URL("/billing", window.location.origin);
         callback.searchParams.set("order", this.order.id);
+        callback.searchParams.set("account", this.account);
         const payment = await submitPayment(
           this.order,
           this.options.publishable_key,
           { ...this.card, number: this.card.number.replaceAll(" ", "") },
           callback.toString(),
+          fetch,
+          { saveCard: this.saveCard },
         );
         this.clearCard();
         if (payment.source?.transaction_url) {
+          this.rememberSaveCardPreference(this.order.id);
           const redirect = new URL(payment.source.transaction_url);
           if (
             redirect.protocol !== "https:" ||
@@ -535,23 +585,8 @@ export default {
           return;
         }
         const verifiedOrder = await this.verify(payment.id);
-        if (
-          this.saveCard &&
-          payment.source?.token &&
-          verifiedOrder?.status === "paid"
-        ) {
-          await this.$client.post(
-            "/billing/accounts/" + this.account + "/payment-methods/",
-            {
-              provider_token: payment.source.token,
-              provider_payment_id: payment.id,
-              consent: true,
-              brand: payment.source.brand || "",
-              last4: payment.source.last4 || "",
-              exp_month: payment.source.month,
-              exp_year: payment.source.year,
-            },
-          );
+        if (this.saveCard && verifiedOrder?.status === "paid") {
+          await this.savePaymentMethod(payment.id);
         }
       } catch {
         this.error = true;

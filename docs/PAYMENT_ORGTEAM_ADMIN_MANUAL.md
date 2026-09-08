@@ -73,6 +73,13 @@ Only a verified `paid` or `captured` payment changes the order and subscription
 state. Reconciliation provisions the organization idempotently; retrying a
 settled order cannot create a second organization.
 
+During checkout, **Save this card for subscription renewal** is an explicit
+opt-in. Moyasar tokenizes the card directly. Jadawl stores only the verified
+provider token reference and safe display details; after a 3-D Secure return,
+the server derives the token from the verified payment before saving it. The
+customer can remove a saved method from **Billing → Payment methods** at any
+time, which revokes it for future renewals.
+
 ## Edit, extend, or revoke access
 
 Open **Billing → Complimentary access** for the account. Use preview to review

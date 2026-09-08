@@ -5,6 +5,7 @@ export async function submitPayment(
   card,
   callback,
   transport = fetch,
+  options = {},
 ) {
   const response = await transport("https://api.moyasar.com/v1/payments", {
     method: "POST",
@@ -25,6 +26,7 @@ export async function submitPayment(
         ...card,
         month: Number(card.month),
         year: Number(card.year),
+        save_card: Boolean(options.saveCard),
       },
     }),
   });
