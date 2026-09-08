@@ -10,6 +10,20 @@ term exists).
 
 ## Core product nouns
 
+### Billing and organizations
+
+| English | Arabic | Notes |
+| --- | --- | --- |
+| Billing | الفوترة | Subscription and payment management. |
+| Billing account | حساب الفوترة | Individual or organization payer context. |
+| Subscription | اشتراك | Recurring access period. |
+| Plan | باقة | Product subscription offering. |
+| Organization | منشأة | Company or organization account. |
+| Complimentary access | وصول مجاني | Explicit administrator grant. |
+| Seat | مقعد | One licensed organization member. |
+
+### Workspace vocabulary
+
 | English | Arabic | Notes |
 |---------|--------|-------|
 | Jadawel (product) | جداول | Product name; never translated further. |

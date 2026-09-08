@@ -1,0 +1,8 @@
+{
+  "name": "Jadawel Billing",
+  "version": "0.1.0",
+  "description": "Individual and Team billing with administrator-managed access",
+  "license": "MIT",
+  "author": "Jadawel contributors",
+  "source": "https://github.com/code92-dev/jadawel_cranl"
+}
