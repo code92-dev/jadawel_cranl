@@ -8,10 +8,99 @@
         <p v-if="options.mode === 'test'" role="status">
           {{ $t("billing.sandbox") }}
         </p>
+        <section
+          v-if="accountState"
+          class="billing-account"
+          data-testid="account-state"
+        >
+          <h2>{{ $t("billing.accountStatus") }}</h2>
+          <p role="status">
+            {{ $t("billing.source." + accountState.effective.source) }} ·
+            {{ $t("billing.seats") }}:
+            {{ accountState.effective.seat_limit }}
+          </p>
+          <p v-if="accountState.effective.valid_until">
+            {{ $t("billing.accessUntil") }}:
+            <time>{{ formatDate(accountState.effective.valid_until) }}</time>
+          </p>
+          <template v-if="accountState.subscription">
+            <p>
+              {{
+                $t("billing.renewal", {
+                  date: formatDate(accountState.subscription.period_end),
+                })
+              }}
+            </p>
+            <Button
+              type="secondary"
+              :disabled="busy"
+              @click="toggleCancellation"
+            >
+              {{
+                accountState.subscription.cancel_at_period_end
+                  ? $t("billing.resumeRenewal")
+                  : $t("billing.cancelRenewal")
+              }}
+            </Button>
+            <form @submit.prevent="scheduleChange">
+              <label>
+                {{ $t("billing.changePlan") }}
+                <select v-model.number="subscriptionChange.price" class="input">
+                  <option
+                    v-for="item in availablePrices"
+                    :key="item.id"
+                    :value="item.id"
+                  >
+                    {{ item.name }} — {{ money(item.amount) }} /
+                    {{ $t("billing." + item.interval.toLowerCase()) }}
+                  </option>
+                </select>
+              </label>
+              <label v-if="selectedAccountKind === 'TEAM'">
+                {{ $t("billing.changeSeats") }}
+                <input
+                  v-model.number="subscriptionChange.seats"
+                  type="number"
+                  min="1"
+                  :max="accountState.subscription.seats"
+                  required
+                  class="input"
+                />
+              </label>
+              <Button type="secondary" :disabled="busy" button-type="submit">
+                {{ $t("billing.scheduleChange") }}
+              </Button>
+            </form>
+          </template>
+        </section>
+        <section v-if="accountState" class="payment-methods">
+          <h2>{{ $t("billing.paymentMethods") }}</h2>
+          <p v-if="!paymentMethods.length">
+            {{ $t("billing.noPaymentMethods") }}
+          </p>
+          <ul v-else>
+            <li v-for="method in paymentMethods" :key="method.id">
+              <bdi>{{ method.brand }}</bdi> ·
+              <span dir="ltr">•••• {{ method.last4 }}</span>
+              <Button
+                type="secondary"
+                :disabled="busy"
+                @click="revokePaymentMethod(method)"
+              >
+                {{ $t("billing.removePaymentMethod") }}
+              </Button>
+            </li>
+          </ul>
+        </section>
         <form v-if="!order" @submit.prevent="prepare">
           <label
             >{{ $t("billing.accounts")
-            }}<select v-model="account" required class="input">
+            }}<select
+              v-model="account"
+              required
+              class="input"
+              @change="loadAccount"
+            >
               <option
                 v-for="item in options.accounts"
                 :key="item.id"
@@ -124,7 +213,7 @@
                 required
                 class="input"
             /></label>
-            <label v-if="selectedAccountKind === 'INDIVIDUAL'">
+            <label>
               <input v-model="saveCard" type="checkbox" />
               {{ $t("billing.saveCard") }}
             </label>
@@ -186,6 +275,8 @@ export default {
     return {
       options: null,
       account: "",
+      accountState: null,
+      paymentMethods: [],
       price: "",
       order: null,
       history: [],
@@ -196,6 +287,7 @@ export default {
       error: false,
       submitted: false,
       card: { name: "", number: "", month: "", year: "", cvc: "" },
+      subscriptionChange: { price: null, seats: 1 },
     };
   },
   async mounted() {
@@ -209,6 +301,7 @@ export default {
       this.account =
         this.$route.query.account || this.options.accounts[0]?.id || "";
       this.price = this.options.prices[0]?.id || "";
+      await this.loadAccount();
       const returnedOrder = this.$route.query.order;
       if (returnedOrder) {
         this.order =
@@ -251,6 +344,66 @@ export default {
     },
     clearCard() {
       this.card = { name: "", number: "", month: "", year: "", cvc: "" };
+    },
+    formatDate(value) {
+      return value ? new Date(value).toLocaleString(this.$i18n.locale) : "";
+    },
+    async loadAccount() {
+      if (!this.account) return;
+      const [account, methods] = await Promise.all([
+        this.$client.get("/billing/accounts/" + this.account + "/"),
+        this.$client.get(
+          "/billing/accounts/" + this.account + "/payment-methods/",
+        ),
+      ]);
+      this.accountState = account.data;
+      this.paymentMethods = methods.data;
+      if (this.accountState.subscription) {
+        this.subscriptionChange = {
+          price: this.accountState.subscription.price,
+          seats: this.accountState.subscription.seats,
+        };
+      }
+    },
+    async toggleCancellation() {
+      await this.runAccountAction(() =>
+        this.$client.post(
+          "/billing/accounts/" + this.account + "/subscription/cancellation/",
+          { cancel: !this.accountState.subscription.cancel_at_period_end },
+        ),
+      );
+    },
+    async scheduleChange() {
+      await this.runAccountAction(() =>
+        this.$client.post(
+          "/billing/accounts/" + this.account + "/subscription/change/",
+          this.subscriptionChange,
+        ),
+      );
+    },
+    async revokePaymentMethod(method) {
+      await this.runAccountAction(() =>
+        this.$client.delete(
+          "/billing/accounts/" +
+            this.account +
+            "/payment-methods/" +
+            method.id +
+            "/",
+        ),
+      );
+    },
+    async runAccountAction(action) {
+      if (this.busy) return;
+      this.busy = true;
+      this.error = false;
+      try {
+        await action();
+        await this.loadAccount();
+      } catch {
+        this.error = true;
+      } finally {
+        this.busy = false;
+      }
     },
     async prepare() {
       this.busy = true;
@@ -330,6 +483,7 @@ export default {
         );
         this.order = data;
         this.history = (await this.$client.get("/billing/orders/")).data;
+        await this.loadAccount();
         return data;
       } catch {
         this.error = true;

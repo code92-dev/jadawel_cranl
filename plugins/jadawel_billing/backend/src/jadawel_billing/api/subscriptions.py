@@ -25,6 +25,7 @@ from jadawel_billing.subscriptions import schedule_subscription_change, set_canc
 
 class PaymentMethodInput(serializers.Serializer[Any]):
     provider_token = serializers.CharField(max_length=160)
+    provider_payment_id = serializers.CharField(max_length=100)
     consent = serializers.BooleanField()
     brand = serializers.CharField(max_length=40, required=False, default="")
     last4 = serializers.CharField(max_length=4, required=False, default="")

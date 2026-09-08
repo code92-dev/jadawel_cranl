@@ -122,6 +122,9 @@ class AccountView(APIView):
                 "subscription": None
                 if subscription is None
                 else {
+                    "price": subscription.price_id,
+                    "status": subscription.status,
+                    "period_start": subscription.period_start,
                     "seats": subscription.seats,
                     "period_end": subscription.period_end,
                     "cancel_at_period_end": subscription.cancel_at_period_end,
