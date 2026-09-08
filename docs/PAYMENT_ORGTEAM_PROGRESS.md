@@ -1,50 +1,73 @@
-# Payment and organization implementation progress
+# Moyasar billing and organization implementation progress
 
-Branch: `payment-Orgteam-plugins`. Executor: current Codex task (Luna handoff cancelled by user).
-Review base: `a7d171a12de08174999adcf43f620b14569c08c0`.
+Branch: `payment-Orgteam-plugins`. Executor: current Codex task. Review base:
+`a7d171a12de08174999adcf43f620b14569c08c0`. No deployment or live charge was
+performed.
 
-## Tracker
+## Implemented slices
 
-All 20 approved vertical slices are published as GitHub issues #42–#61 in code92-dev/jadawel_cranl with `ready-for-agent` and native blocking edges. All 20 dependency sets were read back and verified. See PAYMENT_ORGTEAM_TICKETS.md. No issues closed; this branch contains the billing vertical slice only; no implementation has been pushed or deployed.
+The two standalone packages are now present in the working tree:
 
-## Current work
+- `plugins/jadawel_billing`: Individual and Team accounts, immutable plans and
+  price versions, complimentary grants, Moyasar quote/verification and webhook
+  reconciliation, receipts, saved payment methods, renewal state and grace
+  handling, scheduled subscription changes, refunds, and external payment
+  records.
+- `plugins/jadawel_organizations`: Team organization provisioning, owner/admin/
+  member roles, existing-user adds, hashed invitations and acceptance, revoke
+  and resend behavior, seat locking, workspace binding and member assignment,
+  organization permission enforcement, suspend/reactivate/archive, paid-Team
+  provisioning, and guided Team-to-Individual transition.
 
-- #42: standalone Billing backend discovery, account creation/listing, immutable price-version API and Arabic/English admin page implemented. Package metadata, README, migrations and registry/endpoint loading are present. Focused API/UI checks pass.
-- #43: manual grant/update/revoke/suspension handlers and endpoints, audit, capacity lock and effective manual-access resolution implemented. Expiry, wrong-plan, capacity, suspension, paid fallback and server-side preview checks pass. Grace-period policy remains part of the renewal slice.
-- #44: Individual checkout now creates an immutable server quote, sends card data directly to Moyasar, and activates access only after server verification of the provider payment ID, amount, currency, order metadata and successful paid status. Direct callback activation is not trusted. Paid orders return a verified receipt with provider reference and access period.
-- #45: Moyasar adapter, idempotent webhook inbox, authenticated webhook environment checks, metadata/given-ID binding, leased/reclaimable Celery reconciliation and staff order/provider-event reconciliation views are implemented. Provider timeout, malformed responses, inactive payer recovery, mismatch failure, captured settlement, invalid-ID retry, webhook-before-callback recovery, duplicate event behavior and post-settlement reversal review have focused coverage.
-- #46–#61: not implemented. Saved payment tokens, recurring renewals, refunds, organization members/workspaces, and production/browser sandbox evidence remain. The administrator procedure is documented in PAYMENT_ORGTEAM_ADMIN_MANUAL.md. No provider credentials were used and no payments were initiated.
+The corresponding GitHub ticket frontier is #42–#61. The branch contains the
+implementation for the billing and organization management paths in those
+slices; the issues remain open until a maintainer reviews and lands the branch.
 
-## Test commands that work in this environment
+## Verification completed
 
-From repository root (a local PostgreSQL dev instance is available at 127.0.0.1:5432; the test runner uses its own test database):
+Focused backend verification, with both plugin paths loaded, currently passes:
 
-```bash
-DATABASE_HOST=127.0.0.1 PYTHONPATH=backend/src:backend/tests:plugins/jadawel_billing/backend/src JADAWEL_PLUGIN_DIR="$PWD/plugins" backend/.venv/bin/python -m pytest -c backend/pytest.ini plugins/jadawel_billing/tests -q --reuse-db
+```text
+50 passed
 ```
 
-Use `--create-db` after schema changes. Backend fixture setup is imported from the repository test utilities. `just` and `yarn` are not on this shell's PATH. System Node is 22; use the available Node 24 runtime below.
+The same run covers complimentary access, role authority, seat reservation for
+suspended members, invitation mismatch/expiry/replay, workspace revocation and
+restoration, preservation of pre-existing workspace access, restricted operation
+handling, paid-Team idempotent provisioning, per-seat Team quotes, payment
+verification, webhook reconciliation, active Moyasar token/payment binding,
+payment methods, refunds, and renewal task behavior. The focused frontend run
+passes 5 tests, and strict repository locale parity reports 3,787/3,787 keys.
 
-From web-frontend:
+Additional checks completed during implementation include scoped Ruff checks,
+Django system checks, Nuxt `prepare`, standalone locale parity, and Prettier
+checks for changed frontend files.
 
-```bash
-/home/aziz/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node node_modules/vitest/vitest.mjs --run test/unit/arabase/billingAdmin.spec.js test/unit/arabase/billingGrant.spec.js
-```
+## Local run
 
-Use the frontend Prettier config explicitly when formatting standalone files outside web-frontend.
+The local services used for verification are:
 
-## Verification recorded 2026-09-08
+- Frontend: [http://localhost:3003/billing](http://localhost:3003/billing)
+- Organization member panel: [http://localhost:3003/organizations](http://localhost:3003/organizations)
+- General-admin organization panel: [http://localhost:3003/admin/organizations](http://localhost:3003/admin/organizations)
+- Backend: `http://localhost:8003`
 
-- Billing package tests: `30 passed` with the plugin's Django test command and a fresh schema.
-- Repository backend fork gate: `402 passed, 1 skipped` in `backend/tests/arabase`.
-- Repository frontend unit gate: `4443 passed, 8 skipped` across 156 files.
-- Ruff, Ruff format, scoped mypy and `makemigrations --check --dry-run`: passed.
-- Standalone Arabic/English locale parity: `86/86`; repository strict locale parity: `3787/3787`.
-- `uv build --wheel` produced `jadawel_billing-0.1.0-py3-none-any.whl`; Nuxt `prepare` discovered the standalone module and generated types.
-- Code review completed with two independent review passes. No live Moyasar credentials, charges, production deployment, or browser sandbox payment were used.
+Use `localhost` for the browser host. Jadawl's public-host routing intentionally
+treats `127.0.0.1` as a public-page host and returns the public-page 404 for
+authenticated routes.
 
-Production build and browser sandbox evidence remain blocked by the absence of provider credentials. The organization, renewal, token, and refund tickets remain open by design.
+The local process is configured with both plugin modules and no live Moyasar
+credentials. Administrator-created complimentary organizations work without
+provider keys. A real sandbox payment, 3-D Secure flow, and production build
+still require valid test credentials and a browser-authenticated fixture.
 
-## Preservation
+## Remaining release gates
 
-The pre-existing dirty files in manifests/locks, core settings/tests, PATCHES.md and page-document work are unrelated. Do not reset or stage them. Feature changes currently include plugins/jadawel_billing, the two billing UI test files, glossary additions, the plan and ticket index. The original plugin-creator skill directory was already untracked; do not silently include it in a feature commit.
+Before enabling production billing, obtain and verify the merchant's actual
+prices, tax/invoice treatment, refund policy, recurring-payment eligibility,
+grace policy, and Moyasar webhook configuration. Run the disposable-image fresh
+install/upgrade checks and a browser-authenticated Arabic/English pass with
+Moyasar sandbox credentials. The organization adapter still needs a dedicated
+integration pass for public-share, websocket, delegated-job and legacy import
+surfaces before those paths are described as fully managed. Do not mark these
+provider- or integration-dependent checks as passed from the local no-key run.

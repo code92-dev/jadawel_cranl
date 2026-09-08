@@ -1,6 +1,7 @@
 # Moyasar billing and organization plugins — Luna execution plan
 
-Status: approved; implementation in progress. Date: 2026-09-08.
+Status: approved; implementation complete in the working tree, release gates
+remain. Date: 2026-09-08.
 Branch: `payment-Orgteam-plugins`. Base: `a7d171a12de08174999adcf43f620b14569c08c0`.
 Executor: current Codex task, per user instruction. Use implement, TDD and code-review skills; commit feature work to this branch. Do not deploy.
 

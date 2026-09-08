@@ -9,6 +9,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from jadawel_billing.api.receipts import ReceiptSerializer
 from jadawel_billing.errors import ProviderUnavailable
 from jadawel_billing.entitlements import get_effective_entitlements
 from jadawel_billing.models import BillingAccount, BillingOrder, PlanPrice, Subscription
@@ -28,7 +29,7 @@ class OrderInput(serializers.Serializer[Any]):
     seats = serializers.IntegerField(min_value=1, max_value=100000)
 
 
-class OrderSerializer(serializers.ModelSerializer[Any]):
+class OrderSerializer(ReceiptSerializer):
     given_id = serializers.UUIDField(source="payment_id", read_only=True)
     provider_payment_id = serializers.CharField(
         source="payment_attempt.provider_payment_id", read_only=True, allow_null=True
@@ -39,22 +40,6 @@ class OrderSerializer(serializers.ModelSerializer[Any]):
     failure_code = serializers.CharField(
         source="payment_attempt.failure_code", read_only=True
     )
-    receipt = serializers.SerializerMethodField()
-
-    def get_receipt(self, order: BillingOrder) -> dict[str, Any] | None:
-        if order.status != "paid":
-            return None
-        subscription = Subscription.objects.filter(source_order=order).first()
-        return {
-            "order_id": str(order.pk),
-            "amount": order.amount,
-            "currency": order.currency,
-            "paid_at": order.paid_at,
-            "provider_payment_id": getattr(
-                getattr(order, "payment_attempt", None), "provider_payment_id", None
-            ),
-            "period_end": subscription.period_end if subscription else None,
-        }
 
     class Meta:
         model = BillingOrder
@@ -153,11 +138,9 @@ class CheckoutOptionsView(APIView):
         key = getattr(settings, "JADAWEL_MOYASAR_PUBLISHABLE_KEY", "")
         if not key.startswith(f"pk_{mode}_"):
             raise ProviderUnavailable()
-        accounts = BillingAccount.objects.filter(
-            responsible_user_id=request.user.pk, kind="INDIVIDUAL"
-        )
+        accounts = BillingAccount.objects.filter(responsible_user_id=request.user.pk)
         prices = PlanPrice.objects.filter(
-            available=True, plan__available=True, plan__kind="INDIVIDUAL", amount__gt=0
+            available=True, plan__available=True, amount__gt=0
         ).select_related("plan")
         return Response(
             {
@@ -168,6 +151,7 @@ class CheckoutOptionsView(APIView):
                     {
                         "id": p.pk,
                         "name": p.plan.name,
+                        "kind": p.plan.kind,
                         "amount": p.amount,
                         "currency": p.currency,
                         "interval": p.interval,

@@ -8,13 +8,14 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from jadawel_billing.api.receipts import ReceiptSerializer
 from jadawel_billing.api.checkout import VerifyInput
 from jadawel_billing.api.views import BillingPagination
-from jadawel_billing.models import BillingOrder, ProviderEvent, Subscription
+from jadawel_billing.models import BillingOrder, ProviderEvent
 from jadawel_billing.payments import reconcile_order
 
 
-class AdminOrderSerializer(serializers.ModelSerializer[Any]):
+class AdminOrderSerializer(ReceiptSerializer):
     given_id = serializers.UUIDField(source="payment_id", read_only=True)
     owner_email = serializers.EmailField(
         source="account.responsible_user.email", read_only=True
@@ -28,22 +29,6 @@ class AdminOrderSerializer(serializers.ModelSerializer[Any]):
     failure_code = serializers.CharField(
         source="payment_attempt.failure_code", read_only=True
     )
-    receipt = serializers.SerializerMethodField()
-
-    def get_receipt(self, order: BillingOrder) -> dict[str, Any] | None:
-        if order.status != "paid":
-            return None
-        subscription = Subscription.objects.filter(source_order=order).first()
-        return {
-            "order_id": str(order.pk),
-            "amount": order.amount,
-            "currency": order.currency,
-            "paid_at": order.paid_at,
-            "provider_payment_id": getattr(
-                getattr(order, "payment_attempt", None), "provider_payment_id", None
-            ),
-            "period_end": subscription.period_end if subscription else None,
-        }
 
     class Meta:
         model = BillingOrder

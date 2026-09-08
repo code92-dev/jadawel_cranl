@@ -1,87 +1,151 @@
-# Jadawel billing administrator manual
+# Jadawl billing and OrgTeam administrator manual
 
-This guide describes the billing and complimentary-access controls delivered by
-the `jadawel_billing` plugin. It is written for a Jadawel general administrator
-(`is_staff`). Payment state and effective access are separate: a paid order is
-activated only after the server verifies it with Moyasar, while a complimentary
-grant is an audited entitlement change and never a payment.
+This guide covers the separate `jadawel_billing` and
+`jadawel_organizations` plugins. A paid order is activated only after the
+server verifies Moyasar's payment. Complimentary access is an audited
+entitlement and never pretends that a payment occurred.
 
-## Configure and install
+## Install and configure
 
-Install the plugin package and enable it through the normal Jadawel plugin
-loader. Configure these values outside the admin UI:
+Install Billing first, then Organizations, and run the normal Jadawl migration
+command:
 
-- `JADAWEL_MOYASAR_SECRET_KEY` and `JADAWEL_MOYASAR_PUBLISHABLE_KEY` use the
-  same `test` or `live` prefix as `JADAWEL_BILLING_MODE`.
-- `JADAWEL_MOYASAR_WEBHOOK_SECRET` authenticates the Moyasar webhook.
-- `JADAWEL_BILLING_LIVE_ENABLED` must be explicitly enabled before live mode
-  can be selected.
+```bash
+uv pip install ./plugins/jadawel_billing/backend ./plugins/jadawel_organizations/backend
+export JADAWEL_PLUGIN_DIR="$PWD/plugins"
+export ADDITIONAL_MODULES="../plugins/jadawel_billing/web-frontend/modules/jadawel-billing/module.js,../plugins/jadawel_organizations/web-frontend/modules/jadawel-organizations/module.js"
+```
 
-The plugin works without Moyasar keys for administrator-created complimentary
-access. Do not place card numbers, CVC values, or secret keys in Jadawel
-requests, logs, or screenshots. Card details go directly from the browser to
-Moyasar.
+Configure `JADAWEL_MOYASAR_SECRET_KEY`,
+`JADAWEL_MOYASAR_PUBLISHABLE_KEY`, `JADAWEL_MOYASAR_WEBHOOK_SECRET`,
+`JADAWEL_BILLING_MODE`, and `JADAWEL_BILLING_LIVE_ENABLED` outside the
+repository. Keys must use the selected `test` or `live` prefix. Missing keys do
+not block complimentary administrator access. Never send card numbers, CVCs,
+or secret keys to Jadawl; the browser sends card details directly to Moyasar.
 
-## Create an account without payment
+## Create an organization without payment
 
-1. Open **Billing** in the administrator area and choose **Create account**.
-2. Enter the active responsible user's email and choose **Individual** or
-   **Team**. Account creation is audited and does not contact Moyasar.
-3. Select **Complimentary access** for the account, choose a plan, set the seat
-   limit and optional expiry, and enter a support reason.
-4. Choose **Review access change**. Confirm the plan, seats, start/expiry and
-   current paid renewal shown by the panel, then choose **Confirm**.
+1. Open **Organization administration** at **Admin → Organizations**.
+2. Enter the organization name and the active owner's user ID.
+3. Choose **Create organization**. The general administrator (`is_staff`) owns
+   the audited operation and the Team BillingAccount is created without a
+   provider call.
+4. Open the related Billing account and use **Complimentary access** to choose
+   a Team plan, seat cap, optional expiry, and a written reason. Review the
+   proposed effective access before saving.
 
-The account's effective source becomes **Complimentary** when the grant is
-within its start and expiry window. A general administrator can use this flow
-with Moyasar configuration absent.
+The owner counts as one Team seat. A complimentary organization can be created
+without a plan first, but member additions remain restricted until a paid
+subscription or valid manual grant supplies capacity. Repeat requests can use
+the API's `creation_key` to return the same organization safely.
+
+## Start a paid Team organization
+
+1. A signed-in payer opens **Organizations**, enters a name, and chooses
+   **Create organization**.
+2. Jadawl creates a pending Team account and sends the payer to **Billing**.
+3. Select the Team price and purchased seats. The server calculates the quote
+   as `price amount × seats` in SAR halalas.
+4. Submit card details through Moyasar, then return to **Verify payment** if the
+   redirect or webhook is delayed.
+
+Only a verified `paid` or `captured` payment changes the order and subscription
+state. Reconciliation provisions the organization idempotently; retrying a
+settled order cannot create a second organization.
 
 ## Edit, extend, or revoke access
 
-Open the account's **Complimentary access** panel. Change the plan, seat limit,
-expiry, or reason and review the complete proposed state before saving. A seat
-limit below current usage is rejected while holding the account capacity lock;
-resolve membership usage first rather than removing users implicitly.
+Open **Billing → Complimentary access** for the account. Use preview to review
+plan, seats, start/expiry, the current paid renewal, and the resulting effective
+source before saving. The capacity lock rejects a cap below occupied seats;
+resolve members first rather than evicting them implicitly.
 
-To extend access, set a later expiry and save a new reason. To end it, choose
-**Revoke grant**, enter a reason, and confirm. Revocation falls back to a valid
-paid subscription or **Restricted** access. It does not cancel a paid renewal,
-issue a refund, or delete data. Every change appears in **Activity history**
-with before/after details.
+Set a later expiry to extend access, or use **Revoke grant** with a reason. The
+account falls back to a valid paid subscription or **Restricted** access. Grant
+changes do not refund a payment or silently cancel a paid renewal. **Suspend
+account access** overrides both manual and paid access until restored.
 
-**Suspend account access** takes precedence over both complimentary and paid
-entitlements. **Restore account access** removes that administrative
-suspension; it does not create a subscription.
+## Manage people
 
-## Verify and reconcile payments
+From an organization detail page, an owner, administrator, or general admin
+can:
 
-The customer billing page creates an immutable order quote and submits the card
-directly to Moyasar. The customer can return to **Verify payment** after a
-redirect, timeout, or abandoned callback. A provider payment ID is reused for
-the same order until its state is resolved; a failed payment can be retried
-with a new order attempt after the failed order is visible.
+- **Add existing user** using the user's ID and the Member or Administrator
+  role. This never creates a second identity.
+- **Send invitation** to a verified email. The token is hashed at rest, expires
+  after seven days, and is sent after the transaction commits.
+- Review **Invitations** and **Revoke invitation**. Resending an address revokes
+  the previous pending token before issuing a new one.
+- Suspend/reactivate or remove a member. Suspension keeps the seat reserved and
+  removes managed workspace access; removal releases the seat and retains audit
+  and payment history.
 
-In the administrator **Payments** list:
+An administrator cannot appoint another administrator or remove an
+administrator. Only the owner or general admin can transfer ownership. The
+owner cannot be suspended or removed; transfer ownership to an active member
+first.
 
-1. Confirm the account, amount, currency, mode, provider reference and attempt
-   status.
-2. For a pending order, choose **Verify with Moyasar**. This performs a fresh
-   server-side fetch and checks the provider ID, amount, currency, order
-   metadata and settled `paid` status.
-3. Use **Provider events** to inspect webhook event IDs, processing state,
-   attempt count and retry error. Events are idempotent, retained when a
-   callback arrives late, and reclaimed after a worker lease expires.
+## Accept an invitation
 
-Paid orders show a **Payment receipt** with the Moyasar reference, paid time,
-amount/currency and the subscription access period. A receipt is evidence of a
-verified payment; do not label it a tax invoice without an approved invoicing
-solution.
+The invited user signs in with the matching email and opens
+`/organizations/invitations/accept`, pastes the token, and chooses **Accept
+invitation**. Expired, revoked, replayed, or mismatched-email tokens are
+rejected. Acceptance locks and rechecks Team capacity, so two users cannot
+consume the last seat concurrently.
 
-## Operational boundaries
+## Bind workspaces and assign access
 
-The current plugin slice covers personal checkout, plan and price catalogue
-management, manual entitlements, reconciliation, audit history and receipts.
-Saved payment tokens, recurring renewals, refunds, and the separate
-organization/membership plugin remain planned tickets (#46–#61). Do not create
-an organization by editing billing rows directly; use the organization plugin
-provisioning workflow once that package is implemented.
+1. In the organization detail page, enter a workspace ID and choose **Bind
+   workspace**.
+2. Review the binding preview for existing workspace outsiders and pending
+   invitations. A non-staff manager cannot bind a workspace with unresolved
+   outsiders; a general admin must explicitly review it.
+3. For each binding, choose an active organization member and choose **Assign**.
+   Access is synchronized to the member's organization role.
+4. Use **Unbind workspace** only after reviewing who should retain independent
+   access. Unbinding removes access created by the organization adapter and
+   preserves unrelated personal workspace data.
+
+Organization permission enforcement also applies to core workspace operations.
+Members retain allowed reads during a billing grace period, while writes,
+invites, publishing, and new workspace creation are denied after access becomes
+restricted. Public links and personal workspaces are not deleted by member
+removal.
+
+## Suspend, reactivate, archive, and transition
+
+Use the lifecycle controls after reviewing the effect:
+
+- **Suspend** changes the organization state and immediately removes managed
+  workspace access while preserving data and seats.
+- **Reactivate** restores active members' managed access after entitlement and
+  organization checks.
+- **Archive** is a retained administrative state; it has no permanent delete
+  action in v1.
+- **Transition to personal** is available to an owner after all other members
+  and workspace bindings are explicitly resolved. It creates or reuses the
+  owner's Individual BillingAccount and archives the organization; it does not
+  silently move or delete workspace data.
+
+Stopping future paid renewal is a separate Billing action. Archiving or
+revoking a grant does not issue a refund.
+
+## Reconcile payments, refunds, and external payments
+
+In **Billing → Payments**, inspect the order, mode, amount, currency, provider
+reference, and attempt status. **Verify with Moyasar** performs a fresh
+server-side fetch and checks all order metadata before activation. Provider
+events are idempotent and retryable.
+
+General admins can record a refund with a reason and validated amount. A refund
+record keeps the original payment immutable and prevents duplicate processing.
+Use **Record external payment** for an offline transfer; label it external and
+unverified by Moyasar, and assign access separately. Do not count it as Moyasar
+revenue or treat it as a tax invoice.
+
+## Retention and removal
+
+Removing either plugin does not delete billing, audit, organization, or workspace
+records. Disable affected traffic, back up the database, run migrations before
+restart, and keep the dependency order (Billing before Organizations). There is
+no permanent account or data deletion control in v1.

@@ -89,12 +89,12 @@ class AdminGrantPreviewView(APIView):
         serializer = GrantSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         proposal = preview_grant(request.user, account_id, **serializer.validated_data)
-        proposal["effective_after"] = {
-            "source": "manual",
-            "plan": proposal["plan"],
-            "seat_limit": proposal["seat_limit"],
-            "valid_until": proposal["expires_at"],
-        }
+        proposal["effective_after"] = get_effective_entitlements(
+            account_id,
+            proposed_grant=ManualEntitlementGrant(
+                account_id=account_id, **serializer.validated_data
+            ),
+        )
         proposal["subscription"] = subscription_snapshot(account_id)
         return Response(proposal)
 

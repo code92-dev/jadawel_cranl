@@ -8,6 +8,7 @@ from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from jadawel_billing.errors import ProviderUnavailable
+from jadawel_billing.entitlements import has_team_provisioner, provision_team
 from jadawel_billing.handlers import audit, require_admin
 from jadawel_billing.models import (
     BillingAccount,
@@ -42,9 +43,10 @@ def create_order(
 ) -> BillingOrder:
     require_payer(actor, account)
     mode = billing_mode()
-    # Team checkout stays unavailable until durable organization provisioning exists.
-    if account.kind != "INDIVIDUAL" or seats != 1:
-        raise ValidationError({"account": "team_checkout_unavailable"})
+    if account.kind == "INDIVIDUAL" and seats != 1:
+        raise ValidationError({"account": "individual_requires_one_seat"})
+    if account.kind == "TEAM" and not has_team_provisioner():
+        raise ValidationError({"account": "organizations_required"})
     if (
         not price.available
         or not price.plan.available
@@ -71,7 +73,9 @@ def create_order(
             account=account,
             price=price,
             seats=seats,
-            amount=price.amount,
+            amount=price.amount * seats
+            if account.kind == BillingAccount.Kind.TEAM
+            else price.amount,
             currency=price.currency,
             interval=price.interval,
             mode=mode,
@@ -214,7 +218,7 @@ def _verify_order(
                 "period_start": now,
                 "period_end": period_end(now, order.interval),
                 "source_order": order,
-                "cancel_at_period_end": True,
+                "cancel_at_period_end": False,
             },
         )
         order.status = "paid"
@@ -233,6 +237,8 @@ def _verify_order(
                 "currency": order.currency,
             },
         )
+        if account.kind == BillingAccount.Kind.TEAM:
+            provision_team(account.pk)
         return order
 
 

@@ -1,7 +1,9 @@
 from collections.abc import Callable, Iterator
 from contextlib import contextmanager
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
+
+from django.conf import settings
 from uuid import UUID
 
 from django.db import transaction
@@ -11,6 +13,7 @@ from rest_framework.exceptions import PermissionDenied, ValidationError
 from jadawel_billing.models import BillingAccount, ManualEntitlementGrant, Subscription
 
 _capacity_provider: Callable[[UUID], int] | None = None
+_team_provisioner: Callable[[UUID], None] | None = None
 
 
 def register_capacity_provider(provider: Callable[[UUID], int]) -> None:
@@ -19,6 +22,24 @@ def register_capacity_provider(provider: Callable[[UUID], int]) -> None:
     if _capacity_provider is not None and _capacity_provider is not provider:
         raise RuntimeError("A billing capacity provider is already registered")
     _capacity_provider = provider
+
+
+def register_team_provisioner(provisioner: Callable[[UUID], None]) -> None:
+    """Organizations registers paid-Team provisioning without a billing import."""
+    global _team_provisioner
+    if _team_provisioner is not None and _team_provisioner is not provisioner:
+        raise RuntimeError("A billing team provisioner is already registered")
+    _team_provisioner = provisioner
+
+
+def provision_team(account_id: UUID) -> None:
+    if _team_provisioner is None:
+        return
+    _team_provisioner(account_id)
+
+
+def has_team_provisioner() -> bool:
+    return _team_provisioner is not None
 
 
 def occupied_seats(account: BillingAccount) -> int:
@@ -42,7 +63,10 @@ def validate_capacity(account: BillingAccount, seats: int) -> None:
 
 
 def get_effective_entitlements(
-    account_id: UUID, at: datetime | None = None
+    account_id: UUID,
+    at: datetime | None = None,
+    *,
+    proposed_grant: ManualEntitlementGrant | None = None,
 ) -> dict[str, Any]:
     at = at or timezone.now()
     account = BillingAccount.objects.get(pk=account_id)
@@ -61,9 +85,12 @@ def get_effective_entitlements(
             "source": "suspended",
             "restriction_reason": "admin_suspension",
         }
-    grant = ManualEntitlementGrant.objects.filter(
-        account=account, revoked_at__isnull=True
-    ).first()
+    grant = (
+        proposed_grant
+        or ManualEntitlementGrant.objects.filter(
+            account=account, revoked_at__isnull=True
+        ).first()
+    )
     if (
         grant
         and grant.starts_at <= at
@@ -79,10 +106,8 @@ def get_effective_entitlements(
             "revision": grant.revision,
             "restriction_reason": None,
         }
-    subscription = Subscription.objects.filter(
-        account=account, period_start__lte=at, period_end__gt=at
-    ).first()
-    if subscription:
+    subscription = Subscription.objects.filter(account=account).first()
+    if subscription and subscription.period_start <= at < subscription.period_end:
         return {
             **result,
             "source": "paid",
@@ -92,6 +117,25 @@ def get_effective_entitlements(
             + (["organization"] if account.kind == "TEAM" else []),
             "valid_until": subscription.period_end,
             "restriction_reason": None,
+        }
+    grace_days = max(0, int(getattr(settings, "JADAWEL_BILLING_GRACE_DAYS", 7)))
+    if (
+        subscription
+        and subscription.status
+        in {Subscription.Status.GRACE, Subscription.Status.PAST_DUE}
+        and subscription.period_end
+        <= at
+        < subscription.period_end + timedelta(days=grace_days)
+    ):
+        return {
+            "source": "grace",
+            "plan": subscription.price.plan_id,
+            "seat_limit": subscription.seats,
+            "capabilities": ["data_write"]
+            + (["organization"] if account.kind == "TEAM" else []),
+            "valid_until": subscription.period_end + timedelta(days=grace_days),
+            "revision": 0,
+            "restriction_reason": "renewal_grace",
         }
     return result
 

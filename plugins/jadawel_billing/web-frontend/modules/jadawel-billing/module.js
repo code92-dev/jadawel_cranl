@@ -12,7 +12,7 @@ export default defineNuxtModule({
     const { resolve } = createResolver(import.meta.url);
     addPlugin({ src: resolve("./plugin.js") });
     extendPages((pages) =>
-      pages.push(
+      pages.unshift(
         {
           name: "customer-billing",
           path: "/billing",

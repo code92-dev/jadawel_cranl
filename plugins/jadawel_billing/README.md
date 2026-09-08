@@ -1,10 +1,13 @@
 # Jadawel Billing plugin
 
+Tested against Jadawel revision `a7d171a`.
+
 This standalone plugin provides the billing account, plan and price catalogue,
-administrator-managed complimentary entitlements, and the first Moyasar payment
-verification path for Jadawel. It supports individual accounts today; Team
-checkout remains disabled until the Organizations plugin provisions a Team
-account and its members.
+administrator-managed complimentary entitlements, and Moyasar payment
+verification for Jadawel. It supports Individual accounts on its own. When the
+separate Organizations plugin is installed, it also quotes and activates Team
+subscriptions and provisions the organization through the registered Team
+provisioner.
 
 ## Installation
 
@@ -41,14 +44,20 @@ they are never sent to the Jadawel API.
 ## API and operations
 
 The namespaced API is mounted under `/api/billing/`. Staff users manage accounts,
-plans, prices, grants, suspensions and audit history. An account payer can create
-an individual order and request verification. Moyasar events are accepted at
+plans, prices, grants, suspensions, subscriptions, refunds and audit history.
+An account payer can create an Individual or (when Organizations is installed)
+Team order and request verification. Moyasar events are accepted at
 `/api/billing/moyasar/webhook/`, stored idempotently, and reconciled by the
 `jadawel_billing.reconcile_payments` Celery task.
 
 Complimentary access is an explicit, audited grant with a plan, seat cap, start,
 optional expiry, reason and revision. Editing or revoking a grant does not
 create a payment or silently cancel a paid renewal.
+
+Reusable payment methods are saved only after a paid payment is verified against
+the same billing account and Moyasar reports the token as `active`. Revoking a
+method prevents future renewals from using it; the provider token itself is
+never exposed in API responses.
 
 ## Removal and upgrades
 

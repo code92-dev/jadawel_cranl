@@ -26,6 +26,14 @@ from jadawel_billing.api.views import (
     AdminPriceView,
 )
 from jadawel_billing.api.webhooks import MoyasarWebhookView
+from jadawel_billing.api.subscriptions import (
+    AdminExternalPaymentView,
+    AdminRefundView,
+    CancellationView,
+    PaymentMethodDeleteView,
+    PaymentMethodsView,
+    SubscriptionChangeView,
+)
 
 app_name = "jadawel_billing"
 urlpatterns = [
@@ -36,6 +44,26 @@ urlpatterns = [
         "orders/<uuid:order_id>/verify/", VerifyOrderView.as_view(), name="verify_order"
     ),
     path("accounts/<uuid:account_id>/", AccountView.as_view(), name="account"),
+    path(
+        "accounts/<uuid:account_id>/payment-methods/",
+        PaymentMethodsView.as_view(),
+        name="payment_methods",
+    ),
+    path(
+        "accounts/<uuid:account_id>/payment-methods/<int:method_id>/",
+        PaymentMethodDeleteView.as_view(),
+        name="payment_method_delete",
+    ),
+    path(
+        "accounts/<uuid:account_id>/subscription/cancellation/",
+        CancellationView.as_view(),
+        name="subscription_cancellation",
+    ),
+    path(
+        "accounts/<uuid:account_id>/subscription/change/",
+        SubscriptionChangeView.as_view(),
+        name="subscription_change",
+    ),
     path(
         "admin/accounts/<uuid:account_id>/grant/",
         AdminGrantView.as_view(),
@@ -80,5 +108,15 @@ urlpatterns = [
         "admin/orders/<uuid:order_id>/reconcile/",
         AdminReconcileOrderView.as_view(),
         name="admin_reconcile_order",
+    ),
+    path(
+        "admin/orders/<uuid:order_id>/refund/",
+        AdminRefundView.as_view(),
+        name="admin_refund",
+    ),
+    path(
+        "admin/external-payments/",
+        AdminExternalPaymentView.as_view(),
+        name="admin_external_payment",
     ),
 ]

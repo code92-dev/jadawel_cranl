@@ -18,7 +18,7 @@ term exists).
 | Billing account | حساب الفوترة | Individual or organization payer context. |
 | Subscription | اشتراك | Recurring access period. |
 | Plan | باقة | Product subscription offering. |
-| Organization | منشأة | Company or organization account. |
+| Organization | منظمة | Company or organization account. |
 | Complimentary access | وصول مجاني | Explicit administrator grant. |
 | Seat | مقعد | One licensed organization member. |
 

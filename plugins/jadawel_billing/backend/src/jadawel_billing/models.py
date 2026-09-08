@@ -152,6 +152,12 @@ class PaymentAttempt(models.Model):
 
 
 class Subscription(models.Model):
+    class Status(models.TextChoices):
+        ACTIVE = "active"
+        GRACE = "grace"
+        PAST_DUE = "past_due"
+        CANCELED = "canceled"
+
     account = models.OneToOneField(BillingAccount, on_delete=models.PROTECT)
     price = models.ForeignKey(PlanPrice, on_delete=models.PROTECT)
     seats = models.PositiveIntegerField()
@@ -159,6 +165,76 @@ class Subscription(models.Model):
     period_end = models.DateTimeField()
     cancel_at_period_end = models.BooleanField(default=True)
     source_order = models.OneToOneField(BillingOrder, on_delete=models.PROTECT)
+    status = models.CharField(
+        max_length=12, choices=Status.choices, default=Status.ACTIVE
+    )
+    next_retry_at = models.DateTimeField(null=True, blank=True)
+    retry_count = models.PositiveSmallIntegerField(default=0)
+
+
+class PaymentMethod(models.Model):
+    account = models.ForeignKey(
+        BillingAccount, on_delete=models.PROTECT, related_name="payment_methods"
+    )
+    provider_token = models.CharField(max_length=160, unique=True)
+    brand = models.CharField(max_length=40, blank=True)
+    last4 = models.CharField(max_length=4, blank=True)
+    exp_month = models.PositiveSmallIntegerField(null=True, blank=True)
+    exp_year = models.PositiveSmallIntegerField(null=True, blank=True)
+    consent_at = models.DateTimeField()
+    revoked_at = models.DateTimeField(null=True, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class SubscriptionChange(models.Model):
+    subscription = models.OneToOneField(
+        Subscription, on_delete=models.CASCADE, related_name="scheduled_change"
+    )
+    price = models.ForeignKey(PlanPrice, on_delete=models.PROTECT)
+    seats = models.PositiveIntegerField()
+    effective_at = models.DateTimeField()
+    cancel = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+
+class BillingRefund(models.Model):
+    class Status(models.TextChoices):
+        PENDING = "pending"
+        SUCCEEDED = "succeeded"
+        FAILED = "failed"
+
+    order = models.OneToOneField(
+        BillingOrder, on_delete=models.PROTECT, related_name="refund"
+    )
+    amount = models.PositiveIntegerField()
+    currency = models.CharField(max_length=3)
+    status = models.CharField(
+        max_length=12, choices=Status.choices, default=Status.PENDING
+    )
+    provider_refund_id = models.CharField(
+        max_length=120, unique=True, null=True, blank=True
+    )
+    reason = models.CharField(max_length=500)
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+
+class ExternalPayment(models.Model):
+    account = models.ForeignKey(
+        BillingAccount, on_delete=models.PROTECT, related_name="external_payments"
+    )
+    amount = models.PositiveIntegerField()
+    currency = models.CharField(max_length=3, default="SAR")
+    reference = models.CharField(max_length=120, unique=True)
+    paid_at = models.DateTimeField()
+    notes = models.CharField(max_length=500, blank=True)
+    actor = models.ForeignKey(
+        settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
 
 
 class ProviderEvent(models.Model):

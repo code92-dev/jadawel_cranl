@@ -8,21 +8,25 @@ from django.utils import timezone
 from rest_framework.exceptions import APIException, ValidationError
 
 from jadawel_billing.errors import ProviderUnavailable
-from jadawel_billing.models import BillingOrder, ProviderEvent
-from jadawel_billing.payments import reconcile_order_system
+from jadawel_billing.models import BillingOrder, PaymentAttempt, ProviderEvent
+from jadawel_billing.payments import billing_mode, reconcile_order_system
+from jadawel_billing.subscriptions import renew_due_subscriptions
 
 
 @shared_task(name="jadawel_billing.reconcile_payments")  # type: ignore[untyped-decorator]
 def reconcile_payments() -> None:
+    mode = billing_mode()
     now = timezone.now()
     # A worker can die after claiming an event. Requeue claims older than the
     # short lease so provider success is recoverable on the next beat tick.
     ProviderEvent.objects.filter(
         status="processing", updated_at__lt=now - timedelta(minutes=5)
     ).update(status="pending", error_code="worker_timeout", updated_at=now)
-    for event in ProviderEvent.objects.filter(status="pending").order_by("created_at")[
-        :100
-    ]:
+    for event in (
+        ProviderEvent.objects.filter(status="pending", mode=mode)
+        .filter(Q(attempts=0) | Q(updated_at__lte=now - timedelta(minutes=1)))
+        .order_by("updated_at", "pk")[:100]
+    ):
         with transaction.atomic():
             claimed = (
                 ProviderEvent.objects.filter(pk=event.pk, status="pending")
@@ -93,10 +97,24 @@ def reconcile_payments() -> None:
 
     # A successful browser payment may arrive before, or without, a webhook.
     # Revisit every pending order that already has a provider identifier.
-    for order in BillingOrder.objects.filter(
-        status="pending", payment_attempt__provider_payment_id__isnull=False
-    ).select_related("account", "price", "payment_attempt")[:100]:
+    for order in (
+        BillingOrder.objects.filter(
+            status="pending",
+            mode=mode,
+            payment_attempt__provider_payment_id__isnull=False,
+        )
+        .select_related("account", "price", "payment_attempt")
+        .order_by("payment_attempt__updated_at", "pk")[:100]
+    ):
         try:
             reconcile_order_system(order)
         except APIException:
             continue
+        finally:
+            # Rotate failures too, so an unresolved batch cannot monopolize retries.
+            PaymentAttempt.objects.filter(order=order).update(updated_at=timezone.now())
+
+
+@shared_task(name="jadawel_billing.renew_subscriptions")  # type: ignore[untyped-decorator]
+def renew_subscriptions() -> int:
+    return renew_due_subscriptions()

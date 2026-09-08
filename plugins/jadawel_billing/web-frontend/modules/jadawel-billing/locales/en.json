@@ -69,6 +69,7 @@
     "cardMonth": "Expiry month",
     "cardYear": "Expiry year",
     "cardCvc": "Security code",
+    "saveCard": "Save this card for subscription renewal",
     "pay": "Pay",
     "verifyPayment": "Verify payment",
     "retryPayment": "Try another payment",

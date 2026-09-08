@@ -17,15 +17,25 @@
                 :key="item.id"
                 :value="item.id"
               >
-                {{ $t("billing.individual") }} — {{ item.id }}
+                {{ $t("billing." + item.kind.toLowerCase()) }} — {{ item.id }}
               </option>
             </select></label
           >
+          <label v-if="selectedAccountKind === 'TEAM'">
+            {{ $t("billing.seats") }}
+            <input
+              v-model.number="seats"
+              type="number"
+              min="1"
+              required
+              class="input"
+            />
+          </label>
           <label
             >{{ $t("billing.plans")
             }}<select v-model="price" required class="input">
               <option
-                v-for="item in options.prices"
+                v-for="item in availablePrices"
                 :key="item.id"
                 :value="item.id"
               >
@@ -114,6 +124,10 @@
                 required
                 class="input"
             /></label>
+            <label v-if="selectedAccountKind === 'INDIVIDUAL'">
+              <input v-model="saveCard" type="checkbox" />
+              {{ $t("billing.saveCard") }}
+            </label>
             <Button button-type="submit" :disabled="busy">{{
               $t("billing.pay")
             }}</Button>
@@ -122,7 +136,7 @@
             v-if="order.status === 'pending' && order.provider_payment_id"
             type="secondary"
             :disabled="busy"
-            @click="verify"
+            @click="verify()"
             >{{ $t("billing.verifyPayment") }}</Button
           >
           <Button
@@ -175,6 +189,8 @@ export default {
       price: "",
       order: null,
       history: [],
+      seats: 1,
+      saveCard: false,
       busy: false,
       loading: true,
       error: false,
@@ -190,7 +206,8 @@ export default {
       ]);
       this.options = options.data;
       this.history = history.data;
-      this.account = this.options.accounts[0]?.id || "";
+      this.account =
+        this.$route.query.account || this.options.accounts[0]?.id || "";
       this.price = this.options.prices[0]?.id || "";
       const returnedOrder = this.$route.query.order;
       if (returnedOrder) {
@@ -212,6 +229,19 @@ export default {
   beforeUnmount() {
     this.clearCard();
   },
+  computed: {
+    selectedAccountKind() {
+      return (
+        this.options?.accounts.find((item) => item.id === this.account)?.kind ||
+        "INDIVIDUAL"
+      );
+    },
+    availablePrices() {
+      return (this.options?.prices || []).filter(
+        (item) => item.kind === this.selectedAccountKind,
+      );
+    },
+  },
   methods: {
     money(amount) {
       return new Intl.NumberFormat(this.$i18n.locale, {
@@ -229,7 +259,7 @@ export default {
         const { data } = await this.$client.post("/billing/orders/", {
           account: this.account,
           price: this.price,
-          seats: 1,
+          seats: this.selectedAccountKind === "TEAM" ? this.seats : 1,
         });
         this.order = data;
         this.submitted = false;
@@ -264,7 +294,25 @@ export default {
           window.location.assign(redirect.toString());
           return;
         }
-        await this.verify(payment.id);
+        const verifiedOrder = await this.verify(payment.id);
+        if (
+          this.saveCard &&
+          payment.source?.token &&
+          verifiedOrder?.status === "paid"
+        ) {
+          await this.$client.post(
+            "/billing/accounts/" + this.account + "/payment-methods/",
+            {
+              provider_token: payment.source.token,
+              provider_payment_id: payment.id,
+              consent: true,
+              brand: payment.source.brand || "",
+              last4: payment.source.last4 || "",
+              exp_month: payment.source.month,
+              exp_year: payment.source.year,
+            },
+          );
+        }
       } catch {
         this.error = true;
       } finally {
@@ -282,6 +330,7 @@ export default {
         );
         this.order = data;
         this.history = (await this.$client.get("/billing/orders/")).data;
+        return data;
       } catch {
         this.error = true;
       } finally {

@@ -39,4 +39,9 @@ Manual grant changes replace their effective snapshot with audit before/after hi
 
 ## Remaining enforcement inventory before organization release
 
-The exact workspace attachment/import bridge, token actor subjects, public-share path, websocket subscription invalidation and user-delegated job behavior are not yet verified. Do not claim them covered. Unknown operation handling must fail closed only for managed accounts/workspaces, preserving unmanaged behavior. Any necessary core patch must be narrow and documented in PATCHES.md. B00's full operation inventory is therefore still in progress.
+The organization adapter now registers both user and token actors and uses an
+explicit allowlist of registered read operations; unknown operation names fail
+closed for managed workspaces. The exact workspace attachment/import bridge,
+public-share path, websocket subscription invalidation and user-delegated job
+behavior are not yet verified. Do not claim them covered. Any necessary core
+patch must be narrow and documented in PATCHES.md.

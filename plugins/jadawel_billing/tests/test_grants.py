@@ -113,3 +113,71 @@ def test_admin_grants_and_revokes_complimentary_team_access(api_client, data_fix
         "grant.revoked",
         "grant.updated",
     ]
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    "suspended,future,expected",
+    [(True, False, "suspended"), (False, True, "restricted"), (False, False, "manual")],
+)
+def test_preview_matches_saved_access(
+    api_client, data_fixture, suspended, future, expected
+):
+    from jadawel_billing.handlers import create_account, create_plan
+    from jadawel_billing.models import ManualEntitlementGrant
+
+    admin, token = data_fixture.create_user_and_token(is_staff=True)
+    account = create_account(admin, kind="INDIVIDUAL", responsible_user=admin)
+    account.suspended = suspended
+    account.save()
+    plan = create_plan(admin, code="preview", name="Preview", kind="INDIVIDUAL")
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+    url = f"/api/billing/admin/accounts/{account.pk}/grant/"
+    payload = dict(
+        plan=plan.pk,
+        seat_limit=1,
+        starts_at=(timezone.now() + timedelta(days=1 if future else -1)).isoformat(),
+        reason="Preview regression",
+    )
+    preview = api_client.post(url + "preview/", payload, format="json")
+    assert preview.status_code == 200
+    assert not ManualEntitlementGrant.objects.filter(account=account).exists()
+    saved = api_client.put(url, payload, format="json")
+    assert saved.status_code == 200
+    assert preview.data["effective_after"]["source"] == expected
+    assert preview.data["effective_after"] == saved.data["effective"]
+
+
+@pytest.mark.django_db
+def test_failed_renewal_keeps_access_during_configured_grace(data_fixture, settings):
+    from jadawel_billing.entitlements import get_effective_entitlements
+    from jadawel_billing.handlers import create_account, create_plan, create_price
+    from jadawel_billing.models import BillingOrder, PaymentAttempt, Subscription
+
+    settings.JADAWEL_BILLING_GRACE_DAYS = 7
+    admin = data_fixture.create_user(is_staff=True)
+    account = create_account(admin, kind="INDIVIDUAL", responsible_user=admin)
+    plan = create_plan(admin, code="grace", name="Grace", kind="INDIVIDUAL")
+    price = create_price(admin, plan=plan, amount=5000, interval="MONTH")
+    now = timezone.now()
+    order = BillingOrder.objects.create(
+        account=account,
+        price=price,
+        amount=price.amount,
+        interval=price.interval,
+        mode="test",
+    )
+    PaymentAttempt.objects.create(order=order, given_id=order.payment_id)
+    subscription = Subscription.objects.create(
+        account=account,
+        price=price,
+        seats=1,
+        period_start=now - timedelta(days=31),
+        period_end=now - timedelta(days=1),
+        source_order=order,
+        status=Subscription.Status.GRACE,
+        cancel_at_period_end=False,
+    )
+    assert get_effective_entitlements(account.pk, now)["source"] == "grace"
+    after_grace = subscription.period_end + timedelta(days=7)
+    assert get_effective_entitlements(account.pk, after_grace)["source"] == "restricted"
