@@ -108,10 +108,9 @@ authenticated routes.
 
 The local process is configured with both plugin modules and no live Moyasar
 credentials. Administrator-created complimentary organizations work without
-provider keys. A real sandbox payment, 3-D Secure flow, and production build
-still require valid test credentials and a browser-authenticated fixture. The
-manual currently documents the flows; actual screenshot capture remains a V01
-release gate.
+provider keys. The administrator manual includes screenshots captured from this
+stack with synthetic fixture identities. A real sandbox payment and 3-D Secure
+flow still require valid test credentials and a browser-authenticated fixture.
 
 ## Remaining release gates
 

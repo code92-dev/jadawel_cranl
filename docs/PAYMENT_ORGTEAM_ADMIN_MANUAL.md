@@ -23,6 +23,19 @@ repository. Keys must use the selected `test` or `live` prefix. Missing keys do
 not block complimentary administrator access. Never send card numbers, CVCs,
 or secret keys to Jadawl; the browser sends card details directly to Moyasar.
 
+## Verified local screens
+
+These screenshots were captured on 2026-09-08 from the local QA stack with
+Moyasar credentials absent. They use synthetic fixture identities and show the
+Arabic RTL layout, shared Jadawl forms and buttons, billing administration,
+organization provisioning, membership controls, invitations and audit history.
+
+![Billing administration in Arabic](assets/payment-orgteam/billing-admin-ar.png)
+
+![Organization administration in Arabic](assets/payment-orgteam/organizations-admin-ar.png)
+
+![Organization details in Arabic](assets/payment-orgteam/organization-detail-ar.png)
+
 ## Create an organization without payment
 
 1. Open **Organization administration** at **Admin → Organizations**.

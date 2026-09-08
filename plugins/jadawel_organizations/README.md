@@ -1,6 +1,6 @@
 # Jadawel Organizations plugin
 
-Tested against the `payment-Orgteam-plugins` branch at commit `9dd6623`.
+Validated on the `payment-Orgteam-plugins` branch on 2026-09-08.
 The branch's documented core hooks in `PATCHES.md` are required for managed
 workspace membership enforcement; do not install this package against an older
 Jadawel revision without those hooks.

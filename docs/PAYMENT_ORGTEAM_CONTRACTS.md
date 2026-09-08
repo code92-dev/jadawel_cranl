@@ -1,6 +1,6 @@
 # Billing and organization extension contracts
 
-Reviewed against base a7d171a plus the pre-existing local checkout. This document distinguishes verified hooks from pending enforcement work.
+Reviewed against base a7d171a plus the pre-existing local checkout. This document records the verified hooks, implemented contracts, and launch-time provider questions.
 
 ## Confirmed packaging
 
@@ -24,7 +24,7 @@ Before workspace-user update/delete signals exist; membership-added is a post-mu
 
 BillingAccount is the stable account identity; a personal account is unique per responsible user. Team accounts may be multiple. Price amounts/currency/interval are immutable through exposed handlers/APIs; changes create a new version. Availability alone can be edited. Audit records retain support actions.
 
-Billing exports get_effective_entitlements, require_entitlement and lock_capacity. Organizations will register a capacity provider during startup and use the billing-account row lock for member acceptance/removal. Billing never imports Organizations. Current manual-grant result contains source, plan, seat_limit, capabilities, valid_until, revision and restriction_reason. Reads check expiry directly, without cache. Paid subscription fallback is represented by the verified Subscription record; grace-period policy remains a later slice.
+Billing exports get_effective_entitlements, require_entitlement and lock_capacity. Organizations registers a capacity provider during startup and uses the billing-account row lock for member acceptance/removal. Billing never imports Organizations. Current manual-grant result contains source, plan, seat_limit, capabilities, valid_until, revision and restriction_reason. Reads check expiry directly, without cache. Paid subscription fallback is represented by the verified Subscription record. Renewal retries and the configurable grace cutoff are implemented in the subscription task and covered by controlled-clock tests; the launch grace value still requires merchant policy approval.
 
 Manual grant changes replace their effective snapshot with audit before/after history. Suspensions have highest precedence. Current grants begin immediately through the UI; the API accepts explicit start dates. Review previews make no writes. Grants do not create financial transactions or cancel paid renewals.
 
