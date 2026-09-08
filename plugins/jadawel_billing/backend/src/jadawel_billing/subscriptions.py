@@ -1,4 +1,5 @@
 from datetime import timedelta
+from decimal import Decimal, ROUND_CEILING
 from typing import Any
 
 from django.conf import settings
@@ -19,6 +20,85 @@ from .models import (
 )
 from .payments import billing_mode
 from .providers.moyasar import MoyasarClient
+
+
+def _timedelta_microseconds(value: timedelta) -> int:
+    return value.days * 86_400_000_000 + value.seconds * 1_000_000 + value.microseconds
+
+
+def prorated_seat_increase_amount(
+    subscription: Subscription, seats: int, *, at=None
+) -> int:
+    """Return the integer-halalah quote for seats added during this period."""
+    at = at or timezone.now()
+    if seats <= subscription.seats:
+        raise ValidationError({"seats": "must_increase"})
+    remaining = _timedelta_microseconds(subscription.period_end - at)
+    total = _timedelta_microseconds(subscription.period_end - subscription.period_start)
+    if remaining <= 0 or total <= 0:
+        raise ValidationError({"subscription": "period_expired"})
+    delta = seats - subscription.seats
+    amount = (
+        Decimal(delta * subscription.price.amount * remaining) / Decimal(total)
+    ).to_integral_value(rounding=ROUND_CEILING)
+    return max(1, int(amount))
+
+
+@transaction.atomic
+def create_seat_increase_order(
+    actor: Any, subscription: Subscription, *, seats: int
+) -> tuple[BillingOrder, bool]:
+    """Create an idempotent order for a verified, prorated Team seat increase."""
+    if not actor.is_authenticated or not actor.is_active:
+        raise ValidationError({"subscription": "not_owner"})
+    if not actor.is_staff and subscription.account.responsible_user_id != actor.pk:
+        raise ValidationError({"subscription": "not_owner"})
+    if subscription.account.kind != BillingAccount.Kind.TEAM:
+        raise ValidationError({"seats": "team_only"})
+    mode = billing_mode()
+    now = timezone.now()
+    with transaction.atomic():
+        account = BillingAccount.objects.select_for_update().get(
+            pk=subscription.account_id
+        )
+        current = (
+            Subscription.objects.select_for_update()
+            .select_related("price")
+            .get(pk=subscription.pk)
+        )
+        if current.status != Subscription.Status.ACTIVE:
+            raise ValidationError({"subscription": "not_active"})
+        if current.period_end <= now:
+            raise ValidationError({"subscription": "period_expired"})
+        if account.suspended:
+            raise ValidationError({"account": "account_suspended"})
+        if get_effective_entitlements(account.pk).get("source") != "paid":
+            raise ValidationError({"subscription": "paid_access_required"})
+        validate_capacity(account, seats)
+        pending = BillingOrder.objects.filter(account=account, status="pending").first()
+        if pending:
+            if (
+                pending.purpose != BillingOrder.Purpose.SEAT_INCREASE
+                or pending.subscription_id != current.pk
+                or pending.seats != seats
+            ):
+                raise ValidationError({"account": "resolve_pending_order"})
+            return pending, False
+        order = BillingOrder.objects.create(
+            account=account,
+            price=current.price,
+            subscription=current,
+            purpose=BillingOrder.Purpose.SEAT_INCREASE,
+            seats=seats,
+            amount=prorated_seat_increase_amount(current, seats, at=now),
+            currency=current.price.currency,
+            interval=current.price.interval,
+            mode=mode,
+        )
+        PaymentAttempt.objects.create(
+            order=order, given_id=order.payment_id, provider_mode=mode
+        )
+        return order, True
 
 
 @transaction.atomic

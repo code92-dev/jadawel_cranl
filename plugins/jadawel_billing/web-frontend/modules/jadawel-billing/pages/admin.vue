@@ -121,6 +121,16 @@
               @click="reconcileOrder(item)"
               >{{ $t("billing.reconcile") }}</Button
             >
+            <Button
+              v-if="
+                item.status === 'paid' &&
+                !['succeeded', 'pending'].includes(item.refund_status)
+              "
+              type="secondary"
+              :disabled="saving"
+              @click="selectRefund(item)"
+              >{{ $t("billing.refund") }}</Button
+            >
           </li>
         </ul>
         <p v-if="!loading && !orders.length">
@@ -129,6 +139,109 @@
         <Button v-if="ordersNext" type="secondary" @click="loadMoreOrders">{{
           $t("billing.more")
         }}</Button>
+        <form
+          v-if="selectedRefundOrder"
+          data-testid="refund-form"
+          @submit.prevent="submitRefund"
+        >
+          <p>
+            {{ $t("billing.refundableAmount") }}:
+            {{ money(selectedRefundOrder.refundable_amount) }}
+          </p>
+          <label
+            >{{ $t("billing.refundAmount")
+            }}<input
+              v-model.number="refund.amount"
+              type="number"
+              min="1"
+              :max="selectedRefundOrder.refundable_amount"
+              class="input"
+              required
+          /></label>
+          <label
+            >{{ $t("billing.reason")
+            }}<textarea
+              v-model="refund.reason"
+              class="input"
+              maxlength="500"
+              required
+            />
+          </label>
+          <Button :disabled="saving" button-type="submit">{{
+            $t("billing.confirmRefund")
+          }}</Button>
+          <Button type="secondary" @click="selectedRefundOrder = null">{{
+            $t("billing.cancel")
+          }}</Button>
+        </form>
+        <p v-if="refundResult" role="status">
+          {{ $t("billing.refundStatus") }}:
+          {{ $t("billing.refundStates." + refundResult.status) }}
+        </p>
+      </section>
+      <section>
+        <h2>{{ $t("billing.externalPayments") }}</h2>
+        <form
+          data-testid="external-payment-form"
+          @submit.prevent="recordExternalPayment"
+        >
+          <label
+            >{{ $t("billing.accounts")
+            }}<select v-model="externalPayment.account" required class="input">
+              <option value="" disabled>{{ $t("billing.accounts") }}</option>
+              <option v-for="item in accounts" :key="item.id" :value="item.id">
+                <bdi>{{ item.owner_email }}</bdi> ·
+                {{ $t("billing." + item.kind.toLowerCase()) }}
+              </option>
+            </select></label
+          >
+          <label
+            >{{ $t("billing.amount")
+            }}<input
+              v-model.number="externalPayment.amount"
+              type="number"
+              min="1"
+              class="input"
+              required
+          /></label>
+          <label
+            >{{ $t("billing.reference")
+            }}<input
+              v-model.trim="externalPayment.reference"
+              dir="ltr"
+              maxlength="120"
+              class="input"
+              required
+          /></label>
+          <label
+            >{{ $t("billing.paidAt")
+            }}<input
+              v-model="externalPayment.paid_at"
+              type="datetime-local"
+              class="input"
+              required
+          /></label>
+          <label
+            >{{ $t("billing.notes")
+            }}<textarea
+              v-model="externalPayment.notes"
+              maxlength="500"
+              class="input"
+            />
+          </label>
+          <Button :disabled="saving" button-type="submit">{{
+            $t("billing.recordExternalPayment")
+          }}</Button>
+        </form>
+        <ul data-testid="external-payment-list">
+          <li v-for="payment in externalPayments" :key="payment.id">
+            <bdi>{{ payment.reference }}</bdi> · {{ money(payment.amount) }} ·
+            <time>{{ formatDate(payment.paid_at) }}</time>
+          </li>
+        </ul>
+        <p v-if="!loading && !externalPayments.length">
+          {{ $t("billing.emptyExternalPayments") }}
+        </p>
       </section>
       <section>
         <h2>{{ $t("billing.providerEvents") }}</h2>
@@ -199,8 +312,8 @@
 <script>
 import GrantPanel from "../components/GrantPanel.vue";
 export default {
-  components: { GrantPanel },
   name: "BillingAdmin",
+  components: { GrantPanel },
   layout: "app",
   middleware: "staff",
   data() {
@@ -216,12 +329,23 @@ export default {
       orders: [],
       ordersNext: null,
       providerEvents: [],
+      externalPayments: [],
       prices: [],
       pricesNext: null,
       selectedPlan: null,
       account: { kind: "INDIVIDUAL", responsible_email: "" },
       plan: { code: "", name: "", kind: "INDIVIDUAL" },
       price: { amount: 0, interval: "MONTH" },
+      selectedRefundOrder: null,
+      refund: { amount: 0, reason: "" },
+      refundResult: null,
+      externalPayment: {
+        account: "",
+        amount: 0,
+        reference: "",
+        paid_at: "",
+        notes: "",
+      },
     };
   },
   async mounted() {
@@ -234,16 +358,21 @@ export default {
         currency: "SAR",
       }).format(amount / 100);
     },
+    formatDate(value) {
+      return value ? new Date(value).toLocaleString(this.$i18n.locale) : "";
+    },
     async refresh() {
       this.loading = true;
       this.error = false;
       try {
-        const [accounts, plans, orders, providerEvents] = await Promise.all([
-          this.$client.get("/billing/admin/accounts/"),
-          this.$client.get("/billing/admin/plans/"),
-          this.$client.get("/billing/admin/orders/"),
-          this.$client.get("/billing/admin/provider-events/"),
-        ]);
+        const [accounts, plans, orders, providerEvents, externalPayments] =
+          await Promise.all([
+            this.$client.get("/billing/admin/accounts/"),
+            this.$client.get("/billing/admin/plans/"),
+            this.$client.get("/billing/admin/orders/"),
+            this.$client.get("/billing/admin/provider-events/"),
+            this.$client.get("/billing/admin/external-payments/"),
+          ]);
         this.accounts = accounts.data.results;
         this.accountsNext = accounts.data.next;
         this.plans = plans.data.results;
@@ -251,6 +380,10 @@ export default {
         this.orders = orders.data.results;
         this.ordersNext = orders.data.next;
         this.providerEvents = providerEvents.data.results;
+        this.externalPayments = externalPayments.data.results;
+        if (!this.externalPayment.account) {
+          this.externalPayment.account = this.accounts[0]?.id || "";
+        }
       } catch {
         this.error = true;
       } finally {
@@ -351,6 +484,55 @@ export default {
         if (index !== -1) this.orders.splice(index, 1, data);
       });
     },
+    selectRefund(order) {
+      this.refund = {
+        amount: order.refundable_amount || order.amount,
+        reason: "",
+      };
+      this.refundResult = null;
+      this.selectedRefundOrder = order;
+    },
+    async submitRefund() {
+      if (!this.selectedRefundOrder) return;
+      await this.mutate(async () => {
+        const { data } = await this.$client.post(
+          "/billing/admin/orders/" + this.selectedRefundOrder.id + "/refund/",
+          this.refund,
+        );
+        this.refundResult = data;
+        const index = this.orders.findIndex(
+          (item) => item.id === this.selectedRefundOrder.id,
+        );
+        if (index !== -1) {
+          this.orders.splice(index, 1, {
+            ...this.orders[index],
+            refund_status: data.status,
+            refunded_amount: data.amount,
+            refundable_amount: Math.max(
+              0,
+              this.orders[index].amount - data.amount,
+            ),
+          });
+        }
+        this.selectedRefundOrder = null;
+      });
+    },
+    async recordExternalPayment() {
+      await this.mutate(async () => {
+        const { data } = await this.$client.post(
+          "/billing/admin/external-payments/",
+          {
+            ...this.externalPayment,
+            paid_at: new Date(this.externalPayment.paid_at).toISOString(),
+          },
+        );
+        this.externalPayments.unshift(data);
+        this.externalPayment.amount = 0;
+        this.externalPayment.reference = "";
+        this.externalPayment.paid_at = "";
+        this.externalPayment.notes = "";
+      });
+    },
   },
 };
 </script>
@@ -360,9 +542,14 @@ export default {
   max-inline-size: 960px;
   margin-inline: auto;
   padding: 32px;
+  background: var(--jadawel-content-background, #fcfdfc);
 }
 .billing-admin section {
   margin-block: 32px;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 8px;
+  padding: 20px;
+  background: var(--jadawel-raised-background, #fbfdfb);
 }
 .billing-admin form {
   display: flex;
@@ -374,6 +561,27 @@ export default {
   display: grid;
   gap: 8px;
 }
+.billing-admin input:not([type="checkbox"]),
+.billing-admin select,
+.billing-admin textarea {
+  box-sizing: border-box;
+  min-block-size: 36px;
+  inline-size: 100%;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--jadawel-raised-background, #fbfdfb);
+  color: inherit;
+  font: inherit;
+}
+.billing-admin input:focus,
+.billing-admin select:focus,
+.billing-admin textarea:focus {
+  border-color: var(--jadawel-primary-500, #278053);
+  outline: 2px solid
+    color-mix(in srgb, var(--jadawel-primary-500, #278053) 28%, transparent);
+  outline-offset: 1px;
+}
 .billing-admin li {
   margin-block: 12px;
 }
@@ -382,7 +590,7 @@ export default {
   margin-inline-start: 8px;
 }
 .billing-admin article {
-  border-block-end: 1px solid #e5e7eb;
+  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
   padding-block: 16px;
 }
 </style>

@@ -108,12 +108,16 @@ consume the last seat concurrently.
    invitations. A non-staff manager cannot bind a workspace with unresolved
    outsiders; a general admin must explicitly review it.
 3. For each binding, choose an active organization member and choose **Assign**.
-   Access is synchronized to the member's organization role.
+   Choose **Workspace administrator**, **Workspace member**, or **Viewer** for
+   the assignment. Viewer access is read-only, and is enforced by the backend.
 4. Use **Unbind workspace** only after reviewing who should retain independent
    access. Unbinding removes access created by the organization adapter and
    preserves unrelated personal workspace data.
 
-Organization permission enforcement also applies to core workspace operations.
+Organization permission enforcement also applies to core workspace operations and
+API-token actors. A general administrator must submit an explicit outsider
+confirmation after reviewing the binding preview; the server rejects a bind with
+unresolved outsiders unless that confirmation is present.
 Members retain allowed reads during a billing grace period, while writes,
 invites, publishing, and new workspace creation are denied after access becomes
 restricted. Public links and personal workspaces are not deleted by member

@@ -210,17 +210,42 @@ def _verify_order(
             attempt.save(update_fields=["status", "updated_at"])
             return order
         now = timezone.now()
-        Subscription.objects.update_or_create(
-            account=account,
-            defaults={
-                "price": order.price,
-                "seats": order.seats,
-                "period_start": now,
-                "period_end": period_end(now, order.interval),
-                "source_order": order,
-                "cancel_at_period_end": False,
-            },
-        )
+        if order.purpose == BillingOrder.Purpose.SEAT_INCREASE:
+            subscription = (
+                Subscription.objects.select_for_update()
+                .filter(pk=order.subscription_id, account=account)
+                .first()
+            )
+            if subscription is None:
+                raise ValidationError({"subscription": "not_found"})
+            if subscription.period_end <= now:
+                raise ValidationError({"subscription": "period_expired"})
+            if order.seats <= subscription.seats:
+                raise ValidationError({"seats": "already_applied"})
+            subscription.seats = order.seats
+            subscription.status = Subscription.Status.ACTIVE
+            subscription.retry_count = 0
+            subscription.next_retry_at = None
+            subscription.save(
+                update_fields=[
+                    "seats",
+                    "status",
+                    "retry_count",
+                    "next_retry_at",
+                ]
+            )
+        else:
+            Subscription.objects.update_or_create(
+                account=account,
+                defaults={
+                    "price": order.price,
+                    "seats": order.seats,
+                    "period_start": now,
+                    "period_end": period_end(now, order.interval),
+                    "source_order": order,
+                    "cancel_at_period_end": False,
+                },
+            )
         order.status = "paid"
         order.paid_at = now
         order.save(update_fields=["status", "paid_at"])

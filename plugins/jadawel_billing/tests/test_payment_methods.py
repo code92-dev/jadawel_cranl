@@ -1,6 +1,7 @@
 from unittest.mock import Mock, patch
 
 import pytest
+from django.db import connection
 from rest_framework.exceptions import ValidationError
 
 
@@ -10,7 +11,7 @@ def _provider_response(payload):
     return response
 
 
-@pytest.mark.django_db
+@pytest.mark.django_db(transaction=True)
 def test_payment_method_requires_active_token_bound_to_paid_payment(
     data_fixture, settings
 ):
@@ -46,10 +47,12 @@ def test_payment_method_requires_active_token_bound_to_paid_payment(
         "status": "paid",
         "source": {"token": "token_active"},
     }
-    with patch(
-        "requests.get",
-        side_effect=[_provider_response(token), _provider_response(payment)],
-    ):
+
+    def provider_get(url, **kwargs):
+        assert not connection.in_atomic_block
+        return _provider_response(token if "/tokens/" in url else payment)
+
+    with patch("requests.get", side_effect=provider_get):
         method = save_payment_method(
             admin,
             account,

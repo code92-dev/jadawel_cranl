@@ -32,6 +32,7 @@ from jadawel_billing.api.subscriptions import (
     CancellationView,
     PaymentMethodDeleteView,
     PaymentMethodsView,
+    SeatIncreaseView,
     SubscriptionChangeView,
 )
 
@@ -63,6 +64,11 @@ urlpatterns = [
         "accounts/<uuid:account_id>/subscription/change/",
         SubscriptionChangeView.as_view(),
         name="subscription_change",
+    ),
+    path(
+        "accounts/<uuid:account_id>/subscription/seat-increase/",
+        SeatIncreaseView.as_view(),
+        name="subscription_seat_increase",
     ),
     path(
         "admin/accounts/<uuid:account_id>/grant/",

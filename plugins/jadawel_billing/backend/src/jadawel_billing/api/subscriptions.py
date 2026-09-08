@@ -8,8 +8,10 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from jadawel_billing.api.views import BillingPagination
 from jadawel_billing.models import (
     BillingAccount,
+    ExternalPayment,
     PaymentMethod,
     PlanPrice,
     Subscription,
@@ -20,7 +22,11 @@ from jadawel_billing.payment_methods import (
     save_payment_method,
 )
 from jadawel_billing.refunds import record_external_payment, refund_order
-from jadawel_billing.subscriptions import schedule_subscription_change, set_cancellation
+from jadawel_billing.subscriptions import (
+    create_seat_increase_order,
+    schedule_subscription_change,
+    set_cancellation,
+)
 
 
 class PaymentMethodInput(serializers.Serializer[Any]):
@@ -120,6 +126,28 @@ class SubscriptionChangeView(APIView):
         )
 
 
+class SeatIncreaseInput(serializers.Serializer[Any]):
+    seats = serializers.IntegerField(min_value=2, max_value=100000)
+
+
+class SeatIncreaseView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request: Request, account_id: UUID) -> Response:
+        account = get_object_or_404(
+            BillingAccount, pk=account_id, responsible_user_id=request.user.pk
+        )
+        subscription = get_object_or_404(Subscription, account=account)
+        data = SeatIncreaseInput(data=request.data)
+        data.is_valid(raise_exception=True)
+        order, created = create_seat_increase_order(
+            request.user, subscription, seats=data.validated_data["seats"]
+        )
+        from jadawel_billing.api.checkout import OrderSerializer
+
+        return Response(OrderSerializer(order).data, status=201 if created else 200)
+
+
 class RefundInput(serializers.Serializer[Any]):
     amount = serializers.IntegerField(required=False, min_value=1)
     reason = serializers.CharField(max_length=500)
@@ -145,21 +173,45 @@ class ExternalPaymentInput(serializers.Serializer[Any]):
     amount = serializers.IntegerField(min_value=1)
     reference = serializers.CharField(max_length=120)
     paid_at = serializers.DateTimeField()
-    notes = serializers.CharField(max_length=500, required=False, default="")
+    notes = serializers.CharField(
+        max_length=500, required=False, allow_blank=True, default=""
+    )
+
+
+class ExternalPaymentSerializer(serializers.ModelSerializer[Any]):
+    account = serializers.UUIDField(source="account_id", read_only=True)
+    actor = serializers.IntegerField(source="actor_id", read_only=True, allow_null=True)
+
+    class Meta:
+        model = ExternalPayment
+        fields = [
+            "id",
+            "account",
+            "amount",
+            "currency",
+            "reference",
+            "paid_at",
+            "notes",
+            "actor",
+            "created_at",
+        ]
 
 
 class AdminExternalPaymentView(APIView):
     permission_classes = [IsAdminUser]
 
+    def get(self, request: Request) -> Response:
+        paginator = BillingPagination()
+        payments = ExternalPayment.objects.select_related("account", "actor").order_by(
+            "-paid_at", "-id"
+        )
+        page = paginator.paginate_queryset(payments, request, view=self)
+        return paginator.get_paginated_response(
+            ExternalPaymentSerializer(page, many=True).data
+        )
+
     def post(self, request: Request) -> Response:
         data = ExternalPaymentInput(data=request.data)
         data.is_valid(raise_exception=True)
         payment = record_external_payment(request.user, **data.validated_data)
-        return Response(
-            {
-                "id": payment.pk,
-                "reference": payment.reference,
-                "amount": payment.amount,
-            },
-            status=201,
-        )
+        return Response(ExternalPaymentSerializer(payment).data, status=201)

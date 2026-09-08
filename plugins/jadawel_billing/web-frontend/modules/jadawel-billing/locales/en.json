@@ -10,9 +10,22 @@
     "changePlan": "Change plan at renewal",
     "changeSeats": "Seats at renewal",
     "scheduleChange": "Schedule change",
+    "addSeats": "New total seats",
+    "purchaseSeats": "Add seats now",
     "paymentMethods": "Saved payment methods",
     "noPaymentMethods": "No saved payment methods.",
     "removePaymentMethod": "Remove payment method",
+    "refund": "Refund",
+    "refundableAmount": "Refundable balance",
+    "refundAmount": "Refund amount",
+    "confirmRefund": "Submit refund",
+    "refundStatus": "Refund status",
+    "reference": "External reference",
+    "paidAt": "Paid at",
+    "notes": "Notes",
+    "externalPayments": "External payments",
+    "recordExternalPayment": "Record external payment",
+    "emptyExternalPayments": "No external payments recorded.",
     "email": "Account owner's email",
     "kind": "Account type",
     "individual": "Individual",
@@ -74,6 +87,7 @@
     "sandbox": "Test environment — no real payment.",
     "checkout": "Continue to payment",
     "singlePeriod": "This purchase covers one billing period. Automatic renewal is not enabled.",
+    "proratedSeatIncrease": "This is a one-time prorated charge for the added seats. Your existing renewal date stays unchanged.",
     "cardName": "Name on card",
     "cardNumber": "Card number",
     "cardMonth": "Expiry month",
@@ -103,6 +117,11 @@
     "paymentStatus": {
       "pending": "Awaiting verified payment",
       "paid": "Paid",
+      "failed": "Failed"
+    },
+    "refundStates": {
+      "pending": "Pending review",
+      "succeeded": "Succeeded",
       "failed": "Failed"
     }
   }

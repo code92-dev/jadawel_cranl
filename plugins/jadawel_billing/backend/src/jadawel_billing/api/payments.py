@@ -11,7 +11,7 @@ from rest_framework.views import APIView
 from jadawel_billing.api.receipts import ReceiptSerializer
 from jadawel_billing.api.checkout import VerifyInput
 from jadawel_billing.api.views import BillingPagination
-from jadawel_billing.models import BillingOrder, ProviderEvent
+from jadawel_billing.models import BillingOrder, BillingRefund, ProviderEvent
 from jadawel_billing.payments import reconcile_order
 
 
@@ -29,6 +29,28 @@ class AdminOrderSerializer(ReceiptSerializer):
     failure_code = serializers.CharField(
         source="payment_attempt.failure_code", read_only=True
     )
+    refund_status = serializers.SerializerMethodField()
+    refunded_amount = serializers.SerializerMethodField()
+    refundable_amount = serializers.SerializerMethodField()
+
+    def _refund(self, order: BillingOrder) -> BillingRefund | None:
+        return getattr(order, "refund", None)
+
+    def get_refund_status(self, order: BillingOrder) -> str | None:
+        refund = self._refund(order)
+        return refund.status if refund else None
+
+    def get_refunded_amount(self, order: BillingOrder) -> int:
+        refund = self._refund(order)
+        return refund.amount if refund else 0
+
+    def get_refundable_amount(self, order: BillingOrder) -> int:
+        refund = self._refund(order)
+        if refund and refund.status == BillingRefund.Status.FAILED:
+            # An uncertain or failed provider attempt can be retried, but it
+            # must keep the same amount as the recorded operation identity.
+            return refund.amount
+        return max(0, order.amount - (refund.amount if refund else 0))
 
     class Meta:
         model = BillingOrder
@@ -46,6 +68,10 @@ class AdminOrderSerializer(ReceiptSerializer):
             "currency",
             "interval",
             "seats",
+            "purpose",
+            "refund_status",
+            "refunded_amount",
+            "refundable_amount",
             "mode",
             "status",
             "created_at",
@@ -59,7 +85,7 @@ class AdminOrdersView(generics.ListAPIView[Any]):
     serializer_class = AdminOrderSerializer
     pagination_class = BillingPagination
     queryset = BillingOrder.objects.select_related(
-        "account__responsible_user", "price", "payment_attempt"
+        "account__responsible_user", "price", "payment_attempt", "refund"
     ).order_by("-created_at", "-id")
 
 

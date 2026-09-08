@@ -23,8 +23,10 @@ retained when the plugin is removed; take a database backup before schema change
 The namespaced API is mounted under `/api/organizations/`. It includes member
 list/add/update/remove, invitation create/list/accept/revoke, restricted owner
 setup invitations with resend/reassign controls, workspace outsider previews,
-bind/unbind and member assignment, lifecycle controls, audit history, and the
-Team-to-Individual transition. Owners and organization admins are separate from
+bind/unbind and member assignment (ADMIN, MEMBER, or read-only VIEWER), lifecycle
+controls, audit history, and the Team-to-Individual transition. A general
+administrator must explicitly confirm a binding preview when existing outsiders
+are present. Owners and organization admins are separate from
 Django staff users; the general administrator uses `is_staff` for complimentary
 provisioning, lifecycle recovery, and outsider resolution.
 

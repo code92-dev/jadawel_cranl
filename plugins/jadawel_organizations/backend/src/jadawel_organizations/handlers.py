@@ -163,12 +163,17 @@ def provision_paid_team(account_id: UUID) -> None:
 
 
 def _sync_workspace_user(
-    binding: OrganizationWorkspace, membership: OrganizationMembership
+    binding: OrganizationWorkspace,
+    membership: OrganizationMembership,
+    permissions: str | None = None,
 ) -> None:
     workspace = binding.workspace
     if membership.suspended:
         _remove_workspace_user(binding, membership, preserve_for_restore=True)
         return
+    permissions = permissions or (
+        "ADMIN" if membership.role in {"owner", "admin"} else "MEMBER"
+    )
     workspace_user = WorkspaceUser.objects.filter(
         workspace=workspace, user=membership.user
     ).first()
@@ -178,7 +183,7 @@ def _sync_workspace_user(
             workspace=workspace,
             user=membership.user,
             order=order,
-            permissions="ADMIN" if membership.role in {"owner", "admin"} else "MEMBER",
+            permissions=permissions,
         )
         binding.managed_user_ids = list(
             set(binding.managed_user_ids + [membership.user_id])
@@ -193,9 +198,7 @@ def _sync_workspace_user(
             )
             binding.managed_user_permissions = previous
             binding.save(update_fields=["managed_user_ids", "managed_user_permissions"])
-        workspace_user.permissions = (
-            "ADMIN" if membership.role in {"owner", "admin"} else "MEMBER"
-        )
+        workspace_user.permissions = permissions
         workspace_user.save(update_fields=["permissions"])
 
 
@@ -212,7 +215,11 @@ def _remove_workspace_user(
             workspace=binding.workspace, user_id=membership.user_id
         ).first()
         if preserve_for_restore:
-            if workspace_user is not None:
+            # Keep pre-existing workspace membership rows intact. The
+            # organization permission manager still denies access while the
+            # membership or organization is suspended, and unbinding/removal
+            # restores the original permission below.
+            if previous_permission is None and workspace_user is not None:
                 workspace_user.delete()
         elif previous_permission is None:
             if workspace_user is not None:
@@ -240,11 +247,17 @@ def _sync_member(membership: OrganizationMembership) -> None:
             # Workspace access is an explicit assignment. The owner is added
             # during binding and later owners during ownership transfer.
             continue
-        access.permissions = (
-            "ADMIN" if membership.role in {"owner", "admin"} else "MEMBER"
-        )
-        access.save(update_fields=["permissions"])
-        _sync_workspace_user(binding, membership)
+        _sync_workspace_user(binding, membership, access.permissions)
+
+
+def _require_workspace_admin(actor: Any, workspace: Workspace) -> None:
+    """Require explicit workspace administration before binding existing data."""
+    if actor.is_staff:
+        return
+    if not WorkspaceUser.objects.filter(
+        workspace=workspace, user=actor, permissions="ADMIN"
+    ).exists():
+        raise PermissionDenied("workspace_admin_required")
 
 
 @transaction.atomic
@@ -473,6 +486,32 @@ def create_pending_team(actor: Any, *, name: str) -> Organization:
         "organization.checkout_started",
         organization.pk,
         {"name": name},
+    )
+    return organization
+
+
+@transaction.atomic
+def update_organization(
+    actor: Any, organization: Organization, *, name: str
+) -> Organization:
+    """Update organization settings while retaining an audit trail."""
+    _can_manage(actor, organization)
+    name = name.strip()
+    if not name:
+        raise ValidationError({"name": "required"})
+    if len(name) > 160:
+        raise ValidationError({"name": "too_long"})
+    before = organization.name
+    if before == name:
+        return organization
+    organization.name = name
+    organization.save(update_fields=["name", "updated_at"])
+    audit(
+        actor,
+        organization,
+        "organization.updated",
+        organization.pk,
+        {"before": {"name": before}, "after": {"name": name}},
     )
     return organization
 
@@ -713,9 +752,14 @@ def update_member(
             organization.owner_id = membership.user_id
             organization.save(update_fields=["owner_id", "updated_at"])
             for binding in organization.workspaces.all():
-                OrganizationWorkspaceAccess.objects.get_or_create(
-                    binding=binding, membership=membership
+                access, created = OrganizationWorkspaceAccess.objects.get_or_create(
+                    binding=binding,
+                    membership=membership,
+                    defaults={"permissions": "ADMIN"},
                 )
+                if not created and access.permissions != "ADMIN":
+                    access.permissions = "ADMIN"
+                    access.save(update_fields=["permissions"])
         elif membership.role == "owner":
             raise ValidationError({"role": "transfer_owner_first"})
         elif (
@@ -773,18 +817,26 @@ def remove_member(
 
 @transaction.atomic
 def bind_workspace(
-    actor: Any, organization: Organization, workspace: Workspace
+    actor: Any,
+    organization: Organization,
+    workspace: Workspace,
+    *,
+    confirm_outsiders: bool = False,
 ) -> OrganizationWorkspace:
     _can_manage(actor, organization)
+    _require_workspace_admin(actor, workspace)
     outsiders = (
         WorkspaceUser.objects.filter(workspace=workspace)
         .exclude(user_id__in=organization.memberships.values("user_id"))
         .exists()
     )
-    if outsiders and not actor.is_staff:
-        raise ValidationError(
-            {"workspace": "unresolved_outsiders_require_general_admin"}
-        )
+    if outsiders:
+        if not actor.is_staff:
+            raise ValidationError(
+                {"workspace": "unresolved_outsiders_require_general_admin"}
+            )
+        if not confirm_outsiders:
+            raise ValidationError({"workspace": "outsiders_require_confirmation"})
     binding, created = OrganizationWorkspace.objects.get_or_create(
         organization=organization, workspace=workspace, defaults={"added_by": actor}
     )
@@ -808,6 +860,7 @@ def workspace_binding_preview(
     actor: Any, organization: Organization, workspace: Workspace
 ) -> dict[str, Any]:
     _can_manage(actor, organization)
+    _require_workspace_admin(actor, workspace)
     member_ids = set(organization.memberships.values_list("user_id", flat=True))
     return {
         "workspace": workspace.pk,
@@ -844,6 +897,7 @@ def assign_workspace_member(
     organization: Organization,
     binding: OrganizationWorkspace,
     membership: OrganizationMembership,
+    permissions: str | None = None,
 ) -> OrganizationWorkspaceAccess:
     _can_manage(actor, organization)
     if (
@@ -853,10 +907,16 @@ def assign_workspace_member(
         raise ValidationError({"workspace": "organization_mismatch"})
     if membership.suspended:
         raise ValidationError({"membership": "suspended"})
-    access, _ = OrganizationWorkspaceAccess.objects.get_or_create(
-        binding=binding, membership=membership
+    if permissions is None:
+        permissions = "ADMIN" if membership.role in {"owner", "admin"} else "MEMBER"
+    if permissions not in {"ADMIN", "MEMBER", "VIEWER"}:
+        raise ValidationError({"permissions": "invalid"})
+    access, _ = OrganizationWorkspaceAccess.objects.update_or_create(
+        binding=binding,
+        membership=membership,
+        defaults={"permissions": permissions},
     )
-    _sync_workspace_user(binding, membership)
+    _sync_workspace_user(binding, membership, permissions)
     audit(
         actor,
         organization,

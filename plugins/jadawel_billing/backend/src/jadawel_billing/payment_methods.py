@@ -20,7 +20,6 @@ def _can_manage(actor: Any, account: BillingAccount) -> None:
         raise PermissionDenied()
 
 
-@transaction.atomic
 def save_payment_method(
     actor: Any,
     account: BillingAccount,
@@ -64,24 +63,25 @@ def save_payment_method(
         raise ValidationError({"provider_token": "payment_token_mismatch"})
     if token.get("status") != "active":
         raise ValidationError({"provider_token": "token_not_active"})
-    method, _ = PaymentMethod.objects.update_or_create(
-        provider_token=provider_token,
-        defaults={
-            "account": account,
-            "brand": brand[:40],
-            "last4": last4[-4:],
-            "exp_month": exp_month,
-            "exp_year": exp_year,
-            "consent_at": timezone.now(),
-            "revoked_at": None,
-        },
-    )
-    audit(
-        actor,
-        "payment_method.saved",
-        account.pk,
-        {"last4": method.last4, "brand": method.brand},
-    )
+    with transaction.atomic():
+        method, _ = PaymentMethod.objects.update_or_create(
+            provider_token=provider_token,
+            defaults={
+                "account": account,
+                "brand": brand[:40],
+                "last4": last4[-4:],
+                "exp_month": exp_month,
+                "exp_year": exp_year,
+                "consent_at": timezone.now(),
+                "revoked_at": None,
+            },
+        )
+        audit(
+            actor,
+            "payment_method.saved",
+            account.pk,
+            {"last4": method.last4, "brand": method.brand},
+        )
     return method
 
 

@@ -18,14 +18,18 @@ def refund_order(
     require_admin(actor)
     if not reason.strip():
         raise ValidationError({"reason": "required"})
-    amount = amount or order.amount
-    if order.status != "paid" or amount < 1 or amount > order.amount:
+    requested_amount = amount or order.amount
+    if (
+        order.status != "paid"
+        or requested_amount < 1
+        or requested_amount > order.amount
+    ):
         raise ValidationError({"amount": "invalid_refund_amount"})
     with transaction.atomic():
         refund, created = BillingRefund.objects.get_or_create(
             order=order,
             defaults={
-                "amount": amount,
+                "amount": requested_amount,
                 "currency": order.currency,
                 "reason": reason.strip(),
                 "actor": actor,
@@ -36,6 +40,9 @@ def refund_order(
                 return refund
             if refund.status == BillingRefund.Status.PENDING:
                 raise ValidationError({"refund": "already_processing"})
+            if refund.amount != requested_amount:
+                raise ValidationError({"amount": "must_match_previous_attempt"})
+        amount = refund.amount
     provider_id = getattr(order.payment_attempt, "provider_payment_id", None)
     if not provider_id:
         raise ValidationError({"payment": "provider_id_required"})

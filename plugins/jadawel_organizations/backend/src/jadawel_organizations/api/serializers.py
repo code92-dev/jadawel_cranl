@@ -101,6 +101,10 @@ class StartTeamSerializer(serializers.Serializer[Any]):
     name = serializers.CharField(max_length=160)
 
 
+class OrganizationUpdateSerializer(serializers.Serializer[Any]):
+    name = serializers.CharField(max_length=160)
+
+
 class MembershipSerializer(serializers.ModelSerializer[Any]):
     email = serializers.EmailField(source="user.email", read_only=True)
     name = serializers.CharField(source="user.username", read_only=True)
@@ -154,15 +158,35 @@ class OrganizationWorkspaceSerializer(serializers.ModelSerializer[Any]):
     assigned_members = serializers.IntegerField(
         source="member_access.count", read_only=True
     )
+    assignments = serializers.SerializerMethodField()
+
+    def get_assignments(self, binding: OrganizationWorkspace) -> list[dict[str, Any]]:
+        return [
+            {
+                "membership_id": access.membership_id,
+                "email": access.membership.user.email,
+                "permissions": access.permissions,
+            }
+            for access in binding.member_access.select_related(
+                "membership__user"
+            ).order_by("id")
+        ]
 
     class Meta:
         model = OrganizationWorkspace
-        fields = ["id", "workspace", "assigned_members", "created_at"]
+        fields = ["id", "workspace", "assigned_members", "assignments", "created_at"]
         read_only_fields = fields
 
 
 class BindWorkspaceSerializer(serializers.Serializer[Any]):
     workspace = serializers.PrimaryKeyRelatedField(queryset=Workspace.objects.all())
+    confirm_outsiders = serializers.BooleanField(required=False, default=False)
+
+
+class WorkspaceMemberAssignmentSerializer(serializers.Serializer[Any]):
+    permissions = serializers.ChoiceField(
+        choices=["ADMIN", "MEMBER", "VIEWER"], required=False
+    )
 
 
 class MemberUpdateSerializer(serializers.Serializer[Any]):

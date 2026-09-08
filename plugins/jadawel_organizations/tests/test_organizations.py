@@ -129,6 +129,41 @@ def test_workspace_binding_restores_preexisting_access_on_member_removal(data_fi
 
 
 @pytest.mark.django_db
+def test_organization_suspend_preserves_preexisting_workspace_membership(data_fixture):
+    from jadawel.core.models import WorkspaceUser
+    from jadawel_organizations.handlers import (
+        assign_workspace_member,
+        bind_workspace,
+        change_organization_lifecycle,
+        create_organization,
+        unbind_workspace,
+    )
+    from jadawel_organizations.models import OrganizationMembership
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    member = data_fixture.create_user()
+    organization = create_organization(staff, name="Preserve suspension", owner=owner)
+    membership = OrganizationMembership.objects.create(
+        organization=organization, user=member
+    )
+    workspace = data_fixture.create_workspace(user=owner, name="Preserved shared data")
+    preexisting = WorkspaceUser.objects.create(
+        workspace=workspace, user=member, order=1, permissions="ADMIN"
+    )
+    bind_workspace(staff, organization, workspace)
+    binding = organization.workspaces.get()
+    assign_workspace_member(owner, organization, binding, membership)
+
+    change_organization_lifecycle(staff, organization, action="suspend")
+    assert WorkspaceUser.objects.filter(pk=preexisting.pk).exists()
+    change_organization_lifecycle(staff, organization, action="reactivate")
+    unbind_workspace(staff, organization, binding)
+    preexisting.refresh_from_db()
+    assert preexisting.permissions == "ADMIN"
+
+
+@pytest.mark.django_db
 def test_managed_workspace_uses_organization_permission_and_restricted_mode(
     data_fixture,
 ):
@@ -178,6 +213,120 @@ def test_managed_workspace_uses_organization_permission_and_restricted_mode(
         workspace=workspace,
         context=token,
     )
+
+
+@pytest.mark.django_db
+def test_viewer_workspace_assignment_is_read_only(data_fixture):
+    from django.utils import timezone
+    from jadawel.core.exceptions import PermissionException
+    from jadawel.core.handler import CoreHandler
+    from jadawel_billing.grants import replace_grant
+    from jadawel_billing.handlers import create_plan
+    from jadawel_organizations.handlers import (
+        assign_workspace_member,
+        bind_workspace,
+        create_organization,
+    )
+    from jadawel_organizations.models import OrganizationMembership
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    viewer = data_fixture.create_user()
+    organization = create_organization(staff, name="Viewer access", owner=owner)
+    plan = create_plan(staff, code="viewer-team", name="Viewer team", kind="TEAM")
+    replace_grant(
+        staff,
+        organization.billing_account_id,
+        plan=plan,
+        seat_limit=2,
+        starts_at=timezone.now() - timedelta(minutes=1),
+        reason="Viewer assignment",
+    )
+    membership = OrganizationMembership.objects.create(
+        organization=organization, user=viewer
+    )
+    workspace = data_fixture.create_workspace(user=owner, name="Viewer data")
+    bind_workspace(owner, organization, workspace)
+    assign_workspace_member(
+        owner,
+        organization,
+        organization.workspaces.get(),
+        membership,
+        permissions="VIEWER",
+    )
+    assert CoreHandler().check_permissions(
+        viewer, "workspace.read", workspace=workspace, context=workspace
+    )
+    with pytest.raises(PermissionException):
+        CoreHandler().check_permissions(
+            viewer,
+            "workspace.create_application",
+            workspace=workspace,
+            context=workspace,
+        )
+
+
+@pytest.mark.django_db
+def test_staff_without_explicit_organization_access_cannot_read_managed_workspace(
+    data_fixture,
+):
+    from django.utils import timezone
+    from jadawel.core.exceptions import PermissionException
+    from jadawel.core.handler import CoreHandler
+    from jadawel_billing.grants import replace_grant
+    from jadawel_billing.handlers import create_plan
+    from jadawel_organizations.handlers import bind_workspace, create_organization
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    organization = create_organization(staff, name="Explicit staff access", owner=owner)
+    plan = create_plan(
+        staff, code="explicit-staff-access", name="Explicit staff access", kind="TEAM"
+    )
+    replace_grant(
+        staff,
+        organization.billing_account_id,
+        plan=plan,
+        seat_limit=1,
+        starts_at=timezone.now(),
+        reason="Access boundary",
+    )
+    workspace = data_fixture.create_workspace(user=owner, name="Managed staff boundary")
+    bind_workspace(owner, organization, workspace)
+
+    with pytest.raises(PermissionException):
+        CoreHandler().check_permissions(
+            staff, "workspace.read", workspace=workspace, context=workspace
+        )
+
+
+@pytest.mark.django_db
+def test_owner_cannot_bind_workspace_they_do_not_administer(data_fixture):
+    from django.utils import timezone
+    from rest_framework.exceptions import PermissionDenied
+    from jadawel_billing.grants import replace_grant
+    from jadawel_billing.handlers import create_plan
+    from jadawel_organizations.handlers import bind_workspace, create_organization
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    other_owner = data_fixture.create_user()
+    organization = create_organization(staff, name="Workspace boundary", owner=owner)
+    plan = create_plan(
+        staff, code="workspace-boundary", name="Workspace boundary", kind="TEAM"
+    )
+    replace_grant(
+        staff,
+        organization.billing_account_id,
+        plan=plan,
+        seat_limit=1,
+        starts_at=timezone.now(),
+        reason="Workspace boundary",
+    )
+    workspace = data_fixture.create_workspace(user=other_owner, name="Other workspace")
+
+    with pytest.raises(PermissionDenied, match="workspace_admin_required"):
+        bind_workspace(owner, organization, workspace)
 
 
 @pytest.mark.django_db
@@ -253,6 +402,27 @@ def test_admin_organization_api_and_invitation_api(api_client, data_fixture):
 
 
 @pytest.mark.django_db
+def test_organization_owner_can_update_name_with_audit_entry(data_fixture):
+    from jadawel_organizations.handlers import create_organization, update_organization
+    from jadawel_organizations.models import OrganizationAuditEvent
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    organization = create_organization(staff, name="Before name", owner=owner)
+
+    updated = update_organization(owner, organization, name="After name")
+
+    assert updated.name == "After name"
+    event = OrganizationAuditEvent.objects.get(
+        organization=organization, action="organization.updated"
+    )
+    assert event.details == {
+        "before": {"name": "Before name"},
+        "after": {"name": "After name"},
+    }
+
+
+@pytest.mark.django_db
 def test_general_admin_can_create_complimentary_org_with_grant(
     api_client, data_fixture
 ):
@@ -304,8 +474,11 @@ def test_admin_owner_email_creates_reserved_setup_invitation(data_fixture):
     assert team_occupied_seats(organization.billing_account_id) == 1
     workspace = data_fixture.create_workspace(user=admin, name="Pending owner data")
     from jadawel_organizations.handlers import bind_workspace
+    from rest_framework.exceptions import ValidationError
 
-    bind_workspace(admin, organization, workspace)
+    with pytest.raises(ValidationError, match="outsiders_require_confirmation"):
+        bind_workspace(admin, organization, workspace)
+    bind_workspace(admin, organization, workspace, confirm_outsiders=True)
     owner = data_fixture.create_user(email="new-owner@example.com")
     accept_invitation(owner, organization._owner_setup_token)
     organization.refresh_from_db()
@@ -433,7 +606,14 @@ def test_lifecycle_revokes_and_restores_managed_workspace_access(data_fixture):
     bind_workspace(owner, organization, workspace)
     assert WorkspaceUser.objects.filter(workspace=workspace, user=owner).exists()
     change_organization_lifecycle(staff, organization, action="suspend")
-    assert not WorkspaceUser.objects.filter(workspace=workspace, user=owner).exists()
+    assert WorkspaceUser.objects.filter(workspace=workspace, user=owner).exists()
+    from jadawel.core.exceptions import PermissionException
+    from jadawel.core.handler import CoreHandler
+
+    with pytest.raises(PermissionException):
+        CoreHandler().check_permissions(
+            owner, "workspace.read", workspace=workspace, context=workspace
+        )
     change_organization_lifecycle(staff, organization, action="reactivate")
     assert WorkspaceUser.objects.filter(workspace=workspace, user=owner).exists()
 

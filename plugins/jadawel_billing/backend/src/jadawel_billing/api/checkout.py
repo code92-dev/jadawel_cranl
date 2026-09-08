@@ -52,6 +52,7 @@ class OrderSerializer(ReceiptSerializer):
             "failure_code",
             "amount",
             "currency",
+            "purpose",
             "status",
             "seats",
             "created_at",

@@ -28,6 +28,7 @@ from ..handlers import (
     update_member,
     workspace_binding_preview,
     transition_to_personal,
+    update_organization,
 )
 from ..models import (
     Organization,
@@ -47,8 +48,10 @@ from .serializers import (
     MembershipSerializer,
     OrganizationSerializer,
     OrganizationWorkspaceSerializer,
+    OrganizationUpdateSerializer,
     OwnerSetupSerializer,
     StartTeamSerializer,
+    WorkspaceMemberAssignmentSerializer,
 )
 
 
@@ -98,6 +101,15 @@ class OrganizationDetailView(APIView):
             organization.workspaces.select_related("workspace"), many=True
         ).data
         return Response(payload)
+
+    def patch(self, request: Request, organization_id: UUID) -> Response:
+        organization = get_org(organization_id)
+        serializer = OrganizationUpdateSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        organization = update_organization(
+            request.user, organization, **serializer.validated_data
+        )
+        return Response(organization_snapshot(organization))
 
 
 class AdminOrganizationListView(generics.ListAPIView[Any]):
@@ -262,7 +274,7 @@ class WorkspaceBindView(APIView):
         serializer = BindWorkspaceSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         binding = bind_workspace(
-            request.user, organization, serializer.validated_data["workspace"]
+            request.user, organization, **serializer.validated_data
         )
         return Response(
             OrganizationWorkspaceSerializer(binding).data,
@@ -307,7 +319,15 @@ class WorkspaceMemberAssignmentView(APIView):
         organization = get_org(organization_id)
         binding = get_object_or_404(OrganizationWorkspace, pk=binding_id)
         membership = get_object_or_404(OrganizationMembership, pk=membership_id)
-        assign_workspace_member(request.user, organization, binding, membership)
+        serializer = WorkspaceMemberAssignmentSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        assign_workspace_member(
+            request.user,
+            organization,
+            binding,
+            membership,
+            **serializer.validated_data,
+        )
         return Response({"assigned": True})
 
 

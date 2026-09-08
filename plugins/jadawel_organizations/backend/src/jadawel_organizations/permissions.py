@@ -64,6 +64,7 @@ class OrganizationPermissionManagerType(PermissionManagerType):
         "database.table.read_row_history",
         "database.table.read_view_order",
         "database.table.view.decoration.read",
+        "database.table.view.can_receive_notification_on_submit_form_view",
         "database.table.view.filter.read",
         "database.table.view.filter_group.read",
         "database.table.view.group_by.read",
@@ -132,17 +133,19 @@ class OrganizationPermissionManagerType(PermissionManagerType):
             workspaces__workspace_id=workspace.pk
         ).first()
 
-    def _allowed(self, actor: Any, organization: Organization, workspace: Any) -> bool:
+    def _access(self, actor: Any, organization: Organization, workspace: Any):
         user = getattr(actor, "user", actor)
-        if getattr(user, "is_staff", False):
-            return True
-        return OrganizationWorkspaceAccess.objects.filter(
-            binding__organization=organization,
-            binding__workspace_id=workspace.pk,
-            membership__user_id=user.pk,
-            membership__suspended=False,
-            binding__organization__status=Organization.Status.ACTIVE,
-        ).exists()
+        return (
+            OrganizationWorkspaceAccess.objects.filter(
+                binding__organization=organization,
+                binding__workspace_id=workspace.pk,
+                membership__user_id=user.pk,
+                membership__suspended=False,
+                binding__organization__status=Organization.Status.ACTIVE,
+            )
+            .only("permissions")
+            .first()
+        )
 
     def check_multiple_permissions(self, checks, workspace=None, include_trash=False):
         if workspace is None:
@@ -183,11 +186,16 @@ class OrganizationPermissionManagerType(PermissionManagerType):
         restricted = source in {"restricted", "suspended"}
         result = {}
         for check in checks:
-            if not self._allowed(check.actor, organization, workspace):
+            access = self._access(check.actor, organization, workspace)
+            if access is None:
                 result[check] = UserNotInWorkspace(check.actor, workspace)
             elif restricted and (
                 source == "suspended"
                 or not self.is_read_operation(check.operation_name)
+            ):
+                result[check] = PermissionDenied(check.actor)
+            elif access.permissions == "VIEWER" and not self.is_read_operation(
+                check.operation_name
             ):
                 result[check] = PermissionDenied(check.actor)
         return result
@@ -212,8 +220,6 @@ class OrganizationPermissionManagerType(PermissionManagerType):
     def filter_queryset(self, actor, operation_name, queryset, workspace=None):
         if queryset.model.__name__ not in {"Workspace", "WorkspaceUser"}:
             return None
-        if getattr(getattr(actor, "user", actor), "is_staff", False):
-            return queryset
         actor_user_id = getattr(getattr(actor, "user", actor), "pk", None)
         if queryset.model.__name__ == "WorkspaceUser":
             queryset = queryset.filter(
@@ -222,6 +228,8 @@ class OrganizationPermissionManagerType(PermissionManagerType):
                     workspace__organization_binding__organization__memberships__user_id=actor_user_id,
                     workspace__organization_binding__organization__memberships__suspended=False,
                     workspace__organization_binding__organization__status=Organization.Status.ACTIVE,
+                    workspace__organization_binding__member_access__membership__user_id=actor_user_id,
+                    workspace__organization_binding__member_access__membership__suspended=False,
                 )
             )
         else:
@@ -231,6 +239,8 @@ class OrganizationPermissionManagerType(PermissionManagerType):
                     organization_binding__organization__memberships__user_id=actor_user_id,
                     organization_binding__organization__memberships__suspended=False,
                     organization_binding__organization__status=Organization.Status.ACTIVE,
+                    organization_binding__member_access__membership__user_id=actor_user_id,
+                    organization_binding__member_access__membership__suspended=False,
                 )
             )
         return queryset.distinct()

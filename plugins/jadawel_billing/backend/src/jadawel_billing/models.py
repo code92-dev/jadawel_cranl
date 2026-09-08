@@ -95,6 +95,10 @@ class ManualEntitlementGrant(models.Model):
 
 
 class BillingOrder(models.Model):
+    class Purpose(models.TextChoices):
+        INITIAL = "initial"
+        SEAT_INCREASE = "seat_increase"
+
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     account = models.ForeignKey(BillingAccount, on_delete=models.PROTECT)
     price = models.ForeignKey(PlanPrice, on_delete=models.PROTECT)
@@ -104,6 +108,16 @@ class BillingOrder(models.Model):
     interval = models.CharField(max_length=5, choices=PlanPrice.Interval.choices)
     payment_id = models.UUIDField(default=uuid.uuid4, unique=True, editable=False)
     mode = models.CharField(max_length=4, default="test")
+    purpose = models.CharField(
+        max_length=20, choices=Purpose.choices, default=Purpose.INITIAL
+    )
+    subscription = models.ForeignKey(
+        "Subscription",
+        on_delete=models.PROTECT,
+        null=True,
+        blank=True,
+        related_name="change_orders",
+    )
     status = models.CharField(max_length=12, default="pending")
     created_at = models.DateTimeField(auto_now_add=True)
     paid_at = models.DateTimeField(null=True)
@@ -164,7 +178,11 @@ class Subscription(models.Model):
     period_start = models.DateTimeField()
     period_end = models.DateTimeField()
     cancel_at_period_end = models.BooleanField(default=True)
-    source_order = models.OneToOneField(BillingOrder, on_delete=models.PROTECT)
+    source_order = models.OneToOneField(
+        BillingOrder,
+        on_delete=models.PROTECT,
+        related_name="source_subscription",
+    )
     status = models.CharField(
         max_length=12, choices=Status.choices, default=Status.ACTIVE
     )

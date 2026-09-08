@@ -25,6 +25,9 @@ describe('Billing administration', () => {
     app.mock
       .onGet('/billing/admin/provider-events/')
       .reply(200, { results: [], next: null })
+    app.mock
+      .onGet('/billing/admin/external-payments/')
+      .reply(200, { results: [], next: null })
     app.mock.onPost('/billing/admin/accounts/').reply((config) => {
       const account = { id: 'account-1', ...JSON.parse(config.data) }
       accounts.push(account)
@@ -62,6 +65,9 @@ describe('Billing administration', () => {
     app.mock
       .onGet('/billing/admin/provider-events/')
       .reply(200, { results: [], next: null })
+    app.mock
+      .onGet('/billing/admin/external-payments/')
+      .reply(200, { results: [], next: null })
     app.mock.onPost('/billing/admin/orders/order-1/reconcile/').reply(200, {
       ...pending,
       status: 'paid',
@@ -71,5 +77,53 @@ describe('Billing administration', () => {
     await wrapper.get('[data-testid="payment-list"] button').trigger('click')
     await flushPromises()
     expect(wrapper.get('[data-testid="payment-list"]').text()).toContain('paid')
+  })
+
+  test('staff can record an external payment', async () => {
+    app.mock.onGet('/billing/admin/accounts/').reply(200, {
+      results: [
+        { id: 'account-1', owner_email: 'owner@example.com', kind: 'TEAM' },
+      ],
+      next: null,
+    })
+    app.mock
+      .onGet('/billing/admin/plans/')
+      .reply(200, { results: [], next: null })
+    app.mock
+      .onGet('/billing/admin/orders/')
+      .reply(200, { results: [], next: null })
+    app.mock
+      .onGet('/billing/admin/provider-events/')
+      .reply(200, { results: [], next: null })
+    app.mock
+      .onGet('/billing/admin/external-payments/')
+      .reply(200, { results: [], next: null })
+    app.mock.onPost('/billing/admin/external-payments/').reply(201, {
+      id: 1,
+      account: 'account-1',
+      amount: 1500,
+      currency: 'SAR',
+      reference: 'bank-transfer-1',
+      paid_at: '2026-09-08T13:45:00Z',
+      notes: '',
+      actor: 7,
+      created_at: '2026-09-08T13:45:00Z',
+    })
+    const wrapper = await app.mount(BillingAdmin)
+    await flushPromises()
+    await wrapper
+      .get('[data-testid="external-payment-form"] input[type="number"]')
+      .setValue(1500)
+    await wrapper
+      .get('[data-testid="external-payment-form"] input:not([type])')
+      .setValue('bank-transfer-1')
+    await wrapper
+      .get('[data-testid="external-payment-form"] input[type="datetime-local"]')
+      .setValue('2026-09-08T16:45')
+    await wrapper.get('[data-testid="external-payment-form"]').trigger('submit')
+    await flushPromises()
+    expect(
+      wrapper.get('[data-testid="external-payment-list"]').text()
+    ).toContain('bank-transfer-1')
   })
 })

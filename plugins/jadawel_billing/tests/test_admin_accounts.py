@@ -1,4 +1,5 @@
 import pytest
+from django.utils import timezone
 
 
 @pytest.mark.django_db
@@ -127,3 +128,31 @@ def test_direct_handler_rejects_non_staff(data_fixture):
     user = data_fixture.create_user()
     with pytest.raises(PermissionDenied):
         create_account(user, kind="TEAM", responsible_user=user)
+
+
+@pytest.mark.django_db
+def test_admin_records_and_lists_external_payment(api_client, data_fixture):
+    from jadawel_billing.handlers import create_account
+
+    admin, token = data_fixture.create_user_and_token(is_staff=True)
+    account = create_account(admin, kind="INDIVIDUAL", responsible_user=admin)
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+    paid_at = timezone.now().isoformat()
+    response = api_client.post(
+        "/api/billing/admin/external-payments/",
+        {
+            "account": str(account.pk),
+            "amount": 2500,
+            "reference": "bank-transfer-1",
+            "paid_at": paid_at,
+            "notes": "Manual settlement",
+        },
+        format="json",
+    )
+    assert response.status_code == 201
+    assert response.data["account"] == str(account.pk)
+    assert response.data["amount"] == 2500
+    assert response.data["reference"] == "bank-transfer-1"
+    listing = api_client.get("/api/billing/admin/external-payments/")
+    assert listing.status_code == 200
+    assert listing.data["results"][0]["reference"] == "bank-transfer-1"

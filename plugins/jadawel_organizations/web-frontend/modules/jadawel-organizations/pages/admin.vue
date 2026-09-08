@@ -5,19 +5,19 @@
     <form @submit.prevent="create">
       <label>
         {{ $t("organizations.name") }}
-        <input v-model="name" required />
+        <input v-model="name" required class="input" />
       </label>
       <label>
         {{ $t("organizations.owner") }}
-        <input v-model.number="owner" type="number" min="1" />
+        <input v-model.number="owner" type="number" min="1" class="input" />
       </label>
       <label>
         {{ $t("organizations.ownerEmail") }}
-        <input v-model.trim="ownerEmail" type="email" />
+        <input v-model.trim="ownerEmail" type="email" class="input" />
       </label>
       <label>
         {{ $t("organizations.plan") }}
-        <select v-model="grant.plan">
+        <select v-model="grant.plan" class="input">
           <option value="">{{ $t("organizations.noGrant") }}</option>
           <option v-for="plan in plans" :key="plan.id" :value="plan.id">
             {{ plan.name }}
@@ -31,19 +31,25 @@
           type="number"
           min="1"
           required
+          class="input"
         />
       </label>
       <label v-if="grant.plan">
         {{ $t("organizations.expiresAt") }}
-        <input v-model="grant.expires_at" type="datetime-local" />
+        <input v-model="grant.expires_at" type="datetime-local" class="input" />
       </label>
       <label v-if="grant.plan">
         {{ $t("organizations.reason") }}
-        <textarea v-model="grant.reason" required maxlength="500" />
+        <textarea
+          v-model="grant.reason"
+          required
+          maxlength="500"
+          class="input"
+        />
       </label>
-      <button type="submit" :disabled="busy">
+      <Button :disabled="busy">
         {{ $t("organizations.create") }}
-      </button>
+      </Button>
     </form>
     <p v-if="loading" role="status">{{ $t("organizations.loading") }}</p>
     <p v-else-if="!organizations.length">{{ $t("organizations.empty") }}</p>
@@ -62,9 +68,23 @@
         <span v-if="organization.pending_owner_email">
           — {{ $t("organizations.pendingOwner") }}:
           <bdi>{{ organization.pending_owner_email }}</bdi>
-          <button type="button" @click="resendOwner(organization)">
+          <input
+            v-model.trim="reassignEmails[organization.id]"
+            type="email"
+            :placeholder="$t('organizations.ownerEmail')"
+            dir="ltr"
+            class="input"
+          />
+          <Button type="secondary" @click="resendOwner(organization)">
             {{ $t("organizations.resendOwner") }}
-          </button>
+          </Button>
+          <Button
+            type="secondary"
+            :disabled="!reassignEmails[organization.id]"
+            @click="resendOwner(organization, reassignEmails[organization.id])"
+          >
+            {{ $t("organizations.reassignOwner") }}
+          </Button>
         </span>
       </li>
     </ul>
@@ -90,6 +110,7 @@ export default {
       plans: [],
       grant: { plan: "", seat_limit: 1, expires_at: "", reason: "" },
       organizations: [],
+      reassignEmails: {},
       loading: true,
       busy: false,
       error: false,
@@ -146,14 +167,15 @@ export default {
         this.busy = false;
       }
     },
-    async resendOwner(organization) {
+    async resendOwner(organization, email = "") {
       this.error = false;
       try {
         const response = await this.$client.post(
           `/organizations/admin/${organization.id}/owner-setup/`,
-          {},
+          email ? { email } : {},
         );
         this.ownerSetupToken = response.data.owner_setup_token;
+        if (email) this.reassignEmails[organization.id] = "";
       } catch {
         this.error = true;
       }
@@ -167,6 +189,7 @@ export default {
   max-inline-size: 840px;
   margin-inline: auto;
   padding: 32px;
+  background: var(--jadawel-content-background, #fcfdfc);
 }
 
 .organizations-admin-page form {
@@ -179,5 +202,28 @@ export default {
 .organizations-admin-page label {
   display: grid;
   gap: 8px;
+}
+
+.organizations-admin-page input:not([type="checkbox"]),
+.organizations-admin-page select,
+.organizations-admin-page textarea {
+  box-sizing: border-box;
+  min-block-size: 36px;
+  inline-size: 100%;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--jadawel-raised-background, #fbfdfb);
+  color: inherit;
+  font: inherit;
+}
+
+.organizations-admin-page input:focus,
+.organizations-admin-page select:focus,
+.organizations-admin-page textarea:focus {
+  border-color: var(--jadawel-primary-500, #278053);
+  outline: 2px solid
+    color-mix(in srgb, var(--jadawel-primary-500, #278053) 28%, transparent);
+  outline-offset: 1px;
 }
 </style>

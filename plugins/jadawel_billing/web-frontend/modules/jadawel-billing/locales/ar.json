@@ -10,9 +10,22 @@
     "changePlan": "تغيير الخطة عند التجديد",
     "changeSeats": "المقاعد عند التجديد",
     "scheduleChange": "جدولة التغيير",
+    "addSeats": "إجمالي المقاعد الجديد",
+    "purchaseSeats": "إضافة المقاعد الآن",
     "paymentMethods": "طرق الدفع المحفوظة",
     "noPaymentMethods": "لا توجد طرق دفع محفوظة.",
     "removePaymentMethod": "إزالة طريقة الدفع",
+    "refund": "استرداد",
+    "refundableAmount": "الرصيد القابل للاسترداد",
+    "refundAmount": "مبلغ الاسترداد",
+    "confirmRefund": "إرسال الاسترداد",
+    "refundStatus": "حالة الاسترداد",
+    "reference": "المرجع الخارجي",
+    "paidAt": "تاريخ الدفع",
+    "notes": "ملاحظات",
+    "externalPayments": "الدفعات الخارجية",
+    "recordExternalPayment": "تسجيل دفعة خارجية",
+    "emptyExternalPayments": "لم تُسجّل دفعات خارجية.",
     "email": "البريد الإلكتروني لمالك الحساب",
     "kind": "نوع الحساب",
     "individual": "فردي",
@@ -74,6 +87,7 @@
     "sandbox": "بيئة اختبار — لا توجد دفعة فعلية.",
     "checkout": "المتابعة للدفع",
     "singlePeriod": "يغطي هذا الشراء دورة فوترة واحدة. التجديد التلقائي غير مفعّل.",
+    "proratedSeatIncrease": "هذه دفعة نسبية لمرة واحدة للمقاعد المضافة، ويبقى تاريخ التجديد الحالي دون تغيير.",
     "cardName": "الاسم على البطاقة",
     "cardNumber": "رقم البطاقة",
     "cardMonth": "شهر الانتهاء",
@@ -104,6 +118,11 @@
       "pending": "بانتظار تأكيد الدفع",
       "paid": "مدفوع",
       "failed": "فشل الدفع"
+    },
+    "refundStates": {
+      "pending": "قيد المراجعة",
+      "succeeded": "نجح",
+      "failed": "فشل"
     }
   }
 }

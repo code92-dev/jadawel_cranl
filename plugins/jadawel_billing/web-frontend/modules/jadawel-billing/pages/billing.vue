@@ -71,6 +71,24 @@
                 {{ $t("billing.scheduleChange") }}
               </Button>
             </form>
+            <form
+              v-if="selectedAccountKind === 'TEAM'"
+              @submit.prevent="increaseSeatsNow"
+            >
+              <label>
+                {{ $t("billing.addSeats") }}
+                <input
+                  v-model.number="seatIncrease.seats"
+                  type="number"
+                  :min="accountState.subscription.seats + 1"
+                  required
+                  class="input"
+                />
+              </label>
+              <Button type="secondary" :disabled="busy" button-type="submit">
+                {{ $t("billing.purchaseSeats") }}
+              </Button>
+            </form>
           </template>
         </section>
         <section v-if="accountState" class="payment-methods">
@@ -155,7 +173,10 @@
               }}</time>
             </p>
           </section>
-          <p>{{ $t("billing.singlePeriod") }}</p>
+          <p v-if="order.purpose === 'seat_increase'">
+            {{ $t("billing.proratedSeatIncrease") }}
+          </p>
+          <p v-else>{{ $t("billing.singlePeriod") }}</p>
           <form
             v-if="order.status === 'pending' && !submitted"
             @submit.prevent="pay"
@@ -288,7 +309,21 @@ export default {
       submitted: false,
       card: { name: "", number: "", month: "", year: "", cvc: "" },
       subscriptionChange: { price: null, seats: 1 },
+      seatIncrease: { seats: 2 },
     };
+  },
+  computed: {
+    selectedAccountKind() {
+      return (
+        this.options?.accounts.find((item) => item.id === this.account)?.kind ||
+        "INDIVIDUAL"
+      );
+    },
+    availablePrices() {
+      return (this.options?.prices || []).filter(
+        (item) => item.kind === this.selectedAccountKind,
+      );
+    },
   },
   async mounted() {
     try {
@@ -322,19 +357,6 @@ export default {
   beforeUnmount() {
     this.clearCard();
   },
-  computed: {
-    selectedAccountKind() {
-      return (
-        this.options?.accounts.find((item) => item.id === this.account)?.kind ||
-        "INDIVIDUAL"
-      );
-    },
-    availablePrices() {
-      return (this.options?.prices || []).filter(
-        (item) => item.kind === this.selectedAccountKind,
-      );
-    },
-  },
   methods: {
     money(amount) {
       return new Intl.NumberFormat(this.$i18n.locale, {
@@ -363,6 +385,9 @@ export default {
           price: this.accountState.subscription.price,
           seats: this.accountState.subscription.seats,
         };
+        this.seatIncrease = {
+          seats: this.accountState.subscription.seats + 1,
+        };
       }
     },
     async toggleCancellation() {
@@ -380,6 +405,23 @@ export default {
           this.subscriptionChange,
         ),
       );
+    },
+    async increaseSeatsNow() {
+      if (this.busy) return;
+      this.busy = true;
+      this.error = false;
+      try {
+        const { data } = await this.$client.post(
+          "/billing/accounts/" + this.account + "/subscription/seat-increase/",
+          this.seatIncrease,
+        );
+        this.order = data;
+        this.submitted = false;
+      } catch {
+        this.error = true;
+      } finally {
+        this.busy = false;
+      }
     },
     async revokePaymentMethod(method) {
       await this.runAccountAction(() =>
@@ -510,6 +552,14 @@ export default {
   max-inline-size: 720px;
   margin-inline: auto;
   padding: 32px;
+  background: var(--jadawel-content-background, #fcfdfc);
+}
+.customer-billing section {
+  margin-block: 32px;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 8px;
+  padding: 20px;
+  background: var(--jadawel-raised-background, #fbfdfb);
 }
 .customer-billing form {
   display: grid;
@@ -520,6 +570,27 @@ export default {
 .customer-billing label {
   display: grid;
   gap: 8px;
+}
+.customer-billing input:not([type="checkbox"]),
+.customer-billing select,
+.customer-billing textarea {
+  box-sizing: border-box;
+  min-block-size: 36px;
+  inline-size: 100%;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 6px;
+  padding: 8px 10px;
+  background: var(--jadawel-raised-background, #fbfdfb);
+  color: inherit;
+  font: inherit;
+}
+.customer-billing input:focus,
+.customer-billing select:focus,
+.customer-billing textarea:focus {
+  border-color: var(--jadawel-primary-500, #278053);
+  outline: 2px solid
+    color-mix(in srgb, var(--jadawel-primary-500, #278053) 28%, transparent);
+  outline-offset: 1px;
 }
 .customer-billing li {
   margin-block: 16px;
