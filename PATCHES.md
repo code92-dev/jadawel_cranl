@@ -1336,4 +1336,4 @@ updater then read.
 
 | File | Change | Reason | Risk |
 | --- | --- | --- | --- |
-| `backend/src/jadawel/contrib/database/views/handler.py` | Call the optional organization public-workspace policy before resolving a public view | Organization suspension must disable existing public links without deleting their share configuration; unmanaged workspaces keep the upstream path | Low; optional import is guarded by installed-app detection |
+| `backend/src/jadawel/contrib/database/views/handler.py`, `backend/src/arabase/dashboard/share/handler.py` | Call the optional organization public-workspace policy before resolving a public view or dashboard share | Organization suspension must disable existing public links without deleting their share configuration; unmanaged workspaces keep the upstream path | Low; optional imports are guarded by installed-app detection |

@@ -371,8 +371,16 @@ def test_public_workspace_policy_preserves_records_but_hides_restricted_links(
     workspace = data_fixture.create_workspace(user=owner, name="Shared")
     bind_workspace(owner, organization, workspace)
     assert public_workspace_allowed(workspace)
+    from arabase.dashboard.share.handler import DashboardShareHandler
+    from arabase.dashboard.share.exceptions import DashboardShareDoesNotExist
+
+    dashboard = data_fixture.create_dashboard_application(workspace=workspace)
+    share = DashboardShareHandler().create_share(dashboard)
+    assert DashboardShareHandler().get_share_by_slug(share.slug) == share
     revoke_grant(staff, organization.billing_account_id, reason="Restricted")
     assert not public_workspace_allowed(workspace)
+    with pytest.raises(DashboardShareDoesNotExist):
+        DashboardShareHandler().get_share_by_slug(share.slug)
 
 
 @pytest.mark.django_db
