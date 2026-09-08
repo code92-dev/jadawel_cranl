@@ -3416,6 +3416,22 @@ class ViewHandler(metaclass=jadawel_trace_methods(tracer)):
         if TrashHandler.item_has_a_trashed_parent(view.table, check_item_also=True):
             raise ViewDoesNotExist("The view does not exist.")
 
+        # The organization plugin is optional. When installed, it owns the
+        # lifecycle policy for public links on managed workspaces; keep share
+        # records intact while making suspended or restricted links unavailable.
+        from django.apps import apps as django_apps
+
+        public_workspace_allowed = None
+        if django_apps.is_installed("jadawel_organizations"):
+            try:
+                from jadawel_organizations.policy import public_workspace_allowed
+            except ImportError:
+                pass
+        if public_workspace_allowed and not public_workspace_allowed(
+            view.table.database.workspace
+        ):
+            raise ViewDoesNotExist("The view does not exist.")
+
         user_in_workspace = user and CoreHandler().check_permissions(
             user,
             ReadViewOperationType.type,

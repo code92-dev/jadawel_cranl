@@ -1325,3 +1325,15 @@ updater then read.
 | `web-frontend/modules/database/onboardingTypes.js` | `highlightDataName: 'applications-database'` → `'applications'` | The flat sidebar still tags its applications section with `data-highlight="applications"`; upstream's per-type group element no longer exists in this fork | low — reverts to upstream's pre-grouping value |
 | `web-frontend/modules/core/components/Highlight.vue` | Guard `update()` when no elements match; fall back to a centered box | Port of upstream's own fix — a stale selector crashed the whole preview instead of degrading | low — matches upstream develop verbatim |
 | `web-frontend/test/unit/core/components/highlight.spec.js` and `web-frontend/test/unit/database/components/onboarding/databaseAppLayoutPreview.spec.js` | Cover the no-match fallback and pin the highlight target to an element the preview's sidebar renders | Both went red on the original crash; keeps the selector and the sidebar in lock-step | low |
+
+## Security maintenance (2026-09-07)
+
+| File | Change | Reason | Risk |
+| --- | --- | --- | --- |
+| `backend/src/jadawel/config/settings/base.py` | Parse `JADAWEL_INTEGRATIONS_ALLOW_PRIVATE_ADDRESS` with `str_to_bool` | The strings `false`, `off`, and `0` previously enabled private-network requests and bypassed Advocate address validation | Low; intentional private access must use an explicit true value |
+
+## Phase — Gate public links for suspended organization workspaces (2026-09-08)
+
+| File | Change | Reason | Risk |
+| --- | --- | --- | --- |
+| `backend/src/jadawel/contrib/database/views/handler.py` | Call the optional organization public-workspace policy before resolving a public view | Organization suspension must disable existing public links without deleting their share configuration; unmanaged workspaces keep the upstream path | Low; optional import is guarded by installed-app detection |

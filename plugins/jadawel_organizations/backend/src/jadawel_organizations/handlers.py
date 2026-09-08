@@ -84,7 +84,16 @@ def team_occupied_seats(account_id: UUID) -> int:
     if organization is None:
         return 0
     # Suspension removes workspace access but keeps the purchased seat reserved.
-    return organization.memberships.count()
+    # A pending owner setup also reserves the owner seat until the invite is
+    # accepted or revoked by a general administrator.
+    return (
+        organization.memberships.count()
+        + organization.invitations.filter(
+            role=OrganizationMembership.Role.OWNER,
+            accepted_at__isnull=True,
+            revoked_at__isnull=True,
+        ).count()
+    )
 
 
 @transaction.atomic
@@ -243,7 +252,8 @@ def create_organization(
     actor: Any,
     *,
     name: str,
-    owner: Any,
+    owner: Any | None = None,
+    owner_email: str | None = None,
     creation_key: UUID | None = None,
     plan: Any | None = None,
     seat_limit: int | None = None,
@@ -261,10 +271,34 @@ def create_organization(
         existing = Organization.objects.filter(creation_key=creation_key).first()
         if existing:
             return existing
+    if owner is None and not owner_email:
+        raise ValidationError({"owner": "required"})
+    if owner is not None and owner_email:
+        raise ValidationError({"owner": "choose_id_or_email"})
+    if owner_email:
+        owner_email = owner_email.strip().lower()
+        owner = User.objects.filter(email__iexact=owner_email, is_active=True).first()
+        if owner is None:
+            # The organization is created with a reserved owner seat and a
+            # restricted setup invitation. The invitation acceptance below
+            # attaches the real user without creating a second identity.
+            pending_owner = True
+        else:
+            pending_owner = False
+    else:
+        pending_owner = False
+
     try:
         from jadawel_billing.handlers import create_account
 
-        account = create_account(actor, kind="TEAM", responsible_user=owner)
+        # Until a new owner accepts, the general administrator is the billing
+        # account's responsible user. This is an internal payer reference and
+        # does not grant organization data access.
+        account = create_account(
+            actor,
+            kind="TEAM",
+            responsible_user=owner or actor,
+        )
     except ImportError as exc:
         raise RuntimeError(
             "jadawel_organizations requires the jadawel_billing plugin"
@@ -275,10 +309,18 @@ def create_organization(
         owner=owner,
         created_by=actor,
         creation_key=creation_key,
+        provisioning_status=(
+            Organization.ProvisioningStatus.PENDING
+            if pending_owner
+            else Organization.ProvisioningStatus.READY
+        ),
     )
-    OrganizationMembership.objects.create(
-        organization=organization, user=owner, role=OrganizationMembership.Role.OWNER
-    )
+    if owner is not None:
+        OrganizationMembership.objects.create(
+            organization=organization,
+            user=owner,
+            role=OrganizationMembership.Role.OWNER,
+        )
     if plan is not None:
         from jadawel_billing.grants import replace_grant
 
@@ -300,9 +342,98 @@ def create_organization(
         organization,
         "organization.created",
         organization.pk,
-        {"name": name, "complimentary": True},
+        {
+            "name": name,
+            "complimentary": True,
+            "pending_owner": bool(pending_owner),
+        },
     )
+    if pending_owner:
+        invitation, raw_token = _issue_owner_setup_invitation(
+            actor, organization, owner_email
+        )
+        # Expose the token to the trusted admin API caller so an installation
+        # can hand it to an internal onboarding system. Normal mail delivery
+        # still happens after the transaction commits.
+        organization._owner_setup_token = raw_token
     return organization
+
+
+@transaction.atomic
+def _issue_owner_setup_invitation(
+    actor: Any, organization: Organization, email: str
+) -> tuple[OrganizationInvitation, str]:
+    """Rotate the restricted owner setup invite for an organization."""
+    _require_actor(actor)
+    if not actor.is_staff:
+        raise PermissionDenied("general_admin_required")
+    email = email.strip().lower()
+    OrganizationInvitation.objects.filter(
+        organization=organization,
+        role=OrganizationMembership.Role.OWNER,
+        accepted_at__isnull=True,
+        revoked_at__isnull=True,
+    ).update(revoked_at=timezone.now())
+    raw_token = secrets.token_urlsafe(32)
+    invitation = OrganizationInvitation.objects.create(
+        organization=organization,
+        email=email,
+        invited_by=actor,
+        role=OrganizationMembership.Role.OWNER,
+        token_hash=OrganizationInvitation.hash_token(raw_token),
+        expires_at=timezone.now()
+        + timedelta(
+            days=max(
+                1,
+                int(getattr(settings, "JADAWEL_ORGANIZATION_INVITATION_DAYS", 7)),
+            )
+        ),
+    )
+    audit(
+        actor,
+        organization,
+        "owner.setup_invited",
+        invitation.pk,
+        {"email": email},
+    )
+    transaction.on_commit(
+        lambda: send_mail(
+            f"Set up ownership of {organization.name}",
+            f"Use this invitation token to become the organization owner: {raw_token}",
+            None,
+            [email],
+            fail_silently=True,
+        )
+    )
+    return invitation, raw_token
+
+
+def resend_owner_setup(actor: Any, organization: Organization) -> str:
+    """Resend the current owner setup invitation, rotating its token."""
+    if not actor.is_staff:
+        raise PermissionDenied("general_admin_required")
+    invitation = organization.invitations.filter(
+        role=OrganizationMembership.Role.OWNER,
+        accepted_at__isnull=True,
+        revoked_at__isnull=True,
+    ).first()
+    if invitation is None:
+        raise ValidationError({"owner": "no_pending_setup"})
+    _, token = _issue_owner_setup_invitation(actor, organization, invitation.email)
+    return token
+
+
+def reassign_owner_setup(actor: Any, organization: Organization, email: str) -> str:
+    """Assign a new pending owner email and rotate the setup token."""
+    if not actor.is_staff:
+        raise PermissionDenied("general_admin_required")
+    if organization.owner_id is not None:
+        raise ValidationError({"owner": "already_assigned"})
+    email = email.strip().lower()
+    if not email:
+        raise ValidationError({"email": "required"})
+    _, token = _issue_owner_setup_invitation(actor, organization, email)
+    return token
 
 
 @transaction.atomic
@@ -445,7 +576,7 @@ def add_member(
                 raise ValidationError({"user": "already_member"})
             membership.role = role
             membership.suspended = False
-        used = OrganizationMembership.objects.filter(organization=organization).count()
+        used = team_occupied_seats(organization.billing_account_id)
         if used > entitlement["seat_limit"]:
             if created:
                 membership.delete()
@@ -500,15 +631,25 @@ def accept_invitation(actor: Any, raw_token: str) -> OrganizationMembership:
     with lock_capacity(organization.billing_account_id) as account:
         entitlement = get_effective_entitlements(account.pk)
         used = OrganizationMembership.objects.filter(organization=organization).count()
+        pending_owner_reservation = OrganizationInvitation.objects.filter(
+            organization=organization,
+            role=OrganizationMembership.Role.OWNER,
+            accepted_at__isnull=True,
+            revoked_at__isnull=True,
+        ).count()
         membership = OrganizationMembership.objects.filter(
             organization=organization, user=actor
         ).first()
-        if membership is None and used >= entitlement["seat_limit"]:
+        is_owner_setup = invitation.role == OrganizationMembership.Role.OWNER
+        # Owner setup replaces its reserved seat; accepting an ordinary invite
+        # must leave that reservation intact.
+        effective_used = used + pending_owner_reservation - int(is_owner_setup)
+        if membership is None and effective_used >= entitlement["seat_limit"]:
             raise ValidationError({"seat_limit": "capacity_exceeded"})
         if (
             membership is not None
             and membership.suspended
-            and used > entitlement["seat_limit"]
+            and effective_used > entitlement["seat_limit"]
         ):
             raise ValidationError({"seat_limit": "capacity_exceeded"})
         membership, _ = OrganizationMembership.objects.get_or_create(
@@ -516,10 +657,16 @@ def accept_invitation(actor: Any, raw_token: str) -> OrganizationMembership:
             user=actor,
             defaults={"role": invitation.role},
         )
-        if membership.suspended:
+        if membership.suspended or is_owner_setup:
             membership.suspended = False
             membership.role = invitation.role
             membership.save(update_fields=["suspended", "role", "updated_at"])
+        if is_owner_setup:
+            organization.owner_id = actor.pk
+            organization.provisioning_status = Organization.ProvisioningStatus.READY
+            organization.save(
+                update_fields=["owner_id", "provisioning_status", "updated_at"]
+            )
     invitation.accepted_at = timezone.now()
     invitation.save(update_fields=["accepted_at"])
     _sync_member(membership)
@@ -713,12 +860,22 @@ def assign_workspace_member(
 
 def organization_snapshot(organization: Organization) -> dict[str, Any]:
     effective = _billing_account_for(organization)
+    pending_owner = organization.invitations.filter(
+        role=OrganizationMembership.Role.OWNER,
+        accepted_at__isnull=True,
+        revoked_at__isnull=True,
+    ).first()
     return {
         "id": str(organization.pk),
         "name": organization.name,
         "status": organization.status,
         "provisioning_status": organization.provisioning_status,
-        "owner": {"id": organization.owner_id, "email": organization.owner.email},
+        "owner": (
+            {"id": organization.owner_id, "email": organization.owner.email}
+            if organization.owner_id
+            else None
+        ),
+        "pending_owner_email": pending_owner.email if pending_owner else None,
         "billing_account": str(organization.billing_account_id),
         "members_count": organization.memberships.filter(suspended=False).count(),
         "effective_entitlement": effective,

@@ -26,13 +26,20 @@ or secret keys to Jadawl; the browser sends card details directly to Moyasar.
 ## Create an organization without payment
 
 1. Open **Organization administration** at **Admin → Organizations**.
-2. Enter the organization name and the active owner's user ID.
+2. Enter the organization name and either the active owner's user ID or the
+   email address for a new owner setup.
 3. Choose **Create organization**. The general administrator (`is_staff`) owns
    the audited operation and the Team BillingAccount is created without a
    provider call.
 4. Open the related Billing account and use **Complimentary access** to choose
    a Team plan, seat cap, optional expiry, and a written reason. Review the
    proposed effective access before saving.
+
+When a new-owner email is used, the organization remains pending, the owner
+seat is reserved, and a restricted setup invitation is sent after commit. The
+create response includes a one-time setup token for an internal onboarding
+handoff. A general administrator can rotate or reassign it with
+`POST /api/organizations/admin/{id}/owner-setup/`.
 
 The owner counts as one Team seat. A complimentary organization can be created
 without a plan first, but member additions remain restricted until a paid

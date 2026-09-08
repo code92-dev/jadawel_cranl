@@ -19,6 +19,7 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
     members_count = serializers.IntegerField(read_only=True)
     effective_source = serializers.SerializerMethodField()
     effective_seat_limit = serializers.SerializerMethodField()
+    pending_owner_email = serializers.SerializerMethodField()
 
     def _effective(self, organization: Organization) -> dict[str, Any]:
         from jadawel_billing.entitlements import get_effective_entitlements
@@ -31,6 +32,14 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
     def get_effective_seat_limit(self, organization: Organization) -> int:
         return self._effective(organization)["seat_limit"]
 
+    def get_pending_owner_email(self, organization: Organization) -> str | None:
+        invitation = organization.invitations.filter(
+            role=OrganizationMembership.Role.OWNER,
+            accepted_at__isnull=True,
+            revoked_at__isnull=True,
+        ).first()
+        return invitation.email if invitation else None
+
     class Meta:
         model = Organization
         fields = [
@@ -40,6 +49,7 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
             "provisioning_status",
             "owner",
             "owner_email",
+            "pending_owner_email",
             "billing_account",
             "members_count",
             "effective_source",
@@ -52,8 +62,11 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
 class CreateOrganizationSerializer(serializers.Serializer[Any]):
     name = serializers.CharField(max_length=160)
     owner = serializers.PrimaryKeyRelatedField(
-        queryset=get_user_model().objects.filter(is_active=True)
+        queryset=get_user_model().objects.filter(is_active=True),
+        required=False,
+        allow_null=True,
     )
+    owner_email = serializers.EmailField(required=False, allow_blank=False)
     creation_key = serializers.UUIDField(required=False, allow_null=True)
     plan = serializers.PrimaryKeyRelatedField(
         queryset=Plan.objects.filter(kind="TEAM"), required=False, allow_null=True
@@ -64,6 +77,8 @@ class CreateOrganizationSerializer(serializers.Serializer[Any]):
     reason = serializers.CharField(max_length=500, required=False, allow_blank=True)
 
     def validate(self, attrs: Any) -> Any:
+        if bool(attrs.get("owner")) == bool(attrs.get("owner_email")):
+            raise serializers.ValidationError({"owner": "choose_id_or_email"})
         if attrs.get("plan") is not None:
             if "seat_limit" not in attrs:
                 raise serializers.ValidationError({"seat_limit": "required_with_plan"})
@@ -157,3 +172,7 @@ class MemberUpdateSerializer(serializers.Serializer[Any]):
 
 class LifecycleSerializer(serializers.Serializer[Any]):
     action = serializers.ChoiceField(choices=["suspend", "reactivate", "archive"])
+
+
+class OwnerSetupSerializer(serializers.Serializer[Any]):
+    email = serializers.EmailField(required=False, allow_blank=False)

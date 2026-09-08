@@ -26,6 +26,8 @@ class Organization(models.Model):
     owner = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.PROTECT,
+        null=True,
+        blank=True,
         related_name="owned_organizations",
     )
     status = models.CharField(

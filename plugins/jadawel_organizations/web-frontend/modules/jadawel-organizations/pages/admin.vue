@@ -9,7 +9,11 @@
       </label>
       <label>
         {{ $t("organizations.owner") }}
-        <input v-model.number="owner" type="number" min="1" required />
+        <input v-model.number="owner" type="number" min="1" />
+      </label>
+      <label>
+        {{ $t("organizations.ownerEmail") }}
+        <input v-model.trim="ownerEmail" type="email" />
       </label>
       <label>
         {{ $t("organizations.plan") }}
@@ -55,8 +59,19 @@
           · {{ $t("organizations.seats") }}:
           {{ organization.effective_seat_limit }}
         </span>
+        <span v-if="organization.pending_owner_email">
+          — {{ $t("organizations.pendingOwner") }}:
+          <bdi>{{ organization.pending_owner_email }}</bdi>
+          <button type="button" @click="resendOwner(organization)">
+            {{ $t("organizations.resendOwner") }}
+          </button>
+        </span>
       </li>
     </ul>
+    <p v-if="ownerSetupToken" role="status">
+      {{ $t("organizations.ownerSetupToken") }}:
+      <code dir="ltr">{{ ownerSetupToken }}</code>
+    </p>
     <p v-if="error" role="alert">{{ $t("organizations.error") }}</p>
   </main>
 </template>
@@ -70,6 +85,8 @@ export default {
     return {
       name: "",
       owner: null,
+      ownerEmail: "",
+      ownerSetupToken: "",
       plans: [],
       grant: { plan: "", seat_limit: 1, expires_at: "", reason: "" },
       organizations: [],
@@ -104,8 +121,9 @@ export default {
       try {
         const payload = {
           name: this.name,
-          owner: this.owner,
         };
+        if (this.owner) payload.owner = this.owner;
+        if (this.ownerEmail) payload.owner_email = this.ownerEmail;
         if (this.grant.plan) {
           payload.plan = Number(this.grant.plan);
           payload.seat_limit = this.grant.seat_limit;
@@ -115,12 +133,25 @@ export default {
         await this.$client.post("/organizations/admin/create/", payload);
         this.name = "";
         this.owner = null;
+        this.ownerEmail = "";
         this.grant = { plan: "", seat_limit: 1, expires_at: "", reason: "" };
         await this.load();
       } catch {
         this.error = true;
       } finally {
         this.busy = false;
+      }
+    },
+    async resendOwner(organization) {
+      this.error = false;
+      try {
+        const response = await this.$client.post(
+          `/organizations/admin/${organization.id}/owner-setup/`,
+          {},
+        );
+        this.ownerSetupToken = response.data.owner_setup_token;
+      } catch {
+        this.error = true;
       }
     },
   },

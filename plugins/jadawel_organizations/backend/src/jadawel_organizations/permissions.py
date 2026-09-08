@@ -56,6 +56,7 @@ class OrganizationPermissionManagerType(PermissionManagerType):
         "database.table.list_row_names",
         "database.table.list_rows",
         "database.table.list_views",
+        "database.table.listen_to_all",
         "database.table.list_webhooks",
         "database.table.read",
         "database.table.read_adjacent_row",
@@ -144,7 +145,32 @@ class OrganizationPermissionManagerType(PermissionManagerType):
 
     def check_multiple_permissions(self, checks, workspace=None, include_trash=False):
         if workspace is None:
-            return {}
+            # ``create_workspace`` is a global operation in Jadawel and has no
+            # workspace context for the core permission pipeline to inspect.
+            # A restricted organization must still block creation while leaving
+            # already existing personal workspaces untouched.
+            from jadawel_billing.entitlements import get_effective_entitlements
+
+            result = {}
+            for check in checks:
+                user = getattr(check.actor, "user", check.actor)
+                if getattr(user, "is_staff", False):
+                    result[check] = True
+                    continue
+                if check.operation_name != "create_workspace":
+                    continue
+                organizations = Organization.objects.filter(
+                    memberships__user_id=getattr(user, "pk", None),
+                    memberships__suspended=False,
+                    status=Organization.Status.ACTIVE,
+                ).values_list("billing_account_id", flat=True)
+                if any(
+                    get_effective_entitlements(account_id)["source"]
+                    in {"restricted", "suspended"}
+                    for account_id in organizations
+                ):
+                    result[check] = PermissionDenied(check.actor)
+            return result
         organization = self._binding(workspace)
         if organization is None:
             return {}

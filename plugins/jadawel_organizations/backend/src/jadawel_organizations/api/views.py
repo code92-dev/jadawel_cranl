@@ -20,6 +20,8 @@ from ..handlers import (
     create_pending_team,
     invite_member,
     organization_snapshot,
+    reassign_owner_setup,
+    resend_owner_setup,
     revoke_invitation,
     remove_member,
     unbind_workspace,
@@ -45,6 +47,7 @@ from .serializers import (
     MembershipSerializer,
     OrganizationSerializer,
     OrganizationWorkspaceSerializer,
+    OwnerSetupSerializer,
     StartTeamSerializer,
 )
 
@@ -112,9 +115,29 @@ class AdminOrganizationCreateView(APIView):
         serializer = CreateOrganizationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         organization = create_organization(request.user, **serializer.validated_data)
-        return Response(
-            organization_snapshot(organization), status=status.HTTP_201_CREATED
-        )
+        owner_setup_token = getattr(organization, "_owner_setup_token", None)
+        payload = organization_snapshot(organization)
+        if owner_setup_token:
+            payload["owner_setup_token"] = owner_setup_token
+        return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class AdminOwnerSetupView(APIView):
+    """Resend or reassign the restricted owner setup invitation."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request: Request, organization_id: UUID) -> Response:
+        organization = get_org(organization_id)
+        serializer = OwnerSetupSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        if serializer.validated_data.get("email"):
+            token = reassign_owner_setup(
+                request.user, organization, serializer.validated_data["email"]
+            )
+        else:
+            token = resend_owner_setup(request.user, organization)
+        return Response({"owner_setup_token": token})
 
 
 class StartTeamView(APIView):

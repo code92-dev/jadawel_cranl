@@ -12,7 +12,7 @@ The Nuxt 3 module registers an admin type after the `core` plugin, adds `/admin/
 
 Existing administrative endpoints use DRF IsAdminUser. Billing additionally checks authenticated, active, staff at mutation-handler boundaries. Staff billing authority does not create workspace data access. Existing workspace roles are not organization roles.
 
-CoreHandler.check_multiple_permissions iterates PERMISSION_MANAGERS and accepts the first definitive decision. Organization restrictions must register before permissive managers. CoreHandler.filter_queryset independently applies supported managers; direct checks alone cannot prevent list leaks. A manager must implement both the needed check and list behavior.
+CoreHandler.check_multiple_permissions iterates PERMISSION_MANAGERS and accepts the first definitive decision. Organization restrictions must register before permissive managers. CoreHandler.filter_queryset independently applies supported managers; direct checks alone cannot prevent list leaks. A manager must implement both the needed check and list behavior. The organization manager also handles the global `create_workspace` operation because that operation has no workspace context.
 
 Verified core operations include workspace.read, workspace.create_application, workspace.create_invitation, workspace.list_workspace_users, workspace_user.update/delete, invitation.read/update/delete and application.read/update/duplicate/delete. Row operations include database.table.read_row, read_adjacent_row, update_row, move_row, delete_row, restore_row and read_row_history. The operation registry, not string heuristics, must define restricted-mode coverage.
 
@@ -41,7 +41,9 @@ Manual grant changes replace their effective snapshot with audit before/after hi
 
 The organization adapter now registers both user and token actors and uses an
 explicit allowlist of registered read operations; unknown operation names fail
-closed for managed workspaces. The exact workspace attachment/import bridge,
-public-share path, websocket subscription invalidation and user-delegated job
-behavior are not yet verified. Do not claim them covered. Any necessary core
-patch must be narrow and documented in PATCHES.md.
+closed for managed workspaces. The global workspace-creation check and optional
+public-view policy are wired. Workspace attachment/import and delegated-job
+coverage still require dedicated integration tests. Websocket page checks reuse
+the same CoreHandler operation path; public view websocket access is denied when
+the optional public-view policy reports a suspended or restricted organization.
+Any necessary core patch is narrow and documented in PATCHES.md.

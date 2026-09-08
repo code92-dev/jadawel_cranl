@@ -274,6 +274,94 @@ def test_general_admin_can_create_complimentary_org_with_grant(
 
 
 @pytest.mark.django_db
+def test_admin_owner_email_creates_reserved_setup_invitation(data_fixture):
+    from jadawel_billing.handlers import create_plan
+    from jadawel_organizations.handlers import accept_invitation, create_organization
+    from jadawel_organizations.models import Organization, OrganizationMembership
+
+    admin = data_fixture.create_user(is_staff=True)
+    plan = create_plan(admin, code="pending-owner", name="Pending owner", kind="TEAM")
+    organization = create_organization(
+        admin,
+        name="Pending owner team",
+        owner_email="new-owner@example.com",
+        plan=plan,
+        seat_limit=2,
+        reason="Onboarding access",
+    )
+    assert organization.owner_id is None
+    assert organization.provisioning_status == Organization.ProvisioningStatus.PENDING
+    assert organization.invitations.filter(role="owner").count() == 1
+    from jadawel_organizations.handlers import team_occupied_seats
+
+    assert team_occupied_seats(organization.billing_account_id) == 1
+    owner = data_fixture.create_user(email="new-owner@example.com")
+    accept_invitation(owner, organization._owner_setup_token)
+    organization.refresh_from_db()
+    assert organization.owner_id == owner.pk
+    assert organization.provisioning_status == Organization.ProvisioningStatus.READY
+    assert (
+        OrganizationMembership.objects.get(organization=organization, user=owner).role
+        == "owner"
+    )
+
+
+@pytest.mark.django_db
+def test_restricted_team_cannot_create_new_workspace(data_fixture):
+    from django.utils import timezone
+    from jadawel.core.exceptions import PermissionException
+    from jadawel.core.handler import CoreHandler
+    from jadawel_billing.grants import replace_grant, revoke_grant
+    from jadawel_billing.handlers import create_plan
+    from jadawel_organizations.handlers import create_organization
+
+    admin = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    organization = create_organization(admin, name="Restricted", owner=owner)
+    plan = create_plan(admin, code="restricted-team", name="Restricted", kind="TEAM")
+    replace_grant(
+        admin,
+        organization.billing_account_id,
+        plan=plan,
+        seat_limit=1,
+        starts_at=timezone.now() - timedelta(minutes=1),
+        reason="Temporary access",
+    )
+    revoke_grant(admin, organization.billing_account_id, reason="Expired access")
+    with pytest.raises(PermissionException):
+        CoreHandler().create_workspace(owner, name="Should be blocked")
+
+
+@pytest.mark.django_db
+def test_public_workspace_policy_preserves_records_but_hides_restricted_links(
+    data_fixture,
+):
+    from django.utils import timezone
+    from jadawel_billing.grants import replace_grant, revoke_grant
+    from jadawel_billing.handlers import create_plan
+    from jadawel_organizations.handlers import bind_workspace, create_organization
+    from jadawel_organizations.policy import public_workspace_allowed
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    organization = create_organization(staff, name="Public policy", owner=owner)
+    plan = create_plan(staff, code="public-policy", name="Public policy", kind="TEAM")
+    replace_grant(
+        staff,
+        organization.billing_account_id,
+        plan=plan,
+        seat_limit=1,
+        starts_at=timezone.now() - timedelta(minutes=1),
+        reason="Public link test",
+    )
+    workspace = data_fixture.create_workspace(user=owner, name="Shared")
+    bind_workspace(owner, organization, workspace)
+    assert public_workspace_allowed(workspace)
+    revoke_grant(staff, organization.billing_account_id, reason="Restricted")
+    assert not public_workspace_allowed(workspace)
+
+
+@pytest.mark.django_db
 def test_existing_user_add_and_role_authority(data_fixture):
     from jadawel_billing.grants import replace_grant
     from jadawel_billing.handlers import create_plan

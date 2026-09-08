@@ -21,13 +21,15 @@ an administrator explicitly binds one to an organization. Organization data is
 retained when the plugin is removed; take a database backup before schema changes.
 
 The namespaced API is mounted under `/api/organizations/`. It includes member
-list/add/update/remove, invitation create/list/accept/revoke, workspace
-outsider previews, bind/unbind and member assignment, lifecycle controls, audit
-history, and the Team-to-Individual transition. Owners and organization admins
-are separate from Django staff users; the general administrator uses `is_staff`
-for complimentary provisioning, lifecycle recovery, and outsider resolution.
+list/add/update/remove, invitation create/list/accept/revoke, restricted owner
+setup invitations with resend/reassign controls, workspace outsider previews,
+bind/unbind and member assignment, lifecycle controls, audit history, and the
+Team-to-Individual transition. Owners and organization admins are separate from
+Django staff users; the general administrator uses `is_staff` for complimentary
+provisioning, lifecycle recovery, and outsider resolution.
 
 Team membership is capacity-locked against the Billing entitlement. Active and
-suspended memberships both reserve seats; pending invitations do not. Removing
-a member releases their seat, while suspending them removes managed workspace
+suspended memberships both reserve seats; ordinary pending invitations do not,
+while a pending owner setup invitation reserves the owner seat. Removing a
+member releases their seat, while suspending them removes managed workspace
 access and preserves the reservation.

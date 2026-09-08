@@ -17,7 +17,8 @@ The two standalone packages are now present in the working tree:
   member roles, existing-user adds, hashed invitations and acceptance, revoke
   and resend behavior, seat locking, workspace binding and member assignment,
   organization permission enforcement, suspend/reactivate/archive, paid-Team
-  provisioning, and guided Team-to-Individual transition.
+  provisioning, guided Team-to-Individual transition, and the general-admin
+  pending-owner setup invitation with reserved owner capacity.
 
 The corresponding GitHub ticket frontier is #42–#61. The branch contains the
 implementation for the billing and organization management paths in those
@@ -28,7 +29,7 @@ slices; the issues remain open until a maintainer reviews and lands the branch.
 Focused backend verification, with both plugin paths loaded, currently passes:
 
 ```text
-50 passed
+53 passed
 ```
 
 The same run covers complimentary access, role authority, seat reservation for
@@ -42,6 +43,9 @@ passes 5 tests, and strict repository locale parity reports 3,787/3,787 keys.
 Additional checks completed during implementation include scoped Ruff checks,
 Django system checks, Nuxt `prepare`, standalone locale parity, and Prettier
 checks for changed frontend files.
+
+The organization tests also cover pending-owner acceptance, reserved owner
+capacity, restricted workspace creation, and the public-workspace policy.
 
 ## Local run
 
