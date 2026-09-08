@@ -93,6 +93,7 @@ class OrganizationPermissionManagerType(PermissionManagerType):
         "workspace.read",
         "workspace.read_trash",
         "workspace.token.read",
+        "workspace.token.use",
     }
     WRITE_OPERATIONS = {
         "workspace.update",

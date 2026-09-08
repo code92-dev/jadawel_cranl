@@ -171,6 +171,13 @@ def test_managed_workspace_uses_organization_permission_and_restricted_mode(
             workspace=workspace,
             context=workspace,
         )
+    token = data_fixture.create_token(user=owner, workspace=workspace)
+    assert CoreHandler().check_permissions(
+        owner,
+        "workspace.token.use",
+        workspace=workspace,
+        context=token,
+    )
 
 
 @pytest.mark.django_db
