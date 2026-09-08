@@ -295,6 +295,10 @@ def test_admin_owner_email_creates_reserved_setup_invitation(data_fixture):
     from jadawel_organizations.handlers import team_occupied_seats
 
     assert team_occupied_seats(organization.billing_account_id) == 1
+    workspace = data_fixture.create_workspace(user=admin, name="Pending owner data")
+    from jadawel_organizations.handlers import bind_workspace
+
+    bind_workspace(admin, organization, workspace)
     owner = data_fixture.create_user(email="new-owner@example.com")
     accept_invitation(owner, organization._owner_setup_token)
     organization.refresh_from_db()
@@ -304,6 +308,9 @@ def test_admin_owner_email_creates_reserved_setup_invitation(data_fixture):
         OrganizationMembership.objects.get(organization=organization, user=owner).role
         == "owner"
     )
+    from jadawel.core.models import WorkspaceUser
+
+    assert WorkspaceUser.objects.filter(workspace=workspace, user=owner).exists()
 
 
 @pytest.mark.django_db

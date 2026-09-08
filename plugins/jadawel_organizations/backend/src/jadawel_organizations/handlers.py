@@ -667,6 +667,15 @@ def accept_invitation(actor: Any, raw_token: str) -> OrganizationMembership:
             organization.save(
                 update_fields=["owner_id", "provisioning_status", "updated_at"]
             )
+            for binding in organization.workspaces.all():
+                access, _ = OrganizationWorkspaceAccess.objects.get_or_create(
+                    binding=binding,
+                    membership=membership,
+                    defaults={"permissions": "ADMIN"},
+                )
+                if access.permissions != "ADMIN":
+                    access.permissions = "ADMIN"
+                    access.save(update_fields=["permissions"])
     invitation.accepted_at = timezone.now()
     invitation.save(update_fields=["accepted_at"])
     _sync_member(membership)
