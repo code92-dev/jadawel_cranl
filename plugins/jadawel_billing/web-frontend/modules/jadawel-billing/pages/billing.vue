@@ -123,6 +123,7 @@
                 v-for="item in options.accounts"
                 :key="item.id"
                 :value="item.id"
+                dir="auto"
               >
                 {{ $t("billing." + item.kind.toLowerCase()) }} — {{ item.id }}
               </option>

@@ -251,7 +251,9 @@
             <bdi>{{ event.payment_id }}</bdi> ·
             {{ $t("billing.eventStatus." + event.status) }} ·
             {{ $t("billing.attempts") }}: {{ event.attempts }}
-            <span v-if="event.error_code"> · {{ event.error_code }}</span>
+            <span v-if="event.error_code">
+              · <span dir="auto">{{ event.error_code }}</span>
+            </span>
           </li>
         </ul>
         <p v-if="!loading && !providerEvents.length">

@@ -67,7 +67,14 @@ continue using managed workspace pages.
 
 Additional checks completed during implementation include scoped Ruff checks,
 Django system checks, Nuxt `prepare`, standalone locale parity, and Prettier
-checks for changed frontend files.
+checks for changed frontend files. The final local UI pass verified the English
+and Arabic general-admin organization panels, including the free-organization
+flow, visible RTL alignment and Jadawl's shared form/button styling. Mixed
+direction account IDs, member emails and provider error codes use `dir="auto"`
+or an LTR field boundary. The invalid nested markup in the billing account
+selector was removed after the browser console surfaced it. The production
+Nuxt build was rerun with both plugin modules after this cleanup and completed
+successfully.
 Provider HTTP calls for saved payment methods are outside the database write
 transaction.
 

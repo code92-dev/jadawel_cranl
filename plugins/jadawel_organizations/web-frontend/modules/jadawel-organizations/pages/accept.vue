@@ -4,11 +4,17 @@
     <form @submit.prevent="accept">
       <label>
         {{ $t("organizations.tokenInput") }}
-        <input v-model="token" dir="ltr" minlength="20" required />
+        <input
+          v-model="token"
+          dir="ltr"
+          minlength="20"
+          required
+          class="input"
+        />
       </label>
-      <button type="submit" :disabled="busy">
+      <Button :disabled="busy">
         {{ $t("organizations.accept") }}
-      </button>
+      </Button>
     </form>
     <p v-if="accepted" role="status">
       {{ $t("organizations.invitationAccepted") }}

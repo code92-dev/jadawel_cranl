@@ -297,6 +297,7 @@
                   v-for="member in activeMembers"
                   :key="member.id"
                   :value="member.id"
+                  dir="auto"
                 >
                   {{ member.email }}
                 </option>

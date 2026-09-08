@@ -1,6 +1,9 @@
 # Jadawel Organizations plugin
 
-Tested against Jadawel revision `a7d171a`.
+Tested against the `payment-Orgteam-plugins` branch at commit `9dd6623`.
+The branch's documented core hooks in `PATCHES.md` are required for managed
+workspace membership enforcement; do not install this package against an older
+Jadawel revision without those hooks.
 
 This standalone plugin adds Team organization accounts on top of the separate
 `jadawel_billing` plugin. It provides general-administrator free provisioning,

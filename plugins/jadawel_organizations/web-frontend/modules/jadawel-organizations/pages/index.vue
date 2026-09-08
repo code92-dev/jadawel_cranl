@@ -4,11 +4,11 @@
     <form @submit.prevent="startTeam">
       <label>
         {{ $t("organizations.name") }}
-        <input v-model="teamName" required />
+        <input v-model="teamName" required class="input" />
       </label>
-      <button type="submit" :disabled="busy">
+      <Button :disabled="busy">
         {{ $t("organizations.create") }}
-      </button>
+      </Button>
     </form>
     <form class="organization-search" @submit.prevent="load">
       <label>
@@ -16,12 +16,13 @@
         <input
           v-model.trim="search"
           type="search"
+          class="input"
           :placeholder="$t('organizations.searchOrganizations')"
         />
       </label>
-      <button type="submit" :disabled="loading">
+      <Button type="secondary" :disabled="loading">
         {{ $t("organizations.search") }}
-      </button>
+      </Button>
     </form>
     <p v-if="loading" role="status">{{ $t("organizations.loading") }}</p>
     <p v-else-if="!organizations.length">{{ $t("organizations.empty") }}</p>
@@ -35,14 +36,14 @@
         </span>
       </li>
     </ul>
-    <button
+    <Button
       v-if="organizationsNext"
-      type="button"
+      type="secondary"
       :disabled="loading"
       @click="loadMore"
     >
       {{ $t("organizations.more") }}
-    </button>
+    </Button>
     <p v-if="error" role="alert">{{ $t("organizations.error") }}</p>
   </main>
 </template>
