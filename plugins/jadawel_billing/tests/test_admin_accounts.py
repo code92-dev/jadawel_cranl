@@ -156,3 +156,39 @@ def test_admin_records_and_lists_external_payment(api_client, data_fixture):
     listing = api_client.get("/api/billing/admin/external-payments/")
     assert listing.status_code == 200
     assert listing.data["results"][0]["reference"] == "bank-transfer-1"
+
+
+@pytest.mark.django_db
+def test_external_payment_reference_is_idempotent_but_immutable(
+    api_client, data_fixture
+):
+    from jadawel_billing.handlers import create_account
+
+    admin, token = data_fixture.create_user_and_token(is_staff=True)
+    account = create_account(admin, kind="INDIVIDUAL", responsible_user=admin)
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+    paid_at = timezone.now().isoformat()
+    payload = {
+        "account": str(account.pk),
+        "amount": 2500,
+        "reference": "bank-transfer-idempotent",
+        "paid_at": paid_at,
+        "notes": "Manual settlement",
+    }
+    first = api_client.post(
+        "/api/billing/admin/external-payments/", payload, format="json"
+    )
+    repeated = api_client.post(
+        "/api/billing/admin/external-payments/", payload, format="json"
+    )
+    changed = api_client.post(
+        "/api/billing/admin/external-payments/",
+        {**payload, "amount": 2600},
+        format="json",
+    )
+
+    assert first.status_code == 201
+    assert repeated.status_code == 201
+    assert repeated.data["id"] == first.data["id"]
+    assert changed.status_code == 400
+    assert changed.data["reference"] == "already_used_with_different_details"

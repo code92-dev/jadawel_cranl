@@ -175,8 +175,16 @@ def record_external_payment(
             "actor": actor,
         },
     )
-    if not created and payment.account_id != account.pk:
-        raise ValidationError({"reference": "already_used"})
+    if not created:
+        if payment.account_id != account.pk:
+            raise ValidationError({"reference": "already_used"})
+        if (
+            payment.amount != amount
+            or payment.paid_at != paid_at
+            or payment.notes != notes.strip()
+        ):
+            raise ValidationError({"reference": "already_used_with_different_details"})
+        return payment
     audit(
         actor,
         "payment.external_recorded",

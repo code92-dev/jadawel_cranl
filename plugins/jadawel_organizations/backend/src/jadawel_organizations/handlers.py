@@ -6,7 +6,7 @@ from uuid import UUID
 from django.contrib.auth import get_user_model
 from django.conf import settings
 from django.core.mail import send_mail
-from django.db import transaction
+from django.db import IntegrityError, transaction
 from django.utils import timezone
 from rest_framework.exceptions import PermissionDenied, ValidationError
 
@@ -318,6 +318,8 @@ def create_organization(
     if creation_key:
         existing = Organization.objects.filter(creation_key=creation_key).first()
         if existing:
+            if existing.created_by_id != actor.pk:
+                raise ValidationError({"creation_key": "already_used"})
             return existing
     if owner is None and not owner_email:
         raise ValidationError({"owner": "required"})
@@ -341,28 +343,43 @@ def create_organization(
 
         # Until a new owner accepts, the general administrator is the billing
         # account's responsible user. This is an internal payer reference and
-        # does not grant organization data access.
-        account = create_account(
-            actor,
-            kind="TEAM",
-            responsible_user=owner or actor,
-        )
+        # does not grant organization data access. Keep account and organization
+        # creation in a savepoint so a concurrent idempotency-key retry cannot
+        # leave an orphaned Team account behind.
+        with transaction.atomic():
+            account = create_account(
+                actor,
+                kind="TEAM",
+                responsible_user=owner or actor,
+            )
+            organization = Organization.objects.create(
+                billing_account=account,
+                name=name,
+                owner=owner,
+                created_by=actor,
+                creation_key=creation_key,
+                provisioning_status=(
+                    Organization.ProvisioningStatus.PENDING
+                    if pending_owner
+                    else Organization.ProvisioningStatus.READY
+                ),
+            )
     except ImportError as exc:
         raise RuntimeError(
             "jadawel_organizations requires the jadawel_billing plugin"
         ) from exc
-    organization = Organization.objects.create(
-        billing_account=account,
-        name=name,
-        owner=owner,
-        created_by=actor,
-        creation_key=creation_key,
-        provisioning_status=(
-            Organization.ProvisioningStatus.PENDING
-            if pending_owner
-            else Organization.ProvisioningStatus.READY
-        ),
-    )
+    except IntegrityError:
+        if creation_key:
+            existing = (
+                Organization.objects.select_related("billing_account")
+                .filter(creation_key=creation_key)
+                .first()
+            )
+            if existing is not None:
+                if existing.created_by_id != actor.pk:
+                    raise ValidationError({"creation_key": "already_used"})
+                return existing
+        raise
     if owner is not None:
         OrganizationMembership.objects.create(
             organization=organization,
@@ -485,7 +502,9 @@ def reassign_owner_setup(actor: Any, organization: Organization, email: str) -> 
 
 
 @transaction.atomic
-def create_pending_team(actor: Any, *, name: str) -> Organization:
+def create_pending_team(
+    actor: Any, *, name: str, creation_key: UUID | None = None
+) -> Organization:
     """Start a Team checkout before payment settlement.
 
     The account and organization are deliberately created together so the
@@ -499,30 +518,59 @@ def create_pending_team(actor: Any, *, name: str) -> Organization:
 
     from jadawel_billing.models import BillingAccount
 
-    account = BillingAccount.objects.create(
-        kind=BillingAccount.Kind.TEAM,
-        responsible_user=actor,
-    )
-    organization = Organization.objects.create(
-        billing_account=account,
-        name=name,
-        owner=actor,
-        created_by=actor,
-        provisioning_status=Organization.ProvisioningStatus.PENDING,
-    )
-    OrganizationMembership.objects.create(
-        organization=organization,
-        user=actor,
-        role=OrganizationMembership.Role.OWNER,
-    )
-    audit(
-        actor,
-        organization,
-        "organization.checkout_started",
-        organization.pk,
-        {"name": name},
-    )
-    return organization
+    if creation_key:
+        existing = (
+            Organization.objects.select_related("billing_account")
+            .filter(creation_key=creation_key)
+            .first()
+        )
+        if existing is not None:
+            if existing.billing_account.responsible_user_id != actor.pk:
+                raise ValidationError({"creation_key": "already_used"})
+            return existing
+
+    try:
+        # Keep the account and organization in one savepoint. If two retrying
+        # requests race on the unique creation key, the losing account is
+        # rolled back before the existing organization is returned.
+        with transaction.atomic():
+            account = BillingAccount.objects.create(
+                kind=BillingAccount.Kind.TEAM,
+                responsible_user=actor,
+            )
+            organization = Organization.objects.create(
+                billing_account=account,
+                name=name,
+                owner=actor,
+                created_by=actor,
+                creation_key=creation_key,
+                provisioning_status=Organization.ProvisioningStatus.PENDING,
+            )
+            OrganizationMembership.objects.create(
+                organization=organization,
+                user=actor,
+                role=OrganizationMembership.Role.OWNER,
+            )
+            audit(
+                actor,
+                organization,
+                "organization.checkout_started",
+                organization.pk,
+                {"name": name},
+            )
+            return organization
+    except IntegrityError:
+        if creation_key:
+            existing = (
+                Organization.objects.select_related("billing_account")
+                .filter(creation_key=creation_key)
+                .first()
+            )
+            if existing is not None:
+                if existing.billing_account.responsible_user_id != actor.pk:
+                    raise ValidationError({"creation_key": "already_used"})
+                return existing
+        raise
 
 
 @transaction.atomic
@@ -767,87 +815,104 @@ def update_member(
     suspended: bool | None = None,
 ) -> OrganizationMembership:
     _require_actor(actor)
-    actor_membership = None if actor.is_staff else _can_manage(actor, organization)
-    if membership.organization_id != organization.pk:
-        raise ValidationError({"membership": "organization_mismatch"})
-    if role is not None:
-        if role not in OrganizationMembership.Role.values:
-            raise ValidationError({"role": "invalid"})
-        if role == "owner":
-            if not actor.is_staff and actor_membership.role != "owner":
-                raise PermissionDenied("owner_transfer_requires_owner")
-            if membership.suspended:
-                raise ValidationError({"role": "successor_must_be_active"})
-            old_owner = OrganizationMembership.objects.select_for_update().get(
-                organization=organization, role="owner"
-            )
-            old_owner.role = "admin"
-            old_owner.save(update_fields=["role", "updated_at"])
-            membership.role = "owner"
-            organization.owner_id = membership.user_id
-            organization.save(update_fields=["owner_id", "updated_at"])
-            for binding in organization.workspaces.all():
-                access, created = OrganizationWorkspaceAccess.objects.get_or_create(
-                    binding=binding,
-                    membership=membership,
-                    defaults={"permissions": "ADMIN"},
+    with transaction.atomic():
+        organization = Organization.objects.select_for_update().get(pk=organization.pk)
+        if membership.organization_id != organization.pk:
+            raise ValidationError({"membership": "organization_mismatch"})
+        membership = OrganizationMembership.objects.select_for_update().get(
+            pk=membership.pk, organization=organization
+        )
+        actor_membership = None if actor.is_staff else _can_manage(actor, organization)
+        if role is not None:
+            if role not in OrganizationMembership.Role.values:
+                raise ValidationError({"role": "invalid"})
+            if role == "owner":
+                if not actor.is_staff and actor_membership.role != "owner":
+                    raise PermissionDenied("owner_transfer_requires_owner")
+                if membership.suspended:
+                    raise ValidationError({"role": "successor_must_be_active"})
+                old_owner = OrganizationMembership.objects.select_for_update().get(
+                    organization=organization, role="owner"
                 )
-                if not created and access.permissions != "ADMIN":
-                    access.permissions = "ADMIN"
-                    access.save(update_fields=["permissions"])
-        elif membership.role == "owner":
-            raise ValidationError({"role": "transfer_owner_first"})
-        elif (
-            not actor.is_staff
-            and actor_membership.role == OrganizationMembership.Role.ADMIN
-            and (
-                membership.role == OrganizationMembership.Role.ADMIN or role == "admin"
-            )
-        ):
-            raise PermissionDenied("owner_required_for_admin_role")
-        elif role == "admin" and not actor.is_staff and membership.user_id == actor.pk:
-            raise PermissionDenied("admin_cannot_self_promote")
-        else:
-            membership.role = role
-    if suspended is not None:
-        if membership.role == "owner":
-            raise ValidationError({"member": "owner_cannot_be_suspended"})
-        membership.suspended = suspended
-    membership.save(update_fields=["role", "suspended", "updated_at"])
-    _sync_member(membership)
-    audit(
-        actor,
-        organization,
-        "member.updated",
-        membership.pk,
-        {"role": membership.role, "suspended": membership.suspended},
-    )
-    return membership
+                old_owner.role = "admin"
+                old_owner.save(update_fields=["role", "updated_at"])
+                membership.role = "owner"
+                organization.owner_id = membership.user_id
+                organization.save(update_fields=["owner_id", "updated_at"])
+                for binding in organization.workspaces.all():
+                    access, created = OrganizationWorkspaceAccess.objects.get_or_create(
+                        binding=binding,
+                        membership=membership,
+                        defaults={"permissions": "ADMIN"},
+                    )
+                    if not created and access.permissions != "ADMIN":
+                        access.permissions = "ADMIN"
+                        access.save(update_fields=["permissions"])
+            elif membership.role == "owner":
+                raise ValidationError({"role": "transfer_owner_first"})
+            elif (
+                not actor.is_staff
+                and actor_membership.role == OrganizationMembership.Role.ADMIN
+                and (
+                    membership.role == OrganizationMembership.Role.ADMIN
+                    or role == "admin"
+                )
+            ):
+                raise PermissionDenied("owner_required_for_admin_role")
+            elif (
+                role == "admin"
+                and not actor.is_staff
+                and membership.user_id == actor.pk
+            ):
+                raise PermissionDenied("admin_cannot_self_promote")
+            else:
+                membership.role = role
+        if suspended is not None:
+            if membership.role == "owner":
+                raise ValidationError({"member": "owner_cannot_be_suspended"})
+            membership.suspended = suspended
+        membership.save(update_fields=["role", "suspended", "updated_at"])
+        _sync_member(membership)
+        audit(
+            actor,
+            organization,
+            "member.updated",
+            membership.pk,
+            {"role": membership.role, "suspended": membership.suspended},
+        )
+        return membership
 
 
 @transaction.atomic
 def remove_member(
     actor: Any, organization: Organization, membership: OrganizationMembership
 ) -> None:
-    manager = _can_manage(actor, organization)
-    if membership.role == "owner":
-        raise ValidationError({"member": "owner_cannot_be_removed"})
-    if (
-        manager is not None
-        and manager.role == OrganizationMembership.Role.ADMIN
-        and membership.role == OrganizationMembership.Role.ADMIN
-    ):
-        raise PermissionDenied("owner_required_for_admin_role")
-    for binding in OrganizationWorkspace.objects.select_related("workspace").filter(
-        organization=organization
-    ):
-        OrganizationWorkspaceAccess.objects.filter(
-            binding=binding, membership=membership
-        ).delete()
-        _remove_workspace_user(binding, membership)
-    member_id = membership.pk
-    membership.delete()
-    audit(actor, organization, "member.removed", member_id, {})
+    with transaction.atomic():
+        organization = Organization.objects.select_for_update().get(pk=organization.pk)
+        if membership.organization_id != organization.pk:
+            raise ValidationError({"membership": "organization_mismatch"})
+        membership = OrganizationMembership.objects.select_for_update().get(
+            pk=membership.pk, organization=organization
+        )
+        manager = _can_manage(actor, organization)
+        if membership.role == "owner":
+            raise ValidationError({"member": "owner_cannot_be_removed"})
+        if (
+            manager is not None
+            and manager.role == OrganizationMembership.Role.ADMIN
+            and membership.role == OrganizationMembership.Role.ADMIN
+        ):
+            raise PermissionDenied("owner_required_for_admin_role")
+        for binding in OrganizationWorkspace.objects.select_related("workspace").filter(
+            organization=organization
+        ):
+            OrganizationWorkspaceAccess.objects.filter(
+                binding=binding, membership=membership
+            ).delete()
+            _remove_workspace_user(binding, membership)
+        member_id = membership.pk
+        membership.delete()
+        audit(actor, organization, "member.removed", member_id, {})
 
 
 @transaction.atomic

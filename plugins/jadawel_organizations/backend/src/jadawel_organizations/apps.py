@@ -26,8 +26,14 @@ class OrganizationsConfig(AppConfig):
         )
         from jadawel.core.registries import permission_manager_type_registry
         from jadawel_organizations.permissions import OrganizationPermissionManagerType
+        from jadawel.core.jobs.signals import job_started
+        from jadawel_organizations.job_enforcement import enforce_managed_job_access
 
         plugin_registry.register(OrganizationsPlugin())  # type: ignore[no-untyped-call]
         register_capacity_provider(team_occupied_seats)
         register_team_provisioner(provision_paid_team)
         permission_manager_type_registry.register(OrganizationPermissionManagerType())
+        job_started.connect(
+            enforce_managed_job_access,
+            dispatch_uid="jadawel_organizations.managed_job_access",
+        )

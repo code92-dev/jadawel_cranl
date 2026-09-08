@@ -118,23 +118,28 @@ def schedule_subscription_change(
 ) -> SubscriptionChange:
     if not actor.is_staff and subscription.account.responsible_user_id != actor.pk:
         raise ValidationError({"subscription": "not_owner"})
-    if price.plan.kind != subscription.account.kind:
-        raise ValidationError({"price": "account_kind_mismatch"})
-    if seats > subscription.seats:
-        raise ValidationError({"seats": "seat_increase_requires_verified_payment"})
     with transaction.atomic():
         account = BillingAccount.objects.select_for_update().get(
             pk=subscription.account_id
         )
+        current = Subscription.objects.select_for_update().get(pk=subscription.pk)
+        if current.status in {Subscription.Status.CANCELED}:
+            raise ValidationError({"subscription": "not_active"})
+        if not price.available or not price.plan.available:
+            raise ValidationError({"price": "unavailable"})
+        if price.plan.kind != account.kind:
+            raise ValidationError({"price": "account_kind_mismatch"})
+        if seats > current.seats:
+            raise ValidationError({"seats": "seat_increase_requires_verified_payment"})
         validate_capacity(account, seats)
-    return SubscriptionChange.objects.update_or_create(
-        subscription=subscription,
-        defaults={
-            "price": price,
-            "seats": seats,
-            "effective_at": subscription.period_end,
-        },
-    )[0]
+        return SubscriptionChange.objects.update_or_create(
+            subscription=current,
+            defaults={
+                "price": price,
+                "seats": seats,
+                "effective_at": current.period_end,
+            },
+        )[0]
 
 
 def renew_due_subscriptions() -> int:

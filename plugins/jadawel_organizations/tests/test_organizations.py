@@ -1,4 +1,6 @@
 from datetime import timedelta
+from concurrent.futures import ThreadPoolExecutor
+from uuid import uuid4
 
 import pytest
 from django.utils import timezone
@@ -24,6 +26,66 @@ def test_general_admin_creates_complimentary_organization(data_fixture):
         OrganizationMembership.objects.get(organization=organization, user=owner).role
         == "owner"
     )
+
+
+@pytest.mark.django_db
+def test_start_team_creation_is_idempotent(api_client, data_fixture):
+    from jadawel_billing.models import BillingAccount
+    from jadawel_organizations.models import Organization
+
+    owner, token = data_fixture.create_user_and_token()
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+    key = str(uuid4())
+
+    first = api_client.post(
+        "/api/organizations/start-team/",
+        {"name": "Retryable Team"},
+        format="json",
+        HTTP_IDEMPOTENCY_KEY=key,
+    )
+    second = api_client.post(
+        "/api/organizations/start-team/",
+        {"name": "A different label from the retry"},
+        format="json",
+        HTTP_IDEMPOTENCY_KEY=key,
+    )
+
+    assert first.status_code == 201
+    assert second.status_code == 201
+    assert second.data["id"] == first.data["id"]
+    assert Organization.objects.count() == 1
+    assert BillingAccount.objects.filter(responsible_user=owner).count() == 1
+
+
+@pytest.mark.django_db
+def test_admin_organization_creation_key_replays_for_the_same_admin(
+    api_client, data_fixture
+):
+    from jadawel_organizations.models import Organization
+
+    admin, token = data_fixture.create_user_and_token(is_staff=True)
+    owner = data_fixture.create_user(email="idempotent-owner@example.com")
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+    key = str(uuid4())
+    payload = {"name": "Retryable Admin Team", "owner": owner.pk}
+
+    first = api_client.post(
+        "/api/organizations/admin/create/",
+        payload,
+        format="json",
+        HTTP_IDEMPOTENCY_KEY=key,
+    )
+    second = api_client.post(
+        "/api/organizations/admin/create/",
+        {**payload, "name": "A different retry label"},
+        format="json",
+        HTTP_IDEMPOTENCY_KEY=key,
+    )
+
+    assert first.status_code == 201
+    assert second.status_code == 201
+    assert second.data["id"] == first.data["id"]
+    assert Organization.objects.filter(created_by=admin).count() == 1
 
 
 @pytest.mark.django_db
@@ -62,6 +124,64 @@ def test_invitation_acceptance_enforces_seats_and_email(data_fixture):
         accept_invitation(other, token2)
     invitation2.refresh_from_db()
     assert invitation2.accepted_at is None
+
+
+@pytest.mark.django_db(transaction=True)
+def test_concurrent_last_seat_invitation_acceptance_is_serialized(data_fixture):
+    from django.db import close_old_connections
+    from django.contrib.auth import get_user_model
+    from jadawel_billing.grants import replace_grant
+    from jadawel_billing.handlers import create_plan
+    from jadawel_organizations.handlers import (
+        accept_invitation,
+        create_organization,
+        invite_member,
+    )
+    from jadawel_organizations.models import OrganizationMembership
+    from rest_framework.exceptions import ValidationError
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user(email="seat-owner@example.com")
+    first = data_fixture.create_user(email="seat-first@example.com")
+    second = data_fixture.create_user(email="seat-second@example.com")
+    organization = create_organization(staff, name="Concurrent seats", owner=owner)
+    plan = create_plan(staff, code="concurrent-team", name="Team", kind="TEAM")
+    replace_grant(
+        staff,
+        organization.billing_account_id,
+        plan=plan,
+        seat_limit=2,
+        starts_at=timezone.now() - timedelta(minutes=1),
+        reason="Concurrency test",
+    )
+    _, first_token = invite_member(owner, organization, email=first.email)
+    _, second_token = invite_member(owner, organization, email=second.email)
+
+    barrier = __import__("threading").Barrier(2)
+
+    def accept(user_id, token):
+        close_old_connections()
+        try:
+            user = get_user_model().objects.get(pk=user_id)
+            barrier.wait(timeout=10)
+            accept_invitation(user, token)
+            return "accepted"
+        except ValidationError:
+            return "rejected"
+        finally:
+            close_old_connections()
+
+    with ThreadPoolExecutor(max_workers=2) as executor:
+        results = list(
+            executor.map(
+                accept,
+                (first.pk, second.pk),
+                (first_token, second_token),
+            )
+        )
+
+    assert sorted(results) == ["accepted", "rejected"]
+    assert OrganizationMembership.objects.filter(organization=organization).count() == 2
 
 
 @pytest.mark.django_db
@@ -254,6 +374,41 @@ def test_restricted_workspace_blocks_import_copy_and_airtable_jobs(data_fixture)
             },
             owner,
         )
+
+
+@pytest.mark.django_db
+def test_queued_managed_job_rechecks_access_after_membership_revocation(data_fixture):
+    from jadawel.core.exceptions import PermissionException
+    from jadawel.core.jobs.signals import job_started
+    from jadawel.contrib.database.table.models import DuplicateTableJob
+    from jadawel_organizations.handlers import bind_workspace, create_organization
+    from jadawel_organizations.handlers import remove_member
+    from jadawel_organizations.models import OrganizationMembership
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    member = data_fixture.create_user()
+    organization = create_organization(staff, name="Queued jobs", owner=owner)
+    workspace = data_fixture.create_workspace(user=owner, name="Queued workspace")
+    table = data_fixture.create_database_table(
+        user=owner,
+        database=data_fixture.create_database_application(workspace=workspace),
+    )
+    bind_workspace(owner, organization, workspace)
+    membership = OrganizationMembership.objects.create(
+        organization=organization, user=member
+    )
+    from jadawel_organizations.handlers import assign_workspace_member
+
+    assign_workspace_member(
+        owner, organization, organization.workspaces.get(), membership
+    )
+    job = DuplicateTableJob.objects.create(user=member, original_table=table)
+
+    remove_member(owner, organization, membership)
+
+    with pytest.raises(PermissionException):
+        job_started.send(None, job=job, user=member)
 
 
 @pytest.mark.django_db

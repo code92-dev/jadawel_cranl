@@ -126,6 +126,8 @@
 </template>
 
 <script>
+import { uuid } from "@jadawel/modules/core/utils/string";
+
 export default {
   name: "OrganizationsAdmin",
   layout: "app",
@@ -136,6 +138,7 @@ export default {
       owner: null,
       ownerEmail: "",
       ownerSetupToken: "",
+      creationKey: null,
       plans: [],
       grant: { plan: "", seat_limit: 1, expires_at: "", reason: "" },
       organizations: [],
@@ -173,6 +176,7 @@ export default {
     async create() {
       this.busy = true;
       this.error = false;
+      this.creationKey = this.creationKey || uuid();
       try {
         const payload = {
           name: this.name,
@@ -188,7 +192,9 @@ export default {
         const response = await this.$client.post(
           "/organizations/admin/create/",
           payload,
+          { headers: { "Idempotency-Key": this.creationKey } },
         );
+        this.creationKey = null;
         this.ownerSetupToken = response.data.owner_setup_token || "";
         this.name = "";
         this.owner = null;

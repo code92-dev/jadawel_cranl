@@ -64,6 +64,20 @@ def get_org(organization_id: UUID) -> Organization:
     )
 
 
+def _creation_key(request: Request, body_key: UUID | None) -> UUID | None:
+    """Resolve the retry key while rejecting conflicting client values."""
+    header_key = request.headers.get("Idempotency-Key")
+    if not header_key:
+        return body_key
+    try:
+        header_uuid = UUID(header_key)
+    except ValueError as exc:
+        raise ValidationError({"Idempotency-Key": "must_be_uuid"}) from exc
+    if body_key is not None and body_key != header_uuid:
+        raise ValidationError({"creation_key": "idempotency_key_mismatch"})
+    return header_uuid
+
+
 def require_viewer(request: Request, organization: Organization) -> None:
     if request.user.is_staff:
         return
@@ -148,7 +162,9 @@ class AdminOrganizationCreateView(APIView):
     def post(self, request: Request) -> Response:
         serializer = CreateOrganizationSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        organization = create_organization(request.user, **serializer.validated_data)
+        values = dict(serializer.validated_data)
+        values["creation_key"] = _creation_key(request, values.get("creation_key"))
+        organization = create_organization(request.user, **values)
         owner_setup_token = getattr(organization, "_owner_setup_token", None)
         payload = organization_snapshot(organization)
         if owner_setup_token:
@@ -180,7 +196,9 @@ class StartTeamView(APIView):
     def post(self, request: Request) -> Response:
         serializer = StartTeamSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        organization = create_pending_team(request.user, **serializer.validated_data)
+        values = dict(serializer.validated_data)
+        values["creation_key"] = _creation_key(request, values.get("creation_key"))
+        organization = create_pending_team(request.user, **values)
         return Response(
             organization_snapshot(organization), status=status.HTTP_201_CREATED
         )

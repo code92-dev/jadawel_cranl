@@ -128,6 +128,10 @@ class CreateOrganizationSerializer(serializers.Serializer[Any]):
 
 class StartTeamSerializer(serializers.Serializer[Any]):
     name = serializers.CharField(max_length=160)
+    # A client can retry a failed response without creating a second Team
+    # account.  The same key is also accepted through the Idempotency-Key
+    # header by StartTeamView.
+    creation_key = serializers.UUIDField(required=False, allow_null=True)
 
 
 class OrganizationUpdateSerializer(serializers.Serializer[Any]):

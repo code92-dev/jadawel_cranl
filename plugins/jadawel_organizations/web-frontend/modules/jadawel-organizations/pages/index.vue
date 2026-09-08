@@ -48,6 +48,8 @@
 </template>
 
 <script>
+import { uuid } from "@jadawel/modules/core/utils/string";
+
 export default {
   name: "OrganizationsIndex",
   layout: "app",
@@ -57,6 +59,7 @@ export default {
       organizations: [],
       organizationsNext: null,
       teamName: "",
+      creationKey: null,
       search: "",
       loading: true,
       busy: false,
@@ -101,10 +104,19 @@ export default {
     async startTeam() {
       this.busy = true;
       this.error = false;
+      this.creationKey = this.creationKey || uuid();
       try {
-        const response = await this.$client.post("/organizations/start-team/", {
-          name: this.teamName,
-        });
+        const response = await this.$client.post(
+          "/organizations/start-team/",
+          {
+            name: this.teamName,
+            creation_key: this.creationKey,
+          },
+          {
+            headers: { "Idempotency-Key": this.creationKey },
+          },
+        );
+        this.creationKey = null;
         this.$router.push({
           path: "/billing",
           query: { account: response.data.billing_account },

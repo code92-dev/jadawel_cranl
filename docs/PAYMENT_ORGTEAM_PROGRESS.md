@@ -29,7 +29,7 @@ slices; the issues remain open until a maintainer reviews and lands the branch.
 Focused backend verification, with both plugin paths loaded, currently passes:
 
 ```text
-69 passed
+75 passed
 ```
 
 The same run covers complimentary access, role authority, seat reservation for
@@ -38,7 +38,7 @@ restoration, preservation of pre-existing workspace access, restricted operation
 handling, paid-Team idempotent provisioning, per-seat Team quotes, payment
 verification, webhook reconciliation, active Moyasar token/payment binding,
 payment methods, refunds, and renewal task behavior. The focused frontend run
-passes 31 tests across six files, and strict repository locale parity reports
+passes 32 tests across six files, and strict repository locale parity reports
 3,787/3,787 keys.
 
 The organization UI now previews workspace outsiders before binding, supports
@@ -72,7 +72,11 @@ Provider HTTP calls for saved payment methods are outside the database write
 transaction.
 
 The organization tests also cover pending-owner acceptance, reserved owner
-capacity, restricted workspace creation, and the public-workspace policy.
+capacity, concurrent last-seat acceptance on PostgreSQL, idempotent organization
+creation retries, restricted workspace creation, queued-job rechecks after
+revocation, and the public-workspace policy. External payment references are
+idempotent only when their immutable details match, and scheduled subscription
+changes reject archived or unavailable price versions.
 
 ## Local run
 
@@ -100,7 +104,7 @@ Before enabling production billing, obtain and verify the merchant's actual
 prices, tax/invoice treatment, refund policy, recurring-payment eligibility,
 grace policy, and Moyasar webhook configuration. Run the disposable-image fresh
 install/upgrade checks and a browser-authenticated Arabic/English pass with
-Moyasar sandbox credentials. The organization adapter still needs a dedicated
-integration pass for public-share, websocket delivery, and delegated-job
-execution before those paths are described as fully managed. Do not mark these
-provider- or integration-dependent checks as passed from the local no-key run.
+Moyasar sandbox credentials. The local suite now exercises the public-share
+policy, post-commit websocket disconnect scheduling, and a queued-job permission
+recheck. Do not mark provider-dependent checks as passed from the local no-key
+run.
