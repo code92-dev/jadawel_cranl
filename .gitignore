@@ -177,3 +177,6 @@ web-frontend/storybook-static
 *.dump
 # The e2e fixture database is a deliberate exception.
 !e2e-tests/fixtures/e2e-db.dump
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+/graft/
