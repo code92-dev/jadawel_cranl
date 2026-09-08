@@ -29,7 +29,7 @@ slices; the issues remain open until a maintainer reviews and lands the branch.
 Focused backend verification, with both plugin paths loaded, currently passes:
 
 ```text
-82 passed
+83 passed
 ```
 
 The same run covers complimentary access, role authority, seat reservation for
@@ -43,7 +43,7 @@ filters used by the billing and organization APIs. Renewal retries stop at the
 configured grace boundary, administrator subscription cancellation is exposed,
 and account-kind checkout prices, historical receipts, and organization action
 confirmations are covered by the frontend tests. The focused frontend run
-passes 13 tests across five files, and strict repository locale parity reports
+passes 15 tests across six files, and strict repository locale parity reports
 3,787/3,787 keys.
 
 The organization UI now previews workspace outsiders before binding, supports
