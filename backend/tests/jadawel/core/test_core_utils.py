@@ -1,3 +1,4 @@
+import socket
 from decimal import Decimal
 from io import BytesIO
 from unittest.mock import MagicMock, patch
@@ -668,9 +669,22 @@ def test_remove_duplicates():
 
 
 def test_get_all_ips():
-    assert get_all_ips("localhost") == {"127.0.0.1", "::1"}
+    # Host resolver configuration may omit IPv6 localhost. Exercise both
+    # address families and duplicate results without relying on /etc/hosts.
+    addresses = [
+        (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("127.0.0.1", 0)),
+        (socket.AF_INET, socket.SOCK_DGRAM, 17, "", ("127.0.0.1", 0)),
+        (socket.AF_INET6, socket.SOCK_STREAM, 6, "", ("::1", 0, 0, 0)),
+    ]
+    with patch("jadawel.core.utils.socket.getaddrinfo", return_value=addresses):
+        assert get_all_ips("localhost") == {"127.0.0.1", "::1"}
     assert get_all_ips("0.0.0.0") == {"0.0.0.0"}  # noqa: S104
     assert get_all_ips("::") == {"::"}
+
+
+def test_get_all_ips_resolution_failure():
+    with patch("jadawel.core.utils.socket.getaddrinfo", side_effect=socket.gaierror):
+        assert get_all_ips("unresolvable.invalid") == set()
 
 
 def test_is_hostname_safe():

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Jadawel Plugin Creator"
+  short_description: "Build and verify Arabic-first Jadawel plugins"
+  default_prompt: "Use $jadawel-plugin-creator to build a Jadawel application plugin following this checkout's Django and Nuxt 3 extension points, with Arabic/English UI, packaging, and focused verification."

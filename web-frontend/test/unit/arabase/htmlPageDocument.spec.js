@@ -95,6 +95,39 @@ describe('buildPageDocument', () => {
     expect(BOOTSTRAP_SCRIPT).toContain('onData')
   })
 
+  test.each([
+    '<!-- <head> --><h1>Report</h1>',
+    '<script>const example = "<head>"</script><h1>Report</h1>',
+    '<div data-example="<head>">Report</div>',
+    '<template><head></head></template><h1>Report</h1>',
+    '<script>window.example = true</script><html><head></head></html>',
+    '<html data-example=">"><head></head><body>Report</body></html>',
+  ])('the trusted head precedes misleading author markup: %s', (html) => {
+    const doc = buildPageDocument(html, CSP)
+    const parsed = new DOMParser().parseFromString(doc, 'text/html')
+    const policy = parsed.head.querySelector(
+      'meta[http-equiv="Content-Security-Policy"]'
+    )
+
+    expect(policy?.getAttribute('content')).toBe(CSP)
+    expect(parsed.head.firstElementChild).toBe(policy)
+    expect(doc.indexOf('Content-Security-Policy')).toBeLessThan(
+      doc.indexOf(html)
+    )
+  })
+
+  test.each([undefined, null, '', '  '])(
+    'missing policy fails closed: %s',
+    (policy) => {
+      const doc = buildPageDocument(
+        '<script>window.example = true</script>',
+        policy
+      )
+      expect(doc).not.toContain('<script>')
+      expect(cspTag(doc)).not.toBeNull()
+    }
+  )
+
   test('the bootstrap ignores messages that did not come from the parent', () => {
     // The frame has an opaque origin, so identity is the source window and
     // never event.origin. Guarding on the wrong one is a real mistake, so the

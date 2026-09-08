@@ -1,6 +1,7 @@
 import { flushPromises } from '@vue/test-utils'
 import { TestApp } from '@jadawel/test/helpers/testApp'
 import OrganizationDetail from '../../../../plugins/jadawel_organizations/web-frontend/modules/jadawel-organizations/pages/organization.vue'
+import OrganizationsIndex from '../../../../plugins/jadawel_organizations/web-frontend/modules/jadawel-organizations/pages/index.vue'
 
 describe('Organization Team administration', () => {
   let app
@@ -148,5 +149,33 @@ describe('Organization Team administration', () => {
     await flushPromises()
 
     expect(app.mock.history.delete).toHaveLength(1)
+  })
+
+  test('retries Team creation with one idempotency key', async () => {
+    app.dontFailOnErrorResponses()
+    app.mock.onGet('/organizations/').reply(200, { results: [], next: null })
+    app.mock
+      .onPost('/organizations/start-team/')
+      .replyOnce(503, {})
+      .onPost('/organizations/start-team/')
+      .reply(201, { billing_account: 'account-1' })
+
+    const wrapper = await app.mount(OrganizationsIndex)
+    const form = wrapper.find('form')
+    await form.find('input').setValue('Retryable Team')
+    await form.trigger('submit')
+    await flushPromises()
+    await form.trigger('submit')
+    await flushPromises()
+
+    expect(app.mock.history.post).toHaveLength(2)
+    const firstHeaders = app.mock.history.post[0].headers
+    const secondHeaders = app.mock.history.post[1].headers
+    const firstKey =
+      firstHeaders['Idempotency-Key'] || firstHeaders['idempotency-key']
+    const secondKey =
+      secondHeaders['Idempotency-Key'] || secondHeaders['idempotency-key']
+    expect(firstKey).toBeTruthy()
+    expect(secondKey).toBe(firstKey)
   })
 })

@@ -1,0 +1,56 @@
+services:
+  db:
+    ports: !override
+      - "127.0.0.1:55435:5432"
+  redis:
+    ports: !override
+      - "127.0.0.1:6382:6379"
+  backend:
+    ports: !override
+      - "127.0.0.1:8003:8000"
+    environment:
+      JADAWEL_PLUGIN_DIR: /jadawel/plugins
+      JADAWEL_PUBLIC_URL: http://localhost:3003
+      PUBLIC_BACKEND_URL: http://localhost:8003
+      PUBLIC_WEB_FRONTEND_URL: http://localhost:3003
+      DATABASE_HOST: db
+      REDIS_HOST: redis
+      JADAWEL_MOYASAR_SECRET_KEY:
+      JADAWEL_MOYASAR_PUBLISHABLE_KEY:
+      JADAWEL_MOYASAR_WEBHOOK_SECRET:
+      JADAWEL_BILLING_MODE: test
+      JADAWEL_BILLING_LIVE_ENABLED: "false"
+      JADAWEL_DISABLE_PLUGIN_INSTALL_ON_STARTUP: "yes"
+      PYTHONPATH: /jadawel/backend/src:/jadawel/plugins/jadawel_billing/backend/src:/jadawel/plugins/jadawel_organizations/backend/src
+    volumes:
+      - /home/aziz/workspace/Jadawl.site/jadawel_cranl/.scratch/qa-plugins.RRKjUX:/jadawel/plugins
+  web-frontend:
+    ports: !override
+      - "127.0.0.1:3003:3000"
+    environment:
+      JADAWEL_PUBLIC_URL: http://localhost:3003
+      PUBLIC_BACKEND_URL: http://localhost:8003
+      PUBLIC_WEB_FRONTEND_URL: http://localhost:3003
+      PRIVATE_BACKEND_URL: http://backend:8000
+      JADAWEL_DISABLE_PLUGIN_INSTALL_ON_STARTUP: "yes"
+      ADDITIONAL_MODULES: /jadawel/plugins/jadawel_billing/web-frontend/modules/jadawel-billing/module.js,/jadawel/plugins/jadawel_organizations/web-frontend/modules/jadawel-organizations/module.js
+    volumes:
+      - /home/aziz/workspace/Jadawl.site/jadawel_cranl/.scratch/qa-plugins.RRKjUX:/jadawel/plugins
+  celery:
+    environment:
+      JADAWEL_PLUGIN_DIR: /jadawel/plugins
+      PYTHONPATH: /jadawel/backend/src:/jadawel/plugins/jadawel_billing/backend/src:/jadawel/plugins/jadawel_organizations/backend/src
+    volumes:
+      - /home/aziz/workspace/Jadawl.site/jadawel_cranl/.scratch/qa-plugins.RRKjUX:/jadawel/plugins
+  celery-export-worker:
+    environment:
+      JADAWEL_PLUGIN_DIR: /jadawel/plugins
+      PYTHONPATH: /jadawel/backend/src:/jadawel/plugins/jadawel_billing/backend/src:/jadawel/plugins/jadawel_organizations/backend/src
+    volumes:
+      - /home/aziz/workspace/Jadawl.site/jadawel_cranl/.scratch/qa-plugins.RRKjUX:/jadawel/plugins
+  celery-beat-worker:
+    environment:
+      JADAWEL_PLUGIN_DIR: /jadawel/plugins
+      PYTHONPATH: /jadawel/backend/src:/jadawel/plugins/jadawel_billing/backend/src:/jadawel/plugins/jadawel_organizations/backend/src
+    volumes:
+      - /home/aziz/workspace/Jadawl.site/jadawel_cranl/.scratch/qa-plugins.RRKjUX:/jadawel/plugins
