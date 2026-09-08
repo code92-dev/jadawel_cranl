@@ -190,7 +190,7 @@
             }}<select v-model="externalPayment.account" required class="input">
               <option value="" disabled>{{ $t("billing.accounts") }}</option>
               <option v-for="item in accounts" :key="item.id" :value="item.id">
-                <bdi>{{ item.owner_email }}</bdi> ·
+                {{ item.owner_email }} ·
                 {{ $t("billing." + item.kind.toLowerCase()) }}
               </option>
             </select></label
