@@ -29,7 +29,7 @@ slices; the issues remain open until a maintainer reviews and lands the branch.
 Focused backend verification, with both plugin paths loaded, currently passes:
 
 ```text
-62 passed
+64 passed
 ```
 
 The same run covers complimentary access, role authority, seat reservation for
@@ -38,7 +38,7 @@ restoration, preservation of pre-existing workspace access, restricted operation
 handling, paid-Team idempotent provisioning, per-seat Team quotes, payment
 verification, webhook reconciliation, active Moyasar token/payment binding,
 payment methods, refunds, and renewal task behavior. The focused frontend run
-passes 8 tests, and strict repository locale parity reports 3,787/3,787 keys.
+passes 9 tests, and strict repository locale parity reports 3,787/3,787 keys.
 
 The organization UI now previews workspace outsiders before binding, supports
 pending-owner reassignment, and exposes the guarded Team-to-Individual
@@ -46,7 +46,8 @@ transition. Billing administration lists external payments and supports
 provider refunds with a refundable-balance confirmation. Organization settings
 can be renamed with an audit record; bindings require explicit outsider
 confirmation for general administrators and support ADMIN, MEMBER, and
-read-only VIEWER assignments.
+read-only VIEWER assignments, including per-member unassignment without
+removing the organization membership.
 
 Additional checks completed during implementation include scoped Ruff checks,
 Django system checks, Nuxt `prepare`, standalone locale parity, and Prettier

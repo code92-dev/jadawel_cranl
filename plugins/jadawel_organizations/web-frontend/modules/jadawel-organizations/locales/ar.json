@@ -11,7 +11,7 @@
     "ownerSetupToken": "رمز إعداد المالك",
     "settings": "الإعدادات",
     "saveSettings": "حفظ الإعدادات",
-    "plan": "خطة الفريق المجانية",
+    "plan": "باقة الفريق المجانية",
     "noGrant": "إنشاء بدون منح وصول",
     "seatLimit": "حد المقاعد",
     "expiresAt": "انتهاء الوصول",
@@ -57,6 +57,7 @@
     "workspaceAdmin": "مسؤول مساحة العمل",
     "workspaceMember": "عضو مساحة العمل",
     "workspaceViewer": "مشاهد",
+    "unassignWorkspaceMember": "إزالة الوصول إلى مساحة العمل",
     "workspacePermissions": {
       "admin": "مسؤول مساحة العمل",
       "member": "عضو مساحة العمل",

@@ -927,6 +927,36 @@ def assign_workspace_member(
     return access
 
 
+@transaction.atomic
+def unassign_workspace_member(
+    actor: Any,
+    organization: Organization,
+    binding: OrganizationWorkspace,
+    membership: OrganizationMembership,
+) -> None:
+    """Remove one member's managed workspace access while retaining membership."""
+    _can_manage(actor, organization)
+    if (
+        binding.organization_id != organization.pk
+        or membership.organization_id != organization.pk
+    ):
+        raise ValidationError({"workspace": "organization_mismatch"})
+    access = OrganizationWorkspaceAccess.objects.filter(
+        binding=binding, membership=membership
+    ).first()
+    if access is None:
+        raise ValidationError({"membership": "workspace_access_not_found"})
+    access.delete()
+    _remove_workspace_user(binding, membership)
+    audit(
+        actor,
+        organization,
+        "workspace.member_unassigned",
+        membership.pk,
+        {"workspace": binding.workspace_id},
+    )
+
+
 def organization_snapshot(organization: Organization) -> dict[str, Any]:
     effective = _billing_account_for(organization)
     pending_owner = organization.invitations.filter(

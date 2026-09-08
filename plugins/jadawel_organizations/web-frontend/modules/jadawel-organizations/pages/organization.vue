@@ -206,6 +206,13 @@
                   `organizations.workspacePermissions.${assignment.permissions.toLowerCase()}`,
                 )
               }}
+              <Button
+                type="danger"
+                data-testid="unassign-workspace-member"
+                @click="unassignWorkspace(binding, assignment)"
+              >
+                {{ $t("organizations.unassignWorkspaceMember") }}
+              </Button>
             </li>
           </ul>
           <form @submit.prevent="assignWorkspace(binding)">
@@ -441,6 +448,13 @@ export default {
         this.$client.post(
           `/organizations/${this.organization.id}/workspaces/${binding.id}/members/${this.assignmentMembers[binding.id]}/`,
           { permissions: this.assignmentPermissions[binding.id] || "MEMBER" },
+        ),
+      );
+    },
+    async unassignWorkspace(binding, assignment) {
+      await this.run(() =>
+        this.$client.delete(
+          `/organizations/${this.organization.id}/workspaces/${binding.id}/members/${assignment.membership_id}/`,
         ),
       );
     },

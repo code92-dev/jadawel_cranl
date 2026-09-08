@@ -57,6 +57,7 @@
     "workspaceAdmin": "Workspace administrator",
     "workspaceMember": "Workspace member",
     "workspaceViewer": "Viewer",
+    "unassignWorkspaceMember": "Remove workspace access",
     "workspacePermissions": {
       "admin": "Workspace administrator",
       "member": "Workspace member",

@@ -89,4 +89,43 @@ describe('Organization Team administration', () => {
     await flushPromises()
     expect(app.mock.history.post).toHaveLength(1)
   })
+
+  test('removes one member workspace assignment without removing the member', async () => {
+    const organization = {
+      id: 'org-1',
+      name: 'Acme',
+      status: 'active',
+      provisioning_status: 'ready',
+      members: [
+        { id: 1, email: 'owner@example.com', role: 'owner', suspended: false },
+        { id: 2, email: 'member@example.com', role: 'member', suspended: false },
+      ],
+      workspaces: [
+        {
+          id: 4,
+          workspace: { id: 7, name: 'Shared data' },
+          assigned_members: 1,
+          assignments: [
+            {
+              membership_id: 2,
+              email: 'member@example.com',
+              permissions: 'VIEWER',
+            },
+          ],
+        },
+      ],
+      effective_entitlement: { source: 'manual', seat_limit: 5 },
+    }
+    app.mock.onGet('/organizations/org-1/').reply(200, organization)
+    app.mock.onGet('/organizations/org-1/invitations/').reply(200, [])
+    app.mock.onDelete('/organizations/org-1/workspaces/4/members/2/').reply(204)
+
+    const wrapper = await app.mount(OrganizationDetail, {
+      props: { routeOrganizationId: 'org-1' },
+    })
+    await wrapper.find('[data-testid="unassign-workspace-member"]').trigger('click')
+    await flushPromises()
+
+    expect(app.mock.history.delete).toHaveLength(1)
+  })
 })

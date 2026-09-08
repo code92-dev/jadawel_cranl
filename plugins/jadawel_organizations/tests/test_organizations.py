@@ -267,6 +267,71 @@ def test_viewer_workspace_assignment_is_read_only(data_fixture):
 
 
 @pytest.mark.django_db
+def test_workspace_assignment_can_be_removed_without_removing_member(data_fixture):
+    from jadawel.core.models import WorkspaceUser
+    from jadawel_organizations.handlers import (
+        assign_workspace_member,
+        bind_workspace,
+        create_organization,
+        unassign_workspace_member,
+    )
+    from jadawel_organizations.models import OrganizationMembership
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner = data_fixture.create_user()
+    member = data_fixture.create_user()
+    organization = create_organization(staff, name="Unassign access", owner=owner)
+    membership = OrganizationMembership.objects.create(
+        organization=organization, user=member
+    )
+    workspace = data_fixture.create_workspace(user=owner, name="Assignable data")
+    bind_workspace(owner, organization, workspace)
+    binding = organization.workspaces.get()
+    assign_workspace_member(
+        owner, organization, binding, membership, permissions="VIEWER"
+    )
+    assert WorkspaceUser.objects.filter(workspace=workspace, user=member).exists()
+
+    unassign_workspace_member(owner, organization, binding, membership)
+
+    assert OrganizationMembership.objects.filter(pk=membership.pk).exists()
+    assert not WorkspaceUser.objects.filter(workspace=workspace, user=member).exists()
+
+
+@pytest.mark.django_db
+def test_workspace_assignment_delete_api_keeps_membership(api_client, data_fixture):
+    from jadawel.core.models import WorkspaceUser
+    from jadawel_organizations.handlers import (
+        assign_workspace_member,
+        bind_workspace,
+        create_organization,
+    )
+    from jadawel_organizations.models import OrganizationMembership
+
+    admin = data_fixture.create_user(is_staff=True)
+    owner, token = data_fixture.create_user_and_token()
+    member = data_fixture.create_user()
+    organization = create_organization(admin, name="Unassign API", owner=owner)
+    membership = OrganizationMembership.objects.create(
+        organization=organization, user=member
+    )
+    workspace = data_fixture.create_workspace(user=owner, name="API shared data")
+    binding = bind_workspace(owner, organization, workspace)
+    assign_workspace_member(owner, organization, binding, membership)
+    assert WorkspaceUser.objects.filter(workspace=workspace, user=member).exists()
+
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+    response = api_client.delete(
+        f"/api/organizations/{organization.pk}/workspaces/"
+        f"{binding.pk}/members/{membership.pk}/"
+    )
+
+    assert response.status_code == 204
+    assert OrganizationMembership.objects.filter(pk=membership.pk).exists()
+    assert not WorkspaceUser.objects.filter(workspace=workspace, user=member).exists()
+
+
+@pytest.mark.django_db
 def test_staff_without_explicit_organization_access_cannot_read_managed_workspace(
     data_fixture,
 ):

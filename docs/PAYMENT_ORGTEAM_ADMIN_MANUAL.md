@@ -110,6 +110,8 @@ consume the last seat concurrently.
 3. For each binding, choose an active organization member and choose **Assign**.
    Choose **Workspace administrator**, **Workspace member**, or **Viewer** for
    the assignment. Viewer access is read-only, and is enforced by the backend.
+   Use **Remove workspace access** on an assignment to unassign that member while
+   keeping their organization membership.
 4. Use **Unbind workspace** only after reviewing who should retain independent
    access. Unbinding removes access created by the organization adapter and
    preserves unrelated personal workspace data.

@@ -28,6 +28,7 @@ from ..handlers import (
     update_member,
     workspace_binding_preview,
     transition_to_personal,
+    unassign_workspace_member,
     update_organization,
 )
 from ..models import (
@@ -329,6 +330,19 @@ class WorkspaceMemberAssignmentView(APIView):
             **serializer.validated_data,
         )
         return Response({"assigned": True})
+
+    def delete(
+        self,
+        request: Request,
+        organization_id: UUID,
+        binding_id: int,
+        membership_id: int,
+    ) -> Response:
+        organization = get_org(organization_id)
+        binding = get_object_or_404(OrganizationWorkspace, pk=binding_id)
+        membership = get_object_or_404(OrganizationMembership, pk=membership_id)
+        unassign_workspace_member(request.user, organization, binding, membership)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class LifecycleView(APIView):
