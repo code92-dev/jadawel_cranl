@@ -71,6 +71,26 @@ def test_billing_administration_denies_non_staff(api_client, data_fixture, path)
 
 
 @pytest.mark.django_db
+def test_admin_provider_health_is_safe_when_moyasar_is_not_configured(
+    api_client, data_fixture, settings
+):
+    _, token = data_fixture.create_user_and_token(is_staff=True)
+    settings.JADAWEL_BILLING_MODE = "test"
+    settings.JADAWEL_MOYASAR_SECRET_KEY = ""
+    settings.JADAWEL_MOYASAR_PUBLISHABLE_KEY = ""
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+
+    response = api_client.get("/api/billing/admin/provider-health/")
+
+    assert response.status_code == 200
+    assert response.data == {
+        "mode": "test",
+        "status": "not_configured",
+        "configured": False,
+    }
+
+
+@pytest.mark.django_db
 def test_duplicate_personal_account_is_rejected_but_team_accounts_are_independent(
     api_client, data_fixture
 ):

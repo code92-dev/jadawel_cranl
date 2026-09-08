@@ -4,6 +4,7 @@ from uuid import UUID
 from django.conf import settings
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.request import Request
@@ -11,6 +12,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jadawel_billing.api.receipts import ReceiptSerializer
+from jadawel_billing.api.views import BillingPagination
 from jadawel_billing.entitlements import (
     get_effective_entitlements,
     has_team_provisioner,
@@ -72,9 +74,18 @@ class OrdersView(APIView):
         orders = (
             BillingOrder.objects.select_related("payment_attempt")
             .filter(account__responsible_user_id=request.user.pk)
-            .order_by("-created_at")[:50]
+            .order_by("-created_at", "-id")
         )
-        return Response(OrderSerializer(orders, many=True).data)
+        search = request.query_params.get("search", "").strip()
+        if search:
+            orders = orders.filter(
+                Q(purpose__icontains=search)
+                | Q(status__icontains=search)
+                | Q(payment_attempt__provider_payment_id__icontains=search)
+            )
+        paginator = BillingPagination()
+        page = paginator.paginate_queryset(orders, request, view=self)
+        return paginator.get_paginated_response(OrderSerializer(page, many=True).data)
 
     def post(self, request: Request) -> Response:
         data = OrderInput(data=request.data)

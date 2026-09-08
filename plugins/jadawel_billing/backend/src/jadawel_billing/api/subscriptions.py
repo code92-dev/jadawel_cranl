@@ -1,7 +1,9 @@
 from typing import Any
 from uuid import UUID
 
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
+
 from rest_framework import serializers
 from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.request import Request
@@ -211,6 +213,13 @@ class AdminExternalPaymentView(APIView):
         payments = ExternalPayment.objects.select_related("account", "actor").order_by(
             "-paid_at", "-id"
         )
+        search = request.query_params.get("search", "").strip()
+        if search:
+            payments = payments.filter(
+                Q(reference__icontains=search)
+                | Q(notes__icontains=search)
+                | Q(account__responsible_user__email__icontains=search)
+            )
         page = paginator.paginate_queryset(payments, request, view=self)
         return paginator.get_paginated_response(
             ExternalPaymentSerializer(page, many=True).data

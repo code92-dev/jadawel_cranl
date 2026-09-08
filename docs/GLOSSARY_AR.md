@@ -21,6 +21,11 @@ term exists).
 | Organization | منظمة | Company or organization account. |
 | Complimentary access | وصول مجاني | Explicit administrator grant. |
 | Seat | مقعد | One licensed organization member. |
+| Activity log | سجل النشاط | Chronological record of organization and billing actions. |
+| Payment provider | مزود الدفع | External service such as Moyasar that processes payments. |
+| Provider health | حالة مزود الدفع | Safe configuration and reachability status. |
+| External payment | دفعة خارجية | Administrator-recorded settlement outside the payment provider. |
+| Payment history | سجل المدفوعات | Chronological list of payment orders and their outcomes. |
 
 ### Workspace vocabulary
 

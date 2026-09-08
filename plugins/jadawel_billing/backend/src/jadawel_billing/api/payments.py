@@ -1,18 +1,22 @@
 from typing import Any
 from uuid import UUID
 
+from django.conf import settings
 from django.shortcuts import get_object_or_404
+
 from rest_framework import generics, serializers
+from rest_framework.filters import SearchFilter
 from rest_framework.permissions import IsAdminUser
 from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from jadawel_billing.api.receipts import ReceiptSerializer
 from jadawel_billing.api.checkout import VerifyInput
+from jadawel_billing.api.receipts import ReceiptSerializer
 from jadawel_billing.api.views import BillingPagination
 from jadawel_billing.models import BillingOrder, BillingRefund, ProviderEvent
 from jadawel_billing.payments import reconcile_order
+from jadawel_billing.providers.moyasar import MoyasarClient
 
 
 class AdminOrderSerializer(ReceiptSerializer):
@@ -92,6 +96,14 @@ class AdminOrdersView(generics.ListAPIView[Any]):
     permission_classes = [IsAdminUser]
     serializer_class = AdminOrderSerializer
     pagination_class = BillingPagination
+    filter_backends = [SearchFilter]
+    search_fields = [
+        "account__responsible_user__email",
+        "payment_id",
+        "payment_attempt__provider_payment_id",
+        "purpose",
+        "status",
+    ]
     queryset = BillingOrder.objects.select_related(
         "account__responsible_user", "price", "payment_attempt", "refund"
     ).order_by("-created_at", "-id")
@@ -117,7 +129,38 @@ class AdminProviderEventsView(generics.ListAPIView[Any]):
     permission_classes = [IsAdminUser]
     serializer_class = ProviderEventSerializer
     pagination_class = BillingPagination
+    filter_backends = [SearchFilter]
+    search_fields = ["event_id", "payment_id", "event_type", "status", "error_code"]
     queryset = ProviderEvent.objects.order_by("-created_at", "-id")
+
+
+class AdminProviderHealthView(APIView):
+    """Return a safe provider configuration/reachability status for staff."""
+
+    permission_classes = [IsAdminUser]
+
+    def get(self, request: Request) -> Response:
+        mode = getattr(settings, "JADAWEL_BILLING_MODE", "test")
+        secret = getattr(settings, "JADAWEL_MOYASAR_SECRET_KEY", "")
+        publishable = getattr(settings, "JADAWEL_MOYASAR_PUBLISHABLE_KEY", "")
+        if mode not in ("test", "live"):
+            return Response(
+                {"mode": mode, "status": "invalid_mode", "configured": False}
+            )
+        if mode == "live" and not getattr(
+            settings, "JADAWEL_BILLING_LIVE_ENABLED", False
+        ):
+            return Response(
+                {"mode": mode, "status": "live_disabled", "configured": False}
+            )
+        if not secret.startswith(f"sk_{mode}_") or not publishable.startswith(
+            f"pk_{mode}_"
+        ):
+            return Response(
+                {"mode": mode, "status": "not_configured", "configured": False}
+            )
+        result = MoyasarClient(secret_key=secret, mode=mode).health()
+        return Response({"mode": mode, "configured": True, **result})
 
 
 class AdminReconcileOrderView(APIView):

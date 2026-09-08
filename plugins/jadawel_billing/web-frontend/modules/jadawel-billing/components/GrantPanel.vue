@@ -25,7 +25,12 @@
         >{{ $t("billing.plans") }}
         <select v-model.number="form.plan" name="plan" required class="input">
           <option :value="null" disabled>{{ $t("billing.choosePlan") }}</option>
-          <option v-for="plan in eligiblePlans" :key="plan.id" :value="plan.id">
+          <option
+            v-for="plan in eligiblePlans"
+            :key="plan.id"
+            :value="plan.id"
+            dir="auto"
+          >
             {{ plan.name }}
           </option>
         </select>

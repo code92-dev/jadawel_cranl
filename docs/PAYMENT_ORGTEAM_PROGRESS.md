@@ -29,7 +29,7 @@ slices; the issues remain open until a maintainer reviews and lands the branch.
 Focused backend verification, with both plugin paths loaded, currently passes:
 
 ```text
-75 passed
+79 passed
 ```
 
 The same run covers complimentary access, role authority, seat reservation for
@@ -37,7 +37,9 @@ suspended members, invitation mismatch/expiry/replay, workspace revocation and
 restoration, preservation of pre-existing workspace access, restricted operation
 handling, paid-Team idempotent provisioning, per-seat Team quotes, payment
 verification, webhook reconciliation, active Moyasar token/payment binding,
-payment methods, refunds, and renewal task behavior. The focused frontend run
+payment methods, refunds, and renewal task behavior. It also covers suspended
+owner recovery, safe Moyasar provider-health statuses, and the paginated/search
+filters used by the billing and organization APIs. The focused frontend run
 passes 32 tests across six files, and strict repository locale parity reports
 3,787/3,787 keys.
 
@@ -52,7 +54,10 @@ removing the organization membership.
 
 Organization, member, invitation, workspace, audit, and administrator list APIs
 now support the standard pagination envelope and `search` filtering. Customer
-and administrator organization pages expose search and **Load more** controls.
+and administrator organization pages expose search and **Load more** controls,
+including organization audit history and billing payment/provider history.
+The billing administrator page exposes a safe Moyasar configuration and
+reachability check without returning credentials or provider payloads.
 Organization snapshots expose payment renewal state separately from effective
 access. Refund records retain an operation UUID, attempt count, processing lease,
 provider status reconciliation, and a single safe retry path.

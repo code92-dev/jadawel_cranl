@@ -3,13 +3,14 @@ from uuid import UUID
 
 from django.db.models import Count, Q
 from django.shortcuts import get_object_or_404
+
 from rest_framework import generics, serializers, status
 from rest_framework.exceptions import PermissionDenied, ValidationError
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.filters import SearchFilter
 from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
-from rest_framework.filters import SearchFilter
 from rest_framework.views import APIView
 
 from ..handlers import (
@@ -23,15 +24,15 @@ from ..handlers import (
     invite_member,
     organization_snapshot,
     reassign_owner_setup,
+    remove_member,
     resend_owner_setup,
     revoke_invitation,
-    remove_member,
-    unbind_workspace,
-    update_member,
-    workspace_binding_preview,
     transition_to_personal,
     unassign_workspace_member,
+    unbind_workspace,
+    update_member,
     update_organization,
+    workspace_binding_preview,
 )
 from ..models import (
     Organization,
@@ -47,11 +48,11 @@ from .serializers import (
     InvitationSerializer,
     InviteSerializer,
     LifecycleSerializer,
-    MemberUpdateSerializer,
     MembershipSerializer,
+    MemberUpdateSerializer,
     OrganizationSerializer,
-    OrganizationWorkspaceSerializer,
     OrganizationUpdateSerializer,
+    OrganizationWorkspaceSerializer,
     OwnerSetupSerializer,
     StartTeamSerializer,
     WorkspaceMemberAssignmentSerializer,
@@ -81,12 +82,22 @@ def _creation_key(request: Request, body_key: UUID | None) -> UUID | None:
 def require_viewer(request: Request, organization: Organization) -> None:
     if request.user.is_staff:
         return
-    if organization.status != Organization.Status.ACTIVE:
-        raise ValidationError({"organization": "inactive"})
-    if not OrganizationMembership.objects.filter(
-        organization=organization, user=request.user, suspended=False
-    ).exists():
+    membership = OrganizationMembership.objects.filter(
+        organization=organization, user=request.user
+    ).first()
+    if membership is None:
         raise PermissionDenied("organization_membership_required")
+    # A suspended owner must still be able to open the management view and
+    # reactivate the organization.  All other organization data and mutation
+    # handlers continue to reject inactive organizations through _can_manage.
+    if (
+        organization.status == Organization.Status.SUSPENDED
+        and membership.role == OrganizationMembership.Role.OWNER
+        and not membership.suspended
+    ):
+        return
+    if organization.status != Organization.Status.ACTIVE or membership.suspended:
+        raise ValidationError({"organization": "inactive"})
 
 
 class OrganizationPagination(PageNumberPagination):

@@ -34,6 +34,29 @@ class MoyasarClient:
         except (requests.RequestException, ValueError) as exc:
             raise ProviderUnavailable() from exc
 
+    def health(self) -> dict[str, Any]:
+        """Check provider reachability without exposing payment data.
+
+        Listing a single payment is a read-only authenticated request.  The
+        response is reduced to a safe status so the admin API never returns
+        provider payloads or credentials.
+        """
+        try:
+            response = requests.get(
+                self.base_url,
+                auth=(self.secret_key, ""),
+                params={"limit": 1},
+                timeout=(5, 15),
+                allow_redirects=False,
+            )
+        except requests.RequestException:
+            return {"status": "unreachable", "reachable": False}
+        if response.status_code == 200:
+            return {"status": "ok", "reachable": True}
+        if response.status_code in (401, 403):
+            return {"status": "invalid_credentials", "reachable": True}
+        return {"status": "provider_error", "reachable": True}
+
     def fetch_token(self, token_id: str) -> dict[str, Any]:
         """Fetch a token with the secret key before it can be stored for reuse."""
         try:

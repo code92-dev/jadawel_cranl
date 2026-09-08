@@ -50,6 +50,7 @@
                     v-for="item in availablePrices"
                     :key="item.id"
                     :value="item.id"
+                    dir="auto"
                   >
                     {{ item.name }} — {{ money(item.amount) }} /
                     {{ $t("billing." + item.interval.toLowerCase()) }}
@@ -146,6 +147,7 @@
                 v-for="item in availablePrices"
                 :key="item.id"
                 :value="item.id"
+                dir="auto"
               >
                 {{ item.name }} — {{ money(item.amount) }} /
                 {{ $t("billing." + item.interval.toLowerCase()) }}
@@ -270,7 +272,21 @@
         </section>
       </template>
       <h2>{{ $t("billing.paymentHistory") }}</h2>
-      <ul>
+      <form class="billing-history-search" @submit.prevent="loadHistory">
+        <label>
+          {{ $t("billing.searchHistory") }}
+          <input
+            v-model.trim="historySearch"
+            type="search"
+            class="input"
+            :placeholder="$t('billing.searchHistory')"
+          />
+        </label>
+        <Button type="secondary" :disabled="historyLoading">
+          {{ $t("billing.search") }}
+        </Button>
+      </form>
+      <ul v-if="history.length">
         <li v-for="item in history" :key="item.id">
           <bdi>{{ item.id }}</bdi> — {{ money(item.amount) }} —
           {{ $t("billing.paymentStatus." + item.status) }}
@@ -282,6 +298,15 @@
           >
         </li>
       </ul>
+      <p v-else-if="!historyLoading">{{ $t("billing.emptyHistory") }}</p>
+      <Button
+        v-if="historyNext"
+        type="secondary"
+        :disabled="historyLoading"
+        @click="loadMoreHistory"
+      >
+        {{ $t("billing.more") }}
+      </Button>
     </main>
   </div>
 </template>
@@ -302,6 +327,9 @@ export default {
       price: "",
       order: null,
       history: [],
+      historyNext: null,
+      historySearch: "",
+      historyLoading: false,
       seats: 1,
       saveCard: false,
       busy: false,
@@ -332,10 +360,11 @@ export default {
     try {
       const [options, history] = await Promise.all([
         this.$client.get("/billing/checkout/"),
-        this.$client.get("/billing/orders/"),
+        this.$client.get("/billing/orders/", { params: {} }),
       ]);
       this.options = options.data;
-      this.history = history.data;
+      this.history = history.data.results || history.data;
+      this.historyNext = history.data.next || null;
       this.account =
         this.$route.query.account || this.options.accounts[0]?.id || "";
       this.price = this.options.prices[0]?.id || "";
@@ -527,7 +556,7 @@ export default {
           providerPaymentId ? { provider_payment_id: providerPaymentId } : {},
         );
         this.order = data;
-        this.history = (await this.$client.get("/billing/orders/")).data;
+        await this.loadHistory();
         await this.loadAccount();
         return data;
       } catch {
@@ -540,6 +569,29 @@ export default {
       this.order = order;
       this.submitted = true;
       await this.verify(order.provider_payment_id);
+    },
+    async loadHistory() {
+      this.historyLoading = true;
+      try {
+        const { data } = await this.$client.get("/billing/orders/", {
+          params: this.historySearch ? { search: this.historySearch } : {},
+        });
+        this.history = data.results || data;
+        this.historyNext = data.next || null;
+      } finally {
+        this.historyLoading = false;
+      }
+    },
+    async loadMoreHistory() {
+      if (!this.historyNext || this.historyLoading) return;
+      this.historyLoading = true;
+      try {
+        const { data } = await this.$client.get(this.historyNext);
+        this.history.push(...(data.results || data));
+        this.historyNext = data.next || null;
+      } finally {
+        this.historyLoading = false;
+      }
     },
     startOver() {
       this.order = null;

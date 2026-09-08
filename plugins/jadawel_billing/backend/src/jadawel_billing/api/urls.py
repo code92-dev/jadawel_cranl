@@ -8,24 +8,17 @@ from jadawel_billing.api.checkout import (
 )
 from jadawel_billing.api.grants import (
     AdminAccountAuditView,
-    AdminGrantView,
     AdminGrantPreviewView,
+    AdminGrantView,
     AdminRevokeGrantView,
     AdminSuspensionView,
 )
 from jadawel_billing.api.payments import (
     AdminOrdersView,
     AdminProviderEventsView,
+    AdminProviderHealthView,
     AdminReconcileOrderView,
 )
-from jadawel_billing.api.views import (
-    AdminAccountsView,
-    AdminPlansView,
-    AdminPlanView,
-    AdminPricesView,
-    AdminPriceView,
-)
-from jadawel_billing.api.webhooks import MoyasarWebhookView
 from jadawel_billing.api.subscriptions import (
     AdminExternalPaymentView,
     AdminRefundView,
@@ -35,6 +28,14 @@ from jadawel_billing.api.subscriptions import (
     SeatIncreaseView,
     SubscriptionChangeView,
 )
+from jadawel_billing.api.views import (
+    AdminAccountsView,
+    AdminPlansView,
+    AdminPlanView,
+    AdminPricesView,
+    AdminPriceView,
+)
+from jadawel_billing.api.webhooks import MoyasarWebhookView
 
 app_name = "jadawel_billing"
 urlpatterns = [
@@ -109,6 +110,11 @@ urlpatterns = [
         "admin/provider-events/",
         AdminProviderEventsView.as_view(),
         name="admin_provider_events",
+    ),
+    path(
+        "admin/provider-health/",
+        AdminProviderHealthView.as_view(),
+        name="admin_provider_health",
     ),
     path(
         "admin/orders/<uuid:order_id>/reconcile/",

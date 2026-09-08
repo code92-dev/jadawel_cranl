@@ -57,6 +57,7 @@
           <input
             v-model.trim="memberSearch"
             type="search"
+            class="input"
             :placeholder="$t('organizations.searchMembers')"
           />
         </label>
@@ -165,6 +166,7 @@
           <input
             v-model.trim="invitationSearch"
             type="search"
+            class="input"
             :placeholder="$t('organizations.searchInvitations')"
           />
         </label>
@@ -211,6 +213,7 @@
           <input
             v-model.trim="workspaceSearch"
             type="search"
+            class="input"
             :placeholder="$t('organizations.searchWorkspaces')"
           />
         </label>
@@ -341,6 +344,40 @@
     </section>
 
     <section>
+      <h2>{{ $t("organizations.audit") }}</h2>
+      <form class="organization-search" @submit.prevent="loadAudit">
+        <label>
+          {{ $t("organizations.search") }}
+          <input
+            v-model.trim="auditSearch"
+            type="search"
+            class="input"
+            :placeholder="$t('organizations.searchAudit')"
+          />
+        </label>
+        <Button type="secondary" :disabled="busy">
+          {{ $t("organizations.search") }}
+        </Button>
+      </form>
+      <p v-if="!audit.length">{{ $t("organizations.emptyAudit") }}</p>
+      <ul v-else data-testid="organization-audit-list">
+        <li v-for="event in audit" :key="event.id">
+          <time>{{ formatDate(event.created_at) }}</time> —
+          <span dir="auto">{{ event.action }}</span> —
+          <span dir="auto">{{ event.target }}</span>
+        </li>
+      </ul>
+      <Button
+        v-if="auditNext"
+        type="secondary"
+        :disabled="busy"
+        @click="loadMoreAudit"
+      >
+        {{ $t("organizations.more") }}
+      </Button>
+    </section>
+
+    <section>
       <h2>{{ $t("organizations.lifecycle") }}</h2>
       <Button type="secondary" @click="changeLifecycle('suspend')">
         {{ $t("organizations.suspend") }}
@@ -386,6 +423,9 @@ export default {
       memberSearch: "",
       workspacesNext: null,
       workspaceSearch: "",
+      audit: [],
+      auditNext: null,
+      auditSearch: "",
       email: "",
       role: "member",
       userId: null,
@@ -441,6 +481,18 @@ export default {
         const workspaceData = workspaces.data;
         this.organization.workspaces = workspaceData.results || workspaceData;
         this.workspacesNext = workspaceData.next || null;
+        try {
+          const { data: audit } = await this.$client.get(
+            `/organizations/${this.currentOrganizationId}/audit/`,
+          );
+          this.audit = audit.results || audit;
+          this.auditNext = audit.next || null;
+        } catch {
+          // Older compatible servers may not expose history yet; keep the
+          // organization management screen usable while the list is empty.
+          this.audit = [];
+          this.auditNext = null;
+        }
       } catch {
         this.error = true;
       }
@@ -504,6 +556,20 @@ export default {
       const { data } = await this.$client.get(this.workspacesNext);
       this.organization.workspaces.push(...(data.results || data));
       this.workspacesNext = data.next || null;
+    },
+    async loadAudit() {
+      const { data } = await this.$client.get(
+        `/organizations/${this.currentOrganizationId}/audit/`,
+        { params: this.auditSearch ? { search: this.auditSearch } : {} },
+      );
+      this.audit = data.results || data;
+      this.auditNext = data.next || null;
+    },
+    async loadMoreAudit() {
+      if (!this.auditNext || this.busy) return;
+      const { data } = await this.$client.get(this.auditNext);
+      this.audit.push(...(data.results || data));
+      this.auditNext = data.next || null;
     },
     async invite() {
       await this.run(async () => {

@@ -8,6 +8,7 @@
         <input
           v-model.trim="search"
           type="search"
+          class="input"
           :placeholder="$t('organizations.searchOrganizations')"
         />
       </label>
@@ -32,7 +33,12 @@
         {{ $t("organizations.plan") }}
         <select v-model="grant.plan" class="input">
           <option value="">{{ $t("organizations.noGrant") }}</option>
-          <option v-for="plan in plans" :key="plan.id" :value="plan.id">
+          <option
+            v-for="plan in plans"
+            :key="plan.id"
+            :value="plan.id"
+            dir="auto"
+          >
             {{ plan.name }}
           </option>
         </select>

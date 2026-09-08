@@ -614,6 +614,33 @@ def test_organization_lists_support_search_and_pagination(api_client, data_fixtu
 
 
 @pytest.mark.django_db
+def test_suspended_owner_can_open_org_and_reactivate_it(api_client, data_fixture):
+    from jadawel_organizations.handlers import (
+        change_organization_lifecycle,
+        create_organization,
+    )
+
+    staff = data_fixture.create_user(is_staff=True)
+    owner, token = data_fixture.create_user_and_token(
+        email="suspended-owner@example.com"
+    )
+    organization = create_organization(staff, name="Recoverable team", owner=owner)
+    change_organization_lifecycle(staff, organization, action="suspend")
+    api_client.credentials(HTTP_AUTHORIZATION=f"JWT {token}")
+
+    detail = api_client.get(f"/api/organizations/{organization.pk}/")
+    assert detail.status_code == 200
+    assert detail.data["status"] == "suspended"
+    reactivated = api_client.post(
+        f"/api/organizations/{organization.pk}/lifecycle/",
+        {"action": "reactivate"},
+        format="json",
+    )
+    assert reactivated.status_code == 200
+    assert reactivated.data["status"] == "active"
+
+
+@pytest.mark.django_db
 def test_staff_without_explicit_organization_access_cannot_read_managed_workspace(
     data_fixture,
 ):

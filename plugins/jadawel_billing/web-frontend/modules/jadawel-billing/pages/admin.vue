@@ -109,6 +109,20 @@
       </section>
       <section>
         <h2>{{ $t("billing.payments") }}</h2>
+        <form class="billing-history-search" @submit.prevent="refresh">
+          <label>
+            {{ $t("billing.searchHistory") }}
+            <input
+              v-model.trim="orderSearch"
+              type="search"
+              class="input"
+              :placeholder="$t('billing.searchHistory')"
+            />
+          </label>
+          <Button type="secondary" :disabled="loading">
+            {{ $t("billing.search") }}
+          </Button>
+        </form>
         <ul data-testid="payment-list">
           <li v-for="item in orders" :key="item.id">
             <bdi>{{ item.owner_email }}</bdi> ·
@@ -182,6 +196,23 @@
       <section>
         <h2>{{ $t("billing.externalPayments") }}</h2>
         <form
+          class="billing-history-search"
+          @submit.prevent="loadExternalPayments"
+        >
+          <label>
+            {{ $t("billing.searchHistory") }}
+            <input
+              v-model.trim="externalPaymentSearch"
+              type="search"
+              class="input"
+              :placeholder="$t('billing.searchHistory')"
+            />
+          </label>
+          <Button type="secondary" :disabled="loading">
+            {{ $t("billing.search") }}
+          </Button>
+        </form>
+        <form
           data-testid="external-payment-form"
           @submit.prevent="recordExternalPayment"
         >
@@ -189,7 +220,12 @@
             >{{ $t("billing.accounts")
             }}<select v-model="externalPayment.account" required class="input">
               <option value="" disabled>{{ $t("billing.accounts") }}</option>
-              <option v-for="item in accounts" :key="item.id" :value="item.id">
+              <option
+                v-for="item in accounts"
+                :key="item.id"
+                :value="item.id"
+                dir="auto"
+              >
                 {{ item.owner_email }} ·
                 {{ $t("billing." + item.kind.toLowerCase()) }}
               </option>
@@ -239,12 +275,37 @@
             <time>{{ formatDate(payment.paid_at) }}</time>
           </li>
         </ul>
+        <Button
+          v-if="externalPaymentsNext"
+          type="secondary"
+          :disabled="loading"
+          @click="loadMoreExternalPayments"
+        >
+          {{ $t("billing.more") }}
+        </Button>
         <p v-if="!loading && !externalPayments.length">
           {{ $t("billing.emptyExternalPayments") }}
         </p>
       </section>
       <section>
         <h2>{{ $t("billing.providerEvents") }}</h2>
+        <form
+          class="billing-history-search"
+          @submit.prevent="loadProviderEvents"
+        >
+          <label>
+            {{ $t("billing.searchHistory") }}
+            <input
+              v-model.trim="providerEventSearch"
+              type="search"
+              class="input"
+              :placeholder="$t('billing.searchHistory')"
+            />
+          </label>
+          <Button type="secondary" :disabled="loading">
+            {{ $t("billing.search") }}
+          </Button>
+        </form>
         <ul data-testid="provider-event-list">
           <li v-for="event in providerEvents" :key="event.id">
             <bdi>{{ event.event_id }}</bdi> ·
@@ -259,6 +320,33 @@
         <p v-if="!loading && !providerEvents.length">
           {{ $t("billing.emptyProviderEvents") }}
         </p>
+        <Button
+          v-if="providerEventsNext"
+          type="secondary"
+          :disabled="loading"
+          @click="loadMoreProviderEvents"
+        >
+          {{ $t("billing.more") }}
+        </Button>
+      </section>
+      <section>
+        <h2>{{ $t("billing.providerHealth") }}</h2>
+        <p v-if="providerHealth" role="status">
+          {{ $t("billing.providerHealthMode") }}: {{ providerHealth.mode }} ·
+          {{
+            $t(
+              `billing.providerHealthStatus.${providerHealth.status}`,
+              providerHealth.status,
+            )
+          }}
+        </p>
+        <Button
+          type="secondary"
+          :disabled="loading"
+          @click="checkProviderHealth"
+        >
+          {{ $t("billing.providerHealthCheck") }}
+        </Button>
       </section>
       <section v-if="selectedPlan">
         <h2>
@@ -330,8 +418,14 @@ export default {
       plansNext: null,
       orders: [],
       ordersNext: null,
+      orderSearch: "",
       providerEvents: [],
+      providerEventsNext: null,
+      providerEventSearch: "",
       externalPayments: [],
+      externalPaymentsNext: null,
+      externalPaymentSearch: "",
+      providerHealth: null,
       prices: [],
       pricesNext: null,
       selectedPlan: null,
@@ -367,14 +461,33 @@ export default {
       this.loading = true;
       this.error = false;
       try {
-        const [accounts, plans, orders, providerEvents, externalPayments] =
-          await Promise.all([
-            this.$client.get("/billing/admin/accounts/"),
-            this.$client.get("/billing/admin/plans/"),
-            this.$client.get("/billing/admin/orders/"),
-            this.$client.get("/billing/admin/provider-events/"),
-            this.$client.get("/billing/admin/external-payments/"),
-          ]);
+        const [
+          accounts,
+          plans,
+          orders,
+          providerEvents,
+          externalPayments,
+          health,
+        ] = await Promise.all([
+          this.$client.get("/billing/admin/accounts/"),
+          this.$client.get("/billing/admin/plans/"),
+          this.$client.get("/billing/admin/orders/", {
+            params: this.orderSearch ? { search: this.orderSearch } : {},
+          }),
+          this.$client.get("/billing/admin/provider-events/", {
+            params: this.providerEventSearch
+              ? { search: this.providerEventSearch }
+              : {},
+          }),
+          this.$client.get("/billing/admin/external-payments/", {
+            params: this.externalPaymentSearch
+              ? { search: this.externalPaymentSearch }
+              : {},
+          }),
+          this.$client
+            .get("/billing/admin/provider-health/")
+            .catch(() => ({ data: null })),
+        ]);
         this.accounts = accounts.data.results;
         this.accountsNext = accounts.data.next;
         this.plans = plans.data.results;
@@ -382,7 +495,10 @@ export default {
         this.orders = orders.data.results;
         this.ordersNext = orders.data.next;
         this.providerEvents = providerEvents.data.results;
+        this.providerEventsNext = providerEvents.data.next;
         this.externalPayments = externalPayments.data.results;
+        this.externalPaymentsNext = externalPayments.data.next;
+        this.providerHealth = health.data;
         if (!this.externalPayment.account) {
           this.externalPayment.account = this.accounts[0]?.id || "";
         }
@@ -473,6 +589,56 @@ export default {
     },
     async loadMoreOrders() {
       await this.loadPage(this.ordersNext, "orders", "ordersNext");
+    },
+    async loadProviderEvents() {
+      await this.mutate(async () => {
+        const { data } = await this.$client.get(
+          "/billing/admin/provider-events/",
+          {
+            params: this.providerEventSearch
+              ? { search: this.providerEventSearch }
+              : {},
+          },
+        );
+        this.providerEvents = data.results;
+        this.providerEventsNext = data.next;
+      });
+    },
+    async loadMoreProviderEvents() {
+      await this.loadPage(
+        this.providerEventsNext,
+        "providerEvents",
+        "providerEventsNext",
+      );
+    },
+    async loadExternalPayments() {
+      await this.mutate(async () => {
+        const { data } = await this.$client.get(
+          "/billing/admin/external-payments/",
+          {
+            params: this.externalPaymentSearch
+              ? { search: this.externalPaymentSearch }
+              : {},
+          },
+        );
+        this.externalPayments = data.results;
+        this.externalPaymentsNext = data.next;
+      });
+    },
+    async loadMoreExternalPayments() {
+      await this.loadPage(
+        this.externalPaymentsNext,
+        "externalPayments",
+        "externalPaymentsNext",
+      );
+    },
+    async checkProviderHealth() {
+      await this.mutate(async () => {
+        const { data } = await this.$client.get(
+          "/billing/admin/provider-health/",
+        );
+        this.providerHealth = data;
+      });
     },
     async loadMorePrices() {
       await this.loadPage(this.pricesNext, "prices", "pricesNext");
