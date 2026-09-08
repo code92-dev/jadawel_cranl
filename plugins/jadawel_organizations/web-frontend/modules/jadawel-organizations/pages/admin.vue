@@ -130,7 +130,11 @@ export default {
           payload.reason = this.grant.reason;
           if (this.grant.expires_at) payload.expires_at = this.grant.expires_at;
         }
-        await this.$client.post("/organizations/admin/create/", payload);
+        const response = await this.$client.post(
+          "/organizations/admin/create/",
+          payload,
+        );
+        this.ownerSetupToken = response.data.owner_setup_token || "";
         this.name = "";
         this.owner = null;
         this.ownerEmail = "";
