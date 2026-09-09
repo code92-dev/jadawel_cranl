@@ -1,0 +1,33 @@
+# backend/src/jadawel/contrib/integrations/local_jadawel/models.py
+
+- LocalJadawelIntegration · class · L26-L32 — class LocalJadawelIntegration(Integration)
+- LocalJadawelTableService · class · L35-L39 — class LocalJadawelTableService(Service)
+- Meta · class · L38-L39 — class Meta
+- LocalJadawelViewService · class · L42-L46 — class LocalJadawelViewService(LocalJadawelTableService)
+- Meta · class · L45-L46 — class Meta
+- LocalJadawelFilterableServiceMixin · class · L49-L72 — class LocalJadawelFilterableServiceMixin(models.Model)
+- service_filters_with_untrashed_fields · method · L64-L69 — def service_filters_with_untrashed_fields(self)
+- Meta · class · L71-L72 — class Meta
+- LocalJadawelFilterableSortableMixin · class · L75-L88 — class LocalJadawelFilterableSortableMixin(models.Model)
+- service_sorts_with_untrashed_fields · method · L82-L85 — def service_sorts_with_untrashed_fields(self)
+- Meta · class · L87-L88 — class Meta
+- LocalJadawelListRows · class · L91-L105 — class LocalJadawelListRows( LocalJadawelViewService, LocalJadawelFilterableServiceMixin, LocalJadawelFilterableSortableMixin, SearchableServiceMixin, )
+- LocalJadawelAggregateRows · class · L108-L123 — class LocalJadawelAggregateRows( LocalJadawelViewService, LocalJadawelFilterableServiceMixin, SearchableServiceMixin )
+- LocalJadawelGetRow · class · L126-L136 — class LocalJadawelGetRow( LocalJadawelViewService, LocalJadawelFilterableServiceMixin, LocalJadawelFilterableSortableMixin, SearchableServiceMixin, )
+- LocalJadawelUpsertRow · class · L139-L144 — class LocalJadawelUpsertRow(LocalJadawelTableService)
+- LocalJadawelDeleteRow · class · L147-L152 — class LocalJadawelDeleteRow(LocalJadawelTableService)
+- LocalJadawelRowsCreated · class · L155-L158 — class LocalJadawelRowsCreated(LocalJadawelTableService)
+- LocalJadawelRowsUpdated · class · L161-L164 — class LocalJadawelRowsUpdated(LocalJadawelTableService)
+- LocalJadawelRowsDeleted · class · L167-L170 — class LocalJadawelRowsDeleted(LocalJadawelTableService)
+- LocalJadawelTableServiceRefinementManager · class · L173-L178 — class LocalJadawelTableServiceRefinementManager(models.Manager)
+- LocalJadawelTableServiceFilter · class · L181-L218 — class LocalJadawelTableServiceFilter(ServiceFilter)
+- __str__ · method · L211-L212 — def __str__(self)
+- __repr__ · method · L214-L215 — def __repr__(self)
+- Meta · class · L217-L218 — class Meta
+- LocalJadawelTableServiceSort · class · L221-L262 — class LocalJadawelTableServiceSort(ServiceSort)
+- __repr__ · method · L243-L244 — def __repr__(self)
+- Meta · class · L246-L247 — class Meta
+- get_order_by · method · L249-L262 — def get_order_by(self) -> OrderBy
+- LocalJadawelTableServiceFieldMappingManager · class · L265-L272 — class LocalJadawelTableServiceFieldMappingManager(models.Manager)
+- get_queryset · method · L271-L272 — def get_queryset(self)
+- LocalJadawelTableServiceFieldMapping · class · L275-L301 — class LocalJadawelTableServiceFieldMapping(models.Model)

@@ -2,6 +2,26 @@
   "billing": {
     "title": "Billing",
     "description": "Manage billing accounts and subscription plans.",
+    "adminSections": "Billing administration sections",
+    "adminSummary": "Loaded billing records",
+    "summary": {
+      "accounts": "Accounts on this page",
+      "plans": "Plans on this page",
+      "payments": "Payments on this page",
+      "subscriptions": "Subscriptions on this page"
+    },
+    "sections": {
+      "accounts": "Accounts & access",
+      "plans": "Plans & prices",
+      "payments": "Payments & refunds",
+      "subscriptions": "Subscriptions",
+      "external": "External payments",
+      "provider": "Provider health"
+    },
+    "confirmArchivePlan": "Make {name} unavailable for new purchases? Existing access is unchanged.",
+    "confirmEnablePlan": "Make {name} available for new purchases?",
+    "confirmCancelRenewal": "Cancel this subscription at the end of its current period?",
+    "confirmResumeRenewal": "Keep this subscription renewing automatically?",
     "accounts": "Billing accounts",
     "accountStatus": "Account access",
     "accessUntil": "Access until",
@@ -15,10 +35,13 @@
     "paymentMethods": "Saved payment methods",
     "noPaymentMethods": "No saved payment methods.",
     "removePaymentMethod": "Remove payment method",
+    "confirmRemovePaymentMethod": "Remove this saved payment method?",
     "refund": "Refund",
     "refundableAmount": "Refundable balance",
     "refundAmount": "Refund amount",
+    "reviewRefund": "Review refund",
     "confirmRefund": "Submit refund",
+    "confirmRefundDescription": "Submit a {amount} refund for this payment? This cannot be undone.",
     "refundStatus": "Refund status",
     "reference": "External reference",
     "paidAt": "Paid at",
@@ -84,6 +107,14 @@
       "account_suspension_changed": "Account suspension changed"
     },
     "paymentError": "Payment could not be confirmed. Use Verify payment before trying again.",
+    "checkoutUnavailable": "Billing is temporarily unavailable. Try again shortly.",
+    "retryLoading": "Try again",
+    "accountRequired": "Choose an account to view its access and payment details.",
+    "checkoutSteps": {
+      "account": "Account and plan",
+      "review": "Review order",
+      "payment": "Payment and receipt"
+    },
     "sandbox": "Test environment — no real payment.",
     "checkout": "Continue to payment",
     "singlePeriod": "This purchase covers one billing period. Automatic renewal is not enabled.",

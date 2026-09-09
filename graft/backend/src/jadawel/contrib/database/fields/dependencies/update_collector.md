@@ -1,0 +1,32 @@
+# backend/src/jadawel/contrib/database/fields/dependencies/update_collector.py
+
+- DependencyContext · class · L21-L31 — class DependencyContext
+- PathBasedUpdateStatementCollector · class · L34-L313 — class PathBasedUpdateStatementCollector
+- __init__ · method · L35-L62 — def __init__( self, table: Table, connection_here: Optional[LinkRowField], connection_is_broken: bool, update_changes_only: bool = False, )
+- add_update_statement · method · L64-L72 — def add_update_statement( self, field: Field, update_statement: Expression, path_from_starting_table: Optional[List[LinkRowField]] = None, )
+- mark_field_as_changed · method · L74-L81 — def mark_field_as_changed( self, field: Field, path_from_starting_table: Optional[List[LinkRowField]] = None, )
+- _add_update_statement_or_mark_as_changed_for_field · method · L83-L120 — def _add_update_statement_or_mark_as_changed_for_field( self, field: Field, update_statement: Optional[Expression], path_from_starting_table: Optional[List[LinkRowField]] = None, )
+- _get_collector_for_broken_connection · method · L122-L137 — def _get_collector_for_broken_connection(self, field): # We have been given an update statement for a different table, but # we don't have a path back to the starting table. This only occurs # when a link row field has been converted to another type, which will # have deleted the m2m connection entirely. In this situation we just # want to update all the cells of the dependant fields because they will # have all been affected by the deleted connection.
+- execute_all · method · L139-L192 — def execute_all( self, field_cache: FieldCache, starting_row_ids: StartingRowIdsType = None, path_to_starting_table: StartingRowIdsType = None, deleted_m2m_rels_per_link_field: Optional[Dict[int, Set[int]]] = None, result: Optional[Dict[int, Set[int]]] = None, ) -> Dict[int, Set[int]]
+- _execute_pending_update_statements · method · L194-L270 — def _execute_pending_update_statements( self, field_cache: FieldCache, path_to_starting_table: List[LinkRowField], starting_row_ids: StartingRowIdsType, deleted_m2m_rels_per_link_field: Optional[Dict[int, Set[int]]], ) -> list[int]
+- _include_rows_connected_to_deleted_m2m_relationships · method · L272-L313 — def _include_rows_connected_to_deleted_m2m_relationships( self, deleted_m2m_rels_per_link_field: Dict[int, Set[int]], path_to_starting_table: List[LinkRowField], )
+- FieldUpdatesTracker · class · L316-L332 — class FieldUpdatesTracker(defaultdict)
+- __init__ · method · L322-L323 — def __init__(self)
+- add_field · method · L325-L326 — def add_field(self, field: Field, send_field_updated_signal: bool = True)
+- tables · method · L328-L329 — def tables(self)
+- fields · method · L331-L332 — def fields(self, table)
+- FieldUpdateCollector · class · L335-L573 — class FieldUpdateCollector
+- __init__ · method · L343-L387 — def __init__( self, starting_table: Table, starting_row_ids: StartingRowIdsType = None, deleted_m2m_rels_per_link_field: Optional[Dict[int, Set[int]]] = None, update_changes_only: bool = False, )
+- _init_update_statement_collector · method · L389-L395 — def _init_update_statement_collector(self)
+- add_field_with_pending_update_statement · method · L397-L423 — def add_field_with_pending_update_statement( self, field: Field, update_statement: Expression, via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- add_field_which_has_changed · method · L425-L451 — def add_field_which_has_changed( self, field: Field, via_path_to_starting_table: Optional[List[LinkRowField]] = None, send_field_updated_signal: bool = True, )
+- apply_updates · method · L453-L464 — def apply_updates(self, field_cache: FieldCache) -> dict[int, list[int]]
+- apply_fields_type_changed · method · L466-L469 — def apply_fields_type_changed(self, field_cache: FieldCache)
+- apply_rebuild_field_dependencies · method · L471-L480 — def apply_rebuild_field_dependencies(self, field_cache: FieldCache)
+- apply_updates_and_get_updated_fields · method · L482-L524 — def apply_updates_and_get_updated_fields( self, field_cache: FieldCache, skip_search_updates=False, skip_fields_type_changed=False, skip_rebuild_field_dependencies=False, ) -> List[Field]
+- send_additional_field_updated_signals · method · L526-L545 — def send_additional_field_updated_signals(self)
+- send_force_refresh_signals_for_all_updated_tables · method · L547-L549 — def send_force_refresh_signals_for_all_updated_tables(self)
+- _get_updated_fields_to_send_signals_for_per_table · method · L551-L564 — def _get_updated_fields_to_send_signals_for_per_table( self, ) -> List[Tuple[Field, List[Field]]]
+- _get_updated_fields_in_table · method · L566-L567 — def _get_updated_fields_in_table(self, table) -> List[Field]
+- add_to_fields_type_changed · method · L569-L570 — def add_to_fields_type_changed(self, field: Field)
+- add_to_rebuild_field_dependencies · method · L572-L573 — def add_to_rebuild_field_dependencies(self, field: Field)

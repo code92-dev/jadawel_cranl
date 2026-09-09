@@ -1,0 +1,49 @@
+# web-frontend/modules/core/jobTypes.js
+
+- JobType · class · L9-L122 — class JobType extends Registerable
+- getIconClass · method · L16-L18 — getIconClass()
+- getName · method · L23-L25 — getName()
+- getSidebarText · method · L30-L32 — getSidebarText(job)
+- getSidebarComponent · method · L40-L42 — getSidebarComponent()
+- getSidebarApplicationTypeLocation · method · L50-L52 — getSidebarApplicationTypeLocation(job)
+- constructor · method · L54-L64 — constructor(...args)
+- populate · method · L72-L74 — populate(job)
+- isJobPartOfWorkspace · method · L79-L81 — isJobPartOfWorkspace(job, workspace)
+- isJobPartOfApplication · method · L86-L88 — isJobPartOfApplication(job, application)
+- beforeDelete · method · L95-L95 — beforeDelete(job)
+- beforeUpdate · method · L101-L101 — async beforeUpdate(job, data)
+- afterUpdate · method · L103-L117 — async afterUpdate(job, data)
+- onJobDone · method · L119-L119 — async onJobDone(job, data)
+- onJobFailed · method · L120-L120 — async onJobFailed(job, data)
+- onJobCancelled · method · L121-L121 — async onJobCancelled(job, data)
+- DuplicateApplicationJobType · class · L124-L183 — class DuplicateApplicationJobType extends JobType
+- getType · method · L125-L127 — static getType()
+- getIconClass · method · L129-L132 — getIconClass()
+- getName · method · L134-L136 — getName()
+- getSidebarText · method · L138-L141 — getSidebarText(job)
+- getSidebarComponent · method · L143-L145 — getSidebarComponent()
+- getSidebarApplicationTypeLocation · method · L147-L149 — getSidebarApplicationTypeLocation(job)
+- isJobPartOfWorkspace · method · L151-L153 — isJobPartOfWorkspace(job, workspace)
+- onJobDone · method · L155-L169 — async onJobDone(job)
+- onJobFailed · method · L171-L182 — async onJobFailed(job)
+- InstallTemplateJobType · class · L185-L245 — class InstallTemplateJobType extends JobType
+- getType · method · L186-L188 — static getType()
+- getIconClass · method · L190-L193 — getIconClass()
+- getName · method · L195-L197 — getName()
+- getSidebarText · method · L199-L202 — getSidebarText(job)
+- getSidebarComponent · method · L204-L206 — getSidebarComponent()
+- isJobPartOfWorkspace · method · L208-L210 — isJobPartOfWorkspace(job, workspace)
+- onJobDone · method · L212-L231 — async onJobDone(job)
+- onJobFailed · method · L233-L244 — async onJobFailed(job)
+- CreateSnapshotJobType · class · L247-L255 — class CreateSnapshotJobType extends JobType
+- getType · method · L248-L250 — static getType()
+- getName · method · L252-L254 — getName()
+- RestoreSnapshotJobType · class · L257-L265 — class RestoreSnapshotJobType extends JobType
+- getType · method · L258-L260 — static getType()
+- getName · method · L262-L264 — getName()
+- ExportApplicationsJobType · class · L267-L275 — class ExportApplicationsJobType extends JobType
+- getType · method · L268-L270 — static getType()
+- getName · method · L272-L274 — getName()
+- ImportApplicationsJobType · class · L277-L285 — class ImportApplicationsJobType extends JobType
+- getType · method · L278-L280 — static getType()
+- getName · method · L282-L284 — getName()

@@ -1,0 +1,34 @@
+# web-frontend/modules/database/filePreviewTypes.js
+
+- FilePreviewType · class · L8-L39 — class FilePreviewType extends Registerable
+- isCompatible · method · L15-L19 — isCompatible(mimeType, url)
+- getPreviewComponent · method · L24-L26 — getPreviewComponent()
+- getOrder · method · L28-L30 — getOrder()
+- getName · method · L32-L34 — getName()
+- isExternal · method · L36-L38 — isExternal()
+- ImageFilePreview · class · L41-L58 — class ImageFilePreview extends FilePreviewType
+- getType · method · L42-L44 — static getType()
+- getName · method · L46-L49 — getName()
+- isCompatible · method · L51-L53 — isCompatible(mimeType, fileName)
+- getPreviewComponent · method · L55-L57 — getPreviewComponent()
+- VideoFilePreview · class · L60-L77 — class VideoFilePreview extends FilePreviewType
+- getType · method · L61-L63 — static getType()
+- getName · method · L65-L68 — getName()
+- isCompatible · method · L70-L72 — isCompatible(mimeType, fileName)
+- getPreviewComponent · method · L74-L76 — getPreviewComponent()
+- AudioFilePreview · class · L79-L96 — class AudioFilePreview extends FilePreviewType
+- getType · method · L80-L82 — static getType()
+- getName · method · L84-L87 — getName()
+- isCompatible · method · L89-L91 — isCompatible(mimeType, fileName)
+- getPreviewComponent · method · L93-L95 — getPreviewComponent()
+- PDFBrowserFilePreview · class · L98-L115 — class PDFBrowserFilePreview extends FilePreviewType
+- getType · method · L99-L101 — static getType()
+- getName · method · L103-L106 — getName()
+- isCompatible · method · L108-L110 — isCompatible(mimeType, fileName)
+- getPreviewComponent · method · L112-L114 — getPreviewComponent()
+- GoogleDocFilePreview · class · L117-L162 — class GoogleDocFilePreview extends FilePreviewType
+- getType · method · L118-L120 — static getType()
+- getName · method · L122-L125 — getName()
+- isCompatible · method · L127-L153 — isCompatible(mimeType, fileName)
+- getPreviewComponent · method · L155-L157 — getPreviewComponent()
+- isExternal · method · L159-L161 — isExternal()

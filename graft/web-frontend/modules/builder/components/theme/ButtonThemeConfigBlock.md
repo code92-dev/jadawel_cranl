@@ -1,0 +1,15 @@
+# web-frontend/modules/builder/components/theme/ButtonThemeConfigBlock.vue
+
+- setup · method · L445-L447 — setup()
+- data · method · L448-L479 — data()
+- get · method · L482-L484 — get()
+- set · method · L485-L496 — set(value)
+- get · method · L499-L504 — get()
+- set · method · L505-L508 — set(newValue)
+- paddingDefaults · method · L510-L515 — paddingDefaults()
+- pixedSizeMin · method · L516-L518 — pixedSizeMin()
+- pixedSizeMax · method · L519-L521 — pixedSizeMax()
+- isAllowedKey · method · L524-L526 — isAllowedKey(key)
+- getError · method · L527-L529 — getError(property)
+- getPaddingError · method · L530-L535 — getPaddingError()
+- validations · method · L537-L644 — validations()

@@ -54,6 +54,32 @@ describe('Organization Team administration', () => {
     })
   })
 
+  test('switches organization sections without losing the loaded data', async () => {
+    app.mock.onGet('/organizations/org-1/').reply(200, {
+      id: 'org-1',
+      name: 'Acme',
+      status: 'active',
+      provisioning_status: 'ready',
+      owner: { id: 1, email: 'owner@example.com' },
+      members: [],
+      workspaces: [],
+      effective_entitlement: { source: 'manual', seat_limit: 5 },
+    })
+    app.mock.onGet('/organizations/org-1/invitations/').reply(200, [])
+    app.mock.onGet('/organizations/org-1/members/').reply(200, [])
+    app.mock.onGet('/organizations/org-1/workspaces/').reply(200, [])
+
+    const wrapper = await app.mount(OrganizationDetail, {
+      props: { routeOrganizationId: 'org-1' },
+    })
+    await wrapper.get('#organization-tab-settings').trigger('click')
+    await flushPromises()
+
+    expect(wrapper.vm.organizationSection).toBe('settings')
+    expect(wrapper.get('#organization-panel-settings').isVisible()).toBe(true)
+    expect(wrapper.get('#organization-panel-members').isVisible()).toBe(false)
+  })
+
   test('previews a workspace before binding it', async () => {
     const organization = {
       id: 'org-1',

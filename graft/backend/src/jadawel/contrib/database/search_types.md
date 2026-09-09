@@ -1,0 +1,23 @@
+# backend/src/jadawel/contrib/database/search_types.py
+
+- _empty_annotated_table_queryset · function · L41-L64 — def _empty_annotated_table_queryset(search_type: str, priority: int)
+- DatabaseSearchType · class · L67-L98 — class DatabaseSearchType(ApplicationSearchType)
+- serialize_result · method · L78-L95 — def serialize_result( self, result: Database, user: "AbstractUser", workspace: "Workspace" ) -> Optional[SearchResult]
+- build_subtitle_annotation · method · L97-L98 — def build_subtitle_annotation(self)
+- TableSearchType · class · L101-L171 — class TableSearchType(DatabaseSearchableItemType)
+- get_base_queryset · method · L115-L124 — def get_base_queryset(self, user, workspace) -> QuerySet
+- get_search_queryset · method · L126-L139 — def get_search_queryset(self, user, workspace, context) -> QuerySet
+- build_payload · method · L141-L150 — def build_payload(self)
+- build_subtitle_annotation · method · L152-L157 — def build_subtitle_annotation(self)
+- serialize_result · method · L159-L171 — def serialize_result(self, item, user, workspace) -> Optional[SearchResult]
+- FieldDefinitionSearchType · class · L174-L252 — class FieldDefinitionSearchType(DatabaseSearchableItemType)
+- get_base_queryset · method · L188-L189 — def get_base_queryset(self, user, workspace) -> QuerySet
+- get_search_queryset · method · L191-L220 — def get_search_queryset(self, user, workspace, context) -> QuerySet
+- build_subtitle_annotation · method · L222-L229 — def build_subtitle_annotation(self)
+- build_payload · method · L231-L237 — def build_payload(self)
+- serialize_result · method · L239-L252 — def serialize_result(self, item, user, workspace) -> Optional[SearchResult]
+- RowSearchType · class · L255-L599 — class RowSearchType(SearchableItemType)
+- get_search_queryset · method · L266-L284 — def get_search_queryset(self, user, workspace, context) -> QuerySet
+- get_union_values_queryset · method · L286-L421 — def get_union_values_queryset(self, user, workspace, context) -> QuerySet
+- _fetch_primary_field_values · method · L423-L468 — def _fetch_primary_field_values( self, rows_list: List[Dict], table_id_to_primary_field: Dict[int, Tuple[Table, Field]], ) -> Dict[Tuple[int, int], str]
+- postprocess · method · L470-L599 — def postprocess(self, rows: Iterable[Dict]) -> List[SearchResult]

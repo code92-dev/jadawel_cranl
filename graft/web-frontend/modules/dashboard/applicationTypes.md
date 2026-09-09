@@ -1,0 +1,20 @@
+# web-frontend/modules/dashboard/applicationTypes.js
+
+- DashboardApplicationType · class · L11-L98 — class DashboardApplicationType extends ApplicationType
+- getType · method · L12-L14 — static getType()
+- getIconClass · method · L16-L18 — getIconClass()
+- getName · method · L20-L23 — getName()
+- getNamePlural · method · L25-L28 — getNamePlural()
+- getDescription · method · L30-L33 — getDescription()
+- getDefaultName · method · L35-L38 — getDefaultName()
+- supportsTrash · method · L40-L42 — supportsTrash()
+- getApplicationContextComponent · method · L44-L46 — getApplicationContextComponent()
+- getApplicationFormComponent · method · L48-L50 — getApplicationFormComponent()
+- getSidebarComponent · method · L52-L54 — getSidebarComponent()
+- getTemplateSidebarComponent · method · L56-L58 — getTemplateSidebarComponent()
+- getTemplatesPageComponent · method · L60-L62 — getTemplatesPageComponent()
+- getTemplatePage · method · L64-L68 — getTemplatePage(application)
+- delete · method · L70-L72 — delete(application, { $router })
+- select · method · L74-L89 — async select(application, { $router })
+- developmentStage · method · L91-L93 — get developmentStage()
+- getOrder · method · L95-L97 — getOrder()

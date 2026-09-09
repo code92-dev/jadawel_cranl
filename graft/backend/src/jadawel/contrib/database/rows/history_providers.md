@@ -1,0 +1,30 @@
+# backend/src/jadawel/contrib/database/rows/history_providers.py
+
+- RowChangeData · class · L37-L45 — class RowChangeData(NamedTuple)
+- are_equal_on_create · function · L48-L65 — def are_equal_on_create(field_identifier, after_value, before_value) -> bool
+- BaseActionTypeRowHistoryProvider · class · L68-L151 — class BaseActionTypeRowHistoryProvider(RowHistoryProviderType)
+- get_row_history · method · L78-L105 — def get_row_history(self, user: AnyUser, params: ActionData) -> list[RowHistory]
+- get_related_rows_history · method · L107-L122 — def get_related_rows_history( self, related_rows_diff: RelatedRowsDiff, user: AnyUser, params: ActionData, ) -> Iterable[RowHistory]
+- get_changed_rows · method · L124-L134 — def get_changed_rows( self, command_type: ActionCommandType, params: ActionType.Params ) -> Iterable[RowChangeData]
+- get_row_history_entries · method · L136-L151 — def get_row_history_entries( self, user: AnyUser, command_type: ActionCommandType, params: ActionData, action_params: ActionType.Params, row_change: RowChangeData, related_rows_diff: RelatedRowsDiff, ) -> list[RowHistory]
+- RestoreFromTrashHistoryProvider · class · L154-L252 — class RestoreFromTrashHistoryProvider(BaseActionTypeRowHistoryProvider)
+- get_changed_rows · method · L157-L168 — def get_changed_rows( self, command_type: ActionCommandType, params: RestoreFromTrashActionType.Params ) -> Iterable[RowChangeData]: # `rows` not supported yet, because RestoreFromTrashActionType for rows uses an # intermediate TrashedRows object, which is removed in the action, so long # before we get to history provider call, so we don't know what row ids were # actually used.
+- get_row_history_entries · method · L170-L244 — def get_row_history_entries( self, user: AnyUser, command_type: ActionCommandType, params: ActionData, action_params: RestoreFromTrashActionType.Params, row_change: RowChangeData, related_rows_diff: RelatedRowsDiff, ) -> list[RowHistory]
+- get_related_rows_history · method · L246-L252 — def get_related_rows_history( self, related_rows_diff: RelatedRowsDiff, user: AnyUser, params: ActionData, )
+- CreateRowHistoryMixin · class · L255-L339 — class CreateRowHistoryMixin
+- get_related_rows_history · method · L256-L262 — def get_related_rows_history( self, related_rows_diff, user: AnyUser, params: ActionData, ) -> list
+- get_row_history_entries · method · L264-L339 — def get_row_history_entries( self, user: AnyUser, command_type: ActionCommandType, params: ActionData, action_params: CreateRowsActionType.Params, row_change: RowChangeData, related_rows_diff: RelatedRowsDiff, ) -> list[RowHistory]
+- CreateRowHistoryProvider · class · L342-L359 — class CreateRowHistoryProvider(CreateRowHistoryMixin, BaseActionTypeRowHistoryProvider)
+- get_changed_rows · method · L345-L359 — def get_changed_rows( self, command_type: ActionCommandType, params: CreateRowActionType.Params, ) -> Iterable[RowChangeData]
+- CreateRowsHistoryProvider · class · L362-L383 — class CreateRowsHistoryProvider( CreateRowHistoryMixin, BaseActionTypeRowHistoryProvider )
+- get_changed_rows · method · L367-L383 — def get_changed_rows( self, command_type: ActionCommandType, params: CreateRowsActionType.Params ) -> Iterable[RowChangeData]
+- DeleteRowHistoryMixin · class · L386-L447 — class DeleteRowHistoryMixin
+- get_related_rows_history · method · L387-L393 — def get_related_rows_history( self, related_rows_diff, user: AnyUser, params: ActionData, ) -> list
+- get_row_history_entries · method · L395-L447 — def get_row_history_entries( self, user: AnyUser, command_type: ActionCommandType, params: ActionData, action_params: CreateRowsActionType.Params, row_change: RowChangeData, related_rows_diff: RelatedRowsDiff, ) -> list[RowHistory]
+- DeleteRowHistoryProvider · class · L450-L467 — class DeleteRowHistoryProvider(DeleteRowHistoryMixin, BaseActionTypeRowHistoryProvider)
+- get_changed_rows · method · L453-L467 — def get_changed_rows( self, command_type: ActionCommandType, params: DeleteRowActionType.Params ) -> Iterable[RowChangeData]
+- DeleteRowsHistoryProvider · class · L470-L488 — class DeleteRowsHistoryProvider( DeleteRowHistoryMixin, BaseActionTypeRowHistoryProvider )
+- get_changed_rows · method · L475-L488 — def get_changed_rows( self, command_type: ActionCommandType, params: DeleteRowsActionType.Params ) -> Iterable[RowChangeData]
+- UpdateRowsHistoryProvider · class · L491-L545 — class UpdateRowsHistoryProvider(BaseActionTypeRowHistoryProvider)
+- get_changed_rows · method · L494-L510 — def get_changed_rows( self, command_type: ActionCommandType, params: UpdateRowsActionType.Params ) -> Iterable[RowChangeData]
+- get_row_history_entries · method · L512-L545 — def get_row_history_entries( self, user: AnyUser, command_type: ActionCommandType, params: ActionData, action_params: UpdateRowsActionType.Params, row_change: RowChangeData, related_rows_diff: RelatedRowsDiff, ) -> list[RowHistory]

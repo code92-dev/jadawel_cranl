@@ -1,0 +1,16 @@
+# backend/src/jadawel/core/user/exceptions.py
+
+- UserNotFound · class · L1-L2 — class UserNotFound(Exception)
+- UserAlreadyExist · class · L5-L6 — class UserAlreadyExist(Exception)
+- InvalidVerificationToken · class · L9-L10 — class InvalidVerificationToken(Exception)
+- EmailAlreadyVerified · class · L13-L14 — class EmailAlreadyVerified(Exception)
+- PasswordDoesNotMatchValidation · class · L17-L18 — class PasswordDoesNotMatchValidation(Exception)
+- InvalidPassword · class · L21-L22 — class InvalidPassword(Exception)
+- UserIsLastAdmin · class · L25-L28 — class UserIsLastAdmin(Exception)
+- DisabledSignupError · class · L31-L34 — class DisabledSignupError(Exception)
+- ResetPasswordDisabledError · class · L37-L38 — class ResetPasswordDisabledError(Exception)
+- ResetPasswordTokenAlreadyUsed · class · L41-L42 — class ResetPasswordTokenAlreadyUsed(Exception)
+- DeactivatedUserException · class · L45-L46 — class DeactivatedUserException(Exception)
+- RefreshTokenAlreadyBlacklisted · class · L49-L50 — class RefreshTokenAlreadyBlacklisted(Exception)
+- ChangeEmailNotAllowed · class · L53-L54 — class ChangeEmailNotAllowed(Exception)
+- EmailAlreadyChanged · class · L57-L58 — class EmailAlreadyChanged(Exception)

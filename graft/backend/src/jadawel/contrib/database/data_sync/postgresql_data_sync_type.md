@@ -1,0 +1,25 @@
+# backend/src/jadawel/contrib/database/data_sync/postgresql_data_sync_type.py
+
+- BasePostgreSQLSyncProperty · class · L28-L32 — class BasePostgreSQLSyncProperty(DataSyncProperty)
+- prepare_value · method · L31-L32 — def prepare_value(self, value)
+- TextPostgreSQLSyncProperty · class · L35-L39 — class TextPostgreSQLSyncProperty(BasePostgreSQLSyncProperty)
+- to_jadawel_field · method · L38-L39 — def to_jadawel_field(self) -> TextField
+- LongTextPostgreSQLSyncProperty · class · L42-L46 — class LongTextPostgreSQLSyncProperty(BasePostgreSQLSyncProperty)
+- to_jadawel_field · method · L45-L46 — def to_jadawel_field(self) -> LongTextField
+- BooleanPostgreSQLSyncProperty · class · L49-L56 — class BooleanPostgreSQLSyncProperty(BasePostgreSQLSyncProperty)
+- to_jadawel_field · method · L52-L53 — def to_jadawel_field(self) -> BooleanField
+- prepare_value · method · L55-L56 — def prepare_value(self, value)
+- NumberPostgreSQLSyncProperty · class · L59-L81 — class NumberPostgreSQLSyncProperty(BasePostgreSQLSyncProperty)
+- __init__ · method · L63-L64 — def __init__(self, key, name)
+- is_equal · method · L66-L72 — def is_equal(self, jadawel_row_value: Any, data_sync_row_value: Any) -> bool
+- to_jadawel_field · method · L74-L81 — def to_jadawel_field(self) -> NumberField
+- DatePostgreSQLSyncProperty · class · L84-L98 — class DatePostgreSQLSyncProperty(BasePostgreSQLSyncProperty)
+- is_equal · method · L88-L89 — def is_equal(self, jadawel_row_value, data_sync_row_value) -> bool
+- to_jadawel_field · method · L91-L98 — def to_jadawel_field(self) -> DateField
+- DateTimePostgreSQLSyncProperty · class · L101-L102 — class DateTimePostgreSQLSyncProperty(DatePostgreSQLSyncProperty)
+- PostgreSQLDataSyncType · class · L122-L331 — class PostgreSQLDataSyncType(DataSyncType)
+- _connection · method · L158-L195 — def _connection(self, instance)
+- _get_primary_columns · method · L197-L235 — def _get_primary_columns(self, cursor, instance: PostgreSQLDataSync) -> list[str]
+- _get_table_columns · method · L237-L270 — def _get_table_columns(self, instance)
+- get_properties · method · L272-L291 — def get_properties(self, instance) -> List[DataSyncProperty]
+- get_all_rows · method · L293-L331 — def get_all_rows( self, instance, progress_builder: Optional[ChildProgressBuilder] = None, ) -> List[Dict]

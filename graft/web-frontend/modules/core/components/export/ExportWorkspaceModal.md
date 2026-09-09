@@ -1,0 +1,15 @@
+# web-frontend/modules/core/components/export/ExportWorkspaceModal.vue
+
+- data · method · L135-L143 — data()
+- workspaceExportModalAlertComponents · method · L145-L151 — workspaceExportModalAlertComponents()
+- hasSelectedApplications · method · L152-L154 — hasSelectedApplications()
+- show · method · L157-L161 — show(...args)
+- submitForm · method · L162-L164 — submitForm()
+- updateSelectedApplications · method · L165-L167 — updateSelectedApplications(applicationIds)
+- submitted · method · L168-L180 — async submitted(values)
+- onJobFinished · method · L182-L192 — onJobFinished()
+- onJobFailed · method · L194-L200 — async onJobFailed()
+- loadExports · method · L201-L215 — async loadExports()
+- loadRunningJob · method · L216-L229 — loadRunningJob()
+- reset · method · L230-L235 — reset()
+- getCustomHumanReadableJobState · method · L237-L250 — getCustomHumanReadableJobState(jobState)

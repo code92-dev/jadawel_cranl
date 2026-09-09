@@ -1,0 +1,18 @@
+# backend/tests/jadawel/contrib/dashboard/data_sources/test_dashboard_data_source_handler.py
+
+- test_get_data_source · function · L25-L41 — def test_get_data_source(data_fixture, django_assert_num_queries)
+- test_get_data_source_does_not_exist · function · L45-L47 — def test_get_data_source_does_not_exist(data_fixture)
+- test_get_data_source_with_base_queryset · function · L51-L70 — def test_get_data_source_with_base_queryset(data_fixture)
+- test_get_data_sources · function · L74-L111 — def test_get_data_sources(data_fixture, django_assert_num_queries)
+- test_get_data_sources_specific_services · function · L115-L152 — def test_get_data_sources_specific_services(data_fixture, django_assert_num_queries)
+- test_get_data_sources_with_base_queryset · function · L156-L185 — def test_get_data_sources_with_base_queryset(data_fixture)
+- test_get_data_source_for_update · function · L189-L207 — def test_get_data_source_for_update(data_fixture)
+- test_get_data_source_for_update_does_not_exist · function · L211-L213 — def test_get_data_source_for_update_does_not_exist(data_fixture)
+- test_get_data_source_for_update_with_base_queryset · function · L217-L238 — def test_get_data_source_for_update_with_base_queryset(data_fixture)
+- test_find_unused_data_source_name · function · L242-L259 — def test_find_unused_data_source_name(data_fixture)
+- test_create_data_source · function · L263-L275 — def test_create_data_source(data_fixture)
+- test_update_data_source_name · function · L279-L291 — def test_update_data_source_name(data_fixture)
+- test_update_data_source_change_type · function · L295-L309 — def test_update_data_source_change_type(data_fixture)
+- test_delete_data_source · function · L313-L324 — def test_delete_data_source(data_fixture)
+- test_dispatch_data_source · function · L328-L364 — def test_dispatch_data_source(data_fixture)
+- test_dispatch_data_source_improperly_configured · function · L368-L398 — def test_dispatch_data_source_improperly_configured(data_fixture)

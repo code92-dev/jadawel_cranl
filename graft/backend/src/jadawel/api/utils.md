@@ -1,0 +1,22 @@
+# backend/src/jadawel/api/utils.py
+
+- apply_exception_mapping · function · L46-L70 — def apply_exception_mapping(mapping, exc, with_fallback=False)
+- map_exceptions · function · L74-L147 — def map_exceptions(mapping: ExceptionMappingType)
+- _search_up_class_hierarchy_for_mapping · function · L150-L155 — def _search_up_class_hierarchy_for_mapping(e, mapping)
+- serialize_validation_errors_recursive · function · L158-L167 — def serialize_validation_errors_recursive(error)
+- validate_data · function · L170-L207 — def validate_data( serializer_class: Type[ModelSerializer], data: Dict[str, Any], partial: bool = False, exception_to_raise: Type[Exception] = RequestBodyValidationException, many: bool = False, return_validated: bool = False, instance=None, context: Optional[Dict[str, Any]] = None, ) -> Dict[str, Any]
+- validate_data_custom_fields · function · L210-L274 — def validate_data_custom_fields( type_name: str, registry: "Registry", data: Dict[str, Any], base_serializer_class: Optional[Type[ModelSerializer]] = None, serializer_class_context: Optional[Dict[str, Any]] = None, type_attribute_name: str = "type", partial: bool = False, allow_empty_type: bool = False, return_validated: bool = False, ) -> Dict[str, Any]
+- get_request · function · L277-L290 — def get_request(args: List[Any]) -> Request
+- type_from_data_or_registry · function · L293-L315 — def type_from_data_or_registry( data: Dict, registry: "Registry", model_instance: Model, type_attribute_name: str = "type", ) -> "Instance"
+- generate_meta_ref_name_based_on_model · function · L318-L324 — def generate_meta_ref_name_based_on_model(model_, base_class=None)
+- get_serializer_class · function · L327-L414 — def get_serializer_class( model, field_names, field_overrides=None, base_class=None, meta_ref_name=None, required_fields=None, base_mixins: Iterable[serializers.Serializer] = None, meta_extra_kwargs=None, )
+- Meta · class · L384-L388 — class Meta(extends_meta)
+- validate · function · L395-L403 — def validate(self, value)
+- MappingSerializer · class · L417-L428 — class MappingSerializer
+- __init__ · method · L422-L428 — def __init__(self, component_name, mapping, name, many=False)
+- CustomFieldRegistryMappingSerializer · class · L431-L449 — class CustomFieldRegistryMappingSerializer
+- __init__ · method · L437-L449 — def __init__( self, registry, base_class, many=False, request=False, )
+- DiscriminatorCustomFieldsMappingSerializer · class · L452-L485 — class DiscriminatorCustomFieldsMappingSerializer
+- __init__ · method · L458-L480 — def __init__( self, registry=None, base_class=None, type_field_name="type", many=False, help_text=None, request=False, context=None, name_prefix=None, extra_params=None, )
+- DiscriminatorMappingSerializer · class · L488-L513 — class DiscriminatorMappingSerializer
+- __init__ · method · L494-L508 — def __init__( self, component_name=None, mapping=None, type_field_name="type", many=False, context=None, )

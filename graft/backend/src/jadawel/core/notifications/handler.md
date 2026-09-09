@@ -1,0 +1,33 @@
+# backend/src/jadawel/core/notifications/handler.py
+
+- UserWithScheduledEmailNotifications · class · L46-L55 — class UserWithScheduledEmailNotifications(NamedTuple)
+- NotificationHandler · class · L58-L821 — class NotificationHandler
+- _get_unread_broadcast_q · method · L60-L67 — def _get_unread_broadcast_q(cls, user: AbstractUser) -> Q
+- get_notification_by_id · method · L71-L85 — def get_notification_by_id( cls, user: AbstractUser, notification_id: int ) -> NotificationRecipient
+- get_notification_by · method · L89-L125 — def get_notification_by(cls, user: AbstractUser, **kwargs) -> Notification
+- all_notifications_for_user · method · L129-L142 — def all_notifications_for_user( cls, user, include_workspace: Optional[Workspace] = None )
+- list_notifications · method · L146-L160 — def list_notifications(cls, user, workspace: Workspace)
+- get_unread_notifications_count · method · L164-L192 — def get_unread_notifications_count( cls, user: AbstractUser, workspace: Optional[Workspace] = None ) -> int
+- annotate_workspaces_with_unread_notifications_count · method · L196-L226 — def annotate_workspaces_with_unread_notifications_count( cls, user: AbstractUser, workspace_queryset: QuerySet, outer_ref_key: str = "pk" ) -> QuerySet
+- _get_missing_broadcast_entries_for_user · method · L230-L248 — def _get_missing_broadcast_entries_for_user( cls, user: AbstractUser, ) -> QuerySet[NotificationRecipient]
+- _create_missing_entries_for_broadcast_notifications_with_defaults · method · L252-L285 — def _create_missing_entries_for_broadcast_notifications_with_defaults( cls, user: AbstractUser, read=False, cleared=False, **kwargs )
+- clear_all_notifications · method · L289-L335 — def clear_all_notifications( cls, user: AbstractUser, workspace: Workspace, )
+- mark_notification_as_read · method · L339-L387 — def mark_notification_as_read( cls, user: AbstractUser, notification: Notification, read: bool = True, include_user_in_signal: bool = False, ) -> NotificationRecipient
+- mark_all_notifications_as_read · method · L391-L413 — def mark_all_notifications_as_read(cls, user: AbstractUser, workspace: Workspace)
+- construct_notification · method · L417-L437 — def construct_notification( cls, notification_type: str, sender=None, data=None, workspace=None, **kwargs ) -> Notification
+- construct_notification_recipient · method · L441-L497 — def construct_notification_recipient( cls, notification: Notification, recipient: Optional[AbstractUser] = None, read=False, cleared=False, queued=False, **kwargs, ) -> NotificationRecipient
+- create_notification · method · L501-L525 — def create_notification( cls, notification_type: str, sender=None, data=None, workspace=None, **kwargs ) -> Notification
+- create_broadcast_notification · method · L529-L571 — def create_broadcast_notification( cls, notification_type: str, sender=None, data=None, **kwargs, ) -> Notification
+- create_direct_notification_for_users · method · L575-L624 — def create_direct_notification_for_users( cls, notification_type: str, recipients: List[AbstractUser], sender: Optional[AbstractUser] = None, data: Optional[Dict[str, Any]] = None, workspace: Optional[Workspace] = None, **kwargs, ) -> List[NotificationRecipient]
+- construct_email_summary_for_user · method · L628-L654 — def construct_email_summary_for_user( cls, user: AbstractUser, notifications: List[Notification], total_new_count: int, ) -> NotificationsSummaryEmail
+- filter_and_annotate_users_with_notifications_to_send_by_email · method · L658-L731 — def filter_and_annotate_users_with_notifications_to_send_by_email( cls, user_filters_q: Q, limit_users: Optional[int] = None, limit_notifications_per_user: Optional[int] = None, ) -> UserWithScheduledEmailNotifications
+- mark_all_notifications_matching_filters_as_sent_by_emails · method · L735-L749 — def mark_all_notifications_matching_filters_as_sent_by_emails( cls, filters_q: Q ) -> int
+- send_unread_notifications_by_email_to_users_matching_filters · method · L753-L821 — def send_unread_notifications_by_email_to_users_matching_filters( cls, user_filters_q: Q, max_emails: Optional[int] = None ) -> UserWithScheduledEmailNotifications
+- UserNotificationsGrouper · class · L824-L890 — class UserNotificationsGrouper
+- __init__ · method · L831-L834 — def __init__(self)
+- has_notifications_to_send · method · L836-L837 — def has_notifications_to_send(self)
+- add · method · L839-L842 — def add(self, notification: Notification, recipient_ids: List[int])
+- create_all_notifications_and_trigger_task · method · L844-L875 — def create_all_notifications_and_trigger_task(self, batch_size=2500)
+- user_grouper · method · L877-L880 — def user_grouper(self)
+- __enter__ · method · L882-L885 — def __enter__(self)
+- __exit__ · method · L887-L890 — def __exit__(self, exc_type, exc_value, traceback)

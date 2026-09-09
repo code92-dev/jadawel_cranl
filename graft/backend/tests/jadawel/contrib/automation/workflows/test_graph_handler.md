@@ -1,0 +1,22 @@
+# backend/tests/jadawel/contrib/automation/workflows/test_graph_handler.py
+
+- FakeNode · class · L8-L25 — class FakeNode
+- __init__ · method · L9-L10 — def __init__(self, nid)
+- __eq__ · method · L12-L16 — def __eq__(self, other)
+- __str__ · method · L18-L19 — def __str__(self)
+- __repr__ · method · L21-L22 — def __repr__(self)
+- get_label · method · L24-L25 — def get_label(self)
+- test_graph_handler_get_node_at_position · function · L45-L70 — def test_graph_handler_get_node_at_position( mock_get_nodes, reference_node_id, position, output, expected_result )
+- test_graph_handler_get_node_at_position_empty_graph · function · L75-L83 — def test_graph_handler_get_node_at_position_empty_graph(mock_get_nodes)
+- test_graph_handler_get_last_position · function · L88-L112 — def test_graph_handler_get_last_position(mock_get_nodes)
+- test_graph_handler_get_position · function · L132-L156 — def test_graph_handler_get_position(mock_get_nodes, node_id, expected_result)
+- test_graph_handler_get_previous_position · function · L208-L228 — def test_graph_handler_get_previous_position(mock_get_nodes, node_id, expected_result)
+- test_graph_handler_get_next_nodes · function · L246-L266 — def test_graph_handler_get_next_nodes(mock_get_nodes, node_id, output, expected_result)
+- test_graph_handler_get_children · function · L281-L301 — def test_graph_handler_get_children(mock_get_nodes, node_id, expected_result)
+- test_graph_handler_insert · function · L430-L461 — def test_graph_handler_insert( mock_get_nodes, node_id, reference_node_id, position, output, expected_result, )
+- test_graph_handler_insert_first_node · function · L466-L478 — def test_graph_handler_insert_first_node( mock_get_nodes, )
+- test_graph_handler_remove · function · L536-L561 — def test_graph_handler_remove( mock_get_nodes, node_id, expected_result, )
+- test_graph_handler_remove_last_node · function · L566-L583 — def test_graph_handler_remove_last_node( mock_get_nodes, )
+- test_graph_handler_replace · function · L635-L659 — def test_graph_handler_replace( mock_get_nodes, node_id, replace_id, expected_result, )
+- test_graph_handler_move · function · L749-L780 — def test_graph_handler_move( mock_get_nodes, node_id, reference_node_id, position, output, expected_result, )
+- test_graph_handler_migrate · function · L784-L825 — def test_graph_handler_migrate()

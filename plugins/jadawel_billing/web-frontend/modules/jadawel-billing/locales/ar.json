@@ -1,7 +1,27 @@
 {
   "billing": {
     "title": "الفوترة",
-    "description": "إدارة حسابات الفوترة وباقات الاشتراك.",
+    "description": "إدارة الحسابات والخطط والمدفوعات من مساحة واحدة.",
+    "adminSections": "أقسام إدارة الفوترة",
+    "adminSummary": "سجلات الفوترة المحمّلة",
+    "summary": {
+      "accounts": "الحسابات في هذه الصفحة",
+      "plans": "الباقات في هذه الصفحة",
+      "payments": "المدفوعات في هذه الصفحة",
+      "subscriptions": "الاشتراكات في هذه الصفحة"
+    },
+    "sections": {
+      "accounts": "الحسابات والوصول",
+      "plans": "الخطط والأسعار",
+      "payments": "المدفوعات والاسترداد",
+      "subscriptions": "الاشتراكات",
+      "external": "المدفوعات الخارجية",
+      "provider": "حالة المزوّد"
+    },
+    "confirmArchivePlan": "هل تريد جعل {name} غير متاح للشراء الجديد؟ لن يتغير الوصول الحالي.",
+    "confirmEnablePlan": "هل تريد إتاحة {name} للشراء الجديد؟",
+    "confirmCancelRenewal": "هل تريد إلغاء التجديد في نهاية الفترة الحالية؟",
+    "confirmResumeRenewal": "هل تريد إبقاء الاشتراك متجدداً تلقائياً؟",
     "accounts": "حسابات الفوترة",
     "accountStatus": "وصول الحساب",
     "accessUntil": "الوصول حتى",
@@ -15,10 +35,13 @@
     "paymentMethods": "طرق الدفع المحفوظة",
     "noPaymentMethods": "لا توجد طرق دفع محفوظة.",
     "removePaymentMethod": "إزالة طريقة الدفع",
+    "confirmRemovePaymentMethod": "هل تريد إزالة طريقة الدفع المحفوظة هذه؟",
     "refund": "استرداد",
     "refundableAmount": "الرصيد القابل للاسترداد",
     "refundAmount": "مبلغ الاسترداد",
+    "reviewRefund": "مراجعة الاسترداد",
     "confirmRefund": "إرسال الاسترداد",
+    "confirmRefundDescription": "إرسال استرداد بقيمة {amount} لهذه الدفعة؟ لا يمكن التراجع عن هذا الإجراء.",
     "refundStatus": "حالة الاسترداد",
     "reference": "المرجع الخارجي",
     "paidAt": "تاريخ الدفع",
@@ -84,6 +107,14 @@
       "account_suspension_changed": "تغيير تعليق الحساب"
     },
     "paymentError": "تعذّر تأكيد الدفع. استخدم التحقق من الدفع قبل المحاولة مجددًا.",
+    "checkoutUnavailable": "الفوترة غير متاحة مؤقتاً. حاول مرة أخرى بعد قليل.",
+    "retryLoading": "إعادة المحاولة",
+    "accountRequired": "اختر حساباً لعرض الوصول وتفاصيل الدفع الخاصة به.",
+    "checkoutSteps": {
+      "account": "الحساب والخطة",
+      "review": "مراجعة الطلب",
+      "payment": "الدفع والإيصال"
+    },
     "sandbox": "بيئة اختبار — لا توجد دفعة فعلية.",
     "checkout": "المتابعة للدفع",
     "singlePeriod": "يغطي هذا الشراء دورة فوترة واحدة. التجديد التلقائي غير مفعّل.",

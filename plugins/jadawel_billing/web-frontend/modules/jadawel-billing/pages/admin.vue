@@ -1,11 +1,68 @@
 <template>
   <div class="layout__col-2-scroll">
     <main class="billing-admin">
-      <h1>{{ $t("billing.title") }}</h1>
-      <p>{{ $t("billing.description") }}</p>
+      <header class="billing-admin__header">
+        <div>
+          <h1>{{ $t("billing.title") }}</h1>
+          <p>{{ $t("billing.description") }}</p>
+        </div>
+        <span v-if="providerHealth" class="billing-admin__status" role="status">
+          {{
+            $t(
+              `billing.providerHealthStatus.${providerHealth.status}`,
+              providerHealth.status,
+            )
+          }}
+        </span>
+      </header>
       <p v-if="error" role="alert">{{ $t("billing.error") }}</p>
       <p v-if="loading" role="status">{{ $t("billing.loading") }}</p>
-      <section>
+      <ul
+        class="billing-admin__summary"
+        :aria-label="$t('billing.adminSummary')"
+      >
+        <li>
+          <strong>{{ accounts.length }}</strong>
+          <span>{{ $t("billing.summary.accounts") }}</span>
+        </li>
+        <li>
+          <strong>{{ plans.length }}</strong>
+          <span>{{ $t("billing.summary.plans") }}</span>
+        </li>
+        <li>
+          <strong>{{ orders.length }}</strong>
+          <span>{{ $t("billing.summary.payments") }}</span>
+        </li>
+        <li>
+          <strong>{{ subscriptions.length }}</strong>
+          <span>{{ $t("billing.summary.subscriptions") }}</span>
+        </li>
+      </ul>
+      <nav
+        class="billing-admin__tabs"
+        :aria-label="$t('billing.adminSections')"
+        role="tablist"
+      >
+        <button
+          v-for="section in adminSections"
+          :key="section.id"
+          :id="`billing-admin-tab-${section.id}`"
+          type="button"
+          role="tab"
+          :aria-selected="adminSection === section.id"
+          :aria-controls="`billing-admin-${section.id}`"
+          :class="{ 'is-selected': adminSection === section.id }"
+          @click="adminSection = section.id"
+        >
+          {{ $t(`billing.sections.${section.id}`) }}
+        </button>
+      </nav>
+      <section
+        v-show="adminSection === 'accounts'"
+        id="billing-admin-accounts"
+        role="tabpanel"
+        aria-labelledby="billing-admin-tab-accounts"
+      >
         <h2>{{ $t("billing.accounts") }}</h2>
         <form data-testid="account-form" @submit.prevent="createAccount">
           <label
@@ -46,14 +103,19 @@
           @click="loadMoreAccounts"
           >{{ $t("billing.more") }}</Button
         >
+        <GrantPanel
+          v-if="selectedAccount"
+          :key="selectedAccount.id"
+          :account="selectedAccount"
+          :plans="plans"
+        />
       </section>
-      <GrantPanel
-        v-if="selectedAccount"
-        :key="selectedAccount.id"
-        :account="selectedAccount"
-        :plans="plans"
-      />
-      <section>
+      <section
+        v-show="adminSection === 'plans'"
+        id="billing-admin-plans"
+        role="tabpanel"
+        aria-labelledby="billing-admin-tab-plans"
+      >
         <h2>{{ $t("billing.plans") }}</h2>
         <form @submit.prevent="createPlan">
           <label
@@ -91,7 +153,7 @@
           <Button
             type="secondary"
             :disabled="saving"
-            @click="togglePlan(item)"
+            @click="requestPlanToggle(item)"
             >{{
               $t(item.available ? "billing.archive" : "billing.enable")
             }}</Button
@@ -103,11 +165,44 @@
             >{{ $t("billing.prices") }}</Button
           >
         </article>
+        <div
+          v-if="pendingPlan"
+          class="billing-admin__confirmation"
+          role="alertdialog"
+        >
+          <p>
+            {{
+              $t(
+                pendingPlan.available
+                  ? "billing.confirmArchivePlan"
+                  : "billing.confirmEnablePlan",
+                { name: pendingPlan.name },
+              )
+            }}
+          </p>
+          <Button
+            button-type="button"
+            :disabled="saving"
+            @click="togglePlan(pendingPlan)"
+            >{{ $t("billing.confirm") }}</Button
+          >
+          <Button
+            type="secondary"
+            button-type="button"
+            @click="pendingPlan = null"
+            >{{ $t("billing.cancel") }}</Button
+          >
+        </div>
         <Button v-if="plansNext" type="secondary" @click="loadMorePlans">{{
           $t("billing.more")
         }}</Button>
       </section>
-      <section>
+      <section
+        v-show="adminSection === 'payments'"
+        id="billing-admin-payments"
+        role="tabpanel"
+        aria-labelledby="billing-admin-tab-payments"
+      >
         <h2>{{ $t("billing.payments") }}</h2>
         <form class="billing-history-search" @submit.prevent="refresh">
           <label>
@@ -119,7 +214,7 @@
               :placeholder="$t('billing.searchHistory')"
             />
           </label>
-          <Button type="secondary" :disabled="loading">
+          <Button type="secondary" button-type="submit" :disabled="loading">
             {{ $t("billing.search") }}
           </Button>
         </form>
@@ -156,7 +251,7 @@
         <form
           v-if="selectedRefundOrder"
           data-testid="refund-form"
-          @submit.prevent="submitRefund"
+          @submit.prevent="reviewRefund"
         >
           <p>
             {{ $t("billing.refundableAmount") }}:
@@ -182,18 +277,45 @@
             />
           </label>
           <Button :disabled="saving" button-type="submit">{{
-            $t("billing.confirmRefund")
+            $t("billing.reviewRefund")
           }}</Button>
-          <Button type="secondary" @click="selectedRefundOrder = null">{{
+          <Button type="secondary" @click.prevent="cancelRefund">{{
             $t("billing.cancel")
           }}</Button>
         </form>
+        <div
+          v-if="pendingRefund"
+          class="billing-admin__confirmation"
+          role="alertdialog"
+        >
+          <p>
+            {{
+              $t("billing.confirmRefundDescription", {
+                amount: money(refund.amount),
+              })
+            }}
+          </p>
+          <Button
+            button-type="button"
+            :disabled="saving"
+            @click="submitRefund"
+            >{{ $t("billing.confirmRefund") }}</Button
+          >
+          <Button type="secondary" button-type="button" @click="cancelRefund">{{
+            $t("billing.cancel")
+          }}</Button>
+        </div>
         <p v-if="refundResult" role="status">
           {{ $t("billing.refundStatus") }}:
           {{ $t("billing.refundStates." + refundResult.status) }}
         </p>
       </section>
-      <section>
+      <section
+        v-show="adminSection === 'subscriptions'"
+        id="billing-admin-subscriptions"
+        role="tabpanel"
+        aria-labelledby="billing-admin-tab-subscriptions"
+      >
         <h2>{{ $t("billing.subscriptions") }}</h2>
         <form
           class="billing-history-search"
@@ -208,7 +330,7 @@
               :placeholder="$t('billing.searchHistory')"
             />
           </label>
-          <Button type="secondary" :disabled="loading">
+          <Button type="secondary" button-type="submit" :disabled="loading">
             {{ $t("billing.search") }}
           </Button>
         </form>
@@ -223,7 +345,7 @@
               v-if="item.status !== 'canceled'"
               type="secondary"
               :disabled="saving"
-              @click="toggleSubscription(item)"
+              @click="requestSubscriptionToggle(item)"
             >
               {{
                 item.cancel_at_period_end
@@ -233,6 +355,33 @@
             </Button>
           </li>
         </ul>
+        <div
+          v-if="pendingSubscription"
+          class="billing-admin__confirmation"
+          role="alertdialog"
+        >
+          <p>
+            {{
+              $t(
+                pendingSubscription.cancel_at_period_end
+                  ? "billing.confirmResumeRenewal"
+                  : "billing.confirmCancelRenewal",
+              )
+            }}
+          </p>
+          <Button
+            button-type="button"
+            :disabled="saving"
+            @click="toggleSubscription(pendingSubscription)"
+            >{{ $t("billing.confirm") }}</Button
+          >
+          <Button
+            type="secondary"
+            button-type="button"
+            @click="pendingSubscription = null"
+            >{{ $t("billing.cancel") }}</Button
+          >
+        </div>
         <p v-if="!loading && !subscriptions.length">
           {{ $t("billing.emptySubscriptions") }}
         </p>
@@ -244,7 +393,12 @@
           {{ $t("billing.more") }}
         </Button>
       </section>
-      <section>
+      <section
+        v-show="adminSection === 'external'"
+        id="billing-admin-external"
+        role="tabpanel"
+        aria-labelledby="billing-admin-tab-external"
+      >
         <h2>{{ $t("billing.externalPayments") }}</h2>
         <form
           class="billing-history-search"
@@ -259,7 +413,7 @@
               :placeholder="$t('billing.searchHistory')"
             />
           </label>
-          <Button type="secondary" :disabled="loading">
+          <Button type="secondary" button-type="submit" :disabled="loading">
             {{ $t("billing.search") }}
           </Button>
         </form>
@@ -338,7 +492,12 @@
           {{ $t("billing.emptyExternalPayments") }}
         </p>
       </section>
-      <section>
+      <section
+        v-show="adminSection === 'provider'"
+        id="billing-admin-provider"
+        role="tabpanel"
+        aria-labelledby="billing-admin-tab-provider"
+      >
         <h2>{{ $t("billing.providerEvents") }}</h2>
         <form
           class="billing-history-search"
@@ -353,7 +512,7 @@
               :placeholder="$t('billing.searchHistory')"
             />
           </label>
-          <Button type="secondary" :disabled="loading">
+          <Button type="secondary" button-type="submit" :disabled="loading">
             {{ $t("billing.search") }}
           </Button>
         </form>
@@ -380,7 +539,12 @@
           {{ $t("billing.more") }}
         </Button>
       </section>
-      <section>
+      <section
+        v-show="adminSection === 'provider'"
+        id="billing-admin-provider-health"
+        role="tabpanel"
+        aria-labelledby="billing-admin-tab-provider"
+      >
         <h2>{{ $t("billing.providerHealth") }}</h2>
         <p v-if="providerHealth" role="status">
           {{ $t("billing.providerHealthMode") }}: {{ providerHealth.mode }} ·
@@ -399,7 +563,13 @@
           {{ $t("billing.providerHealthCheck") }}
         </Button>
       </section>
-      <section v-if="selectedPlan">
+      <section
+        v-if="selectedPlan"
+        v-show="adminSection === 'plans'"
+        id="billing-admin-prices"
+        role="tabpanel"
+        aria-labelledby="billing-admin-tab-plans"
+      >
         <h2>
           {{ $t("billing.prices") }} — <bdi>{{ selectedPlan.name }}</bdi>
         </h2>
@@ -464,7 +634,18 @@ export default {
   components: { GrantPanel },
   data() {
     return {
+      adminSection: "accounts",
+      adminSections: [
+        { id: "accounts" },
+        { id: "plans" },
+        { id: "payments" },
+        { id: "subscriptions" },
+        { id: "external" },
+        { id: "provider" },
+      ],
       selectedAccount: null,
+      pendingPlan: null,
+      pendingSubscription: null,
       loading: true,
       saving: false,
       error: false,
@@ -492,6 +673,7 @@ export default {
       plan: { code: "", name: "", kind: "INDIVIDUAL" },
       price: { amount: 0, interval: "MONTH" },
       selectedRefundOrder: null,
+      pendingRefund: false,
       refund: { amount: 0, reason: "" },
       refundResult: null,
       externalPayment: {
@@ -610,7 +792,11 @@ export default {
           available: !plan.available,
         });
         await this.refresh();
+        this.pendingPlan = null;
       });
+    },
+    requestPlanToggle(plan) {
+      this.pendingPlan = plan;
     },
     async selectPlan(plan) {
       this.error = false;
@@ -690,7 +876,11 @@ export default {
           (item) => item.id === subscription.id,
         );
         if (index !== -1) this.subscriptions.splice(index, 1, data);
+        this.pendingSubscription = null;
       });
+    },
+    requestSubscriptionToggle(subscription) {
+      this.pendingSubscription = subscription;
     },
     async loadProviderEvents() {
       await this.mutate(async () => {
@@ -761,9 +951,18 @@ export default {
       };
       this.refundResult = null;
       this.selectedRefundOrder = order;
+      this.pendingRefund = false;
+    },
+    reviewRefund() {
+      if (!this.selectedRefundOrder || this.saving) return;
+      this.pendingRefund = true;
+    },
+    cancelRefund() {
+      this.selectedRefundOrder = null;
+      this.pendingRefund = false;
     },
     async submitRefund() {
-      if (!this.selectedRefundOrder) return;
+      if (!this.selectedRefundOrder || this.saving) return;
       await this.mutate(async () => {
         const { data } = await this.$client.post(
           "/billing/admin/orders/" + this.selectedRefundOrder.id + "/refund/",
@@ -787,6 +986,7 @@ export default {
           });
         }
         this.selectedRefundOrder = null;
+        this.pendingRefund = false;
       });
     },
     async recordExternalPayment() {
@@ -811,10 +1011,117 @@ export default {
 
 <style scoped>
 .billing-admin {
-  max-inline-size: 960px;
+  max-inline-size: 1180px;
   margin-inline: auto;
   padding: 32px;
   background: var(--jadawel-content-background, #fcfdfc);
+}
+.billing-admin__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 20px;
+  margin-block-end: 24px;
+}
+.billing-admin__eyebrow {
+  margin: 0;
+  color: var(--jadawel-primary-500, #278053);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.billing-admin__status {
+  padding: 8px 12px;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 999px;
+  white-space: nowrap;
+}
+.billing-admin__summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+  margin-block: 0 24px;
+}
+.billing-admin__summary li {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 8px;
+  background: var(--jadawel-raised-background, #fbfdfb);
+}
+.billing-admin__summary strong {
+  color: var(--jadawel-primary-500, #278053);
+  font-size: 24px;
+  line-height: 1;
+}
+.billing-admin__summary span {
+  color: var(--jadawel-text-secondary, #66756d);
+  font-size: 12px;
+}
+.billing-admin__tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-block-end: 24px;
+  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
+}
+.billing-admin__tabs button {
+  border: 0;
+  border-block-end: 3px solid transparent;
+  padding: 10px 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+.billing-admin__tabs button.is-selected {
+  border-block-end-color: var(--jadawel-primary-500, #278053);
+  color: var(--jadawel-primary-500, #278053);
+  font-weight: 700;
+}
+.billing-admin__confirmation {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-block: 12px;
+  padding: 14px;
+  border: 1px solid var(--jadawel-warning-500, #b7791f);
+  border-radius: 8px;
+  background: color-mix(
+    in srgb,
+    var(--jadawel-warning-500, #b7791f) 8%,
+    transparent
+  );
+}
+.billing-admin section {
+  box-shadow: 0 8px 24px rgb(20 65 42 / 6%);
+}
+.billing-admin ul {
+  padding: 0;
+  list-style: none;
+}
+.billing-admin li {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
+}
+@media (max-width: 640px) {
+  .billing-admin {
+    padding: 20px 16px;
+  }
+  .billing-admin__header {
+    flex-direction: column;
+  }
+  .billing-admin__summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 .billing-admin section {
   margin-block: 32px;

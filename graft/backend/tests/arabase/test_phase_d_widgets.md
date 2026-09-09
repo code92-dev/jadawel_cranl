@@ -1,0 +1,28 @@
+# backend/tests/arabase/test_phase_d_widgets.py
+
+- dashboard_setup · function · L46-L96 — def dashboard_setup(data_fixture)
+- create_widget · function · L99-L107 — def create_widget(setup, widget_type, **kwargs)
+- configure · function · L110-L116 — def configure(setup, widget, service_type_name, **kwargs)
+- dispatch · function · L119-L124 — def dispatch(setup, widget)
+- test_records_list_widget_creates_a_list_rows_data_source · function · L131-L137 — def test_records_list_widget_creates_a_list_rows_data_source(dashboard_setup)
+- test_records_list_widget_dispatches_rows · function · L141-L153 — def test_records_list_widget_dispatches_rows(dashboard_setup)
+- test_records_list_widget_stores_displayed_fields · function · L157-L166 — def test_records_list_widget_stores_displayed_fields(dashboard_setup)
+- test_displayed_field_ids_are_remapped_on_import · function · L170-L177 — def test_displayed_field_ids_are_remapped_on_import(): # Field ids are renumbered on import, and an id with no mapping belonged to a # field that was deleted before the export.
+- test_records_list_widget_trash_restore_follows_its_data_source · function · L181-L196 — def test_records_list_widget_trash_restore_follows_its_data_source(dashboard_setup)
+- test_progress_widget_creates_an_aggregate_rows_data_source · function · L203-L212 — def test_progress_widget_creates_an_aggregate_rows_data_source(dashboard_setup)
+- test_progress_widget_dispatches_the_aggregation · function · L216-L229 — def test_progress_widget_dispatches_the_aggregation(dashboard_setup)
+- test_progress_widget_target_must_be_positive · function · L233-L235 — def test_progress_widget_target_must_be_positive(dashboard_setup)
+- test_progress_widget_thresholds_cannot_cross · function · L239-L246 — def test_progress_widget_thresholds_cannot_cross(dashboard_setup)
+- test_progress_widget_accepts_a_ring_and_custom_thresholds · function · L250-L268 — def test_progress_widget_accepts_a_ring_and_custom_thresholds(dashboard_setup)
+- test_progress_widget_data_source_cannot_be_deleted_on_its_own · function · L272-L278 — def test_progress_widget_data_source_cannot_be_deleted_on_its_own(dashboard_setup)
+- test_upcoming_dates_widget_creates_an_upcoming_rows_data_source · function · L285-L291 — def test_upcoming_dates_widget_creates_an_upcoming_rows_data_source(dashboard_setup)
+- configure_upcoming · function · L294-L302 — def configure_upcoming(setup, widget, **kwargs)
+- test_upcoming_dates_window_excludes_rows_beyond_it · function · L306-L314 — def test_upcoming_dates_window_excludes_rows_beyond_it(dashboard_setup)
+- test_upcoming_dates_can_exclude_overdue_rows · function · L318-L324 — def test_upcoming_dates_can_exclude_overdue_rows(dashboard_setup)
+- test_upcoming_dates_widens_with_days_ahead · function · L328-L334 — def test_upcoming_dates_widens_with_days_ahead(dashboard_setup)
+- test_upcoming_dates_without_a_date_field_is_a_configuration_error · function · L338-L348 — def test_upcoming_dates_without_a_date_field_is_a_configuration_error(dashboard_setup)
+- test_upcoming_dates_rejects_a_non_date_field · function · L352-L362 — def test_upcoming_dates_rejects_a_non_date_field(dashboard_setup)
+- test_upcoming_dates_rejects_an_absurd_window · function · L366-L370 — def test_upcoming_dates_rejects_an_absurd_window(dashboard_setup)
+- test_upcoming_dates_handles_a_datetime_field · function · L374-L400 — def test_upcoming_dates_handles_a_datetime_field(dashboard_setup, data_fixture): # A timestamp column compared against a date would include or drop a whole # day at the boundary depending on the time, so it is compared by date part.
+- test_upcoming_dates_date_field_is_remapped_on_import · function · L404-L416 — def test_upcoming_dates_date_field_is_remapped_on_import(dashboard_setup)
+- test_changing_the_table_drops_the_date_field · function · L420-L435 — def test_changing_the_table_drops_the_date_field(dashboard_setup, data_fixture)

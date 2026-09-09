@@ -1,0 +1,20 @@
+# backend/src/jadawel/core/telemetry/utils.py
+
+- disable_instrumentation · function · L18-L40 — def disable_instrumentation(wrapped_function)
+- _async_wrapper · function · L22-L27 — async def _async_wrapper(*args, **kwargs)
+- _sync_wrapper · function · L33-L38 — def _sync_wrapper(*args, **kwargs)
+- BatchBaggageSpanProcessor · class · L48-L55 — class BatchBaggageSpanProcessor(BatchSpanProcessor)
+- on_start · method · L49-L55 — def on_start( self, span: Span, parent_context: typing.Optional[Context] = None ) -> None
+- setup_user_in_baggage_and_spans · function · L59-L93 — def setup_user_in_baggage_and_spans(user, request=None)
+- _set · function · L73-L82 — def _set(name, attr, source, set_baggage=False)
+- _jadawel_trace_func · function · L96-L126 — def _jadawel_trace_func(wrapped_func, tracer: Tracer)
+- _async_wrapper · function · L100-L109 — async def _async_wrapper(*args, **kwargs)
+- _sync_wrapper · function · L115-L124 — def _sync_wrapper(*args, **kwargs)
+- jadawel_trace_methods · function · L129-L182 — def jadawel_trace_methods( tracer: Tracer, only: Optional[Union[str, List[str]]] = None, exclude: Optional[Union[str, List[str]]] = None, abc: bool = False, )
+- TraceMethodsMetaClass · class · L164-L180 — class TraceMethodsMetaClass(super_class)
+- __new__ · method · L165-L172 — def __new__(cls, name, bases, local)
+- _should_trace_attr · method · L175-L180 — def _should_trace_attr(attr)
+- jadawel_trace · function · L185-L205 — def jadawel_trace(tracer)
+- inner · function · L202-L203 — def inner(wrapped_function_or_cls)
+- add_jadawel_trace_attrs · function · L208-L219 — def add_jadawel_trace_attrs(**kwargs)
+- otel_is_enabled · function · L222-L228 — def otel_is_enabled()

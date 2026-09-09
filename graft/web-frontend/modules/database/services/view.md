@@ -1,0 +1,16 @@
+# web-frontend/modules/database/services/view.js
+
+- fetchAll · method · L7-L55 — fetchAll( tableId, includeFilters = false, includeSortings = false, includeGroupBys = false, includeDecorations = false, includeDefaultRowValues = false, limit = null, type = null )
+- create · method · L56-L62 — create(tableId, values)
+- get · method · L63-L99 — get( viewId, includeFilters = false, includeSortings = false, includeDecorations = false, includeGroupBys = false, includeDefaultRowValues = false )
+- update · method · L100-L102 — update(viewId, values)
+- duplicate · method · L103-L105 — duplicate(viewId)
+- order · method · L106-L111 — order(tableId, ownershipType, order)
+- delete · method · L112-L114 — delete(viewId)
+- fetchFieldOptions · method · L115-L117 — fetchFieldOptions(viewId)
+- updateFieldOptions · method · L118-L125 — updateFieldOptions({ viewId, values, undoRedoActionGroupId = null })
+- rotateSlug · method · L126-L128 — rotateSlug(viewId)
+- linkRowFieldLookup · method · L129-L156 — linkRowFieldLookup( slug, fieldId, page, search = null, size = 100, publicAuthToken = null )
+- fetchPublicViewInfo · method · L157-L163 — fetchPublicViewInfo(viewSlug, publicAuthToken = null)
+- fetchRow · method · L164-L180 — fetchRow( tableId, rowId, viewSlug = null, publicUrl = false, publicAuthToken = null )
+- updateDefaultValues · method · L181-L183 — updateDefaultValues(viewId, items)

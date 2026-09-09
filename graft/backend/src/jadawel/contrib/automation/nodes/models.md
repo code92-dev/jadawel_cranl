@@ -1,0 +1,36 @@
+# backend/src/jadawel/contrib/automation/nodes/models.py
+
+- get_default_node_content_type · function · L18-L19 — def get_default_node_content_type()
+- AutomationNodeTrashManager · class · L22-L39 — class AutomationNodeTrashManager(models.Manager)
+- get_queryset · method · L29-L39 — def get_queryset(self)
+- AutomationNode · class · L42-L156 — class AutomationNode( TrashableModelMixin, PolymorphicContentTypeMixin, CreatedAndUpdatedOnMixin, HierarchicalModelMixin, WithRegistry, )
+- Meta · class · L84-L85 — class Meta
+- get_type_registry · method · L88-L93 — def get_type_registry()
+- get_parent · method · L95-L96 — def get_parent(self)
+- get_label · method · L98-L102 — def get_label(self)
+- get_previous_nodes · method · L104-L113 — def get_previous_nodes(self)
+- get_previous_service_outputs · method · L115-L122 — def get_previous_service_outputs(self)
+- get_parent_nodes · method · L124-L134 — def get_parent_nodes(self)
+- get_next_nodes · method · L136-L147 — def get_next_nodes( self, output_uid: str | None = None ) -> Iterable["AutomationNode"]
+- get_children · method · L149-L156 — def get_children(self)
+- AutomationActionNode · class · L159-L161 — class AutomationActionNode(AutomationNode)
+- Meta · class · L160-L161 — class Meta
+- AutomationTriggerNode · class · L164-L166 — class AutomationTriggerNode(AutomationNode)
+- Meta · class · L165-L166 — class Meta
+- LocalJadawelRowsCreatedTriggerNode · class · L169-L169 — class LocalJadawelRowsCreatedTriggerNode(AutomationTriggerNode)
+- LocalJadawelRowsUpdatedTriggerNode · class · L172-L172 — class LocalJadawelRowsUpdatedTriggerNode(AutomationTriggerNode)
+- LocalJadawelRowsDeletedTriggerNode · class · L175-L175 — class LocalJadawelRowsDeletedTriggerNode(AutomationTriggerNode)
+- CorePeriodicTriggerNode · class · L178-L178 — class CorePeriodicTriggerNode(AutomationTriggerNode)
+- CoreHTTPTriggerNode · class · L181-L181 — class CoreHTTPTriggerNode(AutomationTriggerNode)
+- LocalJadawelCreateRowActionNode · class · L184-L184 — class LocalJadawelCreateRowActionNode(AutomationActionNode)
+- LocalJadawelUpdateRowActionNode · class · L187-L187 — class LocalJadawelUpdateRowActionNode(AutomationActionNode)
+- LocalJadawelDeleteRowActionNode · class · L190-L190 — class LocalJadawelDeleteRowActionNode(AutomationActionNode)
+- LocalJadawelGetRowActionNode · class · L193-L193 — class LocalJadawelGetRowActionNode(AutomationActionNode)
+- LocalJadawelListRowsActionNode · class · L196-L196 — class LocalJadawelListRowsActionNode(AutomationActionNode)
+- LocalJadawelAggregateRowsActionNode · class · L199-L199 — class LocalJadawelAggregateRowsActionNode(AutomationActionNode)
+- CoreHTTPRequestActionNode · class · L202-L202 — class CoreHTTPRequestActionNode(AutomationActionNode)
+- CoreSMTPEmailActionNode · class · L205-L205 — class CoreSMTPEmailActionNode(AutomationActionNode)
+- CoreRouterActionNode · class · L208-L208 — class CoreRouterActionNode(AutomationActionNode)
+- CoreIteratorActionNode · class · L211-L211 — class CoreIteratorActionNode(AutomationActionNode)
+- AIAgentActionNode · class · L214-L214 — class AIAgentActionNode(AutomationActionNode)
+- SlackWriteMessageActionNode · class · L217-L217 — class SlackWriteMessageActionNode(AutomationActionNode)

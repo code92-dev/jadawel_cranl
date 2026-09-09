@@ -1,0 +1,32 @@
+# backend/src/jadawel/contrib/automation/workflows/actions.py
+
+- CreateAutomationWorkflowActionType · class · L25-L84 — class CreateAutomationWorkflowActionType(UndoableActionType)
+- Params · class · L34-L38 — class Params
+- do · method · L41-L58 — def do( cls, user: AbstractUser, automation_id: int, data: dict ) -> AutomationWorkflow
+- scope · method · L61-L62 — def scope(cls, automation_id)
+- undo · method · L65-L71 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L74-L84 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- UpdateAutomationWorkflowActionType · class · L87-L164 — class UpdateAutomationWorkflowActionType(UndoableActionType)
+- Params · class · L96-L102 — class Params
+- do · method · L105-L138 — def do( cls, user: AbstractUser, workflow_id: int, new_data: dict, ) -> AutomationWorkflow
+- scope · method · L141-L142 — def scope(cls, automation_id)
+- undo · method · L145-L153 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L156-L164 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- DeleteAutomationWorkflowActionType · class · L167-L221 — class DeleteAutomationWorkflowActionType(UndoableActionType)
+- Params · class · L176-L180 — class Params
+- do · method · L183-L195 — def do(cls, user: AbstractUser, workflow_id: int) -> None
+- scope · method · L198-L199 — def scope(cls, automation_id)
+- undo · method · L202-L212 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L215-L221 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- DuplicateAutomationWorkflowActionType · class · L224-L293 — class DuplicateAutomationWorkflowActionType(UndoableActionType)
+- Params · class · L236-L242 — class Params
+- do · method · L245-L267 — def do( cls, user: AbstractUser, workflow: AutomationWorkflow, progress_builder: Optional[ChildProgressBuilder] = None, ) -> AutomationWorkflow
+- scope · method · L270-L271 — def scope(cls, automation_id)
+- undo · method · L274-L280 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L283-L293 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- OrderAutomationWorkflowActionType · class · L296-L362 — class OrderAutomationWorkflowActionType(UndoableActionType)
+- Params · class · L305-L309 — class Params
+- do · method · L312-L332 — def do(cls, user: AbstractUser, automation_id: int, order: List[int]) -> None
+- scope · method · L335-L336 — def scope(cls, automation_id)
+- undo · method · L339-L349 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L352-L362 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )

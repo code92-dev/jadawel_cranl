@@ -30,7 +30,41 @@
     </p>
     <p v-else role="status">{{ $t("organizations.noPaidRenewal") }}</p>
 
-    <section class="organization-settings">
+    <nav
+      class="organization-page__tabs"
+      :aria-label="$t('organizations.sectionNavigation')"
+      role="tablist"
+    >
+      <button
+        v-for="section in organizationSections"
+        :id="`organization-tab-${section.id}`"
+        :key="section.id"
+        type="button"
+        role="tab"
+        :aria-selected="organizationSection === section.id"
+        :aria-controls="`organization-panel-${section.id}`"
+        :class="{ 'is-selected': organizationSection === section.id }"
+        @click="organizationSection = section.id"
+      >
+        {{ $t(`organizations.sections.${section.id}`) }}
+      </button>
+    </nav>
+    <p
+      v-if="busy"
+      class="organization-page__progress"
+      role="status"
+      aria-live="polite"
+    >
+      {{ $t("organizations.loading") }}
+    </p>
+
+    <section
+      v-show="organizationSection === 'settings'"
+      id="organization-panel-settings"
+      role="tabpanel"
+      aria-labelledby="organization-tab-settings"
+      class="organization-settings"
+    >
       <h2>{{ $t("organizations.settings") }}</h2>
       <form
         data-testid="organization-settings-form"
@@ -45,11 +79,55 @@
             class="input"
           />
         </label>
-        <Button :disabled="busy">{{ $t("organizations.saveSettings") }}</Button>
+        <Button button-type="submit" :disabled="busy">{{
+          $t("organizations.saveSettings")
+        }}</Button>
       </form>
+      <section>
+        <h2>{{ $t("organizations.lifecycle") }}</h2>
+        <Button
+          button-type="button"
+          type="secondary"
+          @click="changeLifecycle('suspend')"
+        >
+          {{ $t("organizations.suspend") }}
+        </Button>
+        <Button
+          button-type="button"
+          type="secondary"
+          @click="changeLifecycle('reactivate')"
+        >
+          {{ $t("organizations.reactivate") }}
+        </Button>
+        <Button
+          button-type="button"
+          type="danger"
+          @click="changeLifecycle('archive')"
+        >
+          {{ $t("organizations.archive") }}
+        </Button>
+      </section>
+
+      <section>
+        <h2>{{ $t("organizations.transition") }}</h2>
+        <p>{{ $t("organizations.transitionNote") }}</p>
+        <Button
+          type="secondary"
+          button-type="button"
+          :disabled="busy"
+          @click="transitionToPersonal"
+        >
+          {{ $t("organizations.transitionToPersonal") }}
+        </Button>
+      </section>
     </section>
 
-    <section>
+    <section
+      v-show="organizationSection === 'members'"
+      id="organization-panel-members"
+      role="tabpanel"
+      aria-labelledby="organization-tab-members"
+    >
       <h2>{{ $t("organizations.members") }}</h2>
       <form class="organization-search" @submit.prevent="loadMembers">
         <label>
@@ -61,7 +139,7 @@
             :placeholder="$t('organizations.searchMembers')"
           />
         </label>
-        <Button type="secondary" :disabled="busy">
+        <Button type="secondary" button-type="submit" :disabled="busy">
           {{ $t("organizations.search") }}
         </Button>
       </form>
@@ -84,7 +162,7 @@
             <option value="admin">{{ $t("organizations.admin") }}</option>
           </select>
         </label>
-        <Button :disabled="busy">
+        <Button button-type="submit" :disabled="busy">
           {{ $t("organizations.sendInvite") }}
         </Button>
       </form>
@@ -106,7 +184,7 @@
             <option value="admin">{{ $t("organizations.admin") }}</option>
           </select>
         </label>
-        <Button :disabled="busy">
+        <Button button-type="submit" :disabled="busy">
           {{ $t("organizations.addMember") }}
         </Button>
       </form>
@@ -158,7 +236,12 @@
       </Button>
     </section>
 
-    <section>
+    <section
+      v-show="organizationSection === 'invitations'"
+      id="organization-panel-invitations"
+      role="tabpanel"
+      aria-labelledby="organization-tab-invitations"
+    >
       <h2>{{ $t("organizations.invitations") }}</h2>
       <form class="organization-search" @submit.prevent="loadInvitations">
         <label>
@@ -170,7 +253,7 @@
             :placeholder="$t('organizations.searchInvitations')"
           />
         </label>
-        <Button type="secondary" :disabled="busy">
+        <Button type="secondary" button-type="submit" :disabled="busy">
           {{ $t("organizations.search") }}
         </Button>
       </form>
@@ -205,7 +288,12 @@
       </Button>
     </section>
 
-    <section>
+    <section
+      v-show="organizationSection === 'workspaces'"
+      id="organization-panel-workspaces"
+      role="tabpanel"
+      aria-labelledby="organization-tab-workspaces"
+    >
       <h2>{{ $t("organizations.workspaces") }}</h2>
       <form class="organization-search" @submit.prevent="loadWorkspaces">
         <label>
@@ -217,7 +305,7 @@
             :placeholder="$t('organizations.searchWorkspaces')"
           />
         </label>
-        <Button type="secondary" :disabled="busy">
+        <Button type="secondary" button-type="submit" :disabled="busy">
           {{ $t("organizations.search") }}
         </Button>
       </form>
@@ -232,7 +320,7 @@
             class="input"
           />
         </label>
-        <Button :disabled="busy">
+        <Button button-type="submit" :disabled="busy">
           {{
             workspacePreview
               ? $t("organizations.confirmBindWorkspace")
@@ -324,7 +412,7 @@
                 </option>
               </select>
             </label>
-            <Button :disabled="busy">
+            <Button button-type="submit" :disabled="busy">
               {{ $t("organizations.assign") }}
             </Button>
           </form>
@@ -343,7 +431,12 @@
       </Button>
     </section>
 
-    <section>
+    <section
+      v-show="organizationSection === 'activity'"
+      id="organization-panel-activity"
+      role="tabpanel"
+      aria-labelledby="organization-tab-activity"
+    >
       <h2>{{ $t("organizations.audit") }}</h2>
       <form class="organization-search" @submit.prevent="loadAudit">
         <label>
@@ -355,7 +448,7 @@
             :placeholder="$t('organizations.searchAudit')"
           />
         </label>
-        <Button type="secondary" :disabled="busy">
+        <Button type="secondary" button-type="submit" :disabled="busy">
           {{ $t("organizations.search") }}
         </Button>
       </form>
@@ -377,28 +470,9 @@
       </Button>
     </section>
 
-    <section>
-      <h2>{{ $t("organizations.lifecycle") }}</h2>
-      <Button type="secondary" @click="changeLifecycle('suspend')">
-        {{ $t("organizations.suspend") }}
-      </Button>
-      <Button type="secondary" @click="changeLifecycle('reactivate')">
-        {{ $t("organizations.reactivate") }}
-      </Button>
-      <Button type="danger" @click="changeLifecycle('archive')">
-        {{ $t("organizations.archive") }}
-      </Button>
-    </section>
-
-    <section>
-      <h2>{{ $t("organizations.transition") }}</h2>
-      <p>{{ $t("organizations.transitionNote") }}</p>
-      <Button type="secondary" :disabled="busy" @click="transitionToPersonal">
-        {{ $t("organizations.transitionToPersonal") }}
-      </Button>
-    </section>
-
-    <p v-if="error" role="alert">{{ $t("organizations.error") }}</p>
+    <p v-if="error" role="alert" aria-live="assertive">
+      {{ $t("organizations.error") }}
+    </p>
   </main>
   <p v-else-if="error" role="alert">{{ $t("organizations.error") }}</p>
   <p v-else role="status">{{ $t("organizations.loading") }}</p>
@@ -442,6 +516,14 @@ export default {
       assignmentPermissions: {},
       busy: false,
       error: false,
+      organizationSection: "members",
+      organizationSections: [
+        { id: "members" },
+        { id: "invitations" },
+        { id: "workspaces" },
+        { id: "activity" },
+        { id: "settings" },
+      ],
     };
   },
   computed: {
@@ -462,6 +544,7 @@ export default {
       return value ? new Date(value).toLocaleString(this.$i18n.locale) : "";
     },
     async load() {
+      this.error = false;
       try {
         const [organization, invitations, members, workspaces] =
           await Promise.all([
@@ -502,6 +585,18 @@ export default {
         this.error = true;
       }
     },
+    async loadCollection(action) {
+      if (this.busy) return;
+      this.busy = true;
+      this.error = false;
+      try {
+        await action();
+      } catch {
+        this.error = true;
+      } finally {
+        this.busy = false;
+      }
+    },
     async run(action) {
       this.busy = true;
       this.error = false;
@@ -524,66 +619,84 @@ export default {
       return window.confirm(this.$t(key, params));
     },
     async loadMembers() {
-      const { data } = await this.$client.get(
-        `/organizations/${this.currentOrganizationId}/members/`,
-        { params: this.memberSearch ? { search: this.memberSearch } : {} },
-      );
-      this.organization.members = data.results || data;
-      this.membersNext = data.next || null;
+      await this.loadCollection(async () => {
+        const { data } = await this.$client.get(
+          `/organizations/${this.currentOrganizationId}/members/`,
+          { params: this.memberSearch ? { search: this.memberSearch } : {} },
+        );
+        this.organization.members = data.results || data;
+        this.membersNext = data.next || null;
+      });
     },
     async loadInvitations() {
-      const { data } = await this.$client.get(
-        `/organizations/${this.currentOrganizationId}/invitations/`,
-        {
-          params: this.invitationSearch
-            ? { search: this.invitationSearch }
-            : {},
-        },
-      );
-      this.invitations = data.results || data;
-      this.invitationsNext = data.next || null;
+      await this.loadCollection(async () => {
+        const { data } = await this.$client.get(
+          `/organizations/${this.currentOrganizationId}/invitations/`,
+          {
+            params: this.invitationSearch
+              ? { search: this.invitationSearch }
+              : {},
+          },
+        );
+        this.invitations = data.results || data;
+        this.invitationsNext = data.next || null;
+      });
     },
     async loadWorkspaces() {
-      const { data } = await this.$client.get(
-        `/organizations/${this.currentOrganizationId}/workspaces/`,
-        {
-          params: this.workspaceSearch ? { search: this.workspaceSearch } : {},
-        },
-      );
-      this.organization.workspaces = data.results || data;
-      this.workspacesNext = data.next || null;
+      await this.loadCollection(async () => {
+        const { data } = await this.$client.get(
+          `/organizations/${this.currentOrganizationId}/workspaces/`,
+          {
+            params: this.workspaceSearch
+              ? { search: this.workspaceSearch }
+              : {},
+          },
+        );
+        this.organization.workspaces = data.results || data;
+        this.workspacesNext = data.next || null;
+      });
     },
     async loadMoreMembers() {
       if (!this.membersNext || this.busy) return;
-      const { data } = await this.$client.get(this.membersNext);
-      this.organization.members.push(...(data.results || data));
-      this.membersNext = data.next || null;
+      await this.loadCollection(async () => {
+        const { data } = await this.$client.get(this.membersNext);
+        this.organization.members.push(...(data.results || data));
+        this.membersNext = data.next || null;
+      });
     },
     async loadMoreInvitations() {
       if (!this.invitationsNext || this.busy) return;
-      const { data } = await this.$client.get(this.invitationsNext);
-      this.invitations.push(...(data.results || data));
-      this.invitationsNext = data.next || null;
+      await this.loadCollection(async () => {
+        const { data } = await this.$client.get(this.invitationsNext);
+        this.invitations.push(...(data.results || data));
+        this.invitationsNext = data.next || null;
+      });
     },
     async loadMoreWorkspaces() {
       if (!this.workspacesNext || this.busy) return;
-      const { data } = await this.$client.get(this.workspacesNext);
-      this.organization.workspaces.push(...(data.results || data));
-      this.workspacesNext = data.next || null;
+      await this.loadCollection(async () => {
+        const { data } = await this.$client.get(this.workspacesNext);
+        this.organization.workspaces.push(...(data.results || data));
+        this.workspacesNext = data.next || null;
+      });
     },
     async loadAudit() {
-      const { data } = await this.$client.get(
-        `/organizations/${this.currentOrganizationId}/audit/`,
-        { params: this.auditSearch ? { search: this.auditSearch } : {} },
-      );
-      this.audit = data.results || data;
-      this.auditNext = data.next || null;
+      await this.loadCollection(async () => {
+        const { data } = await this.$client.get(
+          `/organizations/${this.currentOrganizationId}/audit/`,
+          { params: this.auditSearch ? { search: this.auditSearch } : {} },
+        );
+        this.audit = data.results || data;
+        this.auditNext = data.next || null;
+      });
     },
     async loadMoreAudit() {
       if (!this.auditNext || this.busy) return;
-      const { data } = await this.$client.get(this.auditNext);
-      this.audit.push(...(data.results || data));
-      this.auditNext = data.next || null;
+      await this.loadCollection(async () => {
+        const { data } = await this.$client.get(this.auditNext);
+        this.audit.push(...(data.results || data));
+        this.auditNext = data.next || null;
+      });
     },
     async invite() {
       await this.run(async () => {
@@ -747,10 +860,38 @@ export default {
 
 <style scoped>
 .organization-page {
-  max-inline-size: 960px;
+  max-inline-size: 1120px;
   margin-inline: auto;
   padding: 32px;
   background: var(--jadawel-content-background, #fcfdfc);
+}
+
+.organization-page__tabs {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-block: 24px;
+  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
+}
+
+.organization-page__tabs button {
+  border: 0;
+  border-block-end: 3px solid transparent;
+  padding: 10px 12px;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+}
+
+.organization-page__tabs button.is-selected {
+  border-block-end-color: var(--jadawel-primary-500, #278053);
+  color: var(--jadawel-primary-500, #278053);
+  font-weight: 700;
+}
+.organization-page__progress {
+  margin-block: 0 16px;
+  color: var(--jadawel-text-secondary, #66756d);
 }
 
 .organization-page section {
@@ -827,5 +968,14 @@ export default {
   flex-basis: 100%;
   margin-block: 0;
   padding-inline-start: 24px;
+}
+
+@media (max-width: 640px) {
+  .organization-page {
+    padding: 20px 16px;
+  }
+  .organization-page section {
+    padding: 16px;
+  }
 }
 </style>

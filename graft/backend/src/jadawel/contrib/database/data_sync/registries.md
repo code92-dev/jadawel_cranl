@@ -1,0 +1,25 @@
+# backend/src/jadawel/contrib/database/data_sync/registries.py
+
+- DataSyncProperty · class · L31-L101 — class DataSyncProperty(ABC)
+- __init__ · method · L54-L64 — def __init__(self, key, name, initially_selected=True)
+- to_jadawel_field · method · L67-L73 — def to_jadawel_field(self) -> Field
+- get_metadata · method · L75-L88 — def get_metadata( self, jadawel_field: Field, existing_metadata: Optional[dict] = None ) -> Optional[dict]
+- is_equal · method · L90-L101 — def is_equal(self, jadawel_row_value: Any, data_sync_row_value: Any) -> bool
+- DataSyncType · class · L104-L299 — class DataSyncType( ModelInstanceMixin, CustomFieldsInstanceMixin, ImportExportMixin, Instance, ABC )
+- prepare_values · method · L115-L124 — def prepare_values(self, user: AbstractUser, values: Dict) -> Dict
+- prepare_sync_job_values · method · L126-L131 — def prepare_sync_job_values(self, instance: "DataSync")
+- before_sync_table · method · L133-L139 — def before_sync_table(self, user: AbstractUser, instance: "DataSync")
+- get_properties · method · L142-L154 — def get_properties(self, instance: "DataSync") -> List[DataSyncProperty]
+- get_all_rows · method · L157-L177 — def get_all_rows( self, instance: "DataSync", progress_builder: Optional[ChildProgressBuilder] = None, ) -> Iterable[Dict]
+- create_rows · method · L179-L195 — def create_rows( self, serialized_rows: List[dict], data_sync: "DataSync" ) -> (List)[dict]
+- update_rows · method · L197-L215 — def update_rows( self, serialized_rows: List[dict], data_sync: "DataSync", updated_field_ids: List[int], )
+- delete_rows · method · L217-L230 — def delete_rows(self, serialized_rows: List[dict], data_sync: "DataSync")
+- export_serialized · method · L232-L255 — def export_serialized(self, instance: "DataSync")
+- import_serialized · method · L257-L299 — def import_serialized( self, table, serialized_values, id_mapping, import_export_config: ImportExportConfig, )
+- DataSyncTypeRegistry · class · L302-L303 — class DataSyncTypeRegistry(ModelRegistryMixin, CustomFieldsRegistryMixin, Registry)
+- TwoWaySyncStrategy · class · L306-L369 — class TwoWaySyncStrategy(Instance, ABC)
+- before_enable · method · L314-L318 — def before_enable(self)
+- rows_created · method · L320-L334 — def rows_created( self, task_context: Context, serialized_rows: List[dict], data_sync: DataSync )
+- rows_updated · method · L336-L355 — def rows_updated( self, task_context: Context, serialized_rows: List[dict], data_sync: DataSync, updated_field_ids: List[int], )
+- rows_deleted · method · L357-L369 — def rows_deleted(self, serialized_rows: List[dict], data_sync: DataSync)
+- TwoWaySyncStrategyTypeRegistry · class · L372-L373 — class TwoWaySyncStrategyTypeRegistry(Registry)

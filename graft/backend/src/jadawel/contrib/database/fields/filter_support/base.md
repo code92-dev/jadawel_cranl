@@ -1,0 +1,25 @@
+# backend/src/jadawel/contrib/database/fields/filter_support/base.py
+
+- HasValueEmptyFilterSupport · class · L29-L88 — class HasValueEmptyFilterSupport
+- get_in_array_empty_value · method · L30-L42 — def get_in_array_empty_value(self, field: "Field") -> Any
+- empty_query · method · L44-L47 — def empty_query(self, field_name, model_field, field) -> Q
+- get_in_array_empty_query · method · L49-L68 — def get_in_array_empty_query( self, field_name: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- get_all_empty_query · method · L70-L88 — def get_all_empty_query( self, field_name: str, model_field: DjangoField, field: "Field", in_array: bool = True, ) -> OptionallyAnnotatedQ
+- HasValueEqualFilterSupport · class · L91-L105 — class HasValueEqualFilterSupport
+- get_in_array_is_query · method · L92-L105 — def get_in_array_is_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- HasValueContainsFilterSupport · class · L108-L123 — class HasValueContainsFilterSupport
+- get_in_array_contains_query · method · L109-L123 — def get_in_array_contains_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- HasValueContainsWordFilterSupport · class · L126-L141 — class HasValueContainsWordFilterSupport
+- get_in_array_contains_word_query · method · L127-L141 — def get_in_array_contains_word_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- HasValueLengthIsLowerThanFilterSupport · class · L144-L172 — class HasValueLengthIsLowerThanFilterSupport
+- get_in_array_length_is_lower_than_query · method · L145-L172 — def get_in_array_length_is_lower_than_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- HasAllValuesEqualFilterSupport · class · L175-L201 — class HasAllValuesEqualFilterSupport
+- get_has_all_values_equal_query · method · L176-L201 — def get_has_all_values_equal_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field" ) -> "OptionallyAnnotatedQ"
+- HasNumericValueComparableToFilterSupport · class · L204-L218 — class HasNumericValueComparableToFilterSupport
+- get_has_numeric_value_comparable_to_filter_query · method · L205-L218 — def get_has_numeric_value_comparable_to_filter_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field", comparison_op: ComparisonOperator, ) -> OptionallyAnnotatedQ
+- get_array_json_filter_expression · function · L221-L249 — def get_array_json_filter_expression( json_expression: Type[JadawelFilterExpression], field_name: str, value: Value, **extra: Dict[str, Any], ) -> AnnotatedQ
+- get_jsonb_contains_filter_expr · function · L252-L286 — def get_jsonb_contains_filter_expr( model_field: DjangoField, value: str, query_path: str = "$[*].value" ) -> OptionallyAnnotatedQ
+- get_jsonb_contains_word_filter_expr · function · L289-L326 — def get_jsonb_contains_word_filter_expr( model_field: DjangoField, value: str, query_path: str = "$[*].value" ) -> OptionallyAnnotatedQ
+- get_jsonb_has_any_in_value_filter_expr · function · L335-L379 — def get_jsonb_has_any_in_value_filter_expr( model_field: DjangoField, value: Any, query_path: str = "$[*].id", comparison_operator: str = "==", join_operator: str = "||", ) -> OptionallyAnnotatedQ
+- get_jsonb_has_exact_value_filter_expr · function · L382-L415 — def get_jsonb_has_exact_value_filter_expr( model_field: DjangoField, value: List[int] ) -> OptionallyAnnotatedQ
+- get_jsonb_has_date_value_filter_expr · function · L418-L474 — def get_jsonb_has_date_value_filter_expr( model_field: DjangoField, timezone: zoneinfo.ZoneInfo, gte_of: date | datetime | None = None, lt_of: date | datetime | None = None, ) -> OptionallyAnnotatedQ

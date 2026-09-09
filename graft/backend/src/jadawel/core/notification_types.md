@@ -1,0 +1,20 @@
+# backend/src/jadawel/core/notification_types.py
+
+- InvitationNotificationData · class · L24-L27 — class InvitationNotificationData
+- mark_invitation_notification_as_read · function · L30-L42 — def mark_invitation_notification_as_read(user, invitation)
+- WorkspaceInvitationCreatedNotificationType · class · L45-L59 — class WorkspaceInvitationCreatedNotificationType(NotificationType)
+- create_notification · method · L49-L59 — def create_notification(cls, invitation, invited_user)
+- notify_invited_user · function · L63-L67 — def notify_invited_user(sender, invitation, invited_user, created, **kwargs)
+- WorkspaceInvitationAcceptedNotificationType · class · L70-L100 — class WorkspaceInvitationAcceptedNotificationType( EmailNotificationTypeMixin, NotificationType )
+- create_invitation_accepted_notification · method · L76-L87 — def create_invitation_accepted_notification(cls, user, invitation)
+- get_notification_title_for_email · method · L90-L96 — def get_notification_title_for_email(cls, notification, context)
+- get_notification_description_for_email · method · L99-L100 — def get_notification_description_for_email(cls, notification, context)
+- handle_workspace_invitation_accepted · function · L104-L108 — def handle_workspace_invitation_accepted(sender, invitation, user, **kwargs)
+- WorkspaceInvitationRejectedNotificationType · class · L111-L141 — class WorkspaceInvitationRejectedNotificationType( EmailNotificationTypeMixin, NotificationType )
+- create_invitation_rejected_notification · method · L117-L128 — def create_invitation_rejected_notification(cls, user, invitation)
+- get_notification_title_for_email · method · L131-L137 — def get_notification_title_for_email(cls, notification, context)
+- get_notification_description_for_email · method · L140-L141 — def get_notification_description_for_email(cls, notification, context)
+- handle_workspace_invitation_rejected · function · L145-L149 — def handle_workspace_invitation_rejected(sender, invitation, user, **kwargs)
+- JadawelVersionUpgradeNotificationType · class · L152-L186 — class JadawelVersionUpgradeNotificationType(CliNotificationTypeMixin, NotificationType)
+- create_version_upgrade_broadcast_notification · method · L156-L163 — def create_version_upgrade_broadcast_notification( cls, version, release_notes_url=None )
+- prompt_for_args_in_cli_and_create_notification · method · L166-L186 — def prompt_for_args_in_cli_and_create_notification(cls)

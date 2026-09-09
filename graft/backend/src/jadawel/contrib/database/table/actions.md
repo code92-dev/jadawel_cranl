@@ -1,0 +1,32 @@
+# backend/src/jadawel/contrib/database/table/actions.py
+
+- CreateTableActionType · class · L23-L101 — class CreateTableActionType(UndoableActionType)
+- Params · class · L36-L40 — class Params
+- do · method · L43-L86 — def do( cls, user: AbstractUser, database: Database, name: str, data: Optional[List[List[Any]]] = None, first_row_header: bool = True, fill_example: bool = True, progress: Optional[Progress] = None, ) -> Tuple[Table, Dict[str, Dict[str, Any]]]
+- scope · method · L89-L90 — def scope(cls, database_id) -> ActionScopeStr
+- undo · method · L93-L95 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L98-L101 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DeleteTableActionType · class · L104-L157 — class DeleteTableActionType(UndoableActionType)
+- Params · class · L117-L121 — class Params
+- do · method · L124-L143 — def do(cls, user: AbstractUser, table: Table)
+- scope · method · L146-L147 — def scope(cls, database_id) -> ActionScopeStr
+- undo · method · L150-L153 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L156-L157 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- OrderTableActionType · class · L160-L221 — class OrderTableActionType(UndoableActionType)
+- Params · class · L172-L176 — class Params
+- do · method · L179-L201 — def do(cls, user: AbstractUser, database: Database, order: List[int])
+- scope · method · L204-L205 — def scope(cls, database_id) -> ActionScopeStr
+- undo · method · L208-L213 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L216-L221 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- UpdateTableActionType · class · L224-L293 — class UpdateTableActionType(UndoableActionType)
+- Params · class · L240-L245 — class Params
+- do · method · L248-L279 — def do(cls, user: AbstractUser, table: Table, name: str) -> Table
+- scope · method · L282-L283 — def scope(cls, database_id) -> ActionScopeStr
+- undo · method · L286-L289 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L292-L293 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DuplicateTableActionType · class · L296-L369 — class DuplicateTableActionType(UndoableActionType)
+- Params · class · L313-L319 — class Params
+- do · method · L322-L354 — def do( cls, user: AbstractUser, table: Table, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Table
+- scope · method · L357-L358 — def scope(cls, database_id) -> ActionScopeStr
+- undo · method · L361-L363 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L366-L369 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)

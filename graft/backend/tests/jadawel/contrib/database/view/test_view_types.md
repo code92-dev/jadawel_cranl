@@ -1,0 +1,18 @@
+# backend/tests/jadawel/contrib/database/view/test_view_types.py
+
+- test_import_export_grid_view · function · L35-L120 — def test_import_export_grid_view(data_fixture)
+- test_grid_view_field_type_change · function · L124-L170 — def test_grid_view_field_type_change(data_fixture)
+- test_import_export_gallery_view · function · L174-L240 — def test_import_export_gallery_view(data_fixture, tmpdir)
+- test_newly_created_gallery_view · function · L244-L260 — def test_newly_created_gallery_view(data_fixture)
+- test_convert_card_cover_image_field_to_another · function · L264-L273 — def test_convert_card_cover_image_field_to_another(data_fixture)
+- test_convert_card_cover_image_field_deleted · function · L277-L286 — def test_convert_card_cover_image_field_deleted(data_fixture)
+- test_convert_to_incompatible_field_in_form_view · function · L290-L310 — def test_convert_to_incompatible_field_in_form_view(data_fixture)
+- test_import_export_form_view · function · L314-L483 — def test_import_export_form_view(data_fixture, tmpdir)
+- test_import_export_form_view_with_grouped_conditions · function · L487-L767 — def test_import_export_form_view_with_grouped_conditions(data_fixture, tmpdir)
+- test_import_export_form_view_with_conditions_in_groups · function · L771-L870 — def test_import_export_form_view_with_conditions_in_groups(data_fixture, api_client)
+- test_import_export_form_view_with_allowed_select_options · function · L874-L923 — def test_import_export_form_view_with_allowed_select_options(data_fixture, api_client)
+- test_import_export_view_ownership_type · function · L928-L1000 — def test_import_export_view_ownership_type(data_fixture)
+- test_import_export_view_ownership_type_created_by_backward_compatible · function · L1004-L1031 — def test_import_export_view_ownership_type_created_by_backward_compatible(data_fixture)
+- test_import_export_view_ownership_type_not_in_registry · function · L1035-L1072 — def test_import_export_view_ownership_type_not_in_registry(data_fixture)
+- test_new_fields_are_hidden_by_default_in_views_if_public · function · L1077-L1100 — def test_new_fields_are_hidden_by_default_in_views_if_public( view_type, default, data_fixture )
+- test_new_fields_are_hidden_by_default_in_views_if_other_fields_are_hidden · function · L1105-L1135 — def test_new_fields_are_hidden_by_default_in_views_if_other_fields_are_hidden( view_type, default, data_fixture )

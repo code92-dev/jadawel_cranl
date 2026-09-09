@@ -1,0 +1,16 @@
+# backend/tests/jadawel/api/actions/test_action_views.py
+
+- test_undoing_when_nothing_to_do_response_with_correct_code · function · L21-L36 — def test_undoing_when_nothing_to_do_response_with_correct_code( api_client, data_fixture )
+- test_undoing_without_session_id_returns_error · function · L41-L50 — def test_undoing_without_session_id_returns_error(api_client, data_fixture)
+- test_can_undo_an_action_and_get_correct_response_code · function · L55-L88 — def test_can_undo_an_action_and_get_correct_response_code(api_client, data_fixture)
+- test_undoing_an_action_which_fails_returns_correct_result_code · function · L93-L127 — def test_undoing_an_action_which_fails_returns_correct_result_code( api_client, data_fixture )
+- test_redoing_when_nothing_to_do_response_with_correct_code · function · L132-L147 — def test_redoing_when_nothing_to_do_response_with_correct_code( api_client, data_fixture )
+- test_redoing_without_session_id_returns_error · function · L152-L161 — def test_redoing_without_session_id_returns_error(api_client, data_fixture)
+- test_can_redo_an_action_and_get_correct_response_code · function · L166-L210 — def test_can_redo_an_action_and_get_correct_response_code(api_client, data_fixture)
+- test_redoing_an_action_which_fails_returns_correct_result_code · function · L215-L257 — def test_redoing_an_action_which_fails_returns_correct_result_code( api_client, data_fixture )
+- test_can_undo_an_action_group_and_get_correct_response_code · function · L262-L319 — def test_can_undo_an_action_group_and_get_correct_response_code( api_client, data_fixture )
+- test_can_redo_an_action_group_and_get_correct_response_code · function · L324-L392 — def test_can_redo_an_action_group_and_get_correct_response_code( api_client, data_fixture )
+- test_invalid_undo_redo_action_group_header_raise_error · function · L397-L415 — def test_invalid_undo_redo_action_group_header_raise_error(api_client, data_fixture)
+- test_undoing_when_field_locked_fails_and_doesnt_skip · function · L420-L455 — def test_undoing_when_field_locked_fails_and_doesnt_skip(api_client, data_fixture)
+- test_redoing_when_field_locked_fails_and_doesnt_skip · function · L460-L502 — def test_redoing_when_field_locked_fails_and_doesnt_skip(api_client, data_fixture)
+- test_undoing_field_delete_whilst_field_locked_works · function · L507-L538 — def test_undoing_field_delete_whilst_field_locked_works(api_client, data_fixture)

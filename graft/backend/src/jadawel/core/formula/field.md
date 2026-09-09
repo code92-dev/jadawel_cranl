@@ -1,0 +1,22 @@
+# backend/src/jadawel/core/formula/field.py
+
+- FormulaField · class · L22-L233 — class FormulaField(models.TextField)
+- __init__ · method · L36-L42 — def __init__(self, *args, **kwargs)
+- _deserialize_jadawel_object · method · L44-L66 — def _deserialize_jadawel_object( self, value: FormulaFieldDatabaseValue ) -> Optional[Dict[str, Any]]
+- _transform_db_value_to_dict · method · L68-L132 — def _transform_db_value_to_dict( self, value: FormulaFieldDatabaseValue ) -> JadawelFormulaObject
+- contribute_to_class · method · L134-L157 — def contribute_to_class(self, cls, name, **kwargs)
+- save_with_to_python · function · L148-L155 — def save_with_to_python(instance, *args, **kwargs): # Perform the original save operation
+- to_python · method · L159-L169 — def to_python(self, value: FormulaFieldDatabaseValue) -> JadawelFormulaObject
+- from_db_value · method · L171-L183 — def from_db_value( self, value: FormulaFieldDatabaseValue, *args ) -> JadawelFormulaObject
+- get_prep_value · method · L185-L233 — def get_prep_value( self, value: Union[str, JadawelFormulaObject] ) -> Union[str, JadawelFormulaMinified]
+- JSONFormulaField · class · L236-L511 — class JSONFormulaField(models.JSONField)
+- __init__ · method · L237-L239 — def __init__(self, *args, **kwargs)
+- deconstruct · method · L241-L249 — def deconstruct(self)
+- contribute_to_class · method · L251-L274 — def contribute_to_class(self, cls, name, **kwargs)
+- save_with_to_python · function · L265-L272 — def save_with_to_python(instance, *args, **kwargs): # Perform the original save operation
+- _transform_db_property · method · L276-L305 — def _transform_db_property( self, value: Union[str, JadawelFormulaMinified, JadawelFormulaObject], ) -> JadawelFormulaObject
+- _transform_db_properties · method · L307-L374 — def _transform_db_properties( self, value: JSONFormulaFieldDatabaseValue ) -> JSONFormulaFieldResult
+- to_python · method · L376-L387 — def to_python(self, value: JSONFormulaFieldDatabaseValue) -> JSONFormulaFieldResult
+- from_db_value · method · L389-L402 — def from_db_value( self, value: JSONFormulaFieldDatabaseValue, *args ) -> JSONFormulaFieldResult
+- _transform_python_property · method · L404-L426 — def _transform_python_property( self, value: Union[str, JadawelFormulaObject] ) -> JadawelFormulaMinified
+- get_prep_value · method · L428-L511 — def get_prep_value( self, value: Union[JadawelFormulaObject, List[Dict[str, JadawelFormulaObject]]] ) -> JSONFormulaFieldDatabaseValue

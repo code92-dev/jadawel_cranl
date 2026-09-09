@@ -1,0 +1,16 @@
+# web-frontend/modules/builder/components/elements/components/forms/general/RepeatElementForm.vue
+
+- setup · method · L198-L200 — setup()
+- data · method · L201-L226 — data()
+- isCollapsed · method · L229-L232 — isCollapsed()
+- deviceTypes · method · L233-L235 — deviceTypes()
+- itemsPerRowError · method · L236-L245 — itemsPerRowError()
+- gapError · method · L246-L262 — gapError()
+- orientationOptions · method · L263-L276 — orientationOptions()
+- get · method · L278-L283 — get()
+- set · method · L284-L287 — set(newValue)
+- paddingDefaults · method · L289-L294 — paddingDefaults()
+- mounted · method · L296-L306 — mounted()
+- emitToggleRepetitions · method · L311-L317 — emitToggleRepetitions(value)
+- handlePerRowInput · method · L318-L322 — handlePerRowInput(event, deviceTypeType)
+- validations · method · L324-L372 — validations()

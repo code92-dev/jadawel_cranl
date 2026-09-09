@@ -1,0 +1,35 @@
+# backend/src/jadawel/api/user/serializers.py
+
+- SubjectUserSerializer · class · L54-L63 — class SubjectUserSerializer(serializers.ModelSerializer)
+- Meta · class · L55-L63 — class Meta
+- UserSerializer · class · L66-L121 — class UserSerializer(serializers.ModelSerializer)
+- Meta · class · L100-L121 — class Meta
+- PublicUserSerializer · class · L124-L135 — class PublicUserSerializer(serializers.ModelSerializer)
+- Meta · class · L130-L135 — class Meta
+- RegisterSerializer · class · L138-L177 — class RegisterSerializer(serializers.Serializer)
+- AccountSerializer · class · L180-L231 — class AccountSerializer(serializers.Serializer)
+- validate · method · L216-L231 — def validate(self, data)
+- SendResetPasswordEmailBodyValidationSerializer · class · L234-L242 — class SendResetPasswordEmailBodyValidationSerializer(serializers.Serializer)
+- ResetPasswordBodyValidationSerializer · class · L245-L247 — class ResetPasswordBodyValidationSerializer(serializers.Serializer)
+- ChangePasswordBodyValidationSerializer · class · L250-L252 — class ChangePasswordBodyValidationSerializer(serializers.Serializer)
+- SendChangeEmailConfirmationSerializer · class · L255-L264 — class SendChangeEmailConfirmationSerializer(serializers.Serializer)
+- ChangeEmailSerializer · class · L267-L268 — class ChangeEmailSerializer(serializers.Serializer)
+- VerifyEmailAddressSerializer · class · L271-L272 — class VerifyEmailAddressSerializer(serializers.Serializer)
+- SendVerifyEmailAddressSerializer · class · L275-L276 — class SendVerifyEmailAddressSerializer(serializers.Serializer)
+- NormalizedEmailField · class · L279-L282 — class NormalizedEmailField(serializers.EmailField)
+- to_internal_value · method · L280-L282 — def to_internal_value(self, data)
+- get_all_user_data_serialized · function · L285-L301 — def get_all_user_data_serialized( user: AbstractUser, request: Optional[Request] = None ) -> Dict
+- log_in_user · function · L304-L329 — def log_in_user(request, user)
+- TwoFactorAuthRequiredSerializer · class · L332-L334 — class TwoFactorAuthRequiredSerializer(serializers.Serializer)
+- TokenObtainPairWithUserSerializer · class · L338-L380 — class TokenObtainPairWithUserSerializer(TokenObtainPairSerializer)
+- __init__ · method · L341-L345 — def __init__(self, *args, **kwargs)
+- get_username · method · L347-L348 — def get_username(self, value)
+- validate · method · L350-L380 — def validate(self, attrs)
+- TokenRefreshWithUserSerializer · class · L384-L416 — class TokenRefreshWithUserSerializer(TokenRefreshSerializer)
+- __init__ · method · L390-L392 — def __init__(self, *args, **kwargs)
+- validate · method · L394-L416 — def validate(self, attrs)
+- TokenVerifyWithUserSerializer · class · L420-L450 — class TokenVerifyWithUserSerializer(TokenVerifySerializer)
+- __init__ · method · L423-L427 — def __init__(self, *args, **kwargs)
+- validate · method · L429-L450 — def validate(self, attrs)
+- TokenBlacklistSerializer · class · L453-L456 — class TokenBlacklistSerializer(serializers.Serializer)
+- DashboardSerializer · class · L459-L460 — class DashboardSerializer(serializers.Serializer)

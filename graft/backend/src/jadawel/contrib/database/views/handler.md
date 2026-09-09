@@ -1,0 +1,106 @@
+# backend/src/jadawel/contrib/database/views/handler.py
+
+- UpdatedViewWithChangedAttributes · class · L202-L205 — class UpdatedViewWithChangedAttributes
+- ViewIndexingHandler · class · L208-L646 — class ViewIndexingHandler(metaclass=jadawel_trace_methods(tracer))
+- does_index_exist · method · L210-L223 — def does_index_exist(cls, index_name: str) -> bool
+- _get_index_name_prefix · method · L226-L236 — def _get_index_name_prefix(cls, table_id: int) -> str
+- before_field_type_change · method · L239-L271 — def before_field_type_change(cls, field: Field, model=None)
+- _get_index_hash · method · L274-L299 — def _get_index_hash( cls, field_order_bys: List[OptionallyAnnotatedOrderBy] ) -> Optional[str]
+- concat_attrs · function · L286-L290 — def concat_attrs(field_order_by)
+- get_index_name · method · L302-L315 — def get_index_name( cls, table_id: int, field_order_bys: List[OptionallyAnnotatedOrderBy] ) -> str
+- schedule_index_creation_if_needed · method · L318-L341 — def schedule_index_creation_if_needed(cls, view: View, model: GeneratedTableModel)
+- get_index · method · L344-L392 — def get_index( cls, view: View, model: Optional[GeneratedTableModel] = None ) -> Optional[django_models.Index]
+- before_view_permanently_deleted · method · L395-L403 — def before_view_permanently_deleted(cls, view: View)
+- after_fields_changed_or_deleted · method · L406-L420 — def after_fields_changed_or_deleted(cls, fields: List[Field])
+- schedule_index_update · method · L423-L433 — def schedule_index_update(cls, view: View)
+- drop_all_indexes_for_table · method · L436-L468 — def drop_all_indexes_for_table(cls, table_id: int)
+- handle_index_row_size_error · method · L471-L483 — def handle_index_row_size_error(cls, table_id: int)
+- create_index_if_not_exists · method · L486-L531 — def create_index_if_not_exists( cls, view: View, model: GeneratedTableModel, db_index: django_models.Index, ) -> Optional[str]
+- drop_index_if_unused · method · L534-L563 — def drop_index_if_unused( cls, view: View, model: Optional[GeneratedTableModel] = None ) -> Optional[str]
+- drop_index · method · L566-L577 — def drop_index(cls, view, db_index, model=None)
+- update_index_by_view_id · method · L580-L616 — def update_index_by_view_id(cls, view_id: int, nowait=True)
+- update_index · method · L619-L646 — def update_index(cls, view: View, model: Optional[GeneratedTableModel] = None)
+- ViewHandler · class · L649-L4050 — class ViewHandler(metaclass=jadawel_trace_methods(tracer))
+- list_views · method · L652-L722 — def list_views( self, user: AbstractUser, table: Table, _type: str | None = None, filters: bool = True, sortings: bool = True, decorations: bool = True, group_bys: bool = True, default_row_values: bool = False, limit: int | None = None, ) -> Iterable[View]
+- before_field_type_change · method · L724-L732 — def before_field_type_change(self, field: Field)
+- list_workspace_views · method · L734-L801 — def list_workspace_views( self, user: AbstractUser, workspace: Workspace, filters: bool = False, sortings: bool = False, decorations: bool = False, group_bys: bool = False, limit: int = None, specific: bool = True, base_queryset: QuerySet = None, ) -> Iterable[View]
+- get_view_as_user · method · L803-L837 — def get_view_as_user( self, user: AbstractUser, view_id: int, view_model: Optional[Type[View]] = None, base_queryset: Optional[QuerySet] = None, table_id: Optional[int] = None, ) -> View
+- get_view · method · L839-L889 — def get_view( self, view_id: int | str, view_model: Optional[Type[View]] = None, base_queryset: Optional[QuerySet] = None, table_id: Optional[int] = None, pk_field: str = "pk", ) -> View
+- get_view_for_update · method · L891-L925 — def get_view_for_update( self, user: AbstractUser, view_id: int, view_model: Optional[Type[View]] = None, base_queryset: Optional[QuerySet] = None, ) -> View
+- create_view · method · L927-L993 — def create_view( self, user: AbstractUser, table: Table, type_name: str, **kwargs ) -> View
+- find_unused_view_name · method · L995-L1007 — def find_unused_view_name(self, table_id: int, proposed_name: str) -> str
+- duplicate_view · method · L1009-L1103 — def duplicate_view(self, user: AbstractUser, original_view: View) -> View
+- update_view · method · L1105-L1190 — def update_view( self, user: AbstractUser, view: View, **data: Dict[str, Any] ) -> UpdatedViewWithChangedAttributes
+- order_views · method · L1192-L1237 — def order_views(self, user: AbstractUser, table: Table, order: List[int])
+- get_views_order · method · L1239-L1271 — def get_views_order(self, user: AbstractUser, table: Table, ownership_type: str)
+- delete_view_by_id · method · L1273-L1282 — def delete_view_by_id(self, user: AbstractUser, view_id: int)
+- delete_view · method · L1284-L1305 — def delete_view(self, user: AbstractUser, view: View)
+- get_field_options_as_user · method · L1307-L1325 — def get_field_options_as_user(self, user: AbstractUser, view: View)
+- update_field_options · method · L1327-L1450 — def update_field_options( self, view: View, field_options: FieldOptionsDict, user: Optional[AbstractUser] = None, fields: Optional[QuerySet[Field]] = None, )
+- after_field_moved_between_tables · method · L1452-L1462 — def after_field_moved_between_tables(self, field: Field, original_table_id: int)
+- fields_type_changed · method · L1464-L1560 — def fields_type_changed(self, fields: List[Field])
+- field_value_updated · method · L1562-L1578 — def field_value_updated(self, updated_fields: Union[Iterable[Field], Field])
+- field_updated · method · L1580-L1602 — def field_updated(self, updated_fields: Union[Iterable[Field], Field])
+- get_filter_builder · method · L1604-L1620 — def get_filter_builder( self, view: View, model: Type[GeneratedTableModel] ) -> FilterBuilder
+- apply_filters · method · L1622-L1639 — def apply_filters(self, view: View, queryset: QuerySet) -> QuerySet
+- list_filters · method · L1641-L1656 — def list_filters(self, user: AbstractUser, view_id: int) -> QuerySet[ViewFilter]
+- get_filter · method · L1658-L1702 — def get_filter( self, user: AbstractUser, view_filter_id: int, base_queryset: Optional[QuerySet] = None, ) -> ViewFilter
+- create_filter · method · L1704-L1780 — def create_filter( self, user: AbstractUser, view: View, field: Field, type_name: str, value: str, filter_group_id: Optional[int] = None, primary_key: Optional[int] = None, ) -> ViewFilter
+- update_filter · method · L1782-L1845 — def update_filter( self, user: AbstractUser, view_filter: ViewFilter, field: Field = None, type_name: str = None, value: str = None, ) -> ViewFilter
+- delete_filter · method · L1847-L1872 — def delete_filter(self, user: AbstractUser, view_filter: ViewFilter)
+- get_filter_group · method · L1874-L1918 — def get_filter_group( self, user: AbstractUser, filter_group_id: int, base_queryset: Optional[QuerySet] = None, ) -> ViewFilterGroup
+- create_filter_group · method · L1920-L1961 — def create_filter_group( self, user: AbstractUser, view: View, filter_type: Optional[str] = None, parent_group_id: Optional[int] = None, primary_key: Optional[int] = None, ) -> ViewFilterGroup
+- update_filter_group · method · L1963-L1988 — def update_filter_group( self, user: AbstractUser, filter_group: ViewFilterGroup, filter_type: str ) -> ViewFilterGroup
+- delete_filter_group · method · L1990-L2016 — def delete_filter_group(self, user: AbstractUser, filter_group: ViewFilterGroup)
+- get_view_order_bys · method · L2018-L2070 — def get_view_order_bys( self, view: View, model: GeneratedTableModel, queryset: QuerySet, restrict_to_field_ids: Optional[Iterable[int]] = None, ) -> Tuple[List[OrderBy], Optional[QuerySet]]
+- apply_sorting · method · L2072-L2120 — def apply_sorting( self, view: View, queryset: QuerySet, restrict_to_field_ids: Optional[Iterable[int]] = None, ) -> QuerySet
+- list_sorts · method · L2122-L2139 — def list_sorts(self, user: AbstractUser, view_id: int) -> QuerySet[ViewSort]
+- get_sort · method · L2141-L2179 — def get_sort(self, user, view_sort_id, base_queryset=None)
+- create_sort · method · L2181-L2256 — def create_sort( self, user: AbstractUser, view: View, field: Field, order: str, primary_key: Optional[int] = None, sort_type: Optional[str] = None, ) -> ViewSort
+- update_sort · method · L2258-L2338 — def update_sort( self, user: AbstractUser, view_sort: ViewSort, field: Optional[Field] = None, order: Optional[str] = None, sort_type: Optional[str] = None, ) -> ViewSort
+- delete_sort · method · L2340-L2363 — def delete_sort(self, user, view_sort)
+- list_group_bys · method · L2365-L2382 — def list_group_bys(self, user: AbstractUser, view_id: int) -> QuerySet[ViewGroupBy]
+- get_group_by · method · L2384-L2427 — def get_group_by(self, user, view_group_by_id, base_queryset=None)
+- create_group_by · method · L2429-L2506 — def create_group_by( self, user: AbstractUser, view: View, field: Field, order: str, width: int, sort_type: str = None, primary_key: Optional[int] = None, ) -> ViewGroupBy
+- update_group_by · method · L2508-L2597 — def update_group_by( self, user: AbstractUser, view_group_by: ViewGroupBy, field: Optional[Field] = None, order: Optional[str] = None, width: Optional[int] = None, sort_type: Optional[str] = None, ) -> ViewGroupBy
+- delete_group_by · method · L2599-L2625 — def delete_group_by(self, user, view_group_by)
+- create_decoration · method · L2627-L2697 — def create_decoration( self, view: View, decorator_type_name: str, value_provider_type_name: str, value_provider_conf: Dict[str, Any], order: Optional[int] = None, user: Union["AbstractUser", None] = None, primary_key: Optional[int] = None, ) -> ViewDecoration
+- list_decorations · method · L2699-L2718 — def list_decorations( self, user: AbstractUser, view_id: int ) -> QuerySet[ViewDecoration]
+- get_decoration · method · L2720-L2764 — def get_decoration( self, user: AbstractUser, view_decoration_id: int, base_queryset: QuerySet = None, ) -> ViewDecoration
+- update_decoration · method · L2766-L2834 — def update_decoration( self, view_decoration: ViewDecoration, user: Union["AbstractUser", None] = None, decorator_type_name: Optional[str] = None, value_provider_type_name: Optional[str] = None, value_provider_conf: Optional[Dict[str, Any]] = None, order: Optional[int] = None, ) -> ViewDecoration
+- delete_decoration · method · L2836-L2867 — def delete_decoration( self, view_decoration: ViewDecoration, user: Union["AbstractUser", None] = None, )
+- get_queryset · method · L2869-L2939 — def get_queryset( self, user: Optional[AbstractUser], view: View, search: Optional[str] = None, model: Optional[GeneratedTableModel] = None, only_sort_by_field_ids: Optional[Iterable[int]] = None, only_search_by_field_ids: Optional[Iterable[int]] = None, apply_sorts: bool = True, apply_filters: bool = True, search_mode: Optional[SearchMode] = None, ) -> QuerySet
+- _get_aggregation_lock_cache_key · method · L2941-L2946 — def _get_aggregation_lock_cache_key(self, view: View)
+- _get_aggregation_value_cache_key · method · L2948-L2953 — def _get_aggregation_value_cache_key(self, view: View, name: str)
+- _get_aggregation_version_cache_key · method · L2955-L2960 — def _get_aggregation_version_cache_key(self, view: View, name: str)
+- clear_full_aggregation_cache · method · L2962-L2970 — def clear_full_aggregation_cache(self, view: View)
+- clear_aggregation_cache · method · L2972-L2986 — def clear_aggregation_cache(self, view: View, names: Union[List[str], str])
+- _get_aggregations_to_compute · method · L2988-L3042 — def _get_aggregations_to_compute( self, view: View, aggregations: Iterable[Tuple[django_models.Field, str]], no_cache: bool = False, ) -> Tuple[Dict[str, Any], Dict[str, Tuple[django_models.Field, str, int]]]
+- get_view_field_aggregations · method · L3044-L3188 — def get_view_field_aggregations( self, user: AbstractUser, view: View, model: Union[GeneratedTableModel, None] = None, with_total: bool = False, adhoc_filters: Optional[AdHocFilters] = None, combine_filters: bool = False, search: Optional[str] = None, search_mode: Optional[SearchMode] = None, skip_perm_check: bool = False, ) -> Dict[str, Any]
+- get_field_aggregations · method · L3190-L3323 — def get_field_aggregations( self, user: AbstractUser, view: View, aggregations: Iterable[Tuple[django_models.Field, str]], model: Union[GeneratedTableModel, None] = None, with_total: bool = False, adhoc_filters: Optional[AdHocFilters] = None, combine_filters: bool = False, search: Optional[str] = None, search_mode: Optional[SearchMode] = None, skip_perm_check: bool = False, restrict_to_field_ids: Optional[Set[int]] = None, ) -> Dict[str, Any]
+- rotate_view_slug · method · L3325-L3337 — def rotate_view_slug( self, user: AbstractUser, view: View, slug_field: str = "slug" ) -> View
+- update_view_slug · method · L3339-L3373 — def update_view_slug( self, user: AbstractUser, view: View, slug: str, slug_field: str = "slug" ) -> View
+- get_public_view_by_slug · method · L3375-L3446 — def get_public_view_by_slug( self, user: Union[AbstractUser, AnonymousUser], slug: str, view_model: Optional[Type[View]] = None, authorization_token: Optional[str] = None, raise_authorization_error: bool = True, ) -> View
+- _get_allowed_form_field_names · method · L3449-L3462 — def _get_allowed_form_field_names(model, enabled_field_options)
+- submit_form_view · method · L3464-L3519 — def submit_form_view( self, user: AbstractUser, form: FormView, values: Dict[str, Any], model: Optional[Type[GeneratedTableModel]] = None, enabled_field_options: Optional[QuerySet[FormViewFieldOptions]] = None, ) -> GeneratedTableModel
+- edit_form_view_row · method · L3521-L3563 — def edit_form_view_row( self, user: AbstractUser, form: FormView, row_id: int, values: Dict[str, Any], model: Optional[Type[GeneratedTableModel]] = None, enabled_field_options: Optional[QuerySet[FormViewFieldOptions]] = None, ) -> GeneratedTableModel
+- restrict_row_for_view · method · L3565-L3579 — def restrict_row_for_view( self, view: View, serialized_row: Dict[str, Any] ) -> Dict[Any, Any]
+- restrict_rows_for_view · method · L3581-L3610 — def restrict_rows_for_view( self, view: View, serialized_rows: List[Dict[str, Any]], allowed_row_ids: Optional[List[int]] = None, ) -> List[Dict[str, Any]]
+- _get_public_view_jwt_secret · method · L3612-L3623 — def _get_public_view_jwt_secret(self, view: View) -> str
+- encode_public_view_token · method · L3625-L3637 — def encode_public_view_token(self, view: View) -> str
+- decode_public_view_token · method · L3639-L3650 — def decode_public_view_token(self, view: View, token: str) -> Dict[str, Any]
+- is_public_view_token_valid · method · L3652-L3664 — def is_public_view_token_valid(self, view: View, token: str) -> bool
+- get_public_rows_queryset_and_field_ids · method · L3666-L3766 — def get_public_rows_queryset_and_field_ids( self, view: View, search: str | None = None, search_mode: SearchMode | None = None, order_by: str | None = None, group_by: str | None = None, include_fields: str | None = None, exclude_fields: str | None = None, adhoc_filters: AdHocFilters | None = None, table_model: Type[GeneratedTableModel] | None = None, view_type: ViewType | None = None, ) -> Tuple[QuerySet, List[int], List[django_models.Model]]
+- get_group_by_metadata_in_rows · method · L3768-L3854 — def get_group_by_metadata_in_rows( self, fields: List[Field], rows: List["GeneratedTableModel"], base_queryset: QuerySet, ) -> Dict[Field, QuerySet]
+- _get_prepared_values_for_data · method · L3856-L3863 — def _get_prepared_values_for_data( self, view_type: ViewType, view: View, changed_allowed_keys: Iterable[str] ) -> Dict[str, Any]
+- get_view_default_values · method · L3865-L3881 — def get_view_default_values(self, view)
+- update_view_default_values · method · L3883-L3999 — def update_view_default_values(self, user, view, items, model=None)
+- get_view_default_values_for_row_creation · method · L4001-L4050 — def get_view_default_values_for_row_creation(self, view, model=None)
+- ViewSubscriptionHandler · class · L4053-L4218 — class ViewSubscriptionHandler
+- get_subscribed_views · method · L4055-L4068 — def get_subscribed_views(cls, subscriber: django_models.Model) -> QuerySet[View]
+- sync_view_rows · method · L4071-L4096 — def sync_view_rows(cls, views: list[View], model=None) -> list[ViewRows]
+- subscribe_to_views · method · L4099-L4115 — def subscribe_to_views(cls, subscriber: django_models.Model, views: list[View])
+- unsubscribe_from_views · method · L4118-L4139 — def unsubscribe_from_views( cls, subscriber: django_models.Model, views: list[View] | None = None )
+- check_views_with_time_sensitive_filters · method · L4142-L4158 — def check_views_with_time_sensitive_filters(cls)
+- notify_table_views_updates · method · L4161-L4177 — def notify_table_views_updates( cls, views: list[View], model: GeneratedTableModel | None = None )
+- notify_table_views · method · L4180-L4218 — def notify_table_views( cls, view_ids: list[int], model: GeneratedTableModel | None = None )

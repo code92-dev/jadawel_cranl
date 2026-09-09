@@ -1,0 +1,27 @@
+# backend/src/jadawel/core/jobs/models.py
+
+- get_default_job_content_type · function · L23-L24 — def get_default_job_content_type()
+- JobQuerySet · class · L27-L35 — class JobQuerySet(models.QuerySet)
+- is_running · method · L28-L29 — def is_running(self)
+- is_ended · method · L31-L32 — def is_ended(self)
+- is_pending_or_running · method · L34-L35 — def is_pending_or_running(self)
+- Job · class · L38-L202 — class Job(CreatedAndUpdatedOnMixin, PolymorphicContentTypeMixin, models.Model)
+- get_from_cache · method · L70-L79 — def get_from_cache(self) -> dict | None
+- get_from_cached_value_or_from_self · method · L81-L96 — def get_from_cached_value_or_from_self(self, name: str) -> Any
+- get_cached_progress_percentage · method · L98-L99 — def get_cached_progress_percentage(self) -> int
+- get_cached_state · method · L101-L102 — def get_cached_state(self) -> str
+- Meta · class · L104-L106 — class Meta
+- set_cached_state · method · L108-L118 — def set_cached_state(self)
+- set_state · method · L120-L136 — def set_state( self, state: str, error: str | None = None, message: str | None = None )
+- set_state_cancelled · method · L138-L143 — def set_state_cancelled(self)
+- set_state_failed · method · L145-L153 — def set_state_failed(self, error: str, message: str)
+- set_state_started · method · L155-L160 — def set_state_started(self)
+- set_state_finished · method · L162-L167 — def set_state_finished(self)
+- last_updated_on · method · L170-L171 — def last_updated_on(self) -> datetime | None
+- pending · method · L174-L175 — def pending(self) -> bool
+- failed · method · L178-L179 — def failed(self) -> bool
+- cancelled · method · L182-L183 — def cancelled(self) -> bool
+- started · method · L186-L187 — def started(self) -> bool
+- finished · method · L190-L191 — def finished(self) -> bool
+- ended · method · L194-L195 — def ended(self)
+- clear_job_cache · method · L197-L202 — def clear_job_cache(self)

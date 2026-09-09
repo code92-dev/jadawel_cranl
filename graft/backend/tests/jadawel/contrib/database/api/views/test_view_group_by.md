@@ -1,0 +1,15 @@
+# backend/tests/jadawel/contrib/database/api/views/test_view_group_by.py
+
+- test_list_view_group_bys · function · L17-L72 — def test_list_view_group_bys(api_client, data_fixture)
+- test_create_view_group_by · function · L76-L207 — def test_create_view_group_by(api_client, data_fixture)
+- test_create_view_group_by_with_type · function · L211-L237 — def test_create_view_group_by_with_type(api_client, data_fixture)
+- test_cannot_created_group_by · function · L241-L256 — def test_cannot_created_group_by(api_client, data_fixture)
+- test_update_field_to_incompatible_group_by_deletes_group · function · L260-L276 — def test_update_field_to_incompatible_group_by_deletes_group(api_client, data_fixture)
+- test_get_view_group_by · function · L280-L336 — def test_get_view_group_by(api_client, data_fixture)
+- test_update_view_group_by · function · L340-L509 — def test_update_view_group_by(api_client, data_fixture)
+- test_update_view_group_by_with_type · function · L513-L571 — def test_update_view_group_by_with_type(api_client, data_fixture)
+- test_delete_view_group_by · function · L575-L605 — def test_delete_view_group_by(api_client, data_fixture)
+- test_list_views_including_group_bys · function · L609-L653 — def test_list_views_including_group_bys(api_client, data_fixture)
+- test_cant_get_view_group_by_when_view_trashed · function · L657-L668 — def test_cant_get_view_group_by_when_view_trashed(api_client, data_fixture)
+- test_cant_update_view_group_by_when_view_trashed · function · L672-L693 — def test_cant_update_view_group_by_when_view_trashed(api_client, data_fixture)
+- test_cant_delete_view_group_by_when_view_trashed · function · L697-L713 — def test_cant_delete_view_group_by_when_view_trashed(api_client, data_fixture)

@@ -1,0 +1,28 @@
+# backend/src/jadawel/contrib/builder/elements/registries.py
+
+- ElementType · class · L49-L394 — class ElementType( BuilderInstanceWithFormulaMixin, EasyImportExportMixin[ElementSubClass], CustomFieldsInstanceMixin, ModelInstanceMixin[ElementSubClass], Instance, ABC, )
+- is_deactivated · method · L71-L76 — def is_deactivated(self, workspace: Workspace) -> bool
+- prepare_value_for_db · method · L78-L112 — def prepare_value_for_db(self, values: Dict, instance: Optional[Element] = None)
+- validate_place · method · L114-L149 — def validate_place( self, page: Page, parent_element: Optional[ElementSubClass], place_in_container: str, )
+- after_create · method · L151-L158 — def after_create(self, instance: ElementSubClass, values: Dict)
+- after_update · method · L160-L173 — def after_update( self, instance: ElementSubClass, values: Dict, changes: Dict[str, Tuple], )
+- after_move · method · L175-L180 — def after_move(self, instance: ElementSubClass)
+- before_delete · method · L182-L187 — def before_delete(self, instance: ElementSubClass)
+- import_context_addition · method · L189-L199 — def import_context_addition(self, instance: ElementSubClass) -> Dict[str, Any]
+- import_serialized · method · L201-L247 — def import_serialized( self, page: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], files_zip: ZipFile | None = None, storage: Storage | None = None, cache: Dict[str, Any] | None = None, **kwargs, ) -> ElementSubClass: # Add mapping for builder element event uids (for collection field or other # elements that are using dynamic events.
+- sanitize_element_roles · method · L249-L282 — def sanitize_element_roles( self, roles: List[str], existing_roles: List[str], user_sources_mapping: Dict[int, int], ) -> List[str]
+- serialize_property · method · L284-L310 — def serialize_property( self, element: Element, prop_name: str, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict] = None, )
+- deserialize_property · method · L312-L366 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict] = None, **kwargs, ) -> Any
+- get_pytest_params · method · L369-L376 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- formula_generator · method · L378-L394 — def formula_generator( self, element: Element ) -> Generator[str | Instance, str, None]
+- ElementTypeRegistry · class · L400-L409 — class ElementTypeRegistry( Registry[ElementTypeSubClass], ModelRegistryMixin[ElementSubClass, ElementTypeSubClass], CustomFieldsRegistryMixin, )
+- CollectionFieldType · class · L415-L594 — class CollectionFieldType( BuilderInstanceWithFormulaMixin, CustomFieldsInstanceMixin, Instance, ABC, )
+- serialize_property · method · L427-L428 — def serialize_property(self, config: Dict[str, Any], prop_name: str)
+- export_serialized · method · L430-L449 — def export_serialized(self, instance: CollectionField) -> Dict[str, Any]
+- deserialize_property · method · L451-L470 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], serialized_values: Dict[str, Any], **kwargs, ) -> Any
+- create_instance_from_serialized · method · L472-L484 — def create_instance_from_serialized( self, serialized_values: Dict[str, Any] ) -> CollectionField
+- import_serialized · method · L486-L539 — def import_serialized( self, serialized_values: Dict[str, Any], id_mapping: Dict[str, Any], **kwargs, ) -> CollectionField
+- get_serializer · method · L541-L572 — def get_serializer( self, model_instance_or_instances: Union[models.Model, List[models.Model]], base_class: Optional[serializers.ModelSerializer] = None, context: Optional[Dict[str, Any]] = None, request: bool = False, **kwargs: Dict[str, Any], ) -> serializers.ModelSerializer
+- before_delete · method · L574-L578 — def before_delete(self, instance: CollectionField)
+- formula_generator · method · L580-L594 — def formula_generator( self, collection_field: CollectionField ) -> Generator[str | Instance, str, None]
+- CollectionFieldTypeRegistry · class · L602-L610 — class CollectionFieldTypeRegistry( Registry[CollectionFieldTypeSubClass], CustomFieldsRegistryMixin, )

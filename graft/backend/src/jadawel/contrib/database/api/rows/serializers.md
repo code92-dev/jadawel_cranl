@@ -1,0 +1,34 @@
+# backend/src/jadawel/contrib/database/api/rows/serializers.py
+
+- RowSerializer · class · L22-L28 — class RowSerializer(serializers.ModelSerializer)
+- Meta · class · L23-L28 — class Meta
+- CascadeUpdateSerializer · class · L31-L47 — class CascadeUpdateSerializer(serializers.Serializer)
+- BatchOperationMetadataSerializer · class · L50-L67 — class BatchOperationMetadataSerializer(serializers.Serializer)
+- BatchUpdateRowsSerializer · class · L70-L80 — class BatchUpdateRowsSerializer(serializers.Serializer)
+- serialize_rows_for_response · function · L83-L92 — def serialize_rows_for_response( rows, model, user_field_names=False, many=True, field_ids=None )
+- is_read_only · function · L95-L96 — def is_read_only(value)
+- get_row_serializer_class · function · L99-L223 — def get_row_serializer_class( model, base_class=None, is_response=False, field_ids=None, exclude_field_ids=None, field_names_to_include=None, user_field_names=False, field_kwargs=None, include_id=False, required_fields=None, extra_kwargs=None, )
+- get_batch_operation_metadata_serializer · function · L226-L263 — def get_batch_operation_metadata_serializer(row_serializer_class)
+- get_batch_row_serializer_class · function · L266-L289 — def get_batch_row_serializer_class(row_serializer_class)
+- validate · function · L269-L272 — def validate(self, value)
+- BatchDeleteRowsSerializer · class · L292-L297 — class BatchDeleteRowsSerializer(serializers.Serializer)
+- get_example_row_serializer_class · function · L300-L431 — def get_example_row_serializer_class( example_type: str = "get", user_field_names: bool = False, ) -> serializers.Serializer
+- get_example_row_metadata_serializer · function · L434-L454 — def get_example_row_metadata_serializer() -> serializers.Serializer
+- get_example_multiple_rows_metadata_serializer · function · L457-L476 — def get_example_multiple_rows_metadata_serializer() -> serializers.Serializer
+- remap_serialized_rows_to_user_field_names · function · L479-L491 — def remap_serialized_rows_to_user_field_names( serialized_rows: List[Dict], model: ModelBase ) -> List[Dict]
+- remap_serialized_row_to_user_field_names · function · L494-L510 — def remap_serialized_row_to_user_field_names( serialized_row: Dict, model: ModelBase ) -> Dict
+- UserFieldNamesSerializer · class · L513-L516 — class UserFieldNamesSerializer(serializers.Serializer)
+- MoveRowQueryParamsSerializer · class · L519-L520 — class MoveRowQueryParamsSerializer(serializers.Serializer)
+- CreateRowQueryParamsSerializer · class · L523-L525 — class CreateRowQueryParamsSerializer(serializers.Serializer)
+- BatchCreateRowsQueryParamsSerializer · class · L528-L530 — class BatchCreateRowsQueryParamsSerializer(serializers.Serializer)
+- GetRowQueryParamsSerializer · class · L533-L534 — class GetRowQueryParamsSerializer(serializers.Serializer)
+- UpdateRowQueryParamsSerializer · class · L537-L538 — class UpdateRowQueryParamsSerializer(serializers.Serializer)
+- BatchUpdateRowsQueryParamsSerializer · class · L541-L542 — class BatchUpdateRowsQueryParamsSerializer(serializers.Serializer)
+- DeleteRowQueryParamsSerializer · class · L545-L546 — class DeleteRowQueryParamsSerializer(serializers.Serializer)
+- BatchDeleteRowsQueryParamsSerializer · class · L549-L550 — class BatchDeleteRowsQueryParamsSerializer(serializers.Serializer)
+- ListRowsQueryParamsSerializer · class · L553-L560 — class ListRowsQueryParamsSerializer( SearchQueryParamSerializer, UserFieldNamesSerializer )
+- get_example_batch_rows_serializer_class · function · L563-L609 — def get_example_batch_rows_serializer_class( example_type="get", user_field_names=False, request_serializer=False )
+- GetRowAdjacentSerializer · class · L612-L616 — class GetRowAdjacentSerializer( SearchQueryParamSerializer, UserFieldNamesSerializer, serializers.Serializer )
+- RowHistoryUserSerializer · class · L619-L627 — class RowHistoryUserSerializer(serializers.Serializer)
+- RowHistorySerializer · class · L630-L658 — class RowHistorySerializer(serializers.ModelSerializer)
+- Meta · class · L647-L658 — class Meta

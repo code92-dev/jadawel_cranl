@@ -1,0 +1,41 @@
+# web-frontend/modules/database/guidedTourTypes.js
+
+- FiltersSortGroupGuidedTourStep · class · L9-L29 — class FiltersSortGroupGuidedTourStep extends GuidedTourStep
+- title · method · L10-L12 — get title()
+- content · method · L14-L16 — get content()
+- selectors · method · L18-L24 — get selectors()
+- position · method · L26-L28 — get position()
+- AddFieldGuidedTourStep · class · L31-L47 — class AddFieldGuidedTourStep extends GuidedTourStep
+- title · method · L32-L34 — get title()
+- content · method · L36-L38 — get content()
+- selectors · method · L40-L42 — get selectors()
+- position · method · L44-L46 — get position()
+- CreateViewGuidedTourStep · class · L49-L65 — class CreateViewGuidedTourStep extends GuidedTourStep
+- title · method · L50-L52 — get title()
+- content · method · L54-L56 — get content()
+- selectors · method · L58-L60 — get selectors()
+- position · method · L62-L64 — get position()
+- CreateFormViewGuidedTourStep · class · L67-L92 — class CreateFormViewGuidedTourStep extends GuidedTourStep
+- title · method · L68-L70 — get title()
+- content · method · L72-L74 — get content()
+- selectors · method · L76-L78 — get selectors()
+- position · method · L80-L82 — get position()
+- beforeShow · method · L84-L87 — async beforeShow()
+- afterShow · method · L89-L91 — afterShow()
+- ViewOptionGuidedTourStep · class · L94-L119 — class ViewOptionGuidedTourStep extends GuidedTourStep
+- title · method · L95-L97 — get title()
+- content · method · L99-L101 — get content()
+- selectors · method · L103-L105 — get selectors()
+- position · method · L107-L109 — get position()
+- beforeShow · method · L111-L114 — async beforeShow()
+- afterShow · method · L116-L118 — afterShow()
+- TablesGuidedTourStep · class · L121-L137 — class TablesGuidedTourStep extends GuidedTourStep
+- title · method · L122-L124 — get title()
+- content · method · L126-L128 — get content()
+- selectors · method · L130-L132 — get selectors()
+- position · method · L134-L136 — get position()
+- DatabaseGuidedTourType · class · L139-L170 — class DatabaseGuidedTourType extends GuidedTourType
+- getType · method · L140-L142 — static getType()
+- steps · method · L144-L153 — get steps()
+- order · method · L155-L157 — get order()
+- isActive · method · L159-L169 — isActive()

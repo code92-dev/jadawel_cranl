@@ -1,0 +1,18 @@
+# backend/src/jadawel/core/formula/parser/exceptions.py
+
+- JadawelFormulaException · class · L1-L2 — class JadawelFormulaException(Exception)
+- FormulaFunctionTypeDoesNotExist · class · L5-L9 — class FormulaFunctionTypeDoesNotExist(Exception)
+- InvalidNumberOfArguments · class · L12-L29 — class InvalidNumberOfArguments(JadawelFormulaException)
+- __init__ · method · L13-L29 — def __init__(self, function_def, num_args)
+- InvalidFormulaArgumentType · class · L32-L37 — class InvalidFormulaArgumentType(JadawelFormulaException)
+- __init__ · method · L33-L37 — def __init__(self, function_def, arg)
+- MaximumFormulaSizeError · class · L40-L42 — class MaximumFormulaSizeError(JadawelFormulaException)
+- __init__ · method · L41-L42 — def __init__(self)
+- UnknownFieldByIdReference · class · L45-L50 — class UnknownFieldByIdReference(JadawelFormulaException)
+- __init__ · method · L46-L50 — def __init__(self, unknown_field_id)
+- FieldByIdReferencesAreDeprecated · class · L53-L58 — class FieldByIdReferencesAreDeprecated(JadawelFormulaException)
+- __init__ · method · L54-L58 — def __init__(self)
+- UnknownOperator · class · L61-L63 — class UnknownOperator(JadawelFormulaException)
+- __init__ · method · L62-L63 — def __init__(self, operator_text)
+- JadawelFormulaSyntaxError · class · L66-L67 — class JadawelFormulaSyntaxError(JadawelFormulaException)
+- JadawelFormulaExecuteError · class · L70-L71 — class JadawelFormulaExecuteError(JadawelFormulaException)

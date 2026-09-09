@@ -1,0 +1,16 @@
+# web-frontend/modules/core/services/auth.js
+
+- login · method · L3-L5 — login(email, password)
+- blacklistToken · method · L6-L10 — blacklistToken(refreshToken)
+- refresh · method · L11-L17 — refresh(refreshToken)
+- register · method · L18-L49 — register( email, name, password, language, authenticate = true, workspaceInvitationToken = null, templateId = null, captchaToken = '' )
+- sendResetPasswordEmail · method · L50-L55 — sendResetPasswordEmail(email, baseUrl)
+- resetPassword · method · L56-L61 — resetPassword(token, password)
+- changePassword · method · L62-L67 — changePassword(oldPassword, newPassword)
+- sendChangeEmailConfirmation · method · L68-L74 — sendChangeEmailConfirmation(newEmail, password, baseUrl)
+- changeEmail · method · L75-L79 — changeEmail(token)
+- sendVerifyEmail · method · L80-L84 — sendVerifyEmail(email)
+- verifyEmail · method · L85-L89 — verifyEmail(token)
+- dashboard · method · L90-L92 — dashboard()
+- update · method · L93-L95 — update(values)
+- deleteAccount · method · L96-L98 — deleteAccount()

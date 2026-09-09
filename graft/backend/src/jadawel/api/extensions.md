@@ -1,0 +1,18 @@
+# backend/src/jadawel/api/extensions.py
+
+- MappingSerializerExtension · class · L5-L44 — class MappingSerializerExtension(OpenApiSerializerExtension)
+- get_name · method · L28-L29 — def get_name(self)
+- map_serializer · method · L31-L32 — def map_serializer(self, auto_schema, direction)
+- _map_serializer · method · L34-L44 — def _map_serializer(self, auto_schema, direction, mapping)
+- CustomFieldRegistryMappingSerializerExtension · class · L47-L90 — class CustomFieldRegistryMappingSerializerExtension(MappingSerializerExtension)
+- get_name · method · L68-L71 — def get_name(self)
+- map_serializer · method · L73-L90 — def map_serializer(self, auto_schema, direction)
+- DiscriminatorMappingSerializerExtension · class · L93-L145 — class DiscriminatorMappingSerializerExtension(OpenApiSerializerExtension)
+- get_name · method · L115-L116 — def get_name(self)
+- map_serializer · method · L118-L119 — def map_serializer(self, auto_schema, direction)
+- _map_serializer · method · L121-L145 — def _map_serializer(self, auto_schema, direction, mapping)
+- DiscriminatorCustomFieldsMappingSerializerExtension · class · L148-L203 — class DiscriminatorCustomFieldsMappingSerializerExtension( DiscriminatorMappingSerializerExtension )
+- get_name · method · L170-L178 — def get_name(self)
+- map_serializer · method · L180-L203 — def map_serializer(self, auto_schema, direction)
+- PolymorphicMappingSerializerExtensionMixin · class · L206-L214 — class PolymorphicMappingSerializerExtensionMixin( DiscriminatorCustomFieldsMappingSerializerExtension )
+- PolymorphicRequestMappingSerializerExtensionMixin · class · L217-L225 — class PolymorphicRequestMappingSerializerExtensionMixin( CustomFieldRegistryMappingSerializerExtension )

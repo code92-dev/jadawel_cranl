@@ -1,0 +1,22 @@
+# web-frontend/modules/core/registry.js
+
+- Registerable · class · L7-L51 — class Registerable
+- constructor · method · L10-L12 — constructor({ app } = {})
+- isRegisterable · method · L14-L16 — isRegisterable()
+- getType · method · L22-L24 — static getType()
+- getType · method · L26-L28 — getType()
+- type · method · L30-L32 — get type()
+- type · method · L34-L36 — set type(newType)
+- getOrder · method · L43-L45 — getOrder()
+- $t · method · L47-L50 — $t(key)
+- Registry · class · L59-L196 — class Registry
+- constructor · method · L60-L62 — constructor()
+- registerNamespace · method · L67-L74 — registerNamespace(namespace)
+- register · method · L81-L96 — register(namespace, object)
+- unregister · method · L104-L111 — unregister(namespace, type)
+- get · method · L116-L130 — get(namespace, type)
+- getAll · method · L135-L142 — getAll(namespace)
+- getList · method · L145-L147 — getList(namespace)
+- getOrderedList · method · L154-L158 — getOrderedList(namespace)
+- exists · method · L163-L171 — exists(namespace, type)
+- getSpecificConstraint · method · L181-L195 — getSpecificConstraint(namespace, constraintTypeName, fieldType)

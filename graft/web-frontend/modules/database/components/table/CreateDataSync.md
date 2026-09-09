@@ -1,0 +1,16 @@
+# web-frontend/modules/database/components/table/CreateDataSync.vue
+
+- setup · method · L128-L131 — setup()
+- data · method · L132-L141 — data()
+- dataSyncType · method · L143-L147 — dataSyncType()
+- dataSyncComponent · method · L148-L152 — dataSyncComponent()
+- twoWaySyncStrategy · method · L153-L160 — twoWaySyncStrategy()
+- isTwoWaySyncDeactivated · method · L161-L166 — isTwoWaySyncDeactivated()
+- twoWaySyncDeactivatedModal · method · L167-L172 — twoWaySyncDeactivatedModal()
+- chosenType · method · L175-L186 — chosenType(newValue, oldValue)
+- hide · method · L189-L191 — hide()
+- getDefaultName · method · L192-L196 — getDefaultName()
+- submitted · method · L197-L200 — async submitted(formValues)
+- create · method · L201-L239 — async create()
+- onJobDone · method · L240-L251 — async onJobDone()
+- clickTwoWaySync · method · L252-L256 — clickTwoWaySync()

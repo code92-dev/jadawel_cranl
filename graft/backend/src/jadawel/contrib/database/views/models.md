@@ -1,0 +1,83 @@
+# backend/src/jadawel/contrib/database/views/models.py
+
+- get_default_view_content_type · function · L65-L66 — def get_default_view_content_type()
+- View · class · L69-L330 — class View( HierarchicalModelMixin, TrashableModelMixin, CreatedAndUpdatedOnMixin, OrderableMixin, PolymorphicContentTypeMixin, models.Model, WithRegistry, )
+- get_type_registry · method · L152-L155 — def get_type_registry()
+- public_view_has_password · method · L158-L165 — def public_view_has_password(self) -> bool
+- get_parent · method · L167-L168 — def get_parent(self)
+- rotate_slug · method · L170-L175 — def rotate_slug(self)
+- create_new_slug · method · L178-L185 — def create_new_slug() -> str
+- make_password · method · L188-L196 — def make_password(password: str) -> str
+- set_password · method · L198-L205 — def set_password(self, password: str)
+- check_public_view_password · method · L207-L217 — def check_public_view_password(self, password: str) -> bool
+- Meta · class · L219-L220 — class Meta
+- get_all_sorts · method · L222-L247 — def get_all_sorts( self, restrict_to_field_ids: Optional[Iterable[int]] = None ) -> Iterable["Union[ViewGroupBy, ViewSort]"]
+- get_last_order · method · L250-L252 — def get_last_order(cls, table)
+- get_field_options · method · L254-L312 — def get_field_options(self, create_if_missing=False, fields=None)
+- get_queryset · function · L290-L295 — def get_queryset()
+- create_missing_field_options · method · L314-L330 — def create_missing_field_options(self, existing_field_options, fields) -> Iterable
+- ViewFilterManager · class · L333-L342 — class ViewFilterManager(models.Manager)
+- get_queryset · method · L340-L342 — def get_queryset(self)
+- FilterGroupMixin · class · L345-L356 — class FilterGroupMixin(models.Model)
+- Meta · class · L355-L356 — class Meta
+- ViewFilterGroup · class · L359-L372 — class ViewFilterGroup(HierarchicalModelMixin, FilterGroupMixin)
+- Meta · class · L368-L369 — class Meta
+- get_parent · method · L371-L372 — def get_parent(self)
+- ViewFilter · class · L375-L416 — class ViewFilter(HierarchicalModelMixin, models.Model)
+- Meta · class · L408-L409 — class Meta
+- preload_values · method · L412-L413 — def preload_values(self)
+- get_parent · method · L415-L416 — def get_parent(self)
+- ViewDecorationManager · class · L419-L428 — class ViewDecorationManager(models.Manager)
+- get_queryset · method · L426-L428 — def get_queryset(self)
+- ViewDecoration · class · L431-L475 — class ViewDecoration(HierarchicalModelMixin, OrderableMixin, models.Model)
+- get_last_order · method · L467-L469 — def get_last_order(cls, view)
+- get_parent · method · L471-L472 — def get_parent(self)
+- Meta · class · L474-L475 — class Meta
+- ViewSortManager · class · L478-L487 — class ViewSortManager(models.Manager)
+- get_queryset · method · L485-L487 — def get_queryset(self)
+- ViewSort · class · L490-L523 — class ViewSort(HierarchicalModelMixin, models.Model)
+- get_parent · method · L519-L520 — def get_parent(self)
+- Meta · class · L522-L523 — class Meta
+- ViewGroupByManager · class · L526-L529 — class ViewGroupByManager(models.Manager)
+- get_queryset · method · L527-L529 — def get_queryset(self)
+- ViewGroupBy · class · L532-L569 — class ViewGroupBy(HierarchicalModelMixin, models.Model)
+- get_parent · method · L565-L566 — def get_parent(self)
+- Meta · class · L568-L569 — class Meta
+- GridView · class · L572-L599 — class GridView(View)
+- RowIdentifierTypes · class · L573-L575 — class RowIdentifierTypes(models.TextChoices)
+- RowHeightSizes · class · L577-L580 — class RowHeightSizes(models.TextChoices)
+- GridViewFieldOptionsManager · class · L602-L611 — class GridViewFieldOptionsManager(models.Manager)
+- get_queryset · method · L609-L611 — def get_queryset(self)
+- GridViewFieldOptions · class · L614-L673 — class GridViewFieldOptions(HierarchicalModelMixin, models.Model)
+- get_parent · method · L668-L669 — def get_parent(self)
+- Meta · class · L671-L673 — class Meta
+- GalleryView · class · L676-L686 — class GalleryView(View)
+- GalleryViewFieldOptionsManager · class · L689-L697 — class GalleryViewFieldOptionsManager(models.Manager)
+- get_queryset · method · L695-L697 — def get_queryset(self)
+- GalleryViewFieldOptions · class · L700-L722 — class GalleryViewFieldOptions(HierarchicalModelMixin, models.Model)
+- get_parent · method · L717-L718 — def get_parent(self)
+- Meta · class · L720-L722 — class Meta
+- FormView · class · L725-L811 — class FormView(View)
+- active_field_options · method · L788-L811 — def active_field_options(self)
+- FormViewFieldOptionsManager · class · L814-L822 — class FormViewFieldOptionsManager(models.Manager)
+- get_queryset · method · L820-L822 — def get_queryset(self)
+- FormViewFieldOptions · class · L825-L903 — class FormViewFieldOptions(HierarchicalModelMixin, models.Model)
+- get_parent · method · L886-L887 — def get_parent(self)
+- Meta · class · L889-L891 — class Meta
+- is_required · method · L893-L903 — def is_required(self)
+- FormViewFieldOptionsAllowedSelectOptions · class · L906-L914 — class FormViewFieldOptionsAllowedSelectOptions(models.Model)
+- FormViewFieldOptionsConditionManager · class · L917-L919 — class FormViewFieldOptionsConditionManager(models.Manager)
+- get_queryset · method · L918-L919 — def get_queryset(self)
+- FormViewFieldOptionsConditionGroup · class · L922-L934 — class FormViewFieldOptionsConditionGroup(HierarchicalModelMixin, FilterGroupMixin)
+- Meta · class · L930-L931 — class Meta
+- get_parent · method · L933-L934 — def get_parent(self)
+- FormViewFieldOptionsCondition · class · L937-L971 — class FormViewFieldOptionsCondition(HierarchicalModelMixin, models.Model)
+- get_parent · method · L967-L968 — def get_parent(self)
+- Meta · class · L970-L971 — class Meta
+- ViewRows · class · L974-L1000 — class ViewRows(CreatedAndUpdatedOnMixin, models.Model)
+- get_diff · method · L983-L1000 — def get_diff(self, model=None)
+- ViewSubscription · class · L1003-L1010 — class ViewSubscription(models.Model)
+- Meta · class · L1009-L1010 — class Meta
+- ViewDefaultValue · class · L1013-L1059 — class ViewDefaultValue(HierarchicalModelMixin, models.Model)
+- Meta · class · L1050-L1056 — class Meta
+- get_parent · method · L1058-L1059 — def get_parent(self)

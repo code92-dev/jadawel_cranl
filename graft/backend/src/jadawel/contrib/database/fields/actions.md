@@ -1,0 +1,39 @@
+# backend/src/jadawel/contrib/database/fields/actions.py
+
+- UpdateFieldActionType · class · L37-L354 — class UpdateFieldActionType(UndoableActionCustomCleanupMixin, UndoableActionType)
+- Params · class · L53-L71 — class Params
+- do · method · L74-L149 — def do( cls, user: AbstractUser, field: SpecificFieldForUpdate, new_type_name: Optional[str] = None, **kwargs, ) -> Tuple[Field, List[Field]]
+- scope · method · L152-L153 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L156-L167 — def undo( cls, user: AbstractUser, params: Params, action_being_undone: Action, )
+- redo · method · L170-L176 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- clean_up_any_extra_action_data · method · L179-L182 — def clean_up_any_extra_action_data(cls, action_being_cleaned_up: Action)
+- _backup_field_if_required · method · L185-L210 — def _backup_field_if_required( cls, original_field: Field, allowed_new_field_attrs: Dict[str, Any], to_field_type_name: str, backup_uuid: str, for_undo: bool = False, ) -> Optional[BackupData]
+- _should_backup_field · method · L213-L240 — def _should_backup_field( cls, original_field: Field, to_field_type_name: str, allowed_new_field_attrs: Dict[str, Any], ) -> bool
+- _get_prepared_field_attrs · method · L243-L272 — def _get_prepared_field_attrs( cls, field: Field, field_attrs_being_updated: Set[str], to_field_type_name: str )
+- _get_backup_identifier · method · L275-L289 — def _get_backup_identifier( cls, field_id: int, backup_uuid: str, for_undo: bool ) -> str
+- _backup_field_then_update_back_to_previous_backup · method · L292-L354 — def _backup_field_then_update_back_to_previous_backup( cls, user: AbstractUser, action: Action, params: Params, for_undo: bool, )
+- after_field_schema_change_callback · function · L322-L334 — def after_field_schema_change_callback( field_after_schema_change: SpecificFieldForUpdate, )
+- CreateFieldActionType · class · L357-L452 — class CreateFieldActionType(UndoableActionType)
+- Params · class · L367-L375 — class Params
+- do · method · L378-L439 — def do( cls, user: AbstractUser, table: Table, type_name: str, primary=False, return_updated_fields=False, **kwargs, ) -> Union[Field, Tuple[Field, List[Field]]]
+- scope · method · L442-L443 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L446-L448 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L451-L452 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DeleteFieldActionType · class · L455-L524 — class DeleteFieldActionType(UndoableActionType)
+- Params · class · L469-L476 — class Params
+- do · method · L479-L511 — def do( cls, user: AbstractUser, field: Field, ) -> List[Field]
+- scope · method · L514-L515 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L518-L519 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L522-L524 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DuplicateFieldActionType · class · L527-L612 — class DuplicateFieldActionType(UndoableActionType)
+- Params · class · L546-L555 — class Params
+- do · method · L558-L596 — def do( cls, user: AbstractUser, field: Field, duplicate_data: bool = False, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Tuple[Field, List[Field]]
+- scope · method · L599-L600 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L603-L606 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L609-L612 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- ChangePrimaryFieldActionType · class · L615-L693 — class ChangePrimaryFieldActionType(UndoableActionType)
+- Params · class · L631-L639 — class Params
+- do · method · L642-L673 — def do( cls, user: AbstractUser, table: Table, new_primary_field: Field, ) -> Tuple[Field, Field]
+- scope · method · L676-L677 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L680-L685 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L688-L693 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)

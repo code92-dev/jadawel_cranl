@@ -1,0 +1,17 @@
+# web-frontend/modules/builder/components/page/header/DataSourceContext.vue
+
+- data · method · L142-L148 — data()
+- integrations · method · L150-L152 — integrations()
+- dataSources · method · L153-L155 — dataSources()
+- sharedPage · method · L156-L158 — sharedPage()
+- sharedDataSources · method · L159-L163 — sharedDataSources()
+- allDataSources · method · L164-L166 — allDataSources()
+- currentDataSource · method · L167-L171 — currentDataSource()
+- elements · method · L172-L174 — elements()
+- shown · method · L184-L196 — async shown()
+- onHide · method · L197-L200 — async onHide()
+- orderDS · method · L201-L213 — orderDS(shared)
+- createDataSource · method · L214-L218 — async createDataSource()
+- deleteDataSource · method · L219-L241 — async deleteDataSource(dataSource)
+- editDataSource · method · L242-L246 — async editDataSource(dataSource)
+- moveDataSourceToPage · method · L247-L263 — async moveDataSourceToPage(dataSource, pageSource, pageDest)

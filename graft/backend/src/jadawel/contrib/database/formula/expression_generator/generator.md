@@ -1,0 +1,23 @@
+# backend/src/jadawel/contrib/database/formula/expression_generator/generator.py
+
+- jadawel_expression_to_update_django_expression · function · L40-L44 — def jadawel_expression_to_update_django_expression( jadawel_expression: JadawelExpression[JadawelFormulaType], model: Type[Model], )
+- jadawel_expression_to_single_row_update_django_expression · function · L47-L53 — def jadawel_expression_to_single_row_update_django_expression( jadawel_expression: JadawelExpression[JadawelFormulaType], model_instance: Model, )
+- jadawel_expression_to_insert_django_expression · function · L56-L62 — def jadawel_expression_to_insert_django_expression( jadawel_expression: JadawelExpression[JadawelFormulaType], model_instance: Model, )
+- _jadawel_expression_to_django_expression · function · L65-L117 — def _jadawel_expression_to_django_expression( jadawel_expression: JadawelExpression[JadawelFormulaType], model: Type[Model], model_instance: Optional[Model], insert=False, ) -> Expression
+- WrappedExpressionWithMetadata · class · L123-L155 — class WrappedExpressionWithMetadata
+- __init__ · method · L124-L134 — def __init__( self, expression: Expression, pre_annotations: Optional[Dict[str, FilteredRelation]] = None, aggregate_filters: Optional[List[Expression]] = None, join_ids: Optional[JoinIdsType] = None, )
+- pre_annotations · method · L137-L141 — def pre_annotations(self) -> Dict[str, FilteredRelation]: # For some reason (possibly a Django bug), pre_annotations will be modified when # passed into annotate() call but we need to pass the same into multiple # annotate() calls.
+- from_args · method · L144-L155 — def from_args(cls, expr, child_args: List["WrappedExpressionWithMetadata"])
+- JadawelExpressionToDjangoExpressionGenerator · class · L158-L417 — class JadawelExpressionToDjangoExpressionGenerator( JadawelFormulaASTVisitor[JadawelFormulaType, WrappedExpressionWithMetadata] )
+- __init__ · method · L169-L176 — def __init__( self, model: Type[Model], model_instance: Optional[Model], )
+- visit_field_reference · method · L178-L202 — def visit_field_reference( self, field_reference: JadawelFieldReference[JadawelFormulaType] ) -> WrappedExpressionWithMetadata
+- _generate_insert_expression · method · L204-L254 — def _generate_insert_expression(self, db_column)
+- _setup_lookup_expression · method · L257-L300 — def _setup_lookup_expression( self, field_reference: JadawelFieldReference ) -> WrappedExpressionWithMetadata
+- _setup_extra_joins_to_linked_lookup_table · method · L303-L336 — def _setup_extra_joins_to_linked_lookup_table( self, lookup_table_model, m2m_to_lookup_table, path_to_lookup_from_lookup_table ) -> Tuple[fields.Field, str, JoinIdsType, Dict[str, FilteredRelation]]: # If someone has done a lookup of a link row field in the other table, # the actual values we want to lookup are in that linked tables primary # field. To get at those values we need to do two joins, the first # above into the lookup table. The second from the lookup table to the # linked table.
+- _get_remote_model · method · L339-L343 — def _get_remote_model(self, m2m_field_name, model)
+- _setup_annotations_and_joins · method · L346-L368 — def _setup_annotations_and_joins( self, model, join_path: str, middle_link=None ) -> Tuple[str, JoinIdsType, Dict[str, FilteredRelation]]
+- visit_function_call · method · L370-L376 — def visit_function_call( self, function_call: JadawelFunctionCall[JadawelFormulaType] ) -> WrappedExpressionWithMetadata
+- visit_string_literal · method · L378-L388 — def visit_string_literal( self, string_literal: JadawelStringLiteral[JadawelFormulaType] ) -> WrappedExpressionWithMetadata: # We need to cast and be super explicit this is a text field so postgres # does not get angry and claim this is an unknown type.
+- visit_int_literal · method · L390-L398 — def visit_int_literal( self, int_literal: JadawelIntegerLiteral[JadawelFormulaType] ) -> WrappedExpressionWithMetadata
+- visit_decimal_literal · method · L400-L410 — def visit_decimal_literal( self, decimal_literal: JadawelDecimalLiteral ) -> WrappedExpressionWithMetadata
+- visit_boolean_literal · method · L412-L417 — def visit_boolean_literal( self, boolean_literal: JadawelBooleanLiteral ) -> WrappedExpressionWithMetadata

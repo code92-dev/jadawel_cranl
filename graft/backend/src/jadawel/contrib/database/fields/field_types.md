@@ -1,0 +1,538 @@
+# backend/src/jadawel/contrib/database/fields/field_types.py
+
+- CollationSortMixin · class · L278-L291 — class CollationSortMixin
+- get_order · method · L279-L291 — def get_order( self, field, field_name, order_direction, sort_type, table_model=None ) -> OptionallyAnnotatedOrderBy
+- TextFieldMatchingRegexFieldType · class · L294-L375 — class TextFieldMatchingRegexFieldType(FieldType, ABC)
+- regex · method · L313-L314 — def regex(self)
+- validator · method · L317-L318 — def validator(self)
+- prepare_value_for_db · method · L320-L325 — def prepare_value_for_db(self, instance, value)
+- get_serializer_field · method · L327-L339 — def get_serializer_field(self, instance, **kwargs)
+- get_model_field · method · L341-L349 — def get_model_field(self, instance, **kwargs)
+- get_alter_column_prepare_new_value · method · L351-L363 — def get_alter_column_prepare_new_value(self, connection, from_field, to_field)
+- contains_query · method · L365-L366 — def contains_query(self, *args)
+- contains_word_query · method · L368-L369 — def contains_word_query(self, *args)
+- to_jadawel_formula_type · method · L371-L372 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L374-L375 — def from_jadawel_formula_type(self, formula_type: JadawelFormulaCharType)
+- CharFieldMatchingRegexFieldType · class · L378-L416 — class CharFieldMatchingRegexFieldType(TextFieldMatchingRegexFieldType)
+- max_length · method · L397-L398 — def max_length(self)
+- get_serializer_field · method · L400-L402 — def get_serializer_field(self, instance, **kwargs)
+- get_model_field · method · L404-L413 — def get_model_field(self, instance, **kwargs)
+- to_jadawel_formula_type · method · L415-L416 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- ManyToManyFieldTypeSerializeToInputValueMixin · class · L419-L424 — class ManyToManyFieldTypeSerializeToInputValueMixin
+- serialize_to_input_value · method · L420-L421 — def serialize_to_input_value(self, field: Field, value: any) -> any
+- random_to_input_value · method · L423-L424 — def random_to_input_value(self, field: Field, value: any) -> any
+- TextFieldType · class · L427-L477 — class TextFieldType(CollationSortMixin, FieldType)
+- get_serializer_field · method · L437-L447 — def get_serializer_field(self, instance, **kwargs)
+- get_model_field · method · L449-L456 — def get_model_field(self, instance, **kwargs)
+- random_value · method · L458-L459 — def random_value(self, instance, fake, cache)
+- contains_query · method · L461-L462 — def contains_query(self, *args)
+- contains_word_query · method · L464-L465 — def contains_word_query(self, *args)
+- to_jadawel_formula_type · method · L467-L468 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L470-L473 — def from_jadawel_formula_type( self, formula_type: JadawelFormulaTextType ) -> TextField
+- get_value_for_filter · method · L475-L477 — def get_value_for_filter(self, row: "GeneratedTableModel", field: Field) -> any
+- LongTextFieldType · class · L480-L547 — class LongTextFieldType(CollationSortMixin, FieldType)
+- check_can_group_by · method · L488-L489 — def check_can_group_by(self, field: Field, sort_type: str) -> bool
+- can_be_primary_field · method · L491-L498 — def can_be_primary_field(self, field_or_values: Union[Field, dict]) -> bool
+- get_serializer_field · method · L500-L509 — def get_serializer_field(self, instance, **kwargs)
+- serialize_metadata_for_row_history · method · L511-L521 — def serialize_metadata_for_row_history( self, field: Field, row: "GeneratedTableModel", metadata, ) -> SerializedRowHistoryFieldMetadata
+- get_model_field · method · L523-L526 — def get_model_field(self, instance, **kwargs)
+- random_value · method · L528-L529 — def random_value(self, instance, fake, cache)
+- contains_query · method · L531-L532 — def contains_query(self, *args)
+- contains_word_query · method · L534-L535 — def contains_word_query(self, *args)
+- to_jadawel_formula_type · method · L537-L538 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L540-L543 — def from_jadawel_formula_type( self, formula_type: JadawelFormulaTextType ) -> "LongTextField"
+- get_value_for_filter · method · L545-L547 — def get_value_for_filter(self, row: "GeneratedTableModel", field: Field) -> any
+- URLFieldType · class · L550-L571 — class URLFieldType(CollationSortMixin, TextFieldMatchingRegexFieldType)
+- regex · method · L557-L561 — def regex(self): # A very lenient URL validator that allows all types of URLs as long as it # respects the maximal amount of characters before the dot at at least have # one character after the dot.
+- random_value · method · L563-L564 — def random_value(self, instance, fake, cache)
+- get_value_for_filter · method · L566-L568 — def get_value_for_filter(self, row: "GeneratedTableModel", field: Field) -> any
+- to_jadawel_formula_type · method · L570-L571 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- NumberFieldType · class · L574-L876 — class NumberFieldType(FieldType)
+- serialize_allowed_fields · method · L609-L617 — def serialize_allowed_fields(self, field: Field) -> Dict[str, Any]
+- serialize_to_input_value · method · L619-L622 — def serialize_to_input_value(self, field: Field, value: any) -> any
+- prepare_value_for_db · method · L624-L644 — def prepare_value_for_db(self, instance: NumberField, value)
+- get_serializer_field · method · L646-L664 — def get_serializer_field(self, instance: NumberField, **kwargs)
+- get_export_value · method · L666-L731 — def get_export_value(self, value, field_object, rich_value=False)
+- get_model_field · method · L733-L744 — def get_model_field(self, instance, **kwargs)
+- random_value · method · L746-L758 — def random_value(self, instance: NumberField, fake, cache)
+- get_alter_column_prepare_new_value · method · L760-L775 — def get_alter_column_prepare_new_value( self, connection, from_field: NumberField, to_field )
+- force_same_type_alter_column · method · L777-L778 — def force_same_type_alter_column(self, from_field, to_field)
+- contains_query · method · L780-L781 — def contains_query(self, *args)
+- get_export_serialized_value · method · L783-L785 — def get_export_serialized_value(self, row, field_name, cache, files_zip, storage)
+- to_jadawel_formula_type · method · L787-L794 — def to_jadawel_formula_type(self, field: NumberField) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L796-L805 — def from_jadawel_formula_type( self, formula_type: JadawelFormulaNumberType ) -> NumberField
+- should_update_search_data · method · L807-L813 — def should_update_search_data( self, old_field: NumberField, new_field_attrs: Dict[str, Any] ) -> bool
+- should_backup_field_data_for_same_type_update · method · L815-L828 — def should_backup_field_data_for_same_type_update( self, old_field: NumberField, new_field_attrs: Dict[str, Any] ) -> bool
+- serialize_metadata_for_row_history · method · L830-L845 — def serialize_metadata_for_row_history( self, field: Field, row: "GeneratedTableModel", metadata, ) -> SerializedRowHistoryFieldMetadata
+- parse_filter_value · method · L847-L863 — def parse_filter_value(self, field, model_field, value)
+- to_runtime_formula_value · method · L865-L876 — def to_runtime_formula_value(self, field, value)
+- RatingFieldType · class · L879-L1026 — class RatingFieldType(FieldType)
+- prepare_value_for_db · method · L889-L912 — def prepare_value_for_db(self, instance, value)
+- get_serializer_field · method · L914-L929 — def get_serializer_field(self, instance, **kwargs)
+- _rating_required_validator · method · L932-L937 — def _rating_required_validator(value)
+- force_same_type_alter_column · method · L939-L944 — def force_same_type_alter_column(self, from_field, to_field)
+- get_alter_column_prepare_new_value · method · L946-L973 — def get_alter_column_prepare_new_value(self, connection, from_field, to_field)
+- get_alter_column_prepare_old_value · method · L975-L988 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_model_field · method · L990-L997 — def get_model_field(self, instance, **kwargs)
+- random_value · method · L999-L1000 — def random_value(self, instance, fake, cache)
+- contains_query · method · L1002-L1003 — def contains_query(self, *args)
+- contains_word_query · method · L1005-L1006 — def contains_word_query(self, *args)
+- to_jadawel_formula_type · method · L1008-L1009 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L1011-L1014 — def from_jadawel_formula_type( self, formula_type: JadawelFormulaNumberType ) -> "RatingField"
+- should_update_search_data · method · L1016-L1020 — def should_update_search_data( self, old_field: RatingField, new_field_attrs: Dict[str, Any] ) -> bool
+- should_backup_field_data_for_same_type_update · method · L1022-L1026 — def should_backup_field_data_for_same_type_update( self, old_field: RatingField, new_field_attrs: Dict[str, Any] ) -> bool
+- BooleanFieldType · class · L1029-L1093 — class BooleanFieldType(FieldType)
+- get_alter_column_prepare_new_value · method · L1038-L1052 — def get_alter_column_prepare_new_value(self, connection, from_field, to_field)
+- get_serializer_field · method · L1054-L1058 — def get_serializer_field(self, instance, **kwargs)
+- get_model_field · method · L1060-L1063 — def get_model_field(self, instance, **kwargs)
+- random_value · method · L1065-L1066 — def random_value(self, instance, fake, cache)
+- get_export_serialized_value · method · L1068-L1070 — def get_export_serialized_value(self, row, field_name, cache, files_zip, storage)
+- set_import_serialized_value · method · L1072-L1075 — def set_import_serialized_value( self, row, field_name, value, id_mapping, cache, files_zip, storage )
+- to_jadawel_formula_type · method · L1077-L1078 — def to_jadawel_formula_type(self, field: NumberField) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L1080-L1083 — def from_jadawel_formula_type( self, boolean_formula_type: JadawelFormulaBooleanType ) -> BooleanField
+- parse_filter_value · method · L1085-L1093 — def parse_filter_value(self, field, model_field, value)
+- DateFieldType · class · L1096-L1543 — class DateFieldType(FieldType)
+- get_supported_default_value_functions · method · L1134-L1135 — def get_supported_default_value_functions(self)
+- resolve_default_value_function · method · L1137-L1140 — def resolve_default_value_function(self, function_name, field)
+- can_represent_date · method · L1142-L1143 — def can_represent_date(self, field)
+- get_request_kwargs_to_backup · method · L1145-L1149 — def get_request_kwargs_to_backup(self, field, kwargs) -> Dict[str, Any]
+- before_create · method · L1151-L1158 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- before_update · method · L1160-L1170 — def before_update(self, from_field, to_field_values, user, field_kwargs)
+- after_update · method · L1172-L1202 — def after_update( self, from_field, to_field, from_model, to_model, user, connection, altered_column, before, to_field_kwargs, )
+- get_search_expression · method · L1204-L1229 — def get_search_expression( self, field: Union[DateField, LastModifiedField, CreatedOnField], queryset: QuerySet, ) -> Expression
+- prepare_value_for_db · method · L1231-L1281 — def prepare_value_for_db(self, instance, value)
+- get_export_value · method · L1283-L1291 — def get_export_value(self, value, field_object, rich_value=False)
+- get_serializer_field · method · L1293-L1303 — def get_serializer_field(self, instance, **kwargs)
+- get_model_field · method · L1305-L1312 — def get_model_field(self, instance, **kwargs)
+- random_value · method · L1314-L1318 — def random_value(self, instance, fake, cache)
+- contains_query · method · L1320-L1347 — def contains_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_old_value · method · L1349-L1382 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_alter_column_prepare_new_value · method · L1384-L1434 — def get_alter_column_prepare_new_value(self, connection, from_field, to_field)
+- get_export_serialized_value · method · L1436-L1442 — def get_export_serialized_value(self, row, field_name, cache, files_zip, storage)
+- set_import_serialized_value · method · L1444-L1455 — def set_import_serialized_value( self, row, field_name, value, id_mapping, cache, files_zip, storage )
+- to_jadawel_formula_type · method · L1457-L1465 — def to_jadawel_formula_type(self, field: DateField) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L1467-L1476 — def from_jadawel_formula_type( self, formula_type: JadawelFormulaDateType ) -> DateField
+- should_backup_field_data_for_same_type_update · method · L1478-L1484 — def should_backup_field_data_for_same_type_update( self, old_field: DateField, new_field_attrs: Dict[str, Any] ) -> bool
+- should_update_search_data · method · L1486-L1504 — def should_update_search_data( self, old_field: DateField, new_field_attrs: Dict[str, Any] ) -> bool
+- serialize_metadata_for_row_history · method · L1506-L1521 — def serialize_metadata_for_row_history( self, field: Field, row: "GeneratedTableModel", metadata: Optional[SerializedRowHistoryFieldMetadata] = None, ) -> SerializedRowHistoryFieldMetadata
+- get_group_by_field_unique_value · method · L1523-L1529 — def get_group_by_field_unique_value( self, field: Field, field_name: str, value: Any ) -> Any
+- get_group_by_field_filters_and_annotations · method · L1531-L1543 — def get_group_by_field_filters_and_annotations( self, field, field_name, base_queryset, value, cte, rows )
+- CreatedOnLastModifiedBaseFieldType · class · L1546-L1621 — class CreatedOnLastModifiedBaseFieldType(ReadOnlyFieldType, DateFieldType)
+- get_serializer_field · method · L1555-L1559 — def get_serializer_field(self, instance, **kwargs)
+- get_model_field · method · L1561-L1566 — def get_model_field(self, instance, **kwargs)
+- after_create · method · L1568-L1576 — def after_create(self, field, model, user, connection, before, field_kwargs)
+- after_update · method · L1578-L1598 — def after_update( self, from_field, to_field, from_model, to_model, user, connection, altered_column, before, to_field_kwargs, )
+- set_import_serialized_value · method · L1600-L1613 — def set_import_serialized_value( self, row, field_name, value, id_mapping, cache, files_zip, storage )
+- random_value · method · L1615-L1616 — def random_value(self, instance, fake, cache)
+- should_backup_field_data_for_same_type_update · method · L1618-L1621 — def should_backup_field_data_for_same_type_update( self, old_field, new_field_attrs: Dict[str, Any] ) -> bool
+- LastModifiedFieldType · class · L1624-L1630 — class LastModifiedFieldType(CreatedOnLastModifiedBaseFieldType)
+- CreatedOnFieldType · class · L1633-L1637 — class CreatedOnFieldType(CreatedOnLastModifiedBaseFieldType)
+- LastModifiedByFieldType · class · L1640-L1864 — class LastModifiedByFieldType(ReadOnlyFieldType)
+- can_represent_collaborators · method · L1656-L1657 — def can_represent_collaborators(self, field)
+- get_model_field · method · L1659-L1670 — def get_model_field(self, instance, **kwargs)
+- get_serializer_field · method · L1672-L1673 — def get_serializer_field(self, instance, **kwargs)
+- before_create · method · L1675-L1688 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- after_create · method · L1690-L1698 — def after_create(self, field, model, user, connection, before, field_kwargs)
+- after_update · method · L1700-L1720 — def after_update( self, from_field, to_field, from_model, to_model, user, connection, altered_column, before, to_field_kwargs, )
+- enhance_queryset · method · L1722-L1723 — def enhance_queryset(self, queryset, field, name, **kwargs)
+- should_backup_field_data_for_same_type_update · method · L1725-L1728 — def should_backup_field_data_for_same_type_update( self, old_field, new_field_attrs: Dict[str, Any] ) -> bool
+- random_value · method · L1730-L1731 — def random_value(self, instance, fake, cache)
+- get_export_serialized_value · method · L1733-L1746 — def get_export_serialized_value( self, row: "GeneratedTableModel", field_name: str, cache: Dict[str, Any], files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, ) -> Any
+- set_import_serialized_value · method · L1748-L1763 — def set_import_serialized_value( self, row: "GeneratedTableModel", field_name: str, value: Any, id_mapping: Dict[str, Any], cache: Dict[str, Any], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, )
+- get_internal_value_from_db · method · L1765-L1768 — def get_internal_value_from_db( self, row: "GeneratedTableModel", field_name: str ) -> Any
+- get_export_value · method · L1770-L1778 — def get_export_value( self, value: Any, field_object: "FieldObject", rich_value: bool = False ) -> Any
+- get_order · method · L1780-L1796 — def get_order( self, field, field_name, order_direction, sort_type, table_model=None ) -> OptionallyAnnotatedOrderBy
+- get_value_for_filter · method · L1798-L1802 — def get_value_for_filter(self, row: "GeneratedTableModel", field: Field) -> any
+- get_search_expression · method · L1804-L1809 — def get_search_expression(self, field: Field, queryset: QuerySet) -> Expression
+- contains_query · method · L1811-L1815 — def contains_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_new_value · method · L1817-L1830 — def get_alter_column_prepare_new_value(self, connection, from_field, to_field)
+- get_alter_column_prepare_old_value · method · L1832-L1853 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_sortable_column_expression · method · L1855-L1861 — def get_sortable_column_expression( self, field: Field, field_name: str, sort_type: str, ) -> Expression | F
+- get_distribution_group_by_value · method · L1863-L1864 — def get_distribution_group_by_value(self, field_name: str)
+- CreatedByFieldType · class · L1867-L2090 — class CreatedByFieldType(ReadOnlyFieldType)
+- can_represent_collaborators · method · L1882-L1883 — def can_represent_collaborators(self, field)
+- get_model_field · method · L1885-L1896 — def get_model_field(self, instance, **kwargs)
+- get_serializer_field · method · L1898-L1899 — def get_serializer_field(self, instance, **kwargs)
+- before_create · method · L1901-L1914 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- after_create · method · L1916-L1924 — def after_create(self, field, model, user, connection, before, field_kwargs)
+- after_update · method · L1926-L1946 — def after_update( self, from_field, to_field, from_model, to_model, user, connection, altered_column, before, to_field_kwargs, )
+- enhance_queryset · method · L1948-L1949 — def enhance_queryset(self, queryset, field, name, **kwargs)
+- should_backup_field_data_for_same_type_update · method · L1951-L1954 — def should_backup_field_data_for_same_type_update( self, old_field, new_field_attrs: Dict[str, Any] ) -> bool
+- random_value · method · L1956-L1957 — def random_value(self, instance, fake, cache)
+- get_export_serialized_value · method · L1959-L1972 — def get_export_serialized_value( self, row: "GeneratedTableModel", field_name: str, cache: Dict[str, Any], files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, ) -> Any
+- set_import_serialized_value · method · L1974-L1989 — def set_import_serialized_value( self, row: "GeneratedTableModel", field_name: str, value: Any, id_mapping: Dict[str, Any], cache: Dict[str, Any], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, )
+- get_internal_value_from_db · method · L1991-L1994 — def get_internal_value_from_db( self, row: "GeneratedTableModel", field_name: str ) -> Any
+- get_export_value · method · L1996-L2004 — def get_export_value( self, value: Any, field_object: "FieldObject", rich_value: bool = False ) -> Any
+- get_order · method · L2006-L2022 — def get_order( self, field, field_name, order_direction, sort_type, table_model=None ) -> OptionallyAnnotatedOrderBy
+- get_value_for_filter · method · L2024-L2028 — def get_value_for_filter(self, row: "GeneratedTableModel", field: Field) -> any
+- get_search_expression · method · L2030-L2035 — def get_search_expression(self, field: Field, queryset: QuerySet) -> Expression
+- contains_query · method · L2037-L2041 — def contains_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_new_value · method · L2043-L2056 — def get_alter_column_prepare_new_value(self, connection, from_field, to_field)
+- get_alter_column_prepare_old_value · method · L2058-L2079 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_sortable_column_expression · method · L2081-L2087 — def get_sortable_column_expression( self, field: Field, field_name: str, sort_type: str, ) -> Expression | F
+- get_distribution_group_by_value · method · L2089-L2090 — def get_distribution_group_by_value(self, field_name: str)
+- DurationFieldType · class · L2093-L2264 — class DurationFieldType(FieldType)
+- get_model_field · method · L2102-L2103 — def get_model_field(self, instance: DurationField, **kwargs)
+- get_serializer_field · method · L2105-L2113 — def get_serializer_field(self, instance: DurationField, **kwargs)
+- get_serializer_help_text · method · L2115-L2120 — def get_serializer_help_text(self, instance: DurationField)
+- prepare_value_for_db · method · L2122-L2123 — def prepare_value_for_db(self, instance: DurationField, value)
+- get_search_expression · method · L2125-L2126 — def get_search_expression(self, field: Field, queryset: QuerySet) -> Expression
+- random_value · method · L2128-L2133 — def random_value(self, instance: DurationField, fake, cache)
+- get_alter_column_prepare_old_value · method · L2135-L2142 — def get_alter_column_prepare_old_value( self, connection, from_field: DurationField, to_field: Field )
+- get_alter_column_prepare_new_value · method · L2144-L2155 — def get_alter_column_prepare_new_value( self, connection, from_field: Field, to_field: DurationField )
+- serialize_to_input_value · method · L2157-L2158 — def serialize_to_input_value(self, field: Field, value: any) -> any
+- format_duration · method · L2160-L2171 — def format_duration( self, value: Optional[timedelta], duration_format: str ) -> Optional[str]
+- get_export_value · method · L2173-L2181 — def get_export_value( self, value: Optional[timedelta], field_object: "FieldObject", rich_value: bool = False, ) -> Optional[str]
+- should_backup_field_data_for_same_type_update · method · L2183-L2192 — def should_backup_field_data_for_same_type_update( self, old_field: DurationField, new_field_attrs: Dict[str, Any] ) -> bool
+- should_update_search_data · method · L2194-L2203 — def should_update_search_data( self, old_field: DurationField, new_field_attrs: Dict[str, Any] ) -> bool
+- force_same_type_alter_column · method · L2205-L2208 — def force_same_type_alter_column(self, from_field, to_field)
+- serialize_metadata_for_row_history · method · L2210-L2218 — def serialize_metadata_for_row_history( self, field: Field, row: "GeneratedTableModel", metadata: Optional[SerializedRowHistoryFieldMetadata] = None, ) -> SerializedRowHistoryFieldMetadata
+- to_jadawel_formula_type · method · L2220-L2223 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L2225-L2226 — def from_jadawel_formula_type(self, formula_type: JadawelFormulaCharType)
+- get_export_serialized_value · method · L2228-L2240 — def get_export_serialized_value( self, row: "GeneratedTableModel", field_name: str, cache: Dict[str, Any], files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, ) -> Any
+- set_import_serialized_value · method · L2242-L2256 — def set_import_serialized_value( self, row: "GeneratedTableModel", field_name: str, value: Any, id_mapping: Dict[str, Any], cache: Dict[str, Any], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, ) -> Optional[List[models.Model]]
+- get_sortable_column_expression · method · L2258-L2264 — def get_sortable_column_expression( self, field: Field, field_name: str, sort_type: str, ) -> Expression | F
+- LinkRowFieldType · class · L2267-L3712 — class LinkRowFieldType( ManyToManyFieldTypeSerializeToInputValueMixin, ManyToManyGroupByMixin, FieldType )
+- _get_related_table_primary_field · method · L2378-L2389 — def _get_related_table_primary_field( self, field: Field, table_model: Optional["GeneratedTableModel"] = None ) -> Optional[Field]: # If provided, use the table_model to find the related_primary_field to avoid # potential unnecessary queries.
+- _check_related_field_can_order_by · method · L2391-L2401 — def _check_related_field_can_order_by( self, related_primary_field: Type[Field], order_type: str, ) -> bool
+- check_can_group_by · method · L2403-L2413 — def check_can_group_by(self, field, sort_type)
+- _get_group_by_agg_expression · method · L2415-L2425 — def _get_group_by_agg_expression(self, field_name: str) -> dict
+- check_can_order_by · method · L2427-L2433 — def check_can_order_by(self, field: Field, sort_type: str) -> bool
+- get_value_for_filter · method · L2435-L2447 — def get_value_for_filter(self, row: "GeneratedTableModel", field)
+- get_order · method · L2449-L2521 — def get_order( self, field, field_name, order_direction, sort_type, table_model=None )
+- get_array_agg · function · L2476-L2483 — def get_array_agg(expr)
+- get_search_expression · method · L2523-L2560 — def get_search_expression(self, field: Field, queryset: QuerySet) -> Expression
+- enhance_queryset · method · L2562-L2611 — def enhance_queryset(self, queryset, field, name, **kwargs)
+- enhance_field_queryset · method · L2613-L2623 — def enhance_field_queryset( self, queryset: QuerySet[Field], field: Field ) -> QuerySet[Field]
+- prepare_value_for_db · method · L2625-L2628 — def prepare_value_for_db(self, instance, value)
+- prepare_value_for_db_in_bulk · method · L2630-L2791 — def prepare_value_for_db_in_bulk( self, instance, values_by_row, continue_on_error=False ): # Create a map {value -> row_indexes} for ids and strings
+- preprocess_value · function · L2637-L2638 — def preprocess_value(val)
+- get_export_value · method · L2793-L2804 — def get_export_value(self, value, field_object, rich_value=False)
+- map_to_export_value · function · L2794-L2797 — def map_to_export_value(inner_value, inner_field_object)
+- get_internal_value_from_db · method · L2806-L2818 — def get_internal_value_from_db( self, row: "GeneratedTableModel", field_name: str ) -> List[int]
+- get_human_readable_value · method · L2820-L2830 — def get_human_readable_value(self, value, field_object)
+- map_to_human_readable_value · function · L2821-L2824 — def map_to_human_readable_value(inner_value, inner_field_object)
+- _get_related_model_and_primary_field · method · L2832-L2848 — def _get_related_model_and_primary_field(self, instance)
+- _get_and_map_pk_values · method · L2850-L2890 — def _get_and_map_pk_values( self, field_object, value, map_func: Callable[[Any, Dict[str, Any]], Any] )
+- _is_unnamed_primary_field_value · method · L2893-L2905 — def _is_unnamed_primary_field_value(primary_field_value)
+- get_serializer_field · method · L2907-L2918 — def get_serializer_field(self, instance, **kwargs)
+- get_response_serializer_field · method · L2920-L2951 — def get_response_serializer_field(self, instance, **kwargs)
+- get_serializer_help_text · method · L2953-L2962 — def get_serializer_help_text(self, instance)
+- get_model_field · method · L2964-L2970 — def get_model_field(self, instance, **kwargs)
+- after_model_generation · method · L2972-L3021 — def after_model_generation(self, instance, model, field_name): # Store the current table's model into the manytomany_models object so that the # related ManyToMany field can use that one. Otherwise we end up in a recursive # loop.
+- field_is_link_row_related_field · function · L3001-L3006 — def field_is_link_row_related_field(related_field)
+- prepare_values · method · L3023-L3089 — def prepare_values(self, values, user)
+- export_prepared_values · method · L3091-L3102 — def export_prepared_values(self, field: LinkRowField)
+- before_create · method · L3104-L3150 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- before_update · method · L3152-L3204 — def before_update(self, from_field, to_field_values, user, field_kwargs)
+- after_create · method · L3206-L3231 — def after_create(self, field, model, user, connection, before, field_kwargs)
+- find_next_unused_related_field_name · method · L3234-L3243 — def find_next_unused_related_field_name(self, field): # First just try the tables name, so if say the Client table is linking to the # Address table, this field in the Address table will just be called 'Client'. # However say we then add another link from the Client to Address table with # a field name of "Bank Address", the new field in the Address table will be # called 'Client - Bank Address'.
+- before_schema_change · method · L3245-L3332 — def before_schema_change( self, from_field, to_field, to_model, from_model, from_model_field, to_model_field, user, to_field_kwargs, )
+- after_update · method · L3334-L3371 — def after_update( self, from_field, to_field, from_model, to_model, user, connection, altered_column, before, to_field_kwargs, )
+- after_delete · method · L3373-L3379 — def after_delete(self, field, model, connection)
+- random_value · method · L3381-L3417 — def random_value(self, instance, fake, cache)
+- get_random_objects_iterator · function · L3401-L3406 — def get_random_objects_iterator(limit=10000)
+- export_serialized · method · L3419-L3430 — def export_serialized(self, field)
+- import_serialized · method · L3432-L3495 — def import_serialized( self, table: "Table", serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], deferred_fk_update_collector: DeferredForeignKeyUpdater, ) -> Optional[Field]
+- after_import_serialized · method · L3497-L3507 — def after_import_serialized( self, field: LinkRowField, field_cache: "FieldCache", id_mapping: Dict[str, Any], )
+- get_export_serialized_value · method · L3509-L3528 — def get_export_serialized_value(self, row, field_name, cache, files_zip, storage)
+- set_import_serialized_value · method · L3530-L3546 — def set_import_serialized_value( self, row, field_name, value, id_mapping, cache, files_zip, storage )
+- get_other_fields_to_trash_restore_always_together · method · L3548-L3552 — def get_other_fields_to_trash_restore_always_together(self, field) -> List[Field]
+- to_jadawel_formula_type · method · L3554-L3561 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- to_jadawel_formula_expression · method · L3563-L3569 — def to_jadawel_formula_expression( self, field ) -> JadawelExpression[JadawelFormulaType]
+- get_field_dependencies · method · L3571-L3584 — def get_field_dependencies( self, field_instance: LinkRowField, field_cache: "FieldCache" ) -> FieldDependencies
+- should_backup_field_data_for_same_type_update · method · L3586-L3592 — def should_backup_field_data_for_same_type_update( self, old_field: LinkRowField, new_field_attrs: Dict[str, Any] ) -> bool
+- should_update_search_data · method · L3594-L3600 — def should_update_search_data( self, old_field: LinkRowField, new_field_attrs: Dict[str, Any] ) -> bool
+- get_dependants_which_will_break_when_field_type_changes · method · L3602-L3618 — def get_dependants_which_will_break_when_field_type_changes( self, field: LinkRowField, to_field_type: "FieldType", field_cache: "FieldCache" ) -> "FieldDependants"
+- row_of_dependency_updated · method · L3620-L3639 — def row_of_dependency_updated( self, field: Field, starting_row: "StartingRowType", update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: List["LinkRowField"], dependency_context: DependencyContext, )
+- field_dependency_updated · method · L3641-L3660 — def field_dependency_updated( self, field: Field, updated_field: Field, updated_old_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- serialize_metadata_for_row_history · method · L3662-L3691 — def serialize_metadata_for_row_history( self, field: Field, row: "GeneratedTableModel", metadata: Optional[SerializedRowHistoryFieldMetadata] = None, ) -> SerializedRowHistoryFieldMetadata
+- are_row_values_equal · method · L3693-L3694 — def are_row_values_equal(self, value1: any, value2: any) -> bool
+- empty_query · method · L3696-L3712 — def empty_query( self, field_name: str, model_field: LinkRowField, field: ManyToManyField, ) -> Q: # Exclude all the trashed rows in the related table.
+- EmailFieldType · class · L3715-L3746 — class EmailFieldType(CollationSortMixin, CharFieldMatchingRegexFieldType)
+- regex · method · L3721-L3734 — def regex(self)
+- max_length · method · L3737-L3739 — def max_length(self): # max_length=254 to be compliant with RFCs 3696 and 5321
+- random_value · method · L3741-L3742 — def random_value(self, instance, fake, cache)
+- get_value_for_filter · method · L3744-L3746 — def get_value_for_filter(self, row: "GeneratedTableModel", field: Field) -> any
+- FileFieldType · class · L3749-L4039 — class FileFieldType(FieldType)
+- to_jadawel_formula_type · method · L3756-L3757 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L3759-L3760 — def from_jadawel_formula_type(self, formula_type) -> Field
+- get_search_expression · method · L3762-L3773 — def get_search_expression(self, field: FileField, queryset: QuerySet) -> Expression
+- can_represent_files · method · L3775-L3776 — def can_represent_files(self, field)
+- _extract_file_names · method · L3778-L3787 — def _extract_file_names(self, value): # Validates the provided object and extract the names from it. We need the name # to validate if the file actually exists and to get the 'real' properties # from it.
+- prepare_value_for_db · method · L3789-L3823 — def prepare_value_for_db(self, instance, value)
+- prepare_value_for_db_in_bulk · method · L3825-L3877 — def prepare_value_for_db_in_bulk( self, instance, values_by_row, continue_on_error=False )
+- get_serializer_field · method · L3879-L3883 — def get_serializer_field(self, instance, **kwargs)
+- get_response_serializer_field · method · L3885-L3888 — def get_response_serializer_field(self, instance, **kwargs)
+- get_export_value · method · L3890-L3913 — def get_export_value(self, value, field_object, rich_value=False)
+- get_human_readable_value · method · L3915-L3922 — def get_human_readable_value(self, value, field_object)
+- get_serializer_help_text · method · L3924-L3929 — def get_serializer_help_text(self, instance)
+- get_model_field · method · L3931-L3932 — def get_model_field(self, instance, **kwargs)
+- random_value · method · L3934-L3977 — def random_value(self, instance, fake, cache)
+- get_random_objects_iterator · function · L3952-L3960 — def get_random_objects_iterator(limit=10000)
+- contains_query · method · L3979-L3980 — def contains_query(self, *args)
+- get_export_serialized_value · method · L3982-L3997 — def get_export_serialized_value( self, row: "GeneratedTableModel", field_name: str, cache: Dict[str, Any], files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, name_prefix: str = "", ) -> List[Dict[str, Any]]
+- set_import_serialized_value · method · L3999-L4036 — def set_import_serialized_value( self, row: "GeneratedTableModel", field_name: str, value: Dict[str, Any], id_mapping: Dict[str, Any], cache: Dict[str, Any], files_zip: Optional[ZipFile], storage: Optional[Storage], ) -> None
+- are_row_values_equal · method · L4038-L4039 — def are_row_values_equal(self, value1: any, value2: any) -> bool
+- SelectOptionBaseFieldType · class · L4042-L4257 — class SelectOptionBaseFieldType(FieldType)
+- get_default_value · method · L4052-L4053 — def get_default_value(self, field: Field) -> Any
+- create_select_options · method · L4055-L4073 — def create_select_options(self, field, select_options)
+- after_create_select_options · method · L4075-L4089 — def after_create_select_options( self, field, select_default, select_options, mapping )
+- get_default_options_index · method · L4091-L4100 — def get_default_options_index(self, default, select_options)
+- get_options_by_index · method · L4102-L4111 — def get_options_by_index(self, field, index)
+- get_validated_default_value · method · L4113-L4116 — def get_validated_default_value( self, from_field, default_index, has_new_default_value, select_default_value )
+- before_create · method · L4118-L4124 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- after_create · method · L4126-L4141 — def after_create(self, field, model, user, connection, before, field_kwargs)
+- before_update · method · L4143-L4171 — def before_update(self, from_field, to_field_values, user, kwargs)
+- should_backup_field_data_for_same_type_update · method · L4173-L4184 — def should_backup_field_data_for_same_type_update( self, old_field: SingleSelectField, new_field_attrs: Dict[str, Any] ) -> bool
+- should_update_search_data · method · L4186-L4189 — def should_update_search_data(self, old_field, new_field_attrs)
+- enhance_queryset_in_bulk · method · L4191-L4222 — def enhance_queryset_in_bulk(self, queryset, field_objects, **kwargs)
+- get_sortable_column_expression · method · L4224-L4230 — def get_sortable_column_expression( self, field: Field, field_name: str, sort_type: str, ) -> Expression | F
+- parse_filter_value · method · L4232-L4244 — def parse_filter_value(self, field, model_field, value) -> List[int]
+- get_select_options_help_text · method · L4246-L4257 — def get_select_options_help_text(self, instance)
+- SingleSelectFieldType · class · L4260-L4747 — class SingleSelectFieldType(CollationSortMixin, SelectOptionBaseFieldType)
+- init_field_data · method · L4274-L4287 — def init_field_data(self, field, model)
+- get_default_options_index · method · L4289-L4300 — def get_default_options_index(self, default, select_options)
+- get_options_by_index · method · L4302-L4308 — def get_options_by_index(self, field, index)
+- after_create_select_options · method · L4310-L4319 — def after_create_select_options( self, field, select_default, select_options, mapping )
+- get_instance_default_value · method · L4321-L4332 — def get_instance_default_value(self, instance, default_value)
+- get_validated_default_value · method · L4334-L4347 — def get_validated_default_value( self, from_field, default_index, has_new_default_value, select_default_value )
+- get_serializer_field · method · L4349-L4370 — def get_serializer_field(self, instance, **kwargs)
+- get_response_serializer_field · method · L4372-L4381 — def get_response_serializer_field(self, instance, **kwargs)
+- enhance_queryset · method · L4383-L4387 — def enhance_queryset(self, queryset, field, name, **kwargs): # It's important that this individual enhance_queryset method exists, even # though the enhance queryset in bulk exists, because the link_row field can # prefetch the data individually.
+- get_value_for_filter · method · L4389-L4391 — def get_value_for_filter(self, row: "GeneratedTableModel", field) -> int
+- get_internal_value_from_db · method · L4393-L4396 — def get_internal_value_from_db( self, row: "GeneratedTableModel", field_name: str ) -> int
+- import_serialized_default_value · method · L4398-L4402 — def import_serialized_default_value(self, value, id_mapping, workspace_id, cache)
+- get_search_expression · method · L4404-L4409 — def get_search_expression( self, field: SingleSelectField, queryset: QuerySet ) -> Expression
+- prepare_value_for_db · method · L4411-L4414 — def prepare_value_for_db(self, instance, value)
+- prepare_value_for_db_in_bulk · method · L4416-L4486 — def prepare_value_for_db_in_bulk( self, instance, values_by_row, continue_on_error=False ): # Create a map {names/ids -> row_indexes} and extract unique int and text values
+- serialize_to_input_value · method · L4488-L4489 — def serialize_to_input_value(self, field: Field, value: any) -> any
+- serialize_metadata_for_row_history · method · L4491-L4518 — def serialize_metadata_for_row_history( self, field: Field, row: "GeneratedTableModel", metadata: Optional[SerializedRowHistoryFieldMetadata] = None, ) -> SerializedRowHistoryFieldMetadata
+- get_serializer_help_text · method · L4520-L4526 — def get_serializer_help_text(self, instance)
+- get_export_value · method · L4528-L4531 — def get_export_value(self, value, field_object, rich_value=False)
+- get_model_field · method · L4533-L4550 — def get_model_field(self, instance, **kwargs)
+- get_alter_column_prepare_old_value · method · L4552-L4587 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_alter_column_prepare_new_value · method · L4589-L4625 — def get_alter_column_prepare_new_value(self, connection, from_field, to_field)
+- get_sortable_column_expression · method · L4627-L4636 — def get_sortable_column_expression( self, field: Field, field_name: str, sort_type: str, ) -> Expression | F
+- get_order · method · L4638-L4661 — def get_order( self, field, field_name, order_direction, sort_type, table_model=None ) -> OptionallyAnnotatedOrderBy
+- random_value · method · L4663-L4679 — def random_value(self, instance, fake, cache)
+- contains_query · method · L4681-L4686 — def contains_query(self, field_name, value, model_field, field)
+- contains_word_query · method · L4688-L4694 — def contains_word_query(self, field_name, value, model_field, field)
+- set_import_serialized_value · method · L4696-L4705 — def set_import_serialized_value( self, row, field_name, value, id_mapping, cache, files_zip, storage )
+- to_jadawel_formula_type · method · L4707-L4708 — def to_jadawel_formula_type(self, field)
+- from_jadawel_formula_type · method · L4710-L4711 — def from_jadawel_formula_type(self, formula_type) -> Field
+- get_group_by_serializer_field · method · L4713-L4720 — def get_group_by_serializer_field(self, field, **kwargs)
+- get_formula_reference_to_model_field · method · L4722-L4735 — def get_formula_reference_to_model_field( self, model_field, db_column, already_in_subquery )
+- before_field_options_update · method · L4737-L4744 — def before_field_options_update( self, field, to_create=None, to_update=None, to_delete=None )
+- get_distribution_group_by_value · method · L4746-L4747 — def get_distribution_group_by_value(self, field_name: str)
+- MultipleSelectFieldType · class · L4750-L5332 — class MultipleSelectFieldType( CollationSortMixin, ManyToManyFieldTypeSerializeToInputValueMixin, ManyToManyGroupByMixin, SelectOptionBaseFieldType, )
+- import_serialized_default_value · method · L4771-L4777 — def import_serialized_default_value(self, value, id_mapping, workspace_id, cache)
+- init_field_data · method · L4779-L4802 — def init_field_data(self, field, model)
+- get_default_options_index · method · L4804-L4812 — def get_default_options_index(self, default, select_options)
+- get_options_by_index · method · L4814-L4824 — def get_options_by_index(self, field, index)
+- after_create_select_options · method · L4826-L4835 — def after_create_select_options( self, field, select_default, select_options, mapping )
+- get_validated_default_value · method · L4837-L4853 — def get_validated_default_value( self, from_field, default_index, has_new_default_value, select_default_value )
+- get_instance_default_value · method · L4855-L4869 — def get_instance_default_value(self, instance, default_value)
+- to_jadawel_formula_type · method · L4871-L4872 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L4874-L4875 — def from_jadawel_formula_type(self, formula_type) -> Field
+- get_serializer_field · method · L4877-L4901 — def get_serializer_field(self, instance, **kwargs)
+- get_value_for_filter · method · L4903-L4907 — def get_value_for_filter(self, row: "GeneratedTableModel", field) -> str
+- get_internal_value_from_db · method · L4909-L4913 — def get_internal_value_from_db( self, row: "GeneratedTableModel", field_name: str ) -> List[int]
+- get_response_serializer_field · method · L4915-L4924 — def get_response_serializer_field(self, instance, **kwargs)
+- enhance_queryset · method · L4926-L4930 — def enhance_queryset(self, queryset, field, name, **kwargs): # It's important that this individual enhance_queryset method exists, even # though the enhance queryset in bulk exists, because the link_row field can # prefetch the data individually.
+- get_search_expression · method · L4932-L4939 — def get_search_expression(self, field: MultipleSelectField, queryset) -> Expression
+- prepare_value_for_db · method · L4941-L4944 — def prepare_value_for_db(self, instance, value)
+- prepare_value_for_db_in_bulk · method · L4946-L5059 — def prepare_value_for_db_in_bulk( self, instance, values_by_row, continue_on_error=False ): # Create a map {value -> row_indexes} for ids and strings
+- are_invalid_options · function · L5044-L5045 — def are_invalid_options(value)
+- get_serializer_help_text · method · L5061-L5072 — def get_serializer_help_text(self, instance)
+- random_value · method · L5074-L5092 — def random_value(self, instance, fake, cache)
+- get_export_value · method · L5094-L5103 — def get_export_value(self, value, field_object, rich_value=False)
+- get_human_readable_value · method · L5105-L5108 — def get_human_readable_value(self, value, field_object)
+- get_model_field · method · L5110-L5111 — def get_model_field(self, instance, **kwargs)
+- after_model_generation · method · L5113-L5154 — def after_model_generation(self, instance, model, field_name)
+- get_export_serialized_value · method · L5156-L5173 — def get_export_serialized_value(self, row, field_name, cache, files_zip, storage)
+- set_import_serialized_value · method · L5175-L5194 — def set_import_serialized_value( self, row, field_name, value, id_mapping, cache, files_zip, storage )
+- contains_query · method · L5196-L5211 — def contains_query(self, field_name, value, model_field, field)
+- contains_word_query · method · L5213-L5228 — def contains_word_query(self, field_name, value, model_field, field)
+- get_order · method · L5230-L5260 — def get_order( self, field, field_name, order_direction, sort_type, table_model=None )
+- get_group_by_aggregated_order · method · L5262-L5266 — def get_group_by_aggregated_order(self, related_field): # The multiple select field must be ordered by the id of the entry in the # through table because it respects the insertion order. It respects the # `MultipleSelectManyToManyDescriptor::related_manager_cls::_apply_rel_ordering`
+- before_field_options_update · method · L5268-L5283 — def before_field_options_update( self, field, to_create=None, to_update=None, to_delete=None )
+- serialize_metadata_for_row_history · method · L5285-L5313 — def serialize_metadata_for_row_history( self, field: Field, row: "GeneratedTableModel", metadata: Optional[SerializedRowHistoryFieldMetadata] = None, ) -> SerializedRowHistoryFieldMetadata
+- are_row_values_equal · method · L5315-L5316 — def are_row_values_equal(self, value1: any, value2: any) -> bool
+- get_formula_reference_to_model_field · method · L5318-L5332 — def get_formula_reference_to_model_field( self, model_field, db_column, already_in_subquery )
+- PhoneNumberFieldType · class · L5335-L5381 — class PhoneNumberFieldType(CollationSortMixin, CharFieldMatchingRegexFieldType)
+- regex · method · L5351-L5360 — def regex(self)
+- max_length · method · L5363-L5374 — def max_length(self)
+- random_value · method · L5376-L5377 — def random_value(self, instance, fake, cache)
+- get_value_for_filter · method · L5379-L5381 — def get_value_for_filter(self, row: "GeneratedTableModel", field: Field) -> any
+- FormulaFieldType · class · L5384-L6032 — class FormulaFieldType(FormulaFieldTypeArrayFilterSupport, ReadOnlyFieldType)
+- serializer_field_overrides · method · L5412-L5420 — def serializer_field_overrides(self)
+- empty_query · method · L5422-L5427 — def empty_query(self, field_name, model_field, field) -> Q
+- _stack_error_mapper · method · L5430-L5435 — def _stack_error_mapper(e)
+- get_search_expression · method · L5442-L5447 — def get_search_expression( self, field: FormulaField, queryset: QuerySet ) -> Expression
+- is_searchable · method · L5449-L5450 — def is_searchable(self, field: FormulaField) -> bool
+- array_of · method · L5453-L5454 — def array_of(formula_type: str)
+- compatible_with_formula_types · method · L5457-L5468 — def compatible_with_formula_types(*compatible_formula_types: List[str])
+- checker · function · L5458-L5466 — def checker(field) -> bool
+- get_field_instance_and_type_from_formula_field · method · L5470-L5483 — def get_field_instance_and_type_from_formula_field( self, formula_field_instance: FormulaField, ) -> Tuple[Field, FieldType]
+- _filter_serializer_field_kwargs · method · L5485-L5499 — def _filter_serializer_field_kwargs( self, field_type: FieldType, **kwargs ) -> Dict[str, Any]
+- get_serializer_field · method · L5501-L5508 — def get_serializer_field(self, instance: FormulaField, **kwargs)
+- get_response_serializer_field · method · L5510-L5516 — def get_response_serializer_field(self, instance, **kwargs)
+- get_model_field · method · L5518-L5553 — def get_model_field(self, instance: FormulaField, **kwargs): # When typed_table is False we are constructing a table model without # doing any type checking, we can't know what the expression is in this # case but we still want to generate a model field so the model can be # used to do SQL operations like dropping fields etc.
+- has_compatible_model_fields · method · L5555-L5560 — def has_compatible_model_fields(self, instance, instance2) -> bool
+- prepare_value_for_db · method · L5562-L5574 — def prepare_value_for_db(self, instance, value)
+- get_export_value · method · L5576-L5595 — def get_export_value( self, value, field_object, rich_value=False ) -> JadawelFormulaType
+- contains_query · method · L5597-L5602 — def contains_query(self, field_name, value, model_field, field: FormulaField)
+- contains_word_query · method · L5604-L5611 — def contains_word_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_old_value · method · L5613-L5620 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- to_jadawel_formula_type · method · L5622-L5623 — def to_jadawel_formula_type(self, field: FormulaField) -> JadawelFormulaType
+- to_jadawel_formula_expression · method · L5625-L5631 — def to_jadawel_formula_expression( self, field: FormulaField ) -> JadawelExpression[JadawelFormulaType]
+- get_field_dependencies · method · L5633-L5636 — def get_field_dependencies( self, field_instance: FormulaField, field_cache: "FieldCache" ) -> FieldDependencies
+- get_human_readable_value · method · L5638-L5654 — def get_human_readable_value(self, value: Any, field_object) -> str
+- restore_failed · method · L5656-L5671 — def restore_failed(self, field_instance, restore_exception)
+- get_fields_needing_periodic_update · method · L5673-L5679 — def get_fields_needing_periodic_update(self) -> Optional[QuerySet]
+- run_periodic_update · method · L5681-L5751 — def run_periodic_update( self, fields: List[Field], update_collector: "Optional[FieldUpdateCollector]" = None, field_cache: "Optional[FieldCache]" = None, via_path_to_starting_table: Optional[List[LinkRowField]] = None, already_updated_fields: Optional[List[Field]] = None, skip_search_updates: bool = False, database_id: Optional[int] = None, )
+- row_of_dependency_updated · method · L5753-L5773 — def row_of_dependency_updated( self, field: FormulaField, starting_row: "StartingRowType", update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]], dependency_context: DependencyContext, )
+- _update_field_values · method · L5775-L5792 — def _update_field_values( self, field: FormulaField, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]], )
+- field_dependency_created · method · L5794-L5805 — def field_dependency_created( self, field: Field, created_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- field_dependency_updated · method · L5807-L5838 — def field_dependency_updated( self, field: Field, updated_field: Field, updated_old_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- _update_formula_after_dependency_change · method · L5841-L5860 — def _update_formula_after_dependency_change( self, field: FormulaField, old_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- field_dependency_deleted · method · L5862-L5873 — def field_dependency_deleted( self, field: Field, deleted_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- after_create · method · L5875-L5885 — def after_create(self, field, model, user, connection, before, field_kwargs)
+- after_rows_created · method · L5887-L5894 — def after_rows_created( self, field: FormulaField, rows: List["GeneratedTableModel"], update_collector: FieldUpdateCollector, field_cache: "FieldCache", )
+- after_update · method · L5896-L5912 — def after_update( self, from_field, to_field, from_model, to_model, user, connection, altered_column, before, to_field_kwargs, )
+- after_import_serialized · method · L5914-L5916 — def after_import_serialized(self, field, field_cache, id_mapping)
+- after_rows_imported · method · L5918-L5943 — def after_rows_imported( self, field: FormulaField, update_collector: Optional[FieldUpdateCollector] = None, field_cache: Optional["FieldCache"] = None, via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- check_can_order_by · method · L5945-L5950 — def check_can_order_by(self, field, order_type): # The formula types are not compatible with the order type. Therefore, # if the `order_type` is not the default, it will always return False.
+- check_can_group_by · method · L5952-L5955 — def check_can_group_by(self, field, sort_type): # The formula types are not compatible with the order type. Therefore, # if the `order_type` is not the default, it will always return False.
+- get_order · method · L5957-L5963 — def get_order( self, field, field_name, order_direction, sort_type, table_model=None ) -> OptionallyAnnotatedOrderBy: # Ignore the `sort_type` because that is not yet supported in formulas.
+- get_value_for_filter · method · L5965-L5968 — def get_value_for_filter(self, row: "GeneratedTableModel", field)
+- should_update_search_data · method · L5970-L5974 — def should_update_search_data( self, old_field: LinkRowField, new_field_attrs: Dict[str, Any] ) -> bool
+- should_backup_field_data_for_same_type_update · method · L5976-L5979 — def should_backup_field_data_for_same_type_update( self, old_field: FormulaField, new_field_attrs: Dict[str, Any] ) -> bool
+- can_represent_date · method · L5981-L5982 — def can_represent_date(self, field: "Field") -> bool
+- can_represent_files · method · L5984-L5985 — def can_represent_files(self, field)
+- can_represent_select_options · method · L5987-L5988 — def can_represent_select_options(self, field)
+- can_represent_collaborators · method · L5990-L5991 — def can_represent_collaborators(self, field)
+- get_permission_error_when_user_changes_field_to_depend_on_forbidden_field · method · L5993-L6005 — def get_permission_error_when_user_changes_field_to_depend_on_forbidden_field( self, user: AbstractUser, changed_field: Field, forbidden_field: Field ) -> Exception
+- valid_for_bulk_update · method · L6007-L6009 — def valid_for_bulk_update(self, field: Field) -> bool: # Let the dependency handler handle the update in the right order
+- get_field_depdendencies_before_import_serialized · method · L6011-L6022 — def get_field_depdendencies_before_import_serialized( self, serialized_field: Dict[str, Any], serialized_fields_map: Dict[int, Dict[str, Any]], primary_table_fields_map: Dict[int, int], ) -> Optional[Set[Tuple[Union[int, str], Union[int, str]]]]
+- parse_filter_value · method · L6024-L6029 — def parse_filter_value(self, field, model_field, value)
+- can_have_db_index · method · L6031-L6032 — def can_have_db_index(self, field: Field) -> bool
+- CountFieldType · class · L6035-L6200 — class CountFieldType(FormulaFieldType)
+- request_serializer_field_names · method · L6061-L6062 — def request_serializer_field_names(self)
+- request_serializer_field_overrides · method · L6065-L6066 — def request_serializer_field_overrides(self)
+- before_create · method · L6068-L6075 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- get_fields_needing_periodic_update · method · L6077-L6078 — def get_fields_needing_periodic_update(self) -> Optional[QuerySet]
+- before_update · method · L6080-L6096 — def before_update(self, from_field, to_field_values, user, kwargs)
+- field_dependency_deleted · method · L6098-L6114 — def field_dependency_deleted( self, field: CountField, deleted_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- _validate_through_field_values · method · L6116-L6147 — def _validate_through_field_values( self, table, values, all_kwargs, default_through_field_id=None, )
+- import_serialized · method · L6149-L6172 — def import_serialized( self, table: "Table", serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], deferred_fk_update_collector: DeferredForeignKeyUpdater, ) -> "Field"
+- get_field_depdendencies_before_import_serialized · method · L6174-L6195 — def get_field_depdendencies_before_import_serialized( self, serialized_field: Dict[str, Any], serialized_fields_map: Dict[int, Dict[str, Any]], primary_table_fields_map: Dict[int, int], ) -> Optional[Set[Tuple[Union[int, str], Union[int, str]]]]
+- enhance_field_queryset · method · L6197-L6200 — def enhance_field_queryset( self, queryset: QuerySet[Field], field: Field ) -> QuerySet[Field]
+- RollupFieldType · class · L6203-L6427 — class RollupFieldType(FormulaFieldType)
+- request_serializer_field_names · method · L6242-L6243 — def request_serializer_field_names(self)
+- request_serializer_field_overrides · method · L6246-L6247 — def request_serializer_field_overrides(self)
+- before_create · method · L6249-L6256 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- get_fields_needing_periodic_update · method · L6258-L6259 — def get_fields_needing_periodic_update(self) -> Optional[QuerySet]
+- before_update · method · L6261-L6285 — def before_update(self, from_field, to_field_values, user, kwargs)
+- _validate_through_and_target_field_values · method · L6287-L6334 — def _validate_through_and_target_field_values( self, table, values, all_kwargs, default_through_field_id=None, default_target_field_id=None, )
+- field_dependency_deleted · method · L6336-L6352 — def field_dependency_deleted( self, field: RollupField, deleted_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, )
+- import_serialized · method · L6354-L6381 — def import_serialized( self, table: "Table", serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], deferred_fk_update_collector: DeferredForeignKeyUpdater, ) -> "Field"
+- get_field_depdendencies_before_import_serialized · method · L6383-L6404 — def get_field_depdendencies_before_import_serialized( self, serialized_field: Dict[str, Any], serialized_fields_map: Dict[int, Dict[str, Any]], primary_table_fields_map: Dict[int, int], ) -> Optional[Set[Tuple[Union[int, str], Union[int, str]]]]
+- enhance_field_queryset · method · L6406-L6409 — def enhance_field_queryset( self, queryset: QuerySet[Field], field: Field ) -> QuerySet[Field]
+- should_update_search_data · method · L6411-L6427 — def should_update_search_data( self, old_field: LinkRowField, new_field_attrs: Dict[str, Any] ) -> bool
+- LookupFieldType · class · L6430-L6744 — class LookupFieldType(FormulaFieldType)
+- before_create · method · L6498-L6504 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- get_fields_needing_periodic_update · method · L6506-L6507 — def get_fields_needing_periodic_update(self) -> Optional[QuerySet]
+- before_update · method · L6509-L6531 — def before_update(self, from_field, to_field_values, user, kwargs)
+- _validate_through_and_target_field_values · method · L6533-L6579 — def _validate_through_and_target_field_values( self, table, values, default_through_field_id=None, default_target_field_id=None, )
+- field_dependency_updated · method · L6581-L6608 — def field_dependency_updated( self, field: LookupField, updated_field: Field, updated_old_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, ): # The updated field can be the through field or the target field, and we're only # interested if the name or the field type changed.
+- field_dependency_deleted · method · L6610-L6633 — def field_dependency_deleted( self, field: LookupField, deleted_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, ): # Either the through field or the target field has been deleted
+- field_dependency_created · method · L6635-L6671 — def field_dependency_created( self, field: LookupField, created_field: Field, update_collector: FieldUpdateCollector, field_cache: "FieldCache", via_path_to_starting_table: Optional[List[LinkRowField]] = None, ): # If the created field can fix this broken field because it was pointing to # the same name, then we can do so.
+- import_serialized · method · L6673-L6700 — def import_serialized( self, table: "Table", serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], deferred_fk_update_collector: DeferredForeignKeyUpdater, ) -> "Field"
+- get_field_depdendencies_before_import_serialized · method · L6702-L6725 — def get_field_depdendencies_before_import_serialized( self, serialized_field: Dict[str, Any], serialized_fields_map: Dict[int, Dict[str, Any]], primary_table_fields_map: Dict[int, int], ) -> Optional[Set[Tuple[Union[int, str], Union[int, str]]]]
+- enhance_field_queryset · method · L6727-L6730 — def enhance_field_queryset( self, queryset: QuerySet[Field], field: Field ) -> QuerySet[Field]
+- should_update_search_data · method · L6732-L6744 — def should_update_search_data( self, old_field: LinkRowField, new_field_attrs: Dict[str, Any] ) -> bool
+- MultipleCollaboratorsFieldType · class · L6747-L7208 — class MultipleCollaboratorsFieldType( CollationSortMixin, ManyToManyFieldTypeSerializeToInputValueMixin, ManyToManyGroupByMixin, FieldType, )
+- can_represent_collaborators · method · L6772-L6773 — def can_represent_collaborators(self, field)
+- get_serializer_field · method · L6775-L6781 — def get_serializer_field(self, instance, **kwargs)
+- get_search_expression · method · L6783-L6794 — def get_search_expression( self, field: MultipleCollaboratorsField, queryset: QuerySet ) -> Expression
+- get_internal_value_from_db · method · L6796-L6800 — def get_internal_value_from_db( self, row: "GeneratedTableModel", field_name: str ) -> List[int]
+- get_response_serializer_field · method · L6802-L6811 — def get_response_serializer_field(self, instance, **kwargs)
+- serialize_to_input_value · method · L6813-L6814 — def serialize_to_input_value(self, field: Field, value: any) -> any
+- prepare_value_for_db · method · L6816-L6845 — def prepare_value_for_db(self, instance, value)
+- prepare_value_for_db_in_bulk · method · L6847-L6878 — def prepare_value_for_db_in_bulk( self, instance, values_by_row, continue_on_error=False ): # {user_id -> row_indexes}
+- get_serializer_help_text · method · L6880-L6886 — def get_serializer_help_text(self, instance)
+- get_export_value · method · L6888-L6899 — def get_export_value(self, value, field_object, rich_value=False)
+- get_human_readable_value · method · L6901-L6905 — def get_human_readable_value(self, value, field_object)
+- serialize_metadata_for_row_history · method · L6907-L6934 — def serialize_metadata_for_row_history( self, field: Field, row: "GeneratedTableModel", metadata: Optional[SerializedRowHistoryFieldMetadata] = None, ) -> SerializedRowHistoryFieldMetadata
+- are_row_values_equal · method · L6936-L6939 — def are_row_values_equal(self, value1: any, value2: any) -> bool
+- get_model_field · method · L6941-L6942 — def get_model_field(self, instance, **kwargs)
+- after_model_generation · method · L6944-L6997 — def after_model_generation(self, instance, model, field_name)
+- enhance_queryset · method · L6999-L7000 — def enhance_queryset(self, queryset, field, name, **kwargs)
+- get_export_serialized_value · method · L7002-L7018 — def get_export_serialized_value(self, row, field_name, cache, files_zip, storage)
+- set_import_serialized_value · method · L7020-L7058 — def set_import_serialized_value( self, row, field_name, value, id_mapping, cache, files_zip, storage )
+- export_serialized_default_value · method · L7060-L7077 — def export_serialized_default_value(self, value, field, workspace_id, cache)
+- import_serialized_default_value · method · L7079-L7102 — def import_serialized_default_value(self, value, id_mapping, workspace_id, cache)
+- random_value · method · L7104-L7123 — def random_value(self, instance, fake, cache)
+- random_to_input_value · method · L7125-L7126 — def random_to_input_value(self, field, value)
+- get_order · method · L7128-L7157 — def get_order( self, field, field_name, order_direction, sort_type, table_model=None )
+- get_group_by_aggregated_order · method · L7159-L7163 — def get_group_by_aggregated_order(self, related_field): # The multiple select field must be ordered by the id of the entry in the # through table because it respects the insertion order. It respects the # `MultipleSelectManyToManyDescriptor::related_manager_cls::_apply_rel_ordering`
+- get_value_for_filter · method · L7165-L7169 — def get_value_for_filter(self, row: "GeneratedTableModel", field) -> any
+- get_sortable_column_expression · method · L7171-L7177 — def get_sortable_column_expression( self, field: Field, field_name: str, sort_type: str, ) -> Expression | F
+- to_jadawel_formula_type · method · L7179-L7180 — def to_jadawel_formula_type(self, field: Field)
+- from_jadawel_formula_type · method · L7182-L7183 — def from_jadawel_formula_type(self, formula_type) -> Field
+- get_formula_reference_to_model_field · method · L7185-L7208 — def get_formula_reference_to_model_field( self, model_field, db_column, already_in_subquery )
+- UUIDFieldType · class · L7211-L7305 — class UUIDFieldType(ReadOnlyFieldType)
+- get_serializer_field · method · L7223-L7224 — def get_serializer_field(self, instance, **kwargs)
+- get_serializer_help_text · method · L7226-L7227 — def get_serializer_help_text(self, instance)
+- get_model_field · method · L7229-L7235 — def get_model_field(self, instance, **kwargs)
+- after_create · method · L7237-L7238 — def after_create(self, field, model, user, connection, before, field_kwargs)
+- after_update · method · L7240-L7253 — def after_update( self, from_field, to_field, from_model, to_model, user, connection, altered_column, before, to_field_kwargs, )
+- prepare_value_for_db · method · L7255-L7258 — def prepare_value_for_db(self, instance: Field, value)
+- get_export_serialized_value · method · L7260-L7272 — def get_export_serialized_value( self, row: "GeneratedTableModel", field_name: str, cache: Dict[str, Any], files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, ) -> None
+- get_export_value · method · L7274-L7275 — def get_export_value(self, value, field_object, rich_value=False) -> str
+- contains_query · method · L7277-L7278 — def contains_query(self, *args)
+- to_jadawel_formula_expression · method · L7280-L7284 — def to_jadawel_formula_expression(self, field): # Cast the uuid to text, to make it compatible with all the text related # functions.
+- to_jadawel_formula_type · method · L7286-L7287 — def to_jadawel_formula_type(self, field) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L7289-L7292 — def from_jadawel_formula_type( self, formula_type: JadawelFormulaTextType ) -> UUIDField
+- get_formula_reference_to_model_field · method · L7294-L7305 — def get_formula_reference_to_model_field( self, model_field, db_column, already_in_subquery )
+- AutonumberFieldType · class · L7308-L7527 — class AutonumberFieldType(ReadOnlyFieldType)
+- get_serializer_field · method · L7329-L7330 — def get_serializer_field(self, instance, **kwargs)
+- get_serializer_help_text · method · L7332-L7335 — def get_serializer_help_text(self, instance)
+- get_model_field · method · L7337-L7338 — def get_model_field(self, instance, **kwargs)
+- after_rows_imported · method · L7340-L7348 — def after_rows_imported( self, field: FormulaField, update_collector: Optional[FieldUpdateCollector] = None, field_cache: Optional["FieldCache"] = None, via_path_to_starting_table: Optional[List[LinkRowField]] = None, ): # Create the sequence so that rows can start being automatically numbered.
+- _extract_view_from_field_kwargs · method · L7350-L7353 — def _extract_view_from_field_kwargs(self, user, field_kwargs)
+- before_create · method · L7355-L7358 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- after_create · method · L7360-L7362 — def after_create(self, field, model, user, connection, before, field_kwargs)
+- before_update · method · L7364-L7365 — def before_update(self, from_field, to_field_values, user, field_kwargs)
+- before_schema_change · method · L7367-L7382 — def before_schema_change( self, from_field, to_field, to_model, from_model, from_model_field, to_model_field, user, to_field_kwargs, )
+- after_update · method · L7384-L7402 — def after_update( self, from_field, to_field, from_model, to_model, user, connection, altered_column, before, to_field_kwargs, )
+- prepare_value_for_db · method · L7404-L7407 — def prepare_value_for_db(self, instance: Field, value)
+- contains_query · method · L7409-L7410 — def contains_query(self, *args)
+- update_rows_with_field_sequence · method · L7412-L7459 — def update_rows_with_field_sequence( self, field: Field, view: Optional["View"] = None )
+- create_field_sequence · method · L7461-L7497 — def create_field_sequence( self, field: Field, model: "GeneratedTableModel", connection )
+- drop_field_sequence · method · L7499-L7517 — def drop_field_sequence( self, field: Field, model: "GeneratedTableModel", connection )
+- to_jadawel_formula_type · method · L7519-L7522 — def to_jadawel_formula_type(self, field: NumberField) -> JadawelFormulaType
+- from_jadawel_formula_type · method · L7524-L7527 — def from_jadawel_formula_type( self, formula_type: JadawelFormulaNumberType ) -> NumberField
+- PasswordFieldType · class · L7530-L7595 — class PasswordFieldType(FieldType)
+- get_serializer_field · method · L7546-L7558 — def get_serializer_field(self, instance, **kwargs): # If a string value is provided, the password will be set. If `None` is # provided, the password will be cleared. If `True` is provided, it will be # ignored because this is what will be in the response and we can't do # anything with that value.
+- get_response_serializer_field · method · L7560-L7563 — def get_response_serializer_field(self, instance, **kwargs): # For the response it must be a BooleanField because we never want to expose # the password, this will make it respond with `True` if set, and `null` is not.
+- get_serializer_help_text · method · L7565-L7571 — def get_serializer_help_text(self, instance)
+- get_model_field · method · L7573-L7574 — def get_model_field(self, instance, **kwargs)
+- get_human_readable_value · method · L7576-L7579 — def get_human_readable_value(self, value: Any, field_object: "FieldObject") -> str: # We don't want to expose the hash of the password, so we just show `True` or # `False` as string depending on whether the value is set.
+- get_export_value · method · L7581-L7586 — def get_export_value( self, value: Any, field_object: "FieldObject", rich_value: bool = False ) -> Any: # We don't want to expose the hash of the password, so we just show `True` or # `False` as string depending on whether the value is set.
+- prepare_value_for_row_history · method · L7588-L7591 — def prepare_value_for_row_history(self, value): # We don't want to expose the hash of the password, so we just show `True` or # `False` as string depending on whether the value is set.
+- is_searchable · method · L7593-L7595 — def is_searchable(self, field: Field) -> bool: # passwords shouldn't be searchable!
+- FormViewEditRowFieldType · class · L7598-L7729 — class FormViewEditRowFieldType(ReadOnlyFieldType)
+- get_serializer_field · method · L7627-L7628 — def get_serializer_field(self, instance, **kwargs)
+- get_response_serializer_field · method · L7630-L7631 — def get_response_serializer_field(self, instance, **kwargs)
+- get_model_field · method · L7633-L7640 — def get_model_field(self, instance, **kwargs)
+- enhance_field_queryset · method · L7642-L7645 — def enhance_field_queryset( self, queryset: QuerySet[Field], field: Field ) -> QuerySet[Field]
+- before_create · method · L7647-L7653 — def before_create( self, table, primary, allowed_field_values, order, user, field_kwargs )
+- before_update · method · L7655-L7661 — def before_update(self, from_field, to_field_values, user, field_kwargs)
+- is_searchable · method · L7663-L7664 — def is_searchable(self, field: Field) -> bool
+- get_export_value · method · L7666-L7673 — def get_export_value(self, value, field_object, rich_value=False)
+- import_serialized · method · L7675-L7714 — def import_serialized( self, table: "Table", serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], deferred_fk_update_collector: DeferredForeignKeyUpdater, ) -> Optional[Field]
+- get_export_serialized_value · method · L7716-L7724 — def get_export_serialized_value( self, row: "GeneratedTableModel", field_name: str, cache: Dict[str, Any], files_zip=None, storage=None, )
+- set_import_serialized_value · method · L7726-L7729 — def set_import_serialized_value( self, row, field_name, value, id_mapping, cache, files_zip, storage )

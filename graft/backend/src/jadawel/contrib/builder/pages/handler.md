@@ -1,0 +1,30 @@
+# backend/src/jadawel/contrib/builder/pages/handler.py
+
+- PageHandler · class · L56-L978 — class PageHandler
+- get_page · method · L57-L74 — def get_page(self, page_id: int, base_queryset: Optional[QuerySet] = None) -> Page
+- get_shared_page · method · L76-L83 — def get_shared_page(self, builder: Builder) -> Page
+- get_pages · method · L85-L95 — def get_pages(self, builder, base_queryset: Optional[QuerySet] = None)
+- create_shared_page · method · L97-L107 — def create_shared_page(self, builder: Builder) -> Page
+- create_page · method · L109-L155 — def create_page( self, builder: Builder, name: str, path: str, path_params: PagePathParams = None, query_params: PageQueryParam = None, shared: bool = False, ) -> Page
+- delete_page · method · L157-L167 — def delete_page(self, page: Page)
+- update_page · method · L169-L214 — def update_page(self, page: Page, **kwargs) -> Page
+- order_pages · method · L216-L238 — def order_pages( self, builder: Builder, order: List[int], base_qs=None ) -> List[int]
+- get_page_public_records_cache_key · method · L241-L257 — def get_page_public_records_cache_key( cls, page_id: int, user: UserSourceUser, record_name: str )
+- is_published_page · method · L259-L272 — def is_published_page(self, public_page_id: int) -> bool
+- _is_published_application_page · method · L274-L287 — def _is_published_application_page(self, public_page_id: int) -> bool
+- duplicate_page · method · L289-L340 — def duplicate_page( self, page: Page, progress_builder: Optional[ChildProgressBuilder] = None )
+- find_unused_page_name · method · L342-L352 — def find_unused_page_name(self, builder: Builder, proposed_name: str) -> str
+- find_unused_page_path · method · L354-L370 — def find_unused_page_path(self, builder: Builder, proposed_path: str) -> str
+- is_page_path_valid · method · L372-L419 — def is_page_path_valid( self, path: str, path_params: PagePathParams, raises: bool = False ) -> bool
+- validate_query_params · method · L421-L460 — def validate_query_params( self, path: str, path_params: PagePathParams, query_params: PageQueryParams ) -> bool
+- is_page_path_unique · method · L462-L488 — def is_page_path_unique( self, builder: Builder, path: str, base_queryset: QuerySet = None, raises: bool = False, ) -> bool
+- generalise_path · method · L490-L515 — def generalise_path(self, path: str) -> str
+- export_page · method · L517-L571 — def export_page( self, page: Page, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, ) -> PageDict
+- _ops_count_for_import_page · method · L573-L586 — def _ops_count_for_import_page( self, serialized_pages: List[Dict[str, Any]], ) -> int
+- import_pages · method · L588-L666 — def import_pages( self, builder: Builder, serialized_pages: List[Dict[str, Any]], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress: Optional[ChildProgressBuilder] = None, cache: Optional[Dict[str, any]] = None, )
+- import_page · method · L668-L701 — def import_page( self, builder: Builder, serialized_page: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress: Optional[ChildProgressBuilder] = None, cache: Optional[Dict[str, any]] = None, )
+- import_page_only · method · L703-L747 — def import_page_only( self, builder: Builder, serialized_page: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, progress: Optional[ChildProgressBuilder] = None, )
+- import_data_sources · method · L749-L780 — def import_data_sources( self, page: Page, serialized_data_sources: List[Dict], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress: Optional[ChildProgressBuilder] = None, cache: Optional[Dict[str, any]] = None, )
+- import_elements · method · L782-L917 — def import_elements( self, page: Page, serialized_elements: List[ElementDictSubClass], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress: Optional[ChildProgressBuilder] = None, cache: Optional[Dict[str, any]] = None, )
+- element_priority_sort · function · L854-L857 — def element_priority_sort(element_to_sort)
+- import_workflow_actions · method · L919-L978 — def import_workflow_actions( self, page: Page, serialized_workflow_actions: List[Dict], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress: Optional[ChildProgressBuilder] = None, cache: Optional[Dict[str, any]] = None, **kwargs, )

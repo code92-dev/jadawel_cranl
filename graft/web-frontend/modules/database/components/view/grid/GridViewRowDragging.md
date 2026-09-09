@@ -1,0 +1,15 @@
+# web-frontend/modules/database/components/view/grid/GridViewRowDragging.vue
+
+- data · method · L56-L82 — data()
+- width · method · L84-L91 — width()
+- rowHeight · method · L92-L94 — rowHeight()
+- bufferStartIndex · method · L95-L99 — bufferStartIndex()
+- rowsCount · method · L100-L102 — rowsCount()
+- allRows · method · L103-L105 — allRows()
+- beforeUnmount · method · L107-L109 — beforeUnmount()
+- getRowTop · method · L111-L118 — getRowTop(rowId)
+- start · method · L124-L149 — start(row, event)
+- move · method · L154-L217 — move(event = null, startAutoScroll = true)
+- cancel · method · L222-L228 — cancel()
+- up · method · L234-L271 — async up(event)
+- getScrollTop · function · L257-L257 — getScrollTop = ()

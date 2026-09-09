@@ -79,6 +79,53 @@ describe('Billing administration', () => {
     expect(wrapper.get('[data-testid="payment-list"]').text()).toContain('paid')
   })
 
+  test('staff must review a refund before submitting it', async () => {
+    const paid = {
+      id: 'order-1',
+      owner_email: 'owner@example.com',
+      payment_id: 'payment-1',
+      amount: 5000,
+      refundable_amount: 5000,
+      status: 'paid',
+      refund_status: null,
+    }
+    app.mock
+      .onGet('/billing/admin/accounts/')
+      .reply(200, { results: [], next: null })
+    app.mock
+      .onGet('/billing/admin/plans/')
+      .reply(200, { results: [], next: null })
+    app.mock
+      .onGet('/billing/admin/orders/')
+      .reply(200, { results: [paid], next: null })
+    app.mock
+      .onGet('/billing/admin/provider-events/')
+      .reply(200, { results: [], next: null })
+    app.mock
+      .onGet('/billing/admin/external-payments/')
+      .reply(200, { results: [], next: null })
+    app.mock
+      .onPost('/billing/admin/orders/order-1/refund/')
+      .reply(200, { status: 'succeeded', amount: 5000, attempts: 1 })
+
+    const wrapper = await app.mount(BillingAdmin)
+    await flushPromises()
+    await wrapper.get('[data-testid="payment-list"] button').trigger('click')
+    await wrapper
+      .get('[data-testid="refund-form"] textarea')
+      .setValue('Duplicate payment')
+    await wrapper.get('[data-testid="refund-form"]').trigger('submit')
+    await flushPromises()
+
+    expect(wrapper.find('.billing-admin__confirmation').exists()).toBe(true)
+    expect(app.mock.history.post).toHaveLength(0)
+
+    await wrapper.get('.billing-admin__confirmation button').trigger('click')
+    await flushPromises()
+    expect(app.mock.history.post).toHaveLength(1)
+    expect(wrapper.get('[role="status"]').text()).toContain('succeeded')
+  })
+
   test('staff can record an external payment', async () => {
     app.mock.onGet('/billing/admin/accounts/').reply(200, {
       results: [

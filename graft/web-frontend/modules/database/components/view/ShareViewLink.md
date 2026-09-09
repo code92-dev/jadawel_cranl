@@ -1,0 +1,17 @@
+# web-frontend/modules/database/components/view/ShareViewLink.vue
+
+- data · method · L244-L249 — data()
+- shareUrl · method · L251-L259 — shareUrl()
+- optionPasswordText · method · L260-L264 — optionPasswordText()
+- viewType · method · L265-L267 — viewType()
+- viewTypeSharingLinkName · method · L268-L270 — viewTypeSharingLinkName()
+- additionalCreateShareLinkOptions · method · L271-L273 — additionalCreateShareLinkOptions()
+- additionalDisableSharedLinkOptions · method · L274-L276 — additionalDisableSharedLinkOptions()
+- additionalShareLinkOptions · method · L277-L285 — additionalShareLinkOptions()
+- additionalSharingSections · method · L286-L288 — additionalSharingSections()
+- visibleFields · method · L289-L296 — visibleFields()
+- shareViewWarnings · method · L297-L315 — shareViewWarnings()
+- copyShareUrlToClipboard · method · L318-L321 — copyShareUrlToClipboard()
+- updateView · method · L322-L336 — async updateView(values)
+- forceUpdateView · method · L337-L343 — forceUpdateView(values)
+- toggleShareViewPassword · method · L344-L350 — toggleShareViewPassword()

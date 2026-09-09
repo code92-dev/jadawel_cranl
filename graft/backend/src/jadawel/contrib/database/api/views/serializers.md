@@ -1,0 +1,88 @@
+# backend/src/jadawel/contrib/database/api/views/serializers.py
+
+- ListQueryParamatersSerializer · class · L48-L54 — class ListQueryParamatersSerializer(serializers.Serializer)
+- FieldOptionsField · class · L57-L144 — class FieldOptionsField(serializers.Field)
+- __init__ · method · L63-L75 — def __init__(self, serializer_class, create_if_missing=True, **kwargs)
+- to_internal_value · method · L77-L103 — def to_internal_value(self, data)
+- to_representation · method · L105-L144 — def to_representation(self, value)
+- ViewFilterSerializer · class · L147-L175 — class ViewFilterSerializer(serializers.ModelSerializer)
+- Meta · class · L164-L175 — class Meta
+- CreateViewFilterSerializer · class · L178-L196 — class CreateViewFilterSerializer(serializers.ModelSerializer)
+- Meta · class · L193-L196 — class Meta
+- UpdateViewFilterSerializer · class · L199-L209 — class UpdateViewFilterSerializer(serializers.ModelSerializer)
+- Meta · class · L206-L209 — class Meta(CreateViewFilterSerializer.Meta)
+- ViewFilterGroupSerializer · class · L212-L216 — class ViewFilterGroupSerializer(serializers.ModelSerializer)
+- Meta · class · L213-L216 — class Meta
+- CreateViewFilterGroupSerializer · class · L219-L226 — class CreateViewFilterGroupSerializer(serializers.ModelSerializer)
+- Meta · class · L220-L226 — class Meta
+- UpdateViewFilterGroupSerializer · class · L229-L232 — class UpdateViewFilterGroupSerializer(serializers.ModelSerializer)
+- Meta · class · L230-L232 — class Meta
+- ViewSortSerializer · class · L235-L239 — class ViewSortSerializer(serializers.ModelSerializer)
+- Meta · class · L236-L239 — class Meta
+- CreateViewSortSerializer · class · L242-L248 — class CreateViewSortSerializer(serializers.ModelSerializer)
+- Meta · class · L243-L248 — class Meta
+- UpdateViewSortSerializer · class · L251-L260 — class UpdateViewSortSerializer(serializers.ModelSerializer)
+- Meta · class · L252-L260 — class Meta(CreateViewFilterSerializer.Meta)
+- ViewGroupBySerializer · class · L263-L274 — class ViewGroupBySerializer(serializers.ModelSerializer)
+- Meta · class · L264-L274 — class Meta
+- CreateViewGroupBySerializer · class · L277-L290 — class CreateViewGroupBySerializer(serializers.ModelSerializer)
+- Meta · class · L278-L290 — class Meta
+- UpdateViewGroupBySerializer · class · L293-L307 — class UpdateViewGroupBySerializer(serializers.ModelSerializer)
+- Meta · class · L294-L307 — class Meta(CreateViewFilterSerializer.Meta)
+- ViewDecorationSerializer · class · L310-L326 — class ViewDecorationSerializer(serializers.ModelSerializer)
+- Meta · class · L311-L326 — class Meta
+- _only_empty_dict · function · L329-L331 — def _only_empty_dict(value)
+- UpdateViewDecorationSerializer · class · L334-L359 — class UpdateViewDecorationSerializer(serializers.ModelSerializer)
+- Meta · class · L354-L359 — class Meta
+- CreateViewDecorationSerializer · class · L362-L389 — class CreateViewDecorationSerializer(serializers.ModelSerializer)
+- Meta · class · L384-L389 — class Meta
+- ViewDefaultValueSerializer · class · L392-L407 — class ViewDefaultValueSerializer(serializers.ModelSerializer)
+- Meta · class · L393-L407 — class Meta
+- ViewSerializer · class · L410-L533 — class ViewSerializer(serializers.ModelSerializer)
+- Meta · class · L429-L458 — class Meta
+- __init__ · method · L460-L505 — def __init__(self, instance=None, *args, **kwargs)
+- to_representation · method · L507-L529 — def to_representation(self, instance): # We remove the fields in to_representation rather than __init__ as otherwise # drf-spectacular will not know that filters, sortings and decorations exist as # optional return fields. # This way the fields are still dynamic and also show up in the OpenAPI # specification.
+- get_type · method · L532-L533 — def get_type(self, instance)
+- CreateViewSerializer · class · L536-L547 — class CreateViewSerializer(serializers.ModelSerializer)
+- Meta · class · L545-L547 — class Meta
+- UpdateViewSerializer · class · L550-L604 — class UpdateViewSerializer(serializers.ModelSerializer)
+- to_internal_value · method · L563-L576 — def to_internal_value(self, data)
+- validate_ownership_type · method · L578-L588 — def validate_ownership_type(self, value)
+- Meta · class · L590-L604 — class Meta
+- OrderViewsSerializer · class · L607-L612 — class OrderViewsSerializer(serializers.Serializer)
+- PublicViewAuthRequestSerializer · class · L615-L616 — class PublicViewAuthRequestSerializer(serializers.Serializer)
+- PublicViewAuthResponseSerializer · class · L619-L620 — class PublicViewAuthResponseSerializer(serializers.Serializer)
+- PublicViewSortSerializer · class · L623-L629 — class PublicViewSortSerializer(serializers.ModelSerializer)
+- Meta · class · L626-L629 — class Meta
+- PublicViewGroupBySerializer · class · L632-L645 — class PublicViewGroupBySerializer(serializers.ModelSerializer)
+- Meta · class · L635-L645 — class Meta
+- PublicViewTableSerializer · class · L648-L658 — class PublicViewTableSerializer(serializers.Serializer)
+- get_id · method · L653-L654 — def get_id(self, instance)
+- get_database_id · method · L657-L658 — def get_database_id(self, instance)
+- PublicViewSerializer · class · L661-L764 — class PublicViewSerializer(serializers.ModelSerializer)
+- get_sortings · method · L672-L677 — def get_sortings(self, instance)
+- get_group_bys · method · L680-L691 — def get_group_bys(self, instance)
+- get_type · method · L694-L695 — def get_type(self, instance)
+- get_decorations · method · L698-L735 — def get_decorations(self, instance)
+- get_ownership_type · method · L738-L742 — def get_ownership_type(self, instance): # The publicly shared view does not need to know which view ownership type is # publicly shared. However, it does need to have this value in order to work # correctly, so we can always expose the collaborative type.
+- Meta · class · L744-L764 — class Meta
+- PublicFieldSerializer · class · L767-L782 — class PublicFieldSerializer(FieldSerializer)
+- get_table_id · method · L773-L774 — def get_table_id(self, instance)
+- get_database_id · method · L777-L778 — def get_database_id(self, instance)
+- get_workspace_id · method · L781-L782 — def get_workspace_id(self, instance)
+- PublicViewInfoSerializer · class · L785-L808 — class PublicViewInfoSerializer(serializers.Serializer): # get_fields is an actual method on serializers.Serializer so we can't override it.
+- get_public_fields · method · L792-L796 — def get_public_fields(self, instance)
+- get_view · method · L800-L803 — def get_view(self, instance)
+- __init__ · method · L805-L808 — def __init__(self, *args, **kwargs)
+- FieldWithFiltersAndSortsSerializer · class · L811-L818 — class FieldWithFiltersAndSortsSerializer(FieldSerializer)
+- Meta · class · L817-L818 — class Meta(FieldSerializer.Meta)
+- PublicViewFilterSerializer · class · L821-L840 — class PublicViewFilterSerializer(serializers.Serializer)
+- to_internal_value · method · L826-L840 — def to_internal_value(self, data: Dict[str, any])
+- PublicViewFilterUserFieldNamesSerializer · class · L843-L844 — class PublicViewFilterUserFieldNamesSerializer(PublicViewFilterSerializer)
+- RecursiveField · class · L847-L855 — class RecursiveField(serializers.Serializer)
+- to_representation · method · L848-L850 — def to_representation(self, value)
+- to_internal_value · method · L852-L855 — def to_internal_value(self, data)
+- PublicViewFiltersSerializer · class · L858-L872 — class PublicViewFiltersSerializer(serializers.Serializer)
+- __init__ · method · L869-L872 — def __init__(self, *args, **kwargs)
+- validate_api_grouped_filters · function · L875-L919 — def validate_api_grouped_filters( api_filters: Union[str, Dict], exception_to_raise: Type[Exception] = FiltersParamValidationException, user_field_names: Optional[bool] = False, deserialize_filters: bool = True, ) -> Dict[str, Any]
+- serialize_group_by_metadata · function · L922-L969 — def serialize_group_by_metadata( group_by_metadata: Dict[Field, List[Dict[str, Any]]], ) -> Dict[str, List[Dict[str, Any]]]

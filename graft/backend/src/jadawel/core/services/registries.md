@@ -1,0 +1,46 @@
+# backend/src/jadawel/core/services/registries.py
+
+- DispatchTypes · class · L50-L56 — class DispatchTypes(str, Enum): # A `ServiceType` which performs an action.
+- ServiceType · class · L59-L528 — class ServiceType( APIUrlsInstanceMixin, InstanceWithFormulaMixin, EasyImportExportMixin[ServiceSubClass], ModelInstanceMixin[ServiceSubClass], PublicCustomFieldsInstanceMixin, CustomFieldsInstanceMixin, Instance, ABC, )
+- can_be_dispatched_as · method · L95-L103 — def can_be_dispatched_as(self, dispatch_type: DispatchTypes) -> bool
+- get_integration_type · method · L105-L111 — def get_integration_type(self)
+- get_id_property · method · L113-L123 — def get_id_property(self, service: Service) -> str
+- get_name_property · method · L125-L134 — def get_name_property(self, service: Service) -> Optional[str]
+- prepare_values · method · L136-L181 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: Optional[ServiceSubClass] = None, ) -> Dict[str, Any]
+- export_prepared_values · method · L183-L195 — def export_prepared_values(self, instance: Service)
+- after_create · method · L197-L204 — def after_create(self, instance: ServiceSubClass, values: Dict)
+- after_update · method · L206-L220 — def after_update( self, instance: ServiceSubClass, values: Dict, changes: Dict[str, Tuple], )
+- before_delete · method · L222-L227 — def before_delete(self, instance: ServiceSubClass)
+- get_context_data · method · L229-L237 — def get_context_data(self, service: ServiceSubClass)
+- get_sample_data · method · L239-L244 — def get_sample_data( self, service: ServiceSubClass, dispatch_context: DispatchContext ) -> Optional[Dict[Any, Any]]
+- get_context_data_schema · method · L246-L249 — def get_context_data_schema(self, service: ServiceSubClass)
+- requires_integration · method · L251-L252 — def requires_integration(self, service: ServiceSubClass) -> bool
+- formulas_to_resolve · method · L254-L255 — def formulas_to_resolve(self, service: ServiceSubClass) -> list[FormulaToResolve]
+- _get_validation_details · method · L257-L270 — def _get_validation_details(self, error)
+- resolve_service_formulas · method · L272-L315 — def resolve_service_formulas( self, service: ServiceSubClass, dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- prepare_value_path · method · L317-L322 — def prepare_value_path(self, service: Service, path: List[str])
+- dispatch_transform · method · L324-L334 — def dispatch_transform( self, data: Any, ) -> DispatchResult
+- dispatch_data · method · L336-L350 — def dispatch_data( self, service: ServiceSubClass, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Any
+- dispatch · method · L352-L402 — def dispatch( self, service: ServiceSubClass, dispatch_context: DispatchContext, ) -> DispatchResult
+- remove_unused_field_names · method · L404-L414 — def remove_unused_field_names( self, row: Dict[str, Any], field_names: List[str], ) -> Dict[str, Any]
+- sanitize_result · method · L416-L430 — def sanitize_result(self, service, result, allowed_field_names)
+- get_schema_name · method · L432-L440 — def get_schema_name(self, service: Service) -> str
+- generate_schema · method · L442-L456 — def generate_schema( self, service: Service, allowed_fields: Optional[List[str]] = None ) -> Optional[Dict[str, Any]]
+- enhance_queryset · method · L458-L464 — def enhance_queryset(self, queryset)
+- import_path · method · L466-L473 — def import_path(self, path, id_mapping, **kwargs)
+- import_context_path · method · L475-L484 — def import_context_path( self, path: List[str], id_mapping: Dict[int, int], **kwargs )
+- import_serialized · method · L486-L509 — def import_serialized( self, parent: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], import_formula: Callable[[str, Dict[str, Any]], str] = None, **kwargs, )
+- extract_properties · method · L511-L514 — def extract_properties( self, service: Service, path: List[str], **kwargs ) -> List[str]
+- import_property_name · method · L516-L525 — def import_property_name( self, property_name: str, id_mapping: Dict[str, Any] ) -> Optional[str]
+- get_edges · method · L527-L528 — def get_edges(self, service)
+- ListServiceTypeMixin · class · L534-L569 — class ListServiceTypeMixin
+- get_record_names · method · L540-L555 — def get_record_names( self, service: Service, record_ids: List[int], dispatch_context: DispatchContext, ) -> Dict[str, str]
+- get_max_result_limit · method · L558-L562 — def get_max_result_limit(self, service: Service)
+- get_default_result_limit · method · L565-L569 — def get_default_result_limit(self, service: Service)
+- TriggerServiceTypeMixin · class · L572-L620 — class TriggerServiceTypeMixin(ABC): # The callable function which should be called when the event occurs.
+- can_immediately_be_tested · method · L579-L585 — def can_immediately_be_tested(self, service: Service)
+- dispatch_data · method · L587-L597 — def dispatch_data( self, service: Service, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ): # By default a trigger uses the data from the dispatch context event_payload
+- dispatch_transform · method · L599-L600 — def dispatch_transform(self, data)
+- start_listening · method · L602-L612 — def start_listening(self, on_event: Callable) -> None
+- stop_listening · method · L614-L620 — def stop_listening(self) -> None
+- ServiceTypeRegistry · class · L623-L634 — class ServiceTypeRegistry( APIUrlsRegistryMixin, ModelRegistryMixin[ServiceSubClass, ServiceTypeSubClass], Registry[ServiceTypeSubClass], CustomFieldsRegistryMixin, )

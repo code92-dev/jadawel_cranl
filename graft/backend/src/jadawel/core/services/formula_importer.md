@@ -1,0 +1,21 @@
+# backend/src/jadawel/core/services/formula_importer.py
+
+- JadawelFormulaImporter · class · L11-L103 — class JadawelFormulaImporter(JadawelFormulaVisitor, ABC)
+- get_data_provider_type_registry · method · L18-L18 — def get_data_provider_type_registry(self)
+- __init__ · method · L20-L22 — def __init__(self, id_mapping, **kwargs)
+- visitRoot · method · L24-L25 — def visitRoot(self, ctx: JadawelFormula.RootContext)
+- visitStringLiteral · method · L27-L29 — def visitStringLiteral(self, ctx: JadawelFormula.StringLiteralContext): # noinspection PyTypeChecker
+- visitDecimalLiteral · method · L31-L32 — def visitDecimalLiteral(self, ctx: JadawelFormula.DecimalLiteralContext)
+- visitBooleanLiteral · method · L34-L35 — def visitBooleanLiteral(self, ctx: JadawelFormula.BooleanLiteralContext)
+- visitBrackets · method · L37-L38 — def visitBrackets(self, ctx: JadawelFormula.BracketsContext)
+- process_string · method · L40-L41 — def process_string(self, ctx)
+- visitFunctionCall · method · L43-L47 — def visitFunctionCall(self, ctx: JadawelFormula.FunctionCallContext)
+- _do_func_import · method · L49-L69 — def _do_func_import(self, function_argument_expressions, function_name: str)
+- visitBinaryOp · method · L71-L73 — def visitBinaryOp(self, ctx: JadawelFormula.BinaryOpContext)
+- visitFunc_name · method · L75-L76 — def visitFunc_name(self, ctx: JadawelFormula.Func_nameContext)
+- visitIdentifier · method · L78-L79 — def visitIdentifier(self, ctx: JadawelFormula.IdentifierContext)
+- visitIntegerLiteral · method · L81-L82 — def visitIntegerLiteral(self, ctx: JadawelFormula.IntegerLiteralContext)
+- visitFieldReference · method · L84-L90 — def visitFieldReference(self, ctx: JadawelFormula.FieldReferenceContext)
+- visitFieldByIdReference · method · L92-L93 — def visitFieldByIdReference(self, ctx: JadawelFormula.FieldByIdReferenceContext)
+- visitLeftWhitespaceOrComments · method · L95-L98 — def visitLeftWhitespaceOrComments( self, ctx: JadawelFormula.LeftWhitespaceOrCommentsContext )
+- visitRightWhitespaceOrComments · method · L100-L103 — def visitRightWhitespaceOrComments( self, ctx: JadawelFormula.RightWhitespaceOrCommentsContext )

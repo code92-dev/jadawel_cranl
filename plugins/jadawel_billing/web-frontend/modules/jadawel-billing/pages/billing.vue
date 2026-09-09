@@ -1,16 +1,71 @@
 <template>
   <div class="layout__col-2-scroll">
     <main class="customer-billing">
-      <h1>{{ $t("billing.title") }}</h1>
-      <p v-if="error" role="alert">{{ $t("billing.paymentError") }}</p>
+      <header class="billing-page__header">
+        <div>
+          <h1>{{ $t("billing.title") }}</h1>
+          <p class="billing-page__description">
+            {{ $t("billing.description") }}
+          </p>
+        </div>
+        <span
+          v-if="options && options.mode === 'test'"
+          class="billing-page__mode"
+          role="status"
+          >{{ $t("billing.sandbox") }}</span
+        >
+      </header>
+      <p v-if="checkoutUnavailable" role="alert">
+        {{ $t("billing.checkoutUnavailable") }}
+      </p>
+      <Button
+        v-if="checkoutUnavailable"
+        type="secondary"
+        button-type="button"
+        @click="loadInitial"
+        >{{ $t("billing.retryLoading") }}</Button
+      >
+      <p v-else-if="error" role="alert">{{ $t("billing.paymentError") }}</p>
       <p v-if="loading" role="status">{{ $t("billing.loading") }}</p>
       <template v-if="options">
-        <p v-if="options.mode === 'test'" role="status">
-          {{ $t("billing.sandbox") }}
-        </p>
+        <section class="billing-page__card billing-page__account-picker">
+          <h2>{{ $t("billing.accounts") }}</h2>
+          <p>{{ $t("billing.accountRequired") }}</p>
+          <label>
+            {{ $t("billing.accounts") }}
+            <select
+              v-model="account"
+              required
+              class="input"
+              @change="loadAccount"
+            >
+              <option
+                v-for="item in options.accounts"
+                :key="item.id"
+                :value="item.id"
+                dir="auto"
+              >
+                {{ $t("billing." + item.kind.toLowerCase()) }} — {{ item.id }}
+              </option>
+            </select>
+          </label>
+        </section>
+        <ol class="billing-page__steps" :aria-label="$t('billing.checkout')">
+          <li
+            v-for="(step, index) in checkoutSteps"
+            :key="step"
+            :class="{
+              'is-current': checkoutStep === index + 1,
+              'is-complete': checkoutStep > index + 1,
+            }"
+          >
+            <span>{{ index + 1 }}</span>
+            {{ $t(`billing.checkoutSteps.${step}`) }}
+          </li>
+        </ol>
         <section
           v-if="accountState"
-          class="billing-account"
+          class="billing-account billing-page__card"
           data-testid="account-state"
         >
           <h2>{{ $t("billing.accountStatus") }}</h2>
@@ -34,7 +89,7 @@
             <Button
               type="secondary"
               :disabled="busy"
-              @click="toggleCancellation"
+              @click="pendingAction = 'cancelRenewal'"
             >
               {{
                 accountState.subscription.cancel_at_period_end
@@ -91,8 +146,35 @@
               </Button>
             </form>
           </template>
+          <div
+            v-if="pendingAction === 'cancelRenewal'"
+            class="billing-page__confirmation"
+            role="alertdialog"
+          >
+            <p>
+              {{
+                $t(
+                  accountState.subscription.cancel_at_period_end
+                    ? "billing.confirmResumeRenewal"
+                    : "billing.confirmCancelRenewal",
+                )
+              }}
+            </p>
+            <Button
+              button-type="button"
+              :disabled="busy"
+              @click="confirmPendingAction"
+              >{{ $t("billing.confirm") }}</Button
+            >
+            <Button
+              type="secondary"
+              button-type="button"
+              @click="pendingAction = null"
+              >{{ $t("billing.cancel") }}</Button
+            >
+          </div>
         </section>
-        <section v-if="accountState" class="payment-methods">
+        <section v-if="accountState" class="payment-methods billing-page__card">
           <h2>{{ $t("billing.paymentMethods") }}</h2>
           <p v-if="!paymentMethods.length">
             {{ $t("billing.noPaymentMethods") }}
@@ -104,32 +186,43 @@
               <Button
                 type="secondary"
                 :disabled="busy"
-                @click="revokePaymentMethod(method)"
+                @click="pendingAction = { kind: 'removeMethod', method }"
               >
                 {{ $t("billing.removePaymentMethod") }}
               </Button>
             </li>
           </ul>
-        </section>
-        <form v-if="!order" @submit.prevent="prepare">
-          <label
-            >{{ $t("billing.accounts")
-            }}<select
-              v-model="account"
-              required
-              class="input"
-              @change="loadAccount"
-            >
-              <option
-                v-for="item in options.accounts"
-                :key="item.id"
-                :value="item.id"
-                dir="auto"
-              >
-                {{ $t("billing." + item.kind.toLowerCase()) }} — {{ item.id }}
-              </option>
-            </select></label
+          <div
+            v-if="pendingAction && pendingAction.kind === 'removeMethod'"
+            class="billing-page__confirmation"
+            role="alertdialog"
           >
+            <p>
+              {{ $t("billing.confirmRemovePaymentMethod") }}
+              <bdi
+                >{{ pendingAction.method.brand }} ••••
+                {{ pendingAction.method.last4 }}</bdi
+              >
+            </p>
+            <Button
+              button-type="button"
+              :disabled="busy"
+              @click="confirmPendingAction"
+              >{{ $t("billing.confirm") }}</Button
+            >
+            <Button
+              type="secondary"
+              button-type="button"
+              @click="pendingAction = null"
+              >{{ $t("billing.cancel") }}</Button
+            >
+          </div>
+        </section>
+        <form
+          v-if="!order"
+          class="billing-page__card billing-page__checkout"
+          @submit.prevent="prepare"
+        >
           <label v-if="selectedAccountKind === 'TEAM'">
             {{ $t("billing.seats") }}
             <input
@@ -158,7 +251,7 @@
             $t("billing.checkout")
           }}</Button>
         </form>
-        <section v-if="order">
+        <section v-if="order" class="billing-page__card billing-page__payment">
           <h2>{{ money(order.amount) }}</h2>
           <p role="status">{{ $t("billing.paymentStatus." + order.status) }}</p>
           <section v-if="order.receipt" data-testid="receipt" role="region">
@@ -271,48 +364,54 @@
           >
         </section>
       </template>
-      <h2>{{ $t("billing.paymentHistory") }}</h2>
-      <form class="billing-history-search" @submit.prevent="loadHistory">
-        <label>
-          {{ $t("billing.searchHistory") }}
-          <input
-            v-model.trim="historySearch"
-            type="search"
-            class="input"
-            :placeholder="$t('billing.searchHistory')"
-          />
-        </label>
-        <Button type="secondary" :disabled="historyLoading">
-          {{ $t("billing.search") }}
+      <section class="billing-page__card billing-page__history">
+        <h2>{{ $t("billing.paymentHistory") }}</h2>
+        <form class="billing-history-search" @submit.prevent="loadHistory">
+          <label>
+            {{ $t("billing.searchHistory") }}
+            <input
+              v-model.trim="historySearch"
+              type="search"
+              class="input"
+              :placeholder="$t('billing.searchHistory')"
+            />
+          </label>
+          <Button
+            type="secondary"
+            button-type="submit"
+            :disabled="historyLoading"
+          >
+            {{ $t("billing.search") }}
+          </Button>
+        </form>
+        <ul v-if="history.length">
+          <li v-for="item in history" :key="item.id">
+            <bdi>{{ item.id }}</bdi> — {{ money(item.amount) }} —
+            {{ $t("billing.paymentStatus." + item.status) }}
+            <Button
+              v-if="item.status === 'pending'"
+              type="secondary"
+              @click="resume(item)"
+              >{{ $t("billing.verifyPayment") }}</Button
+            >
+            <Button
+              v-if="item.status === 'paid' && item.receipt"
+              type="secondary"
+              @click="showReceipt(item)"
+              >{{ $t("billing.viewReceipt") }}</Button
+            >
+          </li>
+        </ul>
+        <p v-else-if="!historyLoading">{{ $t("billing.emptyHistory") }}</p>
+        <Button
+          v-if="historyNext"
+          type="secondary"
+          :disabled="historyLoading"
+          @click="loadMoreHistory"
+        >
+          {{ $t("billing.more") }}
         </Button>
-      </form>
-      <ul v-if="history.length">
-        <li v-for="item in history" :key="item.id">
-          <bdi>{{ item.id }}</bdi> — {{ money(item.amount) }} —
-          {{ $t("billing.paymentStatus." + item.status) }}
-          <Button
-            v-if="item.status === 'pending'"
-            type="secondary"
-            @click="resume(item)"
-            >{{ $t("billing.verifyPayment") }}</Button
-          >
-          <Button
-            v-if="item.status === 'paid' && item.receipt"
-            type="secondary"
-            @click="showReceipt(item)"
-            >{{ $t("billing.viewReceipt") }}</Button
-          >
-        </li>
-      </ul>
-      <p v-else-if="!historyLoading">{{ $t("billing.emptyHistory") }}</p>
-      <Button
-        v-if="historyNext"
-        type="secondary"
-        :disabled="historyLoading"
-        @click="loadMoreHistory"
-      >
-        {{ $t("billing.more") }}
-      </Button>
+      </section>
     </main>
   </div>
 </template>
@@ -325,7 +424,9 @@ definePageMeta({
 </script>
 
 <script>
+/* eslint-disable import/first -- Nuxt page metadata uses a separate setup block. */
 import { submitPayment } from "../payment";
+/* eslint-enable import/first */
 
 export default {
   name: "CustomerBilling",
@@ -341,6 +442,8 @@ export default {
       historyNext: null,
       historySearch: "",
       historyLoading: false,
+      checkoutUnavailable: false,
+      pendingAction: null,
       seats: 1,
       saveCard: false,
       busy: false,
@@ -350,6 +453,7 @@ export default {
       card: { name: "", number: "", month: "", year: "", cvc: "" },
       subscriptionChange: { price: null, seats: 1 },
       seatIncrease: { seats: 2 },
+      checkoutSteps: ["account", "review", "payment"],
     };
   },
   computed: {
@@ -366,51 +470,88 @@ export default {
           (item.kind !== "TEAM" || this.options?.team_available),
       );
     },
+    checkoutStep() {
+      if (!this.order) return 1;
+      return this.order.status === "pending" && !this.submitted ? 2 : 3;
+    },
   },
   async mounted() {
-    try {
-      const [options, history] = await Promise.all([
-        this.$client.get("/billing/checkout/"),
-        this.$client.get("/billing/orders/", { params: {} }),
-      ]);
-      this.options = options.data;
-      this.history = history.data.results || history.data;
-      this.historyNext = history.data.next || null;
-      this.account =
-        this.$route.query.account || this.options.accounts[0]?.id || "";
-      this.price = this.availablePrices[0]?.id || "";
-      await this.loadAccount();
-      this.subscriptionChange.price = this.availablePrices[0]?.id || null;
-      const returnedOrder = this.$route.query.order;
-      if (returnedOrder) {
-        this.order =
-          this.history.find((item) => item.id === returnedOrder) || null;
-        this.submitted = true;
-        if (this.order) {
-          const providerPaymentId =
-            this.$route.query.provider_payment_id || this.$route.query.id;
-          const saveCard = this.takeSaveCardPreference(returnedOrder);
-          const verifiedOrder = await this.verify(providerPaymentId);
-          if (
-            saveCard &&
-            verifiedOrder?.status === "paid" &&
-            providerPaymentId
-          ) {
-            await this.savePaymentMethod(providerPaymentId);
-            this.clearSaveCardPreference(returnedOrder);
-          }
-        }
-      }
-    } catch {
-      this.error = true;
-    } finally {
-      this.loading = false;
-    }
+    await this.loadInitial();
   },
   beforeUnmount() {
     this.clearCard();
   },
   methods: {
+    isCheckoutUnavailable(error) {
+      const response = error?.response || error?.handler?.response;
+      // The provider exception can be localized by the API error handler, so
+      // the HTTP status is the stable signal for this retryable state.
+      return (
+        response?.status === 503 ||
+        error?.status === 503 ||
+        error?.statusCode === 503
+      );
+    },
+    async loadInitial() {
+      this.loading = true;
+      this.checkoutUnavailable = false;
+      this.error = false;
+      let checkoutLoaded = false;
+      try {
+        const { data } = await this.$client.get("/billing/checkout/");
+        this.options = data;
+        this.account =
+          this.$route.query.account || this.options.accounts[0]?.id || "";
+        this.price = this.availablePrices[0]?.id || "";
+        checkoutLoaded = true;
+      } catch (error) {
+        if (this.isCheckoutUnavailable(error)) {
+          this.checkoutUnavailable = true;
+        } else {
+          this.error = true;
+        }
+      }
+
+      try {
+        const { data } = await this.$client.get("/billing/orders/", {
+          params: {},
+        });
+        this.history = data.results || data;
+        this.historyNext = data.next || null;
+      } catch {
+        this.error = true;
+      }
+
+      if (checkoutLoaded) {
+        try {
+          await this.loadAccount();
+          this.subscriptionChange.price = this.availablePrices[0]?.id || null;
+          const returnedOrder = this.$route.query.order;
+          if (returnedOrder) {
+            this.order =
+              this.history.find((item) => item.id === returnedOrder) || null;
+            this.submitted = true;
+            if (this.order) {
+              const providerPaymentId =
+                this.$route.query.provider_payment_id || this.$route.query.id;
+              const saveCard = this.takeSaveCardPreference(returnedOrder);
+              const verifiedOrder = await this.verify(providerPaymentId);
+              if (
+                saveCard &&
+                verifiedOrder?.status === "paid" &&
+                providerPaymentId
+              ) {
+                await this.savePaymentMethod(providerPaymentId);
+                this.clearSaveCardPreference(returnedOrder);
+              }
+            }
+          }
+        } catch {
+          this.error = true;
+        }
+      }
+      this.loading = false;
+    },
     money(amount) {
       return new Intl.NumberFormat(this.$i18n.locale, {
         style: "currency",
@@ -529,6 +670,16 @@ export default {
             "/",
         ),
       );
+    },
+    async confirmPendingAction() {
+      const action = this.pendingAction;
+      if (!action) return;
+      if (action === "cancelRenewal") {
+        await this.toggleCancellation();
+      } else if (action.kind === "removeMethod") {
+        await this.revokePaymentMethod(action.method);
+      }
+      if (!this.error) this.pendingAction = null;
     },
     async runAccountAction(action) {
       if (this.busy) return;
@@ -662,10 +813,67 @@ export default {
 
 <style scoped>
 .customer-billing {
-  max-inline-size: 720px;
+  max-inline-size: 1120px;
   margin-inline: auto;
   padding: 32px;
   background: var(--jadawel-content-background, #fcfdfc);
+}
+.billing-page__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 24px;
+  margin-block-end: 24px;
+}
+.billing-page__eyebrow {
+  margin: 0 0 4px;
+  color: var(--jadawel-primary-500, #278053);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.billing-page__description {
+  margin-block: 6px 0;
+  color: var(--jadawel-text-secondary, #66756d);
+}
+.billing-page__mode {
+  border: 1px solid var(--jadawel-warning-500, #b7791f);
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 12px;
+}
+.billing-page__card {
+  box-shadow: 0 8px 24px rgb(20 65 42 / 6%);
+}
+.billing-page__checkout {
+  max-inline-size: none;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  align-items: end;
+}
+.billing-page__history ul {
+  display: grid;
+  gap: 10px;
+  padding: 0;
+  list-style: none;
+}
+.billing-page__history li {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 8px;
+}
+@media (max-width: 640px) {
+  .billing-page__header {
+    flex-direction: column;
+  }
+  .customer-billing {
+    padding: 20px 16px;
+  }
 }
 .customer-billing section {
   margin-block: 32px;

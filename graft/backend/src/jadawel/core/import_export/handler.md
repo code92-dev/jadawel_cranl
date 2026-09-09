@@ -1,0 +1,42 @@
+# backend/src/jadawel/core/import_export/handler.py
+
+- ImportExportHandler · class · L83-L1483 — class ImportExportHandler(metaclass=jadawel_trace_methods(tracer))
+- get_workspace_or_raise · method · L84-L110 — def get_workspace_or_raise(self, user: AbstractUser, workspace_id: int)
+- compute_checksums · method · L112-L146 — def compute_checksums( self, zip_file: ExportZipFile, storage: Storage ) -> Dict[str, str]
+- compute_checksum_from_file · method · L148-L163 — def compute_checksum_from_file(self, full_path: str, storage: Storage) -> str
+- mark_resource_invalid · method · L165-L173 — def mark_resource_invalid(self, resource: ImportExportResource)
+- clean_storage · method · L175-L197 — def clean_storage(self, path: str, storage: Storage)
+- export_application · method · L199-L243 — def export_application( self, app: Application, zip_file: ExportZipFile, import_export_config: ImportExportConfig, storage: Storage, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Dict
+- export_multiple_applications · method · L245-L275 — def export_multiple_applications( self, applications: List[Application], zip_file: ExportZipFile, import_export_config: ImportExportConfig, storage: Storage, progress_builder: Optional[ChildProgressBuilder] = None, ) -> List[Dict]
+- get_export_storage_path · method · L277-L278 — def get_export_storage_path(self, *args) -> str
+- export_file_path · method · L280-L291 — def export_file_path(self, file_name: str) -> str
+- create_manifest · method · L293-L333 — def create_manifest( self, exported_applications: List[Dict], zip_file: ExportZipFile, import_export_config: ImportExportConfig, storage: Storage, ) -> Dict[str, Any]
+- _get_keys · method · L335-L357 — def _get_keys( self, trusted_source: ImportExportTrustedSource ) -> Tuple[rsa.RSAPrivateKey, bytes]
+- _create_keys · method · L359-L382 — def _create_keys(self) -> Tuple[rsa.RSAPrivateKey, bytes, bytes]
+- get_or_create_key_pair · method · L384-L418 — def get_or_create_key_pair(self) -> Tuple[rsa.RSAPrivateKey, bytes]
+- create_manifest_signature · method · L420-L462 — def create_manifest_signature( self, manifest_data: Dict, zip_file: ExportZipFile, )
+- export_workspace_applications · method · L464-L528 — def export_workspace_applications( self, applications: List[Application], import_export_config: ImportExportConfig, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> ImportExportResource
+- list_exports · method · L530-L553 — def list_exports(self, performed_by: AbstractUser, workspace_id: int) -> QuerySet
+- get_import_storage_path · method · L555-L556 — def get_import_storage_path(self, *args) -> str
+- create_resource_from_file · method · L558-L599 — def create_resource_from_file( self, user: AbstractUser, file_name: str, stream: IOBase, storage: Storage = None, ) -> ImportExportResource
+- validate_uploaded_file · method · L601-L619 — def validate_uploaded_file(self, stream: IOBase)
+- _read_with_limit · method · L622-L634 — def _read_with_limit(stream, max_size: int, too_large_message: str) -> bytes
+- _load_json_with_limit · method · L637-L648 — def _load_json_with_limit( cls, stream, max_size: int, too_large_message: str, corrupted_message: str, )
+- _validate_archive · method · L651-L694 — def _validate_archive(zip_file: ZipFile) -> Dict[str, zipfile.ZipInfo]
+- _validate_application_json_files · method · L697-L714 — def _validate_application_json_files( manifest_data: Dict, files_by_name: Dict[str, zipfile.ZipInfo] )
+- validate_manifest · method · L716-L777 — def validate_manifest(self, zip_file)
+- validate_signature · method · L779-L848 — def validate_signature(self, zip_file: ZipFile, manifest_data: Dict)
+- validate_checksums · method · L850-L882 — def validate_checksums(self, manifest: Dict, import_tmp_dir: str, storage: Storage)
+- import_application · method · L884-L937 — def import_application( self, workspace: Workspace, id_mapping: Dict[str, Any], application_manifest: Dict, import_tmp_path: str, import_export_config: ImportExportConfig, zip_file: ZipFile, storage: Storage, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Application
+- import_multiple_applications · method · L939-L1052 — def import_multiple_applications( self, user: AbstractUser, workspace: Workspace, manifest: Dict, import_tmp_path: str, import_export_config: ImportExportConfig, zip_file: ZipFile, storage: Storage, application_ids: Optional[List[int]] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> List[Application]
+- application_priority_sort · function · L981-L984 — def application_priority_sort(application_to_sort)
+- _validate_safe_path · method · L1055-L1069 — def _validate_safe_path(base_path: str, filename: str) -> str
+- _build_allowed_files · method · L1072-L1086 — def _build_allowed_files(manifest_data: dict) -> set[str]
+- extract_files_from_zip · method · L1088-L1138 — def extract_files_from_zip( self, tmp_import_path: str, zip_file: ZipFile, storage: Storage, allowed_files: Collection[str], progress_builder: Optional[ChildProgressBuilder] = None, )
+- import_workspace_applications · method · L1140-L1282 — def import_workspace_applications( self, user: AbstractUser, workspace: Workspace, resource: ImportExportResource, application_ids: Optional[List[int]] = None, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> List[Application]
+- mark_resource_for_deletion · method · L1284-L1324 — def mark_resource_for_deletion( self, user: AbstractUser, resource_id: str, delete_used_resources_after_days: int = settings.JADAWEL_IMPORT_EXPORT_RESOURCE_REMOVAL_AFTER_DAYS, )
+- permanently_delete_trashed_resources · method · L1326-L1384 — def permanently_delete_trashed_resources(self)
+- resources_in_use_by · function · L1335-L1338 — def resources_in_use_by(model)
+- add_trusted_public_key · method · L1386-L1419 — def add_trusted_public_key(self, name, public_key_data)
+- list_trusted_public_keys · method · L1421-L1458 — def list_trusted_public_keys(self)
+- delete_trusted_public_key · method · L1460-L1483 — def delete_trusted_public_key(self, source_id: str)

@@ -1,0 +1,18 @@
+# backend/tests/arabase/test_grouped_aggregate_rows_service_type.py
+
+- chart_setup · function · L32-L67 — def chart_setup(data_fixture)
+- configure · function · L70-L77 — def configure(setup, **kwargs)
+- reload_service · function · L80-L83 — def reload_service(setup)
+- dispatch · function · L86-L90 — def dispatch(setup)
+- test_chart_widget_data_source_uses_the_grouped_service · function · L94-L95 — def test_chart_widget_data_source_uses_the_grouped_service(chart_setup)
+- test_dispatch_groups_by_a_field · function · L99-L118 — def test_dispatch_groups_by_a_field(chart_setup)
+- test_dispatch_without_a_group_by_returns_one_bucket · function · L122-L135 — def test_dispatch_without_a_group_by_returns_one_bucket(chart_setup)
+- test_dispatch_with_multiple_series · function · L139-L158 — def test_dispatch_with_multiple_series(chart_setup)
+- test_dispatch_without_series_raises · function · L162-L170 — def test_dispatch_without_series_raises(chart_setup)
+- test_dispatch_skips_a_trashed_series_field · function · L174-L188 — def test_dispatch_skips_a_trashed_series_field(chart_setup, data_fixture)
+- test_bucket_cap_is_applied · function · L192-L206 — def test_bucket_cap_is_applied(chart_setup, settings)
+- test_group_by_single_select_resolves_labels_and_colors · function · L210-L232 — def test_group_by_single_select_resolves_labels_and_colors(data_fixture, chart_setup)
+- test_too_many_series_is_rejected · function · L236-L248 — def test_too_many_series_is_rejected(chart_setup, data_fixture)
+- test_duplicate_series_is_rejected · function · L252-L261 — def test_duplicate_series_is_rejected(chart_setup)
+- test_more_than_one_group_by_is_rejected · function · L265-L274 — def test_more_than_one_group_by_is_rejected(chart_setup)
+- test_changing_the_table_drops_series_and_group_bys · function · L278-L295 — def test_changing_the_table_drops_series_and_group_bys(chart_setup, data_fixture)

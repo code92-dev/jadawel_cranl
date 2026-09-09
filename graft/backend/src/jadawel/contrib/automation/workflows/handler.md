@@ -1,0 +1,39 @@
+# backend/src/jadawel/contrib/automation/workflows/handler.py
+
+- AutomationWorkflowHandler · class · L80-L1235 — class AutomationWorkflowHandler(metaclass=jadawel_trace_methods(tracer))
+- get_workflow · method · L88-L116 — def get_workflow( self, workflow_id: int, base_queryset: Optional[QuerySet] = None, for_update: bool = False, ) -> AutomationWorkflow
+- get_published_workflow · method · L118-L149 — def get_published_workflow( self, workflow: AutomationWorkflow, with_cache: bool = True ) -> Optional[AutomationWorkflow]
+- _get_published_workflow · function · L132-L141 — def _get_published_workflow( workflow: AutomationWorkflow, ) -> Optional[AutomationWorkflow]
+- _invalidate_workflow_caches · method · L151-L158 — def _invalidate_workflow_caches(self, workflow: AutomationWorkflow) -> None
+- get_workflows · method · L160-L172 — def get_workflows( self, automation: Automation, base_queryset: Optional[QuerySet] = None ) -> QuerySet
+- create_workflow · method · L174-L189 — def create_workflow(self, automation: Automation, name: str) -> AutomationWorkflow
+- delete_workflow · method · L191-L203 — def delete_workflow(self, user: AbstractUser, workflow: AutomationWorkflow) -> None
+- export_prepared_values · method · L205-L226 — def export_prepared_values(self, workflow: AutomationWorkflow) -> Dict[Any, Any]
+- update_workflow · method · L228-L265 — def update_workflow( self, workflow: AutomationWorkflow, **kwargs ) -> UpdatedAutomationWorkflow
+- order_workflows · method · L267-L289 — def order_workflows( self, automation: Automation, order: List[int], base_qs=None ) -> List[int]
+- get_workflows_order · method · L291-L299 — def get_workflows_order(self, automation: Automation) -> List[int]
+- duplicate_workflow · method · L301-L353 — def duplicate_workflow( self, workflow: AutomationWorkflow, progress_automation: Optional[ChildProgressBuilder] = None, )
+- find_unused_workflow_name · method · L355-L376 — def find_unused_workflow_name( self, automation: Automation, proposed_name: str ) -> str
+- export_workflow · method · L378-L422 — def export_workflow( self, workflow: AutomationWorkflow, import_export_config: Optional[ImportExportConfig] = None, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, Any]] = None, ) -> AutomationWorkflowDict
+- _ops_count_for_import_workflow · method · L424-L433 — def _ops_count_for_import_workflow( self, serialized_workflows: List[Dict[str, Any]], ) -> int
+- import_nodes · method · L435-L474 — def import_nodes( self, workflow: AutomationWorkflow, serialized_nodes: List[AutomationNodeDict], id_mapping: Dict[str, Dict[int, int]], import_export_config: Optional[ImportExportConfig] = None, files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress: Optional[ChildProgressBuilder] = None, cache: Optional[Dict[str, Any]] = None, ) -> List[AutomationNode]
+- import_workflows · method · L476-L537 — def import_workflows( self, automation: Automation, serialized_workflows: List[AutomationWorkflowDict], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress: Optional[ChildProgressBuilder] = None, cache: Optional[Dict[str, any]] = None, import_export_config: Optional[ImportExportConfig] = None, ) -> List[AutomationWorkflow]
+- import_workflow · method · L539-L576 — def import_workflow( self, automation: Automation, serialized_workflow: AutomationWorkflowDict, id_mapping: Dict[str, Dict[int, int]], import_export_config: Optional[ImportExportConfig] = None, files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress: Optional[ChildProgressBuilder] = None, cache: Optional[Dict[str, Any]] = None, ) -> AutomationWorkflow
+- import_workflow_only · method · L578-L612 — def import_workflow_only( self, automation: Automation, serialized_workflow: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], progress: Optional[ChildProgressBuilder] = None, **kwargs: Any, )
+- clean_up_previously_published_automations · method · L614-L639 — def clean_up_previously_published_automations( self, workflow: AutomationWorkflow ) -> None
+- _clone_workflow · method · L641-L696 — def _clone_workflow( self, workflow: AutomationWorkflow, state: WorkflowState | None = None, progress: Progress | None = None, ) -> Tuple[Automation, Dict]
+- publish · method · L698-L728 — def publish( self, workflow: AutomationWorkflow, progress: Optional[Progress] = None, ) -> AutomationWorkflow
+- disable_workflow · method · L730-L753 — def disable_workflow(self, workflow: AutomationWorkflow) -> None
+- set_workflow_temporary_states · method · L755-L783 — def set_workflow_temporary_states(self, workflow, simulate_until_node=None)
+- reset_workflow_temporary_states · method · L785-L802 — def reset_workflow_temporary_states(self, workflow)
+- toggle_test_run · method · L804-L855 — def toggle_test_run( self, workflow: AutomationWorkflow, simulate_until_node: AutomationNode | None, )
+- clear_old_history · method · L857-L913 — def clear_old_history(self) -> None
+- mark_failure_for_timed_out_history · method · L915-L953 — def mark_failure_for_timed_out_history(self) -> None
+- _ensure_published_for_run · method · L955-L987 — def _ensure_published_for_run( self, workflow: AutomationWorkflow ) -> AutomationWorkflow
+- _get_workflow_history_rate_limit_cache_key · method · L989-L992 — def _get_workflow_history_rate_limit_cache_key( self, original_workflow: AutomationWorkflow ) -> str
+- _get_histories_for_current_workflow_version · method · L994-L1001 — def _get_histories_for_current_workflow_version(self, workflow: AutomationWorkflow)
+- _check_is_rate_limited · method · L1003-L1049 — def _check_is_rate_limited(self, workflow: AutomationWorkflow) -> bool
+- _check_too_many_errors · method · L1051-L1102 — def _check_too_many_errors(self, workflow: AutomationWorkflow) -> bool
+- before_run · method · L1104-L1119 — def before_run(self, workflow: AutomationWorkflow) -> None
+- async_start_workflow · method · L1121-L1217 — def async_start_workflow( self, workflow: AutomationWorkflow, event_payload: Optional[List[Dict]] = None, ) -> None
+- start_workflow · method · L1219-L1235 — def start_workflow( self, workflow: AutomationWorkflow, history: AutomationWorkflowHistory, ) -> Signature

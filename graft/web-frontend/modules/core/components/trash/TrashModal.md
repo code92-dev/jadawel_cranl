@@ -1,0 +1,15 @@
+# web-frontend/modules/core/components/trash/TrashModal.vue
+
+- data · method · L78-L89 — data()
+- pickInitialWorkspaceToSelect · method · L100-L115 — pickInitialWorkspaceToSelect()
+- pickInitialApplicationToSelect · method · L119-L138 — pickInitialApplicationToSelect(firstWorkspaceToShow)
+- show · method · L143-L164 — async show(...args)
+- loadTrashContentsPage · method · L168-L192 — async loadTrashContentsPage(nextPage)
+- selectWorkspaceOrApp · method · L197-L205 — async selectWorkspaceOrApp({ workspace, application = null })
+- loadNextPage · method · L211-L215 — async loadNextPage(nextPage)
+- onRestore · method · L221-L239 — async onRestore(trashEntry)
+- updateStructureIfWorkspaceOrAppRestored · method · L240-L260 — updateStructureIfWorkspaceOrAppRestored(trashEntry)
+- onEmpty · method · L268-L286 — async onEmpty()
+- removeSelectedAppFromSidebar · method · L287-L300 — removeSelectedAppFromSidebar()
+- removeSelectedTrashWorkspaceFromSidebar · method · L301-L311 — removeSelectedTrashWorkspaceFromSidebar()
+- removeWorkspaceOrAppFromSidebarIfNowPermDeleted · method · L316-L344 — removeWorkspaceOrAppFromSidebarIfNowPermDeleted()

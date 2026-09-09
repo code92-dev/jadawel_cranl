@@ -1,15 +1,25 @@
 {
   "organizations": {
     "title": "Organizations",
+    "description": "Create and manage the teams that share access to Jadawel.",
     "adminTitle": "Organization administration",
     "name": "Organization name",
     "owner": "Owner",
     "ownerEmail": "Owner email (new owner setup)",
     "pendingOwner": "Pending owner",
+    "ownerNotAssigned": "Owner not assigned",
     "resendOwner": "Resend setup",
     "reassignOwner": "Reassign setup",
     "ownerSetupToken": "Owner setup token",
     "settings": "Settings",
+    "sectionNavigation": "Organization sections",
+    "sections": {
+      "members": "Members",
+      "invitations": "Invitations",
+      "workspaces": "Workspaces",
+      "activity": "Activity",
+      "settings": "Settings & lifecycle"
+    },
     "saveSettings": "Save settings",
     "plan": "Complimentary Team plan",
     "noGrant": "Create without access grant",

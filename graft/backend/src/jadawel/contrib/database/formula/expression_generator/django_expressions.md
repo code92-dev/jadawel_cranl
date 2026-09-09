@@ -1,0 +1,49 @@
+# backend/src/jadawel/contrib/database/formula/expression_generator/django_expressions.py
+
+- BinaryOpExpr · class · L19-L21 — class BinaryOpExpr(Transform)
+- IsNullExpr · class · L24-L26 — class IsNullExpr(Transform)
+- EqualsExpr · class · L33-L34 — class EqualsExpr(BinaryOpExpr)
+- NotEqualsExpr · class · L38-L39 — class NotEqualsExpr(BinaryOpExpr)
+- GreaterThanExpr · class · L43-L44 — class GreaterThanExpr(BinaryOpExpr)
+- GreaterThanOrEqualExpr · class · L48-L49 — class GreaterThanOrEqualExpr(BinaryOpExpr)
+- LessThanExpr · class · L53-L54 — class LessThanExpr(BinaryOpExpr)
+- LessThanEqualOrExpr · class · L58-L59 — class LessThanEqualOrExpr(BinaryOpExpr)
+- AndExpr · class · L63-L64 — class AndExpr(BinaryOpExpr)
+- OrExpr · class · L68-L69 — class OrExpr(BinaryOpExpr)
+- NotExpr · class · L73-L75 — class NotExpr(Transform)
+- TimezoneExpr · class · L78-L79 — class TimezoneExpr(BinaryOpExpr)
+- JadawelStringAgg · class · L82-L93 — class JadawelStringAgg(OrderableAggMixin, Aggregate)
+- __init__ · method · L87-L88 — def __init__(self, expression, delimiter, **extra)
+- convert_value · method · L90-L93 — def convert_value(self, value, expression, connection)
+- JSONArray · class · L96-L119 — class JSONArray(Func)
+- __init__ · method · L100-L104 — def __init__(self, *items)
+- as_sql · method · L106-L111 — def as_sql(self, compiler, connection, **extra_context)
+- as_postgresql · method · L113-L119 — def as_postgresql(self, compiler, connection, **extra_context)
+- JSONBArrayUniqueByValue · class · L122-L135 — class JSONBArrayUniqueByValue(Func)
+- JSONBArrayJoinValues · class · L138-L163 — class JSONBArrayJoinValues(Func)
+- __init__ · method · L151-L155 — def __init__(self, expression, separator, **extra)
+- as_sql · method · L157-L163 — def as_sql(self, compiler, connection, **extra_context)
+- JSONBArrayGetElement · class · L166-L204 — class JSONBArrayGetElement(Expression)
+- __init__ · method · L179-L183 — def __init__(self, array_expr, index_expr, value_sql, output_field)
+- resolve_expression · method · L185-L196 — def resolve_expression( self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False )
+- as_sql · method · L198-L204 — def as_sql(self, compiler, connection)
+- JSONBArraySlice · class · L207-L263 — class JSONBArraySlice(Expression)
+- __init__ · method · L216-L221 — def __init__(self, array_expr, offset_expr, limit_expr, reverse_expr)
+- resolve_expression · method · L223-L240 — def resolve_expression( self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False )
+- as_sql · method · L242-L263 — def as_sql(self, compiler, connection)
+- JadawelFilterExpression · class · L266-L322 — class JadawelFilterExpression(Expression)
+- __init__ · method · L275-L278 — def __init__(self, field_name: F, value: Value, output_field: Field)
+- resolve_expression · method · L280-L294 — def resolve_expression( self, query=None, allow_joins=True, reuse=None, summarize=False, for_save=False )
+- get_template_data · method · L296-L300 — def get_template_data(self, sql_value) -> dict
+- render_template_as_sql · method · L302-L317 — def render_template_as_sql( self, filter_value: str, template: str | None = None ) -> str
+- as_sql · method · L319-L322 — def as_sql(self, compiler, connection, template=None)
+- FileNameContainsExpr · class · L325-L336 — class FileNameContainsExpr(JadawelFilterExpression): # fmt: off
+- JSONArrayContainsValueLengthLowerThanExpr · class · L339-L350 — class JSONArrayContainsValueLengthLowerThanExpr(JadawelFilterExpression): # fmt: off
+- JSONArrayAllAreExpr · class · L353-L363 — class JSONArrayAllAreExpr(JadawelFilterExpression): # fmt: off
+- ComparisonOperator · class · L366-L376 — class ComparisonOperator(Enum)
+- JSONArrayCompareNumericValueExpr · class · L379-L415 — class JSONArrayCompareNumericValueExpr(JadawelFilterExpression)
+- __init__ · method · L386-L398 — def __init__( self, field_name: F, value: Value, comparison_op: ComparisonOperator, output_field: Field, )
+- get_template_data · method · L412-L415 — def get_template_data(self, sql_value) -> dict
+- JSONArrayCompareIntervalValueExpr · class · L418-L454 — class JSONArrayCompareIntervalValueExpr(JadawelFilterExpression)
+- __init__ · method · L425-L437 — def __init__( self, field_name: F, value: Value, comparison_op: ComparisonOperator, output_field: Field, )
+- get_template_data · method · L451-L454 — def get_template_data(self, sql_value) -> dict

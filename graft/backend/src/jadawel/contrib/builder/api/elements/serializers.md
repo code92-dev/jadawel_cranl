@@ -1,0 +1,35 @@
+# backend/src/jadawel/contrib/builder/api/elements/serializers.py
+
+- ElementSerializer · class · L38-L108 — class ElementSerializer(serializers.ModelSerializer)
+- get_type · method · L50-L51 — def get_type(self, instance)
+- Meta · class · L63-L108 — class Meta
+- CreateElementSerializer · class · L111-L184 — class CreateElementSerializer(serializers.ModelSerializer)
+- Meta · class · L144-L184 — class Meta
+- UpdateElementSerializer · class · L187-L231 — class UpdateElementSerializer(serializers.ModelSerializer)
+- Meta · class · L198-L231 — class Meta
+- MoveElementSerializer · class · L234-L261 — class MoveElementSerializer(serializers.Serializer)
+- DuplicateElementSerializer · class · L264-L284 — class DuplicateElementSerializer(serializers.Serializer)
+- get_elements · method · L271-L275 — def get_elements(self, obj: ElementsAndWorkflowActions)
+- get_workflow_actions · method · L278-L284 — def get_workflow_actions(self, obj: ElementsAndWorkflowActions)
+- PageParameterValueSerializer · class · L287-L289 — class PageParameterValueSerializer(serializers.Serializer)
+- CollectionFieldSerializer · class · L293-L378 — class CollectionFieldSerializer(serializers.ModelSerializer)
+- get_type_from_type_name · method · L307-L308 — def get_type_from_type_name(self, name)
+- get_type_from_instance · method · L310-L311 — def get_type_from_instance(self, instance)
+- get_type_from_mapping · method · L313-L314 — def get_type_from_mapping(self, mapping)
+- to_representation · method · L316-L338 — def to_representation(self, instance)
+- to_internal_value · method · L340-L374 — def to_internal_value(self, data)
+- Meta · class · L376-L378 — class Meta
+- UpdateCollectionFieldSerializer · class · L381-L388 — class UpdateCollectionFieldSerializer(serializers.ModelSerializer)
+- ChoiceOptionSerializer · class · L391-L394 — class ChoiceOptionSerializer(serializers.ModelSerializer)
+- Meta · class · L392-L394 — class Meta
+- CollectionElementPropertyOptionsSerializer · class · L397-L408 — class CollectionElementPropertyOptionsSerializer( UnknownFieldRaisesExceptionSerializerMixin, serializers.ModelSerializer )
+- Meta · class · L406-L408 — class Meta
+- MenuItemSerializer · class · L411-L485 — class MenuItemSerializer(serializers.ModelSerializer)
+- Meta · class · L453-L470 — class Meta
+- to_representation · method · L472-L485 — def to_representation(self, instance)
+- NestedMenuItemsMixin · class · L488-L506 — class NestedMenuItemsMixin(serializers.Serializer)
+- get_menu_items · method · L494-L506 — def get_menu_items(self, obj)
+- CollectionFieldOptionalFormulaSerializerField · class · L510-L543 — class CollectionFieldOptionalFormulaSerializerField(FormulaSerializerField)
+- __init__ · method · L518-L520 — def __init__(self, *args, is_formula_field_name=None, **kwargs)
+- to_representation · method · L522-L534 — def to_representation(self, value)
+- to_internal_value · method · L536-L543 — def to_internal_value(self, data)

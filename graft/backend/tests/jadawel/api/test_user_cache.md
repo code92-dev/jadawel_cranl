@@ -1,0 +1,15 @@
+# backend/tests/jadawel/api/test_user_cache.py
+
+- test_set_and_get_cached_user · function · L24-L35 — def test_set_and_get_cached_user(data_fixture)
+- test_caching_disabled_when_ttl_is_zero · function · L40-L44 — def test_caching_disabled_when_ttl_is_zero(data_fixture)
+- test_invalidate_cached_user · function · L49-L55 — def test_invalidate_cached_user(data_fixture)
+- test_signal_invalidates_cache_on_user_save · function · L60-L71 — def test_signal_invalidates_cache_on_user_save( data_fixture, django_capture_on_commit_callbacks )
+- test_signal_invalidates_cache_on_profile_save · function · L76-L87 — def test_signal_invalidates_cache_on_profile_save( data_fixture, django_capture_on_commit_callbacks )
+- test_signal_invalidates_cache_on_deactivation · function · L92-L102 — def test_signal_invalidates_cache_on_deactivation( data_fixture, django_capture_on_commit_callbacks )
+- test_signal_invalidates_cache_on_user_delete · function · L107-L117 — def test_signal_invalidates_cache_on_user_delete( data_fixture, django_capture_on_commit_callbacks )
+- test_cached_user_profile_accessible_without_extra_query · function · L122-L134 — def test_cached_user_profile_accessible_without_extra_query(data_fixture)
+- test_cached_user_omits_password_hash · function · L139-L150 — def test_cached_user_omits_password_hash(data_fixture)
+- test_get_user_uses_cache_on_second_call · function · L155-L171 — def test_get_user_uses_cache_on_second_call(data_fixture)
+- test_get_user_always_hits_db_when_cache_disabled · function · L176-L190 — def test_get_user_always_hits_db_when_cache_disabled(data_fixture)
+- test_password_change_invalidates_cache_and_rejects_old_token · function · L195-L228 — def test_password_change_invalidates_cache_and_rejects_old_token( data_fixture, api_request_factory, django_capture_on_commit_callbacks )
+- test_user_delete_invalidates_cache_and_rejects_old_token · function · L233-L263 — def test_user_delete_invalidates_cache_and_rejects_old_token( data_fixture, api_request_factory, django_capture_on_commit_callbacks )

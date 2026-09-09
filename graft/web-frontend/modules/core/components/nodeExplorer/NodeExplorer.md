@@ -1,0 +1,18 @@
+# web-frontend/modules/core/components/nodeExplorer/NodeExplorer.vue
+
+- provide · method · L65-L69 — provide()
+- data · method · L99-L108 — data()
+- filteredNodesHierarchy · method · L110-L117 — filteredNodesHierarchy()
+- isSearching · method · L118-L120 — isSearching()
+- emptyResults · method · L121-L123 — emptyResults()
+- matchingPaths · method · L124-L135 — matchingPaths()
+- mode · method · L138-L143 — mode(newMode, oldMode)
+- search · method · L147-L153 — search(newSearch)
+- matchingPaths · method · L154-L156 — matchingPaths(value)
+- handler · method · L158-L163 — handler(path)
+- mounted · method · L167-L169 — mounted()
+- resetSearch · method · L171-L178 — resetSearch(newTabIndex)
+- onShow · method · L179-L182 — onShow()
+- getPathAndParents · method · L187-L191 — getPathAndParents(path)
+- matchesSearch · method · L198-L238 — matchesSearch(nodes, search, parentPath = [])
+- toggleNode · method · L244-L260 — toggleNode(path, forceOpen = false)

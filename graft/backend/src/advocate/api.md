@@ -1,0 +1,22 @@
+# backend/src/advocate/api.py
+
+- Session · class · L25-L63 — class Session(RequestsSession)
+- __init__ · method · L35-L54 — def __init__(self, *args, **kwargs)
+- mount · method · L56-L63 — def mount(self, *args, **kwargs)
+- session · function · L66-L67 — def session(*args, **kwargs)
+- request · function · L70-L105 — def request(method, url, **kwargs)
+- get · function · L108-L118 — def get(url, **kwargs)
+- options · function · L121-L131 — def options(url, **kwargs)
+- head · function · L134-L144 — def head(url, **kwargs)
+- post · function · L147-L158 — def post(url, data=None, json=None, **kwargs)
+- put · function · L161-L171 — def put(url, data=None, **kwargs)
+- patch · function · L174-L184 — def patch(url, data=None, **kwargs)
+- delete · function · L187-L196 — def delete(url, **kwargs)
+- RequestsAPIWrapper · class · L199-L278 — class RequestsAPIWrapper
+- __init__ · method · L207-L251 — def __init__(self, validator): # Do this here to avoid circular import issues
+- _WrappedSession · class · L219-L227 — class _WrappedSession(Session)
+- _WrappedFuturesSession · class · L233-L236 — class _WrappedFuturesSession(FuturesSession)
+- __getattr__ · method · L253-L260 — def __getattr__(self, item): # This class is meant to mimic the requests base module, so if we don't # have this attribute, it might be on the base module (like the Request # class, etc.)
+- _default_arg_wrapper · method · L262-L267 — def _default_arg_wrapper(self, fun)
+- wrapped_func · function · L263-L265 — def wrapped_func(*args, **kwargs)
+- _make_wrapper_cls_global · method · L269-L278 — def _make_wrapper_cls_global(self, cls)

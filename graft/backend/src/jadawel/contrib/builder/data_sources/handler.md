@@ -1,0 +1,22 @@
+# backend/src/jadawel/contrib/builder/data_sources/handler.py
+
+- DataSourceHandler · class · L37-L696 — class DataSourceHandler
+- __init__ · method · L38-L39 — def __init__(self)
+- get_data_source · method · L41-L71 — def get_data_source( self, data_source_id: int, base_queryset: Optional[QuerySet] = None, specific=True, with_cache=False, ) -> DataSource
+- _get_data_source · method · L73-L113 — def _get_data_source( self, data_source_id: int, base_queryset: Optional[QuerySet] = None, specific=True, ) -> DataSource
+- get_data_source_for_update · method · L115-L136 — def get_data_source_for_update( self, data_source_id: int, base_queryset=None ) -> DataSourceForUpdate
+- _query_data_sources · method · L138-L196 — def _query_data_sources( self, base_queryset: QuerySet, specific=True, with_cache=False )
+- get_data_sources · method · L198-L240 — def get_data_sources( self, page: Page, base_queryset: Optional[QuerySet] = None, with_shared: Optional[bool] = False, specific: Optional[bool] = True, with_cache=False, ) -> Union[QuerySet[DataSource], Iterable[DataSource]]
+- get_builder_data_sources · method · L242-L271 — def get_builder_data_sources( self, builder: "Builder", base_queryset: Optional[QuerySet] = None, specific: Optional[bool] = True, with_cache=False, ) -> Union[QuerySet[DataSource], Iterable[DataSource]]
+- get_data_sources_with_cache · method · L273-L298 — def get_data_sources_with_cache( self, page: Page, base_queryset: Optional[QuerySet] = None, specific: bool = True, )
+- get_data_source_with_cache · method · L300-L330 — def get_data_source_with_cache( self, page: Page, data_source_id: int, base_queryset: Optional[QuerySet] = None, specific: bool = True, ) -> DataSource
+- find_unused_data_source_name · method · L332-L344 — def find_unused_data_source_name(self, page: Page, proposed_name: str) -> str
+- create_data_source · method · L346-L392 — def create_data_source( self, page: Page, name: str, service_type: Optional[ServiceType] = None, before: Optional[DataSource] = None, **kwargs, ) -> DataSource
+- update_data_source · method · L394-L469 — def update_data_source( self, data_source: DataSourceForUpdate, service_type: Optional[ServiceType] = None, name: Optional[str] = None, page: Optional[Page] = None, **kwargs, ) -> DataSource
+- delete_data_source · method · L471-L478 — def delete_data_source(self, data_source: DataSource)
+- dispatch_data_sources · method · L480-L518 — def dispatch_data_sources( self, data_sources, dispatch_context: BuilderDispatchContext )
+- dispatch_data_source · method · L520-L567 — def dispatch_data_source( self, data_source: DataSource, dispatch_context: BuilderDispatchContext ) -> Any
+- move_data_source · method · L569-L592 — def move_data_source( self, data_source: DataSourceForUpdate, before: Optional[DataSource] = None ) -> DataSource
+- recalculate_full_orders · method · L594-L604 — def recalculate_full_orders( self, page: Page, )
+- export_data_source · method · L606-L634 — def export_data_source( self, data_source: DataSource, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, ) -> DataSourceDict
+- import_data_source · method · L636-L696 — def import_data_source( self, page, serialized_data_source: DataSourceDict, id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, )

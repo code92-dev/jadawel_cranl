@@ -1,0 +1,15 @@
+# web-frontend/modules/builder/components/page/PageElement.vue
+
+- provide · method · L44-L46 — provide()
+- applicationContext · method · L68-L74 — applicationContext()
+- themeConfigBlocks · method · L75-L77 — themeConfigBlocks()
+- colorVariables · method · L78-L83 — colorVariables()
+- elementMode · method · L84-L86 — elementMode()
+- component · method · L87-L92 — component()
+- elementPage · method · L96-L102 — elementPage()
+- elementType · method · L103-L105 — elementType()
+- elementClasses · method · L106-L108 — elementClasses()
+- isVisible · method · L109-L123 — isVisible()
+- wrapperClasses · method · L124-L146 — wrapperClasses()
+- elementStyles · method · L147-L220 — elementStyles()
+- border · method · L224-L229 — border(size, color)

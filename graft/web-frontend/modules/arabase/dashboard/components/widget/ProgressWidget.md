@@ -1,0 +1,17 @@
+# web-frontend/modules/arabase/dashboard/components/widget/ProgressWidget.vue
+
+- dataSource · method · L135-L139 — dataSource()
+- dataForDataSource · method · L140-L144 — dataForDataSource()
+- isEditMode · method · L145-L149 — isEditMode()
+- isRing · method · L150-L152 — isRing()
+- circumference · method · L153-L155 — circumference()
+- result · method · L161-L165 — result()
+- target · method · L166-L172 — target()
+- percentage · method · L173-L178 — percentage()
+- cappedPercentage · method · L179-L183 — cappedPercentage()
+- percentageLabel · method · L184-L189 — percentageLabel()
+- dashLength · method · L190-L192 — dashLength()
+- stateClass · method · L193-L204 — stateClass()
+- resultLabel · method · L209-L216 — resultLabel()
+- targetLabel · method · L217-L224 — targetLabel()
+- dataSourceMisconfigured · method · L225-L227 — dataSourceMisconfigured()

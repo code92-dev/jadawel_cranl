@@ -1,0 +1,44 @@
+# web-frontend/modules/builder/fontFamilyTypes.js
+
+- FontFamilyType · class · L3-L19 — class FontFamilyType extends Registerable
+- name · method · L4-L6 — get name()
+- safeFont · method · L8-L10 — get safeFont()
+- weights · method · L12-L14 — get weights()
+- defaultWeight · method · L16-L18 — get defaultWeight()
+- InterFontFamilyType · class · L21-L33 — class InterFontFamilyType extends FontFamilyType
+- getType · method · L22-L24 — static getType()
+- name · method · L26-L28 — get name()
+- weights · method · L30-L32 — get weights()
+- ArialFontFamilyType · class · L35-L43 — class ArialFontFamilyType extends FontFamilyType
+- getType · method · L36-L38 — static getType()
+- name · method · L40-L42 — get name()
+- VerdanaFontFamilyType · class · L45-L53 — class VerdanaFontFamilyType extends FontFamilyType
+- getType · method · L46-L48 — static getType()
+- name · method · L50-L52 — get name()
+- TahomaFontFamilyType · class · L55-L63 — class TahomaFontFamilyType extends FontFamilyType
+- getType · method · L56-L58 — static getType()
+- name · method · L60-L62 — get name()
+- TrebuchetMSFontFamilyType · class · L65-L73 — class TrebuchetMSFontFamilyType extends FontFamilyType
+- getType · method · L66-L68 — static getType()
+- name · method · L70-L72 — get name()
+- TimesNewRomanFontFamilyType · class · L75-L87 — class TimesNewRomanFontFamilyType extends FontFamilyType
+- getType · method · L76-L78 — static getType()
+- name · method · L80-L82 — get name()
+- safeFont · method · L84-L86 — get safeFont()
+- GeorgiaFontFamilyType · class · L89-L101 — class GeorgiaFontFamilyType extends FontFamilyType
+- getType · method · L90-L92 — static getType()
+- name · method · L94-L96 — get name()
+- safeFont · method · L98-L100 — get safeFont()
+- GaramondFontFamilyType · class · L103-L115 — class GaramondFontFamilyType extends FontFamilyType
+- getType · method · L104-L106 — static getType()
+- name · method · L108-L110 — get name()
+- safeFont · method · L112-L114 — get safeFont()
+- CourierNewFontFamilyType · class · L117-L129 — class CourierNewFontFamilyType extends FontFamilyType
+- getType · method · L118-L120 — static getType()
+- name · method · L122-L124 — get name()
+- safeFont · method · L126-L128 — get safeFont()
+- BrushScriptMTFontFamilyType · class · L131-L147 — class BrushScriptMTFontFamilyType extends FontFamilyType
+- getType · method · L132-L134 — static getType()
+- name · method · L136-L138 — get name()
+- safeFont · method · L140-L142 — get safeFont()
+- weights · method · L144-L146 — get weights()

@@ -1,0 +1,25 @@
+# web-frontend/modules/core/notificationTypes.js
+
+- NotificationType · class · L10-L33 — class NotificationType extends Registerable
+- getIconComponent · method · L11-L13 — getIconComponent()
+- getContentComponent · method · L15-L17 — getContentComponent()
+- getIconComponentProps · method · L19-L21 — getIconComponentProps()
+- getRoute · method · L30-L32 — getRoute(notificationData)
+- WorkspaceInvitationCreatedNotificationType · class · L35-L51 — class WorkspaceInvitationCreatedNotificationType extends NotificationType
+- getType · method · L36-L38 — static getType()
+- getIconComponent · method · L40-L42 — getIconComponent()
+- getContentComponent · method · L44-L46 — getContentComponent()
+- getRoute · method · L48-L50 — getRoute(notificationData)
+- WorkspaceInvitationAcceptedNotificationType · class · L53-L65 — class WorkspaceInvitationAcceptedNotificationType extends NotificationType
+- getType · method · L54-L56 — static getType()
+- getIconComponent · method · L58-L60 — getIconComponent()
+- getContentComponent · method · L62-L64 — getContentComponent()
+- WorkspaceInvitationRejectedNotificationType · class · L67-L79 — class WorkspaceInvitationRejectedNotificationType extends NotificationType
+- getType · method · L68-L70 — static getType()
+- getIconComponent · method · L72-L74 — getIconComponent()
+- getContentComponent · method · L76-L78 — getContentComponent()
+- JadawelVersionUpgradeNotificationType · class · L81-L97 — class JadawelVersionUpgradeNotificationType extends NotificationType
+- getType · method · L82-L84 — static getType()
+- getIconComponent · method · L86-L88 — getIconComponent()
+- getIconComponentProps · method · L90-L92 — getIconComponentProps()
+- getContentComponent · method · L94-L96 — getContentComponent()

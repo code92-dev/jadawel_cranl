@@ -1,0 +1,23 @@
+# backend/src/jadawel/core/trash/handler.py
+
+- TrashHandler · class · L48-L548 — class TrashHandler(metaclass=jadawel_trace_methods(tracer))
+- trash · method · L50-L132 — def trash( requesting_user: User, workspace: Workspace, application: Optional[Application], trash_item, existing_trash_entry: Optional[TrashEntry] = None, trash_operation_type: Optional[str] = None, ) -> TrashEntry
+- get_trash_entry · method · L135-L139 — def get_trash_entry(cls, trash_item_type, trash_item_id, parent_trash_item_id=None)
+- restore_item · method · L142-L196 — def restore_item( cls, user, trash_item_type, trash_item_id, parent_trash_item_id=None, ) -> Any
+- get_trash_structure · method · L199-L234 — def get_trash_structure(user: User) -> Dict[str, Any]
+- mark_old_trash_for_permanent_deletion · method · L237-L252 — def mark_old_trash_for_permanent_deletion()
+- mark_all_trash_for_permanent_deletion · method · L255-L262 — def mark_all_trash_for_permanent_deletion()
+- empty · method · L265-L275 — def empty(requesting_user: User, workspace_id: int, application_id: Optional[int])
+- try_perm_delete_trash_entry · method · L278-L315 — def try_perm_delete_trash_entry( trash_entry: TrashEntry, trash_item_lookup_cache: Optional[Dict[str, Any]] = None, )
+- permanently_delete_marked_trash · method · L318-L347 — def permanently_delete_marked_trash()
+- _permanently_delete_and_signal · method · L350-L385 — def _permanently_delete_and_signal( trash_item_type: Any, to_delete: Any, parent_id: Optional[int], trash_item_lookup_cache: Optional[Dict[str, Any]] = None, )
+- permanently_delete · method · L388-L399 — def permanently_delete(trashable_item, parent_id=None)
+- get_trash_contents_for_emptying · method · L402-L451 — def get_trash_contents_for_emptying( user: User, workspace_id: int, application_id: Optional[int] ) -> QuerySet
+- get_trash_contents · method · L454-L520 — def get_trash_contents( user: User, workspace_id: int, application_id: Optional[int], exclude_managed: bool = True, ) -> QuerySet
+- item_has_a_trashed_parent · method · L523-L548 — def item_has_a_trashed_parent(item, check_item_also=False)
+- _get_workspace · function · L551-L564 — def _get_workspace(workspace_id)
+- _get_application · function · L567-L587 — def _get_application( application_id: int, workspace: Workspace ) -> Optional[Application]
+- _check_parent_id_valid · function · L590-L612 — def _check_parent_id_valid( parent_trash_item_id: Optional[int], trashable_item_type: TrashableItemType )
+- _get_workspaces_excluding_perm_deleted · function · L615-L625 — def _get_workspaces_excluding_perm_deleted(user)
+- _get_applications_excluding_perm_deleted · function · L628-L657 — def _get_applications_excluding_perm_deleted( workspace: Workspace, user: AbstractUser ) -> List[Application]
+- _get_trash_entry · function · L660-L685 — def _get_trash_entry( trash_item_type: str, parent_trash_item_id: Optional[int], trash_item_id: int, ) -> TrashEntry

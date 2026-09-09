@@ -1,0 +1,27 @@
+# backend/tests/jadawel/core/user_file/test_user_file_handler.py
+
+- test_user_file_path · function · L36-L42 — def test_user_file_path(data_fixture)
+- test_user_file_thumbnail_path · function · L46-L61 — def test_user_file_thumbnail_path(data_fixture)
+- test_generate_unique · function · L65-L87 — def test_generate_unique(data_fixture)
+- test_upload_user_file · function · L91-L241 — def test_upload_user_file(data_fixture, tmpdir)
+- test_upload_user_file_with_truncated_image · function · L245-L266 — def test_upload_user_file_with_truncated_image(data_fixture, tmpdir)
+- test_upload_user_file_with_unsupported_image_format · function · L270-L289 — def test_upload_user_file_with_unsupported_image_format( data_fixture, tmpdir, open_test_file )
+- test_upload_user_file_active_content_download_policy · function · L294-L312 — def test_upload_user_file_active_content_download_policy(data_fixture, tmpdir)
+- test_upload_user_file_active_content_block_policy · function · L321-L328 — def test_upload_user_file_active_content_block_policy(data_fixture, tmpdir, file_name)
+- test_upload_user_file_active_content_block_policy_uses_mime_type · function · L333-L343 — def test_upload_user_file_active_content_block_policy_uses_mime_type( data_fixture, tmpdir )
+- test_upload_user_file_by_url · function · L348-L402 — def test_upload_user_file_by_url(data_fixture, tmpdir)
+- test_upload_user_file_by_url_within_private_network · function · L406-L421 — def test_upload_user_file_by_url_within_private_network(data_fixture, tmpdir)
+- test_upload_user_file_by_url_with_querystring · function · L426-L455 — def test_upload_user_file_by_url_with_querystring(data_fixture, tmpdir) -> None
+- test_upload_user_file_by_url_with_image_without_extension_with_wrong_content_type · function · L460-L550 — def test_upload_user_file_by_url_with_image_without_extension_with_wrong_content_type( data_fixture, tmpdir ) -> None
+- test_upload_user_file_by_url_with_slash · function · L555-L584 — def test_upload_user_file_by_url_with_slash(data_fixture, tmpdir) -> None
+- test_upload_user_file_by_url_without_path · function · L589-L622 — def test_upload_user_file_by_url_without_path(data_fixture, tmpdir) -> None
+- test_upload_user_file_by_url_with_invalid_paths · function · L646-L664 — def test_upload_user_file_by_url_with_invalid_paths( data_fixture, tmpdir, uri, remote_file ) -> None
+- test_upload_user_file_by_url_with_invalid_content_type · function · L669-L704 — def test_upload_user_file_by_url_with_invalid_content_type( data_fixture, tmpdir ) -> None
+- test_export_user_file_returns_none_if_user_file_is_empty · function · L707-L714 — def test_export_user_file_returns_none_if_user_file_is_empty()
+- test_export_user_file_doesnt_add_if_file_exists_in_files_zip · function · L718-L748 — def test_export_user_file_doesnt_add_if_file_exists_in_files_zip( data_fixture, tmpdir, )
+- test_export_user_file_doesnt_add_if_file_in_cache · function · L752-L781 — def test_export_user_file_doesnt_add_if_file_in_cache( data_fixture, tmpdir, )
+- test_export_user_file_adds_if_files_zip_is_empty_and_not_in_cache · function · L785-L823 — def test_export_user_file_adds_if_files_zip_is_empty_and_not_in_cache( data_fixture, tmpdir, )
+- test_import_user_file_returns_none_if_user_file_is_empty · function · L826-L836 — def test_import_user_file_returns_none_if_user_file_is_empty()
+- test_import_user_file_returns_user_file_from_handler_if_files_zip_is_none · function · L839-L857 — def test_import_user_file_returns_user_file_from_handler_if_files_zip_is_none()
+- test_import_user_file_returns_none_if_name_or_original_name_are_empty · function · L869-L895 — def test_import_user_file_returns_none_if_name_or_original_name_are_empty( tmpdir, name, original_name, )
+- test_import_user_file_returns_user_file_from_files_zip · function · L898-L934 — def test_import_user_file_returns_user_file_from_files_zip(tmpdir)

@@ -1,0 +1,6 @@
+# backend/tests/jadawel/contrib/builder/elements/test_link_collection_field_type.py
+
+- test_registering_link_collection_field_type_connects_to_page_deleted_signal · function · L23-L29 — def test_registering_link_collection_field_type_connects_to_page_deleted_signal()
+- test_unregistering_link_collection_field_type_disconnects_from_page_deleted_signal · function · L32-L35 — def test_unregistering_link_collection_field_type_disconnects_from_page_deleted_signal()
+- test_import_export_link_collection_field_type · function · L39-L143 — def test_import_export_link_collection_field_type(data_fixture)
+- test_import_link_collection_field_with_stale_page_id · function · L147-L203 — def test_import_link_collection_field_with_stale_page_id(data_fixture)

@@ -1,0 +1,6 @@
+# backend/tests/jadawel/core/notifications/test_notifications_tasks.py
+
+- test_daily_report_is_sent_at_correct_time_according_to_user_timezone · function · L23-L143 — def test_daily_report_is_sent_at_correct_time_according_to_user_timezone( mock_get_mail_connection, data_fixture )
+- test_weekly_report_is_sent_at_correct_date_and_time_according_to_user_timezone · function · L150-L270 — def test_weekly_report_is_sent_at_correct_date_and_time_according_to_user_timezone( mock_get_mail_connection, data_fixture )
+- test_daily_report_is_sent_up_to_max_limit_per_task_and_log_the_error · function · L279-L357 — def test_daily_report_is_sent_up_to_max_limit_per_task_and_log_the_error( mock_get_mail_connection, data_fixture, mocker )
+- test_daily_report_is_sent_up_to_max_limit_per_task_log_the_error_and_retry_after · function · L366-L418 — def test_daily_report_is_sent_up_to_max_limit_per_task_log_the_error_and_retry_after( mock_get_mail_connection, data_fixture, mocker )

@@ -1,0 +1,16 @@
+# web-frontend/modules/integrations/ai/components/integrations/AIForm.vue
+
+- setup · method · L111-L113 — setup()
+- data · method · L114-L122 — data()
+- workspace · method · L124-L126 — workspace()
+- availableProviders · method · L127-L133 — availableProviders()
+- handler · method · L137-L148 — handler(newVal)
+- mounted · method · L152-L167 — mounted()
+- getProviderName · method · L169-L172 — getProviderName(providerType)
+- getProviderSettings · method · L173-L176 — getProviderSettings(providerType)
+- isProviderOverridden · method · L177-L179 — isProviderOverridden(providerType)
+- parseProviderSettings · method · L180-L189 — parseProviderSettings(providerType, existingValues = null)
+- getDefaultValues · method · L190-L195 — getDefaultValues()
+- getFormValues · method · L196-L218 — getFormValues()
+- hasConfigurableIntegrationSettings · method · L219-L221 — hasConfigurableIntegrationSettings(providerType)
+- validations · method · L223-L245 — validations()

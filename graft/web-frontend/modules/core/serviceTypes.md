@@ -1,0 +1,23 @@
+# web-frontend/modules/core/serviceTypes.js
+
+- ServiceType · class · L3-L83 — class ServiceType extends Registerable
+- name · method · L4-L6 — get name()
+- integrationType · method · L11-L13 — get integrationType()
+- formComponent · method · L18-L20 — get formComponent()
+- icon · method · L22-L24 — get icon()
+- getErrorMessage · method · L31-L33 — getErrorMessage({ service })
+- isInError · method · L40-L42 — isInError(params)
+- getDataSchema · method · L47-L49 — getDataSchema(applicationContext, service)
+- getSampleData · method · L54-L56 — getSampleData(service)
+- beforeUpdate · method · L62-L64 — beforeUpdate(newValues, oldValues)
+- getDescription · method · L69-L71 — getDescription(service, application)
+- prepareValuePath · method · L76-L78 — prepareValuePath(service, path)
+- getOrder · method · L80-L82 — getOrder()
+- DataSourceServiceTypeMixin · function · L85-L127 — DataSourceServiceTypeMixin = (Base)
+- returnsList · method · L92-L94 — get returnsList()
+- getRecordName · method · L100-L102 — getRecordName(service, record)
+- getIdProperty · method · L108-L110 — getIdProperty(service, record)
+- getMaxResultLimit · method · L115-L117 — getMaxResultLimit(service)
+- getResult · method · L124-L126 — getResult(service, data)
+- WorkflowActionServiceTypeMixin · function · L129-L132 — WorkflowActionServiceTypeMixin = (Base)
+- TriggerServiceTypeMixin · function · L134-L137 — TriggerServiceTypeMixin = (Base)

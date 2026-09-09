@@ -1,0 +1,29 @@
+# backend/src/arabase/mcp/protection/models.py
+
+- MCPProtectionLifecycleStatus · class · L11-L14 — class MCPProtectionLifecycleStatus(models.TextChoices)
+- MCPProtectedFieldState · class · L17-L19 — class MCPProtectedFieldState(models.TextChoices)
+- MCPProtectionSafeReason · class · L22-L38 — class MCPProtectionSafeReason(models.TextChoices)
+- MCPProtectionPolicy · class · L41-L86 — class MCPProtectionPolicy(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L63-L86 — class Meta
+- MCPProtectedField · class · L89-L144 — class MCPProtectedField(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L114-L144 — class Meta
+- MCPProtectionCommand · class · L147-L175 — class MCPProtectionCommand(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L163-L175 — class Meta
+- MCPProtectionEditCommand · class · L178-L207 — class MCPProtectionEditCommand(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L195-L207 — class Meta
+- MCPProtectionMutationAudit · class · L210-L239 — class MCPProtectionMutationAudit(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L233-L239 — class Meta
+- MCPProtectionLifecycleAudit · class · L242-L271 — class MCPProtectionLifecycleAudit(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L265-L271 — class Meta
+- ArtifactAudience · class · L274-L278 — class ArtifactAudience(models.TextChoices)
+- ArtifactDraftStatus · class · L281-L285 — class ArtifactDraftStatus(models.TextChoices)
+- ArtifactProvenance · class · L288-L290 — class ArtifactProvenance(models.TextChoices)
+- HtmlPageArtifactState · class · L293-L319 — class HtmlPageArtifactState(CreatedAndUpdatedOnMixin, models.Model)
+- ArtifactDraft · class · L322-L371 — class ArtifactDraft(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L360-L371 — class Meta
+- ArtifactManifestField · class · L374-L406 — class ArtifactManifestField(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L394-L406 — class Meta
+- ArtifactApproval · class · L409-L456 — class ArtifactApproval(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L446-L456 — class Meta
+- ArtifactAuditEvent · class · L459-L507 — class ArtifactAuditEvent(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L501-L507 — class Meta

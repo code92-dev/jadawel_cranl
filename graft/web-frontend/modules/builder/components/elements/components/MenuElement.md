@@ -1,0 +1,16 @@
+# web-frontend/modules/builder/components/elements/components/MenuElement.vue
+
+- data · method · L150-L155 — data()
+- pages · method · L157-L159 — pages()
+- menuElementType · method · L160-L162 — menuElementType()
+- menuAlignment · method · L163-L170 — menuAlignment()
+- mounted · method · L172-L201 — mounted()
+- showSubMenu · method · L203-L211 — showSubMenu(event, itemId)
+- getItemUrl · method · L212-L224 — getItemUrl(item)
+- toggleExpanded · method · L225-L227 — toggleExpanded(itemId)
+- getMenuItem · method · L232-L248 — getMenuItem(item)
+- isExpanded · method · L249-L251 — isExpanded(itemId)
+- onButtonClick · method · L252-L257 — onButtonClick(item)
+- menuItemIsActive · method · L258-L260 — menuItemIsActive(item)
+- getActiveParentClass · method · L261-L266 — getActiveParentClass(item)
+- sublinkIsActive · method · L267-L272 — sublinkIsActive(item)

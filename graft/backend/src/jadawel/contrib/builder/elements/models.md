@@ -1,0 +1,77 @@
+# backend/src/jadawel/contrib/builder/elements/models.py
+
+- BackgroundTypes · class · L37-L40 — class BackgroundTypes(models.TextChoices)
+- WidthTypes · class · L43-L48 — class WidthTypes(models.TextChoices)
+- ChildWidthTypes · class · L51-L54 — class ChildWidthTypes(models.TextChoices)
+- INPUT_TEXT_TYPES · class · L57-L59 — class INPUT_TEXT_TYPES(models.TextChoices)
+- get_default_element_content_type · function · L62-L63 — def get_default_element_content_type()
+- get_default_table_orientation · function · L66-L71 — def get_default_table_orientation()
+- get_collection_field_config_formula_properties · function · L74-L84 — def get_collection_field_config_formula_properties() -> List[str]
+- Element · class · L87-L408 — class Element( HierarchicalModelMixin, TrashableModelMixin, CreatedAndUpdatedOnMixin, FractionOrderableMixin, PolymorphicContentTypeMixin, WithRegistry, models.Model, )
+- VISIBILITY_TYPES · class · L101-L104 — class VISIBILITY_TYPES(models.TextChoices)
+- ROLE_TYPES · class · L106-L109 — class ROLE_TYPES(models.TextChoices)
+- Meta · class · L298-L299 — class Meta
+- get_type_registry · method · L302-L305 — def get_type_registry()
+- get_parent · method · L307-L308 — def get_parent(self)
+- get_sibling_elements · method · L310-L313 — def get_sibling_elements(self)
+- is_root_element · method · L316-L317 — def is_root_element(self)
+- get_last_order · method · L320-L334 — def get_last_order( cls, page: "Page", parent_element_id: Optional[int] = None, place_in_container: Optional[str] = None, )
+- get_last_orders · method · L337-L360 — def get_last_orders( cls, page: "Page", parent_element_id: Optional[int] = None, place_in_container: Optional[str] = None, amount=1, )
+- get_unique_order_before_element · method · L363-L384 — def get_unique_order_before_element( cls, before: "Element", parent_element_id: int, place_in_container: str )
+- _scope_queryset_to_container · method · L387-L408 — def _scope_queryset_to_container( cls, queryset: QuerySet, parent_element_id: int, place_in_container: str ) -> QuerySet
+- ContainerElement · class · L411-L417 — class ContainerElement(Element)
+- Meta · class · L416-L417 — class Meta
+- ColumnElement · class · L420-L445 — class ColumnElement(ContainerElement)
+- HeadingElement · class · L448-L463 — class HeadingElement(Element)
+- HeadingLevel · class · L453-L458 — class HeadingLevel(models.IntegerChoices)
+- TextElement · class · L466-L481 — class TextElement(Element)
+- TEXT_FORMATS · class · L471-L473 — class TEXT_FORMATS(models.TextChoices)
+- NavigationElementMixin · class · L484-L538 — class NavigationElementMixin(models.Model)
+- NAVIGATION_TYPES · class · L489-L491 — class NAVIGATION_TYPES(models.TextChoices)
+- TARGETS · class · L493-L495 — class TARGETS(models.TextChoices)
+- Meta · class · L537-L538 — class Meta
+- LinkElement · class · L541-L556 — class LinkElement(Element, NavigationElementMixin)
+- VARIANTS · class · L546-L548 — class VARIANTS(models.TextChoices)
+- ImageElement · class · L559-L589 — class ImageElement(Element)
+- IMAGE_SOURCE_TYPES · class · L565-L567 — class IMAGE_SOURCE_TYPES(models.TextChoices)
+- IMAGE_CONSTRAINT_TYPES · class · L569-L572 — class IMAGE_CONSTRAINT_TYPES(models.TextChoices)
+- FormContainerElement · class · L592-L602 — class FormContainerElement(ContainerElement)
+- FormElement · class · L605-L616 — class FormElement(Element)
+- Meta · class · L615-L616 — class Meta
+- BaseRatingElement · class · L619-L649 — class BaseRatingElement(Element)
+- Meta · class · L648-L649 — class Meta
+- RatingElement · class · L652-L653 — class RatingElement(BaseRatingElement)
+- RatingInputElement · class · L656-L659 — class RatingInputElement(BaseRatingElement, FormElement)
+- InputTextElement · class · L662-L698 — class InputTextElement(FormElement)
+- INPUT_TEXT_VALIDATION_TYPES · class · L667-L670 — class INPUT_TEXT_VALIDATION_TYPES(models.TextChoices)
+- ChoiceElement · class · L701-L733 — class ChoiceElement(FormElement)
+- OPTION_TYPE · class · L702-L704 — class OPTION_TYPE(models.TextChoices)
+- ChoiceElementOption · class · L736-L755 — class ChoiceElementOption(models.Model)
+- CheckboxElement · class · L758-L766 — class CheckboxElement(FormElement)
+- ButtonElement · class · L769-L774 — class ButtonElement(Element)
+- CollectionField · class · L777-L813 — class CollectionField(models.Model)
+- get_type · method · L805-L810 — def get_type(self)
+- Meta · class · L812-L813 — class Meta
+- CollectionElement · class · L816-L844 — class CollectionElement(Element)
+- Meta · class · L843-L844 — class Meta
+- CollectionElementPropertyOptions · class · L847-L878 — class CollectionElementPropertyOptions(models.Model)
+- Meta · class · L877-L878 — class Meta
+- TableElement · class · L881-L892 — class TableElement(CollectionElement)
+- IFrameElement · class · L895-L916 — class IFrameElement(Element)
+- IFRAME_SOURCE_TYPE · class · L900-L902 — class IFRAME_SOURCE_TYPE(models.TextChoices)
+- RepeatElement · class · L919-L956 — class RepeatElement(CollectionElement, ContainerElement)
+- ORIENTATIONS · class · L925-L927 — class ORIENTATIONS(models.TextChoices)
+- RecordSelectorElement · class · L959-L977 — class RecordSelectorElement(CollectionElement, FormElement)
+- DateTimePickerElement · class · L980-L1006 — class DateTimePickerElement(FormElement)
+- MultiPageElement · class · L1009-L1029 — class MultiPageElement(Element)
+- SHARE_TYPE · class · L1015-L1018 — class SHARE_TYPE(models.TextChoices)
+- Meta · class · L1028-L1029 — class Meta
+- HeaderElement · class · L1032-L1035 — class HeaderElement(MultiPageElement, ContainerElement)
+- FooterElement · class · L1038-L1041 — class FooterElement(MultiPageElement, ContainerElement)
+- MenuItemElement · class · L1044-L1091 — class MenuItemElement(NavigationElementMixin)
+- VARIANTS · class · L1049-L1051 — class VARIANTS(models.TextChoices)
+- TYPES · class · L1060-L1064 — class TYPES(models.TextChoices)
+- Meta · class · L1090-L1091 — class Meta
+- MenuElement · class · L1094-L1116 — class MenuElement(Element)
+- ORIENTATIONS · class · L1099-L1101 — class ORIENTATIONS(models.TextChoices)
+- SimpleContainerElement · class · L1119-L1122 — class SimpleContainerElement(ContainerElement)

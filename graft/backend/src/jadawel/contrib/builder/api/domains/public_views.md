@@ -1,0 +1,21 @@
+# backend/src/jadawel/contrib/builder/api/domains/public_views.py
+
+- ForcedPublicPolymorphicApplicationResponseSerializer · class · L96-L99 — class ForcedPublicPolymorphicApplicationResponseSerializer( PublicPolymorphicApplicationResponseSerializer )
+- PublicBuilderByDomainNameView · class · L102-L155 — class PublicBuilderByDomainNameView(APIView)
+- get · method · L126-L138 — def get(self, request: Request, domain_name: str)
+- _get_public_builder_by_domain · method · L140-L155 — def _get_public_builder_by_domain(self, domain_name: str)
+- PublicBuilderByIdView · class · L158-L195 — class PublicBuilderByIdView(APIView)
+- get · method · L188-L195 — def get(self, request, builder_id)
+- PublicElementsView · class · L198-L272 — class PublicElementsView(APIView)
+- get · method · L230-L248 — def get(self, request: Request, page_id: int)
+- _get_public_page_elements · method · L250-L272 — def _get_public_page_elements( self, user: AbstractUser, page_id: int ) -> List[Dict[str, Any]]
+- PublicDataSourcesView · class · L275-L362 — class PublicDataSourcesView(APIView)
+- get · method · L306-L327 — def get(self, request: Request, page_id: int)
+- _get_public_page_data_sources · method · L329-L362 — def _get_public_page_data_sources( self, user: AbstractUser, user_source_user: UserSourceUser, page_id: int )
+- PublicBuilderWorkflowActionsView · class · L365-L446 — class PublicBuilderWorkflowActionsView(APIView)
+- get · method · L401-L420 — def get(self, request: Request, page_id: int)
+- _get_public_page_workflow_actions · method · L422-L446 — def _get_public_page_workflow_actions(self, user: AbstractUser, page_id: int)
+- PublicDispatchDataSourceView · class · L449-L517 — class PublicDispatchDataSourceView(APIView)
+- post · method · L501-L517 — def post(self, request, data_source_id: int)
+- PublicDispatchDataSourcesView · class · L520-L586 — class PublicDispatchDataSourcesView(APIView)
+- post · method · L552-L586 — def post(self, request, page_id: str)

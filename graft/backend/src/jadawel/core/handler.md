@@ -1,0 +1,63 @@
+# backend/src/jadawel/core/handler.py
+
+- ApplicationUpdatedResult · class · L137-L140 — class ApplicationUpdatedResult
+- CoreHandler · class · L143-L2214 — class CoreHandler(metaclass=jadawel_trace_methods(tracer, exclude="clear_context"))
+- clear_context · method · L147-L154 — def clear_context(self)
+- get_settings · method · L156-L177 — def get_settings(self) -> Settings
+- update_settings · method · L179-L217 — def update_settings( self, user: User, settings_instance: Optional[Settings] = None, **kwargs ) -> Settings
+- check_multiple_permissions · method · L219-L295 — def check_multiple_permissions( self, checks: List[PermissionCheck], workspace: Optional[Workspace] = None, include_trash: bool = False, return_permissions_exceptions: bool = False, ) -> Dict[PermissionCheck, Union[bool, PermissionException]]
+- check_permission_for_multiple_actors · method · L297-L325 — def check_permission_for_multiple_actors( self, actors: List[Actor], operation_name: str, workspace: Optional[Workspace] = None, context: Optional[ContextObject] = None, include_trash: bool = False, ) -> List[Actor]
+- check_permissions · method · L327-L397 — def check_permissions( self, actor: Actor, operation_name: str, workspace: Optional[Workspace] = None, context: Optional[ContextObject] = None, include_trash: bool = False, raise_permission_exceptions: bool = True, ) -> bool
+- _ensure_context_matches_operation · method · L399-L413 — def _ensure_context_matches_operation(self, context, operation_name)
+- get_permissions · method · L415-L470 — def get_permissions( self, actor: Actor, workspace: Optional[Workspace] = None ) -> List[PermissionObjectResult]
+- filter_queryset · method · L472-L524 — def filter_queryset( self, actor: Actor, operation_name: str, queryset: QuerySet, workspace: Optional[Workspace] = None, ) -> QuerySet
+- get_workspace_for_update · method · L526-L533 — def get_workspace_for_update(self, workspace_id: int) -> WorkspaceForUpdate
+- list_user_workspaces · method · L535-L548 — def list_user_workspaces( self, user: AbstractUser, base_queryset: QuerySet[Workspace] = None ) -> QuerySet[Workspace]
+- get_enhanced_workspace_queryset · method · L550-L568 — def get_enhanced_workspace_queryset( self, queryset: QuerySet[Workspace] | None = None ) -> QuerySet[Workspace]
+- get_workspace · method · L570-L593 — def get_workspace( self, workspace_id: int, base_queryset: QuerySet = None ) -> Workspace
+- get_workspaceuser_workspace_queryset · method · L595-L611 — def get_workspaceuser_workspace_queryset(self) -> QuerySet[WorkspaceUser]
+- create_workspace · method · L613-L636 — def create_workspace(self, user: User, name: str) -> WorkspaceUser
+- update_workspace · method · L638-L679 — def update_workspace( self, user: AbstractUser, workspace: WorkspaceForUpdate, name: Optional[str] = None, generative_ai_models_settings: Optional[Dict[str, Any]] = None, ) -> Workspace
+- leave_workspace · method · L681-L730 — def leave_workspace(self, user, workspace)
+- delete_workspace_by_id · method · L732-L743 — def delete_workspace_by_id(self, user: AbstractUser, workspace_id: int)
+- delete_workspace · method · L745-L789 — def delete_workspace(self, user: AbstractUser, workspace: WorkspaceForUpdate)
+- order_workspaces · method · L791-L804 — def order_workspaces(self, user: AbstractUser, workspace_ids: List[int])
+- get_workspaces_order · method · L806-L819 — def get_workspaces_order(self, user: AbstractUser) -> List[int]
+- get_workspace_user · method · L821-L849 — def get_workspace_user(self, workspace_user_id, base_queryset=None)
+- get_workspace_users · method · L851-L867 — def get_workspace_users( self, workspace: Workspace, users: List[User], include_trash: bool = False ) -> QuerySet
+- get_users_in_workspace · method · L869-L873 — def get_users_in_workspace(self, workspace: Workspace) -> list[User]
+- update_workspace_user · method · L875-L899 — def update_workspace_user( self, user: AbstractUser, workspace_user: WorkspaceUser, **kwargs, ) -> WorkspaceUser
+- force_update_workspace_user · method · L901-L925 — def force_update_workspace_user( self, user: Optional[AbstractUser], workspace_user: WorkspaceUser, **kwargs ) -> WorkspaceUser
+- delete_workspace_user · method · L927-L969 — def delete_workspace_user(self, user, workspace_user)
+- get_workspace_invitation_signer · method · L971-L981 — def get_workspace_invitation_signer(self)
+- send_workspace_invitation_email · method · L983-L1020 — def send_workspace_invitation_email(self, invitation, base_url)
+- get_workspace_invitation_by_token · method · L1022-L1058 — def get_workspace_invitation_by_token(self, token, base_queryset=None)
+- get_workspace_invitation · method · L1060-L1088 — def get_workspace_invitation(self, workspace_invitation_id, base_queryset=None)
+- create_workspace_invitation · method · L1090-L1158 — def create_workspace_invitation( self, user: AbstractUser, workspace: Workspace, email: str, permissions: str, base_url: str, ) -> WorkspaceInvitation
+- update_workspace_invitation · method · L1160-L1187 — def update_workspace_invitation( self, user: AbstractUser, invitation: WorkspaceInvitation, permissions: str ) -> WorkspaceInvitation
+- delete_workspace_invitation · method · L1189-L1209 — def delete_workspace_invitation( self, user: AbstractUser, invitation: WorkspaceInvitation ) -> None
+- reject_workspace_invitation · method · L1211-L1235 — def reject_workspace_invitation(self, user, invitation)
+- add_user_to_workspace · method · L1237-L1270 — def add_user_to_workspace( self, workspace: Workspace, user: AbstractUser, permissions: str = WORKSPACE_USER_PERMISSION_MEMBER, ) -> WorkspaceUser
+- accept_workspace_invitation · method · L1272-L1304 — def accept_workspace_invitation( self, user: User, invitation: WorkspaceInvitation ) -> WorkspaceUser
+- get_user_email_mapping · method · L1307-L1320 — def get_user_email_mapping( cls, workspace_id: int, only_emails: list[Email] ) -> UserEmailMapping
+- get_application · method · L1322-L1352 — def get_application( self, application_id: int, base_queryset: Optional[QuerySet] = None, ) -> Application
+- get_application_for_url · method · L1354-L1365 — def get_application_for_url(self, url) -> Application | None
+- list_applications_in_workspace · method · L1367-L1387 — def list_applications_in_workspace( self, workspace: Workspace, base_queryset: Optional[QuerySet] = None, ) -> QuerySet[Application]
+- filter_specific_applications · method · L1389-L1400 — def filter_specific_applications( self, queryset: QuerySet[Application], per_content_type_queryset_hook: Optional[ Callable[[Model, QuerySet], QuerySet] ] = None, ) -> QuerySet[Application]
+- create_application · method · L1402-L1443 — def create_application( self, user: AbstractUser, workspace: Workspace, type_name: str, init_with_data: bool = False, **kwargs, ) -> Application
+- find_unused_application_name · method · L1445-L1461 — def find_unused_application_name( self, workspace_id: int, proposed_name: str ) -> str
+- update_application · method · L1463-L1508 — def update_application( self, user: AbstractUser, application: Application, **kwargs ) -> ApplicationUpdatedResult
+- duplicate_application · method · L1510-L1589 — def duplicate_application( self, user: AbstractUser, application: Application, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Application
+- order_applications · method · L1591-L1637 — def order_applications( self, user: AbstractUser, workspace: Workspace, order: List[int] ) -> List[int]
+- delete_application · method · L1639-L1666 — def delete_application(self, user: AbstractUser, application: Application)
+- export_workspace_applications · method · L1668-L1716 — def export_workspace_applications( self, workspace, files_buffer, import_export_config: ImportExportConfig, storage=None, )
+- import_applications_to_workspace · method · L1718-L1799 — def import_applications_to_workspace( self, workspace: Workspace, exported_applications: List[Dict[str, Any]], files_buffer: IO[bytes], import_export_config: ImportExportConfig, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Tuple[List[Application], Dict[str, Any]]
+- application_priority_sort · function · L1757-L1760 — def application_priority_sort(application_to_sort)
+- get_template · method · L1801-L1826 — def get_template(self, template_id, base_queryset=None)
+- sync_templates · method · L1832-L1940 — def sync_templates( self, storage=None, pattern: str | None = None, force: bool = False )
+- _sync_template · method · L1942-L2072 — def _sync_template( self, template_file_path, config, installed_templates, installed_categories, storage, force: bool = False, )
+- get_valid_template_path_or_raise · method · L2074-L2085 — def get_valid_template_path_or_raise(self, template)
+- install_template · method · L2087-L2164 — def install_template( self, user: AbstractUser, workspace: Workspace, template: Template, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Tuple[List[Application], Dict[str, Any]]
+- raise_if_user_is_last_admin_of_workspace · method · L2167-L2185 — def raise_if_user_is_last_admin_of_workspace(cls, workspace_user: WorkspaceUser)
+- create_initial_workspace · method · L2187-L2203 — def create_initial_workspace(self, user: AbstractUser) -> Workspace
+- is_max_lock_exceeded_exception · method · L2206-L2214 — def is_max_lock_exceeded_exception(exception: OperationalError) -> bool

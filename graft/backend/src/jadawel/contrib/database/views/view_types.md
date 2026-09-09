@@ -1,0 +1,57 @@
+# backend/src/jadawel/contrib/database/views/view_types.py
+
+- GridViewType · class · L77-L370 — class GridViewType(ViewType)
+- get_api_urls · method · L115-L120 — def get_api_urls(self)
+- export_serialized · method · L122-L156 — def export_serialized( self, grid: View, import_export_config: ImportExportConfig, cache: Dict, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, )
+- import_serialized · method · L158-L200 — def import_serialized( self, table: Table, serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], cache: Dict, files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, ) -> Optional[View]
+- get_visible_fields_and_model · method · L202-L216 — def get_visible_fields_and_model(self, view)
+- before_field_options_update · method · L218-L247 — def before_field_options_update(self, view, field_options, fields)
+- after_fields_type_change · method · L249-L284 — def after_fields_type_change(self, fields)
+- get_visible_field_options_in_order · method · L286-L294 — def get_visible_field_options_in_order(self, grid_view)
+- get_aggregations · method · L296-L307 — def get_aggregations(self, grid_view)
+- after_field_value_update · method · L309-L330 — def after_field_value_update(self, updated_fields)
+- after_field_update · method · L332-L338 — def after_field_update(self, updated_fields)
+- after_filter_update · method · L340-L346 — def after_filter_update(self, grid_view)
+- get_hidden_fields · method · L348-L367 — def get_hidden_fields( self, view: GridView, field_ids_to_check: Optional[List[int]] = None, ) -> Set[int]
+- enhance_queryset · method · L369-L370 — def enhance_queryset(self, queryset)
+- GalleryViewType · class · L373-L605 — class GalleryViewType(ViewType)
+- get_api_urls · method · L399-L404 — def get_api_urls(self)
+- prepare_values · method · L406-L428 — def prepare_values(self, values, table, user)
+- after_fields_type_change · method · L430-L443 — def after_fields_type_change(self, fields)
+- export_serialized · method · L445-L476 — def export_serialized( self, gallery: View, import_export_config: ImportExportConfig, cache: Dict, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, )
+- import_serialized · method · L478-L528 — def import_serialized( self, table: Table, serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], cache: Dict, files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, ) -> Optional[View]
+- view_created · method · L530-L544 — def view_created(self, view)
+- export_prepared_values · method · L546-L557 — def export_prepared_values(self, view: GalleryView) -> Dict[str, Any]
+- get_visible_field_options_in_order · method · L559-L566 — def get_visible_field_options_in_order(self, gallery_view: GalleryView)
+- get_hidden_fields · method · L568-L596 — def get_hidden_fields( self, view: GalleryView, field_ids_to_check: Optional[List[int]] = None, ) -> Set[int]
+- enhance_queryset · method · L598-L599 — def enhance_queryset(self, queryset)
+- after_field_delete · method · L601-L605 — def after_field_delete(self, field: Field) -> None
+- FormViewType · class · L608-L1479 — class FormViewType(ViewType)
+- get_api_urls · method · L673-L678 — def get_api_urls(self)
+- after_fields_type_change · method · L680-L694 — def after_fields_type_change(self, fields)
+- before_field_options_update · method · L696-L712 — def before_field_options_update(self, view, field_options, fields)
+- _prepare_new_condition_group · method · L714-L729 — def _prepare_new_condition_group( self, updated_field_option_instance, group, existing_condition_group_ids )
+- _group_exists_and_matches_field · method · L731-L735 — def _group_exists_and_matches_field(self, existing_group, numeric_field_id)
+- _prepare_condition_groups · method · L737-L799 — def _prepare_condition_groups( self, field_options: Dict[str, Any], updated_field_options_by_field_id: Dict[int, FormViewFieldOptions], existing_condition_groups: Dict[int, FormViewFieldOptionsConditionGroup], ) -> Tuple[ List[int], List[FormViewFieldOptionsConditionGroup], List[FormViewFieldOptionsConditionGroup], List[int], ]
+- _update_field_options_condition_groups · method · L801-L856 — def _update_field_options_condition_groups( self, field_options: Dict[str, Any], updated_field_options_by_field_id: Dict[int, FormViewFieldOptions], existing_condition_groups: Dict[int, FormViewFieldOptionsConditionGroup], ) -> Dict[int, FormViewFieldOptionsConditionGroup]
+- _prepare_condition_update · method · L858-L862 — def _prepare_condition_update(self, existing_condition, condition, group_id)
+- _prepare_new_condition · method · L864-L873 — def _prepare_new_condition( self, updated_field_option_instance, condition, group_id ) -> FormViewFieldOptionsCondition
+- _get_group_id · method · L875-L884 — def _get_group_id(self, condition, condition_group_id_map)
+- _condition_exists_and_matches_field · method · L886-L890 — def _condition_exists_and_matches_field(self, existing_condition, numeric_field_id)
+- _prepare_conditions · method · L892-L946 — def _prepare_conditions( self, field_options: Dict[str, Any], updated_field_options_by_field_id, existing_conditions: Dict[int, FormViewFieldOptionsCondition], condition_group_id_map, table_id: int, table_field_ids: Set[int], ) -> Tuple[ List[FormViewFieldOptionsCondition], List[FormViewFieldOptionsCondition], List[int], ]
+- _update_field_options_conditions · method · L948-L998 — def _update_field_options_conditions( self, view: View, field_options: Dict[str, Any], existing_conditions: Dict[int, FormViewFieldOptionsCondition], table_field_ids: Set[int], updated_field_options_by_field_id: Dict[int, FormViewFieldOptions], condition_group_id_map: Dict[int, FormViewFieldOptionsConditionGroup], )
+- after_field_options_update · method · L1000-L1057 — def after_field_options_update( self, view, field_options, fields, update_field_option_instances )
+- _update_field_options_allowed_select_options · method · L1059-L1146 — def _update_field_options_allowed_select_options( self, view, field_options, updated_field_options_by_field_id ): # Dict containing the field options object as key and a list of desired field # option IDs based on the provided `field_options`.
+- export_serialized · method · L1148-L1233 — def export_serialized( self, form: View, import_export_config: ImportExportConfig, cache: Dict, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, )
+- add_user_file · function · L1164-L1180 — def add_user_file(user_file)
+- import_serialized · method · L1235-L1354 — def import_serialized( self, table: Table, serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], cache: Dict, files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, ) -> Optional[View]
+- get_file · function · L1249-L1260 — def get_file(file)
+- get_visible_field_options_in_order · method · L1356-L1361 — def get_visible_field_options_in_order(self, form_view)
+- before_view_create · method · L1363-L1370 — def before_view_create(self, values: dict, table: "Table", user: AbstractUser)
+- before_view_update · method · L1372-L1385 — def before_view_update(self, values: dict, view: "View", user: AbstractUser)
+- prepare_values · method · L1387-L1420 — def prepare_values( self, values: Dict[str, Any], table: Table, user: AbstractUser ) -> Dict[str, Any]
+- export_prepared_values · method · L1422-L1439 — def export_prepared_values(self, view: FormView) -> Dict[str, Any]
+- enhance_queryset · method · L1441-L1444 — def enhance_queryset(self, queryset)
+- enhance_field_options_queryset · method · L1446-L1449 — def enhance_field_options_queryset(self, queryset)
+- prepare_field_options · method · L1451-L1456 — def prepare_field_options( self, view: FormView, field_id: int ) -> FormViewFieldOptions
+- check_view_update_permissions · method · L1458-L1479 — def check_view_update_permissions(self, user, view, data)

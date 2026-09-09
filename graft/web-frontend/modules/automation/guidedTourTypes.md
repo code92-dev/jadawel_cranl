@@ -1,0 +1,43 @@
+# web-frontend/modules/automation/guidedTourTypes.js
+
+- WelcomeGuidedTourStep · class · L6-L22 — class WelcomeGuidedTourStep extends GuidedTourStep
+- title · method · L7-L9 — get title()
+- content · method · L11-L13 — get content()
+- selectors · method · L15-L17 — get selectors()
+- position · method · L19-L21 — get position()
+- GraphGuidedTourStep · class · L24-L44 — class GraphGuidedTourStep extends GuidedTourStep
+- title · method · L25-L27 — get title()
+- content · method · L29-L31 — get content()
+- selectors · method · L33-L35 — get selectors()
+- position · method · L37-L39 — get position()
+- highlightPadding · method · L41-L43 — get highlightPadding()
+- HistoryGuidedTourStep · class · L46-L62 — class HistoryGuidedTourStep extends GuidedTourStep
+- title · method · L47-L49 — get title()
+- content · method · L51-L53 — get content()
+- selectors · method · L55-L57 — get selectors()
+- position · method · L59-L61 — get position()
+- TestRunGuidedTourStep · class · L64-L80 — class TestRunGuidedTourStep extends GuidedTourStep
+- title · method · L65-L67 — get title()
+- content · method · L69-L71 — get content()
+- selectors · method · L73-L75 — get selectors()
+- position · method · L77-L79 — get position()
+- PublishGuidedTourStep · class · L82-L98 — class PublishGuidedTourStep extends GuidedTourStep
+- title · method · L83-L85 — get title()
+- content · method · L87-L89 — get content()
+- selectors · method · L91-L93 — get selectors()
+- position · method · L95-L97 — get position()
+- StateGuidedTourStep · class · L100-L116 — class StateGuidedTourStep extends GuidedTourStep
+- title · method · L101-L103 — get title()
+- content · method · L105-L107 — get content()
+- selectors · method · L109-L111 — get selectors()
+- position · method · L113-L115 — get position()
+- DocsGuidedTourStep · class · L118-L134 — class DocsGuidedTourStep extends GuidedTourStep
+- title · method · L119-L121 — get title()
+- content · method · L123-L125 — get content()
+- selectors · method · L127-L129 — get selectors()
+- position · method · L131-L133 — get position()
+- AutomationGuidedTourType · class · L136-L163 — class AutomationGuidedTourType extends GuidedTourType
+- getType · method · L137-L139 — static getType()
+- steps · method · L141-L151 — get steps()
+- order · method · L153-L155 — get order()
+- isActive · method · L157-L162 — isActive()

@@ -1,0 +1,53 @@
+# backend/src/jadawel/contrib/database/formula/ast/function.py
+
+- FixedNumOfArgs · class · L42-L51 — class FixedNumOfArgs(ArgCountSpecifier)
+- __str__ · method · L43-L48 — def __str__(self)
+- test · method · L50-L51 — def test(self, num_args)
+- NumOfArgsGreaterThan · class · L54-L59 — class NumOfArgsGreaterThan(ArgCountSpecifier)
+- __str__ · method · L55-L56 — def __str__(self)
+- test · method · L58-L59 — def test(self, num_args)
+- NumOfArgsBetween · class · L62-L78 — class NumOfArgsBetween(ArgCountSpecifier)
+- __init__ · method · L63-L66 — def __init__(self, min_count, max_count, inclusive=True)
+- __str__ · method · L68-L72 — def __str__(self)
+- test · method · L74-L78 — def test(self, num_args)
+- ToDjangoExpressionGivenArgsMixin · class · L81-L93 — class ToDjangoExpressionGivenArgsMixin
+- to_django_expression_given_args · method · L82-L93 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- ZeroArgumentJadawelFunction · class · L96-L160 — class ZeroArgumentJadawelFunction( ToDjangoExpressionGivenArgsMixin, JadawelFunctionDefinition )
+- arg_types · method · L107-L108 — def arg_types(self) -> JadawelArgumentTypeChecker
+- num_args · method · L111-L112 — def num_args(self) -> ArgCountSpecifier
+- type_function · method · L115-L136 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L139-L150 — def to_django_expression(self) -> Expression
+- type_function_given_valid_args · method · L152-L157 — def type_function_given_valid_args( self, args: List[JadawelExpression[JadawelFormulaValidType]], func_call: JadawelFunctionCall[UnTyped], ) -> JadawelExpression[JadawelFormulaType]
+- __call__ · method · L159-L160 — def __call__(self) -> JadawelFunctionCall[JadawelFormulaType]
+- OneArgumentJadawelFunction · class · L163-L252 — class OneArgumentJadawelFunction( ToDjangoExpressionGivenArgsMixin, JadawelFunctionDefinition )
+- arg_type · method · L177-L186 — def arg_type(self) -> JadawelSingleArgumentTypeChecker
+- arg_types · method · L189-L190 — def arg_types(self) -> JadawelArgumentTypeChecker
+- num_args · method · L193-L194 — def num_args(self) -> ArgCountSpecifier
+- type_function · method · L197-L223 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L226-L238 — def to_django_expression(self, arg: Expression) -> Expression
+- type_function_given_valid_args · method · L240-L247 — def type_function_given_valid_args( self, args: List[JadawelExpression[JadawelFormulaValidType]], func_call: JadawelFunctionCall[UnTyped], ) -> JadawelExpression[JadawelFormulaType]
+- __call__ · method · L249-L252 — def __call__( self, arg: JadawelExpression[JadawelFormulaType] ) -> JadawelFunctionCall[JadawelFormulaType]
+- aggregate_wrapper · function · L255-L278 — def aggregate_wrapper( expr_with_metadata: WrappedExpressionWithMetadata, model: Type[Model], ) -> WrappedExpressionWithMetadata
+- aggregate_expr_with_metadata_filters · function · L281-L297 — def aggregate_expr_with_metadata_filters( expr_with_metadata: WrappedExpressionWithMetadata, ) -> Expression
+- construct_not_null_filters_for_inner_join · function · L300-L309 — def construct_not_null_filters_for_inner_join(pre_annotations)
+- construct_aggregate_wrapper_queryset · function · L312-L340 — def construct_aggregate_wrapper_queryset( expr_with_metadata: WrappedExpressionWithMetadata, model: Type[Model], result_key="result", ) -> QuerySet
+- TwoArgumentJadawelFunction · class · L343-L450 — class TwoArgumentJadawelFunction( ToDjangoExpressionGivenArgsMixin, JadawelFunctionDefinition )
+- arg1_type · method · L357-L367 — def arg1_type(self) -> JadawelSingleArgumentTypeChecker
+- arg2_type · method · L371-L380 — def arg2_type(self) -> JadawelSingleArgumentTypeChecker
+- arg_types · method · L383-L384 — def arg_types(self) -> JadawelArgumentTypeChecker
+- num_args · method · L387-L388 — def num_args(self) -> ArgCountSpecifier
+- type_function · method · L391-L420 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L423-L436 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- type_function_given_valid_args · method · L438-L443 — def type_function_given_valid_args( self, args: List[JadawelExpression[JadawelFormulaValidType]], func_call: JadawelFunctionCall[UnTyped], ) -> JadawelExpression[JadawelFormulaType]
+- __call__ · method · L445-L450 — def __call__( self, arg1: JadawelExpression[JadawelFormulaType], arg2: JadawelExpression[JadawelFormulaType], ) -> JadawelFunctionCall[JadawelFormulaType]
+- ThreeArgumentJadawelFunction · class · L453-L570 — class ThreeArgumentJadawelFunction( ToDjangoExpressionGivenArgsMixin, JadawelFunctionDefinition )
+- arg_types · method · L457-L458 — def arg_types(self) -> JadawelArgumentTypeChecker
+- arg1_type · method · L462-L471 — def arg1_type(self) -> JadawelSingleArgumentTypeChecker
+- arg2_type · method · L475-L484 — def arg2_type(self) -> JadawelSingleArgumentTypeChecker
+- arg3_type · method · L488-L497 — def arg3_type(self) -> JadawelSingleArgumentTypeChecker
+- num_args · method · L500-L501 — def num_args(self) -> ArgCountSpecifier
+- type_function · method · L504-L536 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], arg3: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L539-L555 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- type_function_given_valid_args · method · L557-L562 — def type_function_given_valid_args( self, args: List[JadawelExpression[JadawelFormulaValidType]], func_call: JadawelFunctionCall[UnTyped], ) -> JadawelExpression[JadawelFormulaType]
+- __call__ · method · L564-L570 — def __call__( self, arg1: JadawelExpression[JadawelFormulaType], arg2: JadawelExpression[JadawelFormulaType], arg3: JadawelExpression[JadawelFormulaType], ) -> JadawelFunctionCall[JadawelFormulaType]
+- CollapseManyJadawelFunction · class · L573-L577 — class CollapseManyJadawelFunction

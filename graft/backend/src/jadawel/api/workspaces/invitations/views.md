@@ -1,0 +1,15 @@
+# backend/src/jadawel/api/workspaces/invitations/views.py
+
+- WorkspaceInvitationsView · class · L67-L187 — class WorkspaceInvitationsView(APIView, SortableViewMixin, SearchableViewMixin)
+- get · method · L107-L130 — def get(self, request, workspace_id, query_params)
+- post · method · L173-L187 — def post(self, request, data, workspace_id)
+- WorkspaceInvitationView · class · L190-L337 — class WorkspaceInvitationView(APIView)
+- get · method · L224-L240 — def get(self, request, workspace_invitation_id)
+- patch · method · L281-L291 — def patch(self, request, data, workspace_invitation_id)
+- delete · method · L325-L337 — def delete(self, request, workspace_invitation_id)
+- AcceptWorkspaceInvitationView · class · L340-L393 — class AcceptWorkspaceInvitationView(APIView)
+- post · method · L373-L393 — def post(self, request, workspace_invitation_id)
+- RejectWorkspaceInvitationView · class · L396-L444 — class RejectWorkspaceInvitationView(APIView)
+- post · method · L429-L444 — def post(self, request, workspace_invitation_id)
+- WorkspaceInvitationByTokenView · class · L447-L491 — class WorkspaceInvitationByTokenView(APIView)
+- get · method · L478-L491 — def get(self, request, token)

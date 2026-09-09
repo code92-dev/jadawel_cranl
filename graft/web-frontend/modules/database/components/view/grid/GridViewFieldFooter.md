@@ -1,0 +1,16 @@
+# web-frontend/modules/database/components/view/grid/GridViewFieldFooter.vue
+
+- data · method · L100-L102 — data()
+- userCanMakeAggregations · method · L104-L110 — userCanMakeAggregations()
+- aggregationType · method · L111-L113 — aggregationType()
+- aggregationRawType · method · L114-L116 — aggregationRawType()
+- value · method · L117-L129 — value()
+- loading · method · L130-L132 — loading()
+- viewAggregationType · method · L133-L138 — viewAggregationType()
+- viewAggregationTypes · method · L139-L145 — viewAggregationTypes()
+- fieldType · method · L146-L148 — fieldType()
+- fieldAggregationData · method · L149-L153 — fieldAggregationData()
+- fieldOptions · method · L154-L158 — fieldOptions()
+- rowCount · method · L159-L161 — rowCount()
+- aggregationRawType · method · L164-L177 — aggregationRawType(value)
+- selectAggregation · method · L193-L224 — async selectAggregation(newType)

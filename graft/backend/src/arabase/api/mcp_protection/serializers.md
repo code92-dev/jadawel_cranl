@@ -1,0 +1,26 @@
+# backend/src/arabase/api/mcp_protection/serializers.py
+
+- MCPProtectedFieldSerializer · class · L13-L60 — class MCPProtectedFieldSerializer(serializers.ModelSerializer)
+- Meta · class · L20-L30 — class Meta
+- _may_display · method · L32-L33 — def _may_display(self, instance) -> bool
+- get_name · method · L35-L36 — def get_name(self, instance) -> str | None
+- get_type · method · L38-L48 — def get_type(self, instance) -> str | None
+- get_table · method · L50-L54 — def get_table(self, instance) -> dict | None
+- get_database · method · L56-L60 — def get_database(self, instance) -> dict | None
+- MCPProtectionPolicySerializer · class · L63-L87 — class MCPProtectionPolicySerializer(serializers.ModelSerializer)
+- Meta · class · L70-L81 — class Meta
+- get_protected_field_count · method · L84-L87 — def get_protected_field_count(instance) -> int
+- MCPEndpointProtectionSummarySerializer · class · L90-L112 — class MCPEndpointProtectionSummarySerializer(serializers.ModelSerializer)
+- Meta · class · L102-L112 — class Meta
+- CreateProtectedMCPEndpointSerializer · class · L115-L126 — class CreateProtectedMCPEndpointSerializer(serializers.Serializer)
+- validate_protected_field_ids · method · L123-L126 — def validate_protected_field_ids(self, value)
+- UpdateMCPProtectionPolicySerializer · class · L129-L146 — class UpdateMCPProtectionPolicySerializer(serializers.Serializer)
+- validate_protected_field_ids · method · L138-L141 — def validate_protected_field_ids(self, value)
+- validate_confirm_remove_field_ids · method · L143-L146 — def validate_confirm_remove_field_ids(self, value)
+- ReactivateMCPProtectionPolicySerializer · class · L149-L150 — class ReactivateMCPProtectionPolicySerializer(serializers.Serializer)
+- ArtifactDraftRequestSerializer · class · L153-L207 — class ArtifactDraftRequestSerializer(serializers.Serializer)
+- validate_protected_field_ids · method · L176-L179 — def validate_protected_field_ids(self, value)
+- validate_pending_view_values · method · L181-L207 — def validate_pending_view_values(self, value)
+- ArtifactRevokeSerializer · class · L210-L217 — class ArtifactRevokeSerializer(serializers.Serializer)
+- CreatedProtectedMCPEndpointSerializer · class · L220-L226 — class CreatedProtectedMCPEndpointSerializer(MCPEndpointSerializer)
+- Meta · class · L225-L226 — class Meta(MCPEndpointSerializer.Meta)

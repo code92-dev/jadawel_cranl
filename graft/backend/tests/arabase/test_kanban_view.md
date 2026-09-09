@@ -1,0 +1,18 @@
+# backend/tests/arabase/test_kanban_view.py
+
+- kanban_setup · function · L26-L68 — def kanban_setup(data_fixture)
+- auth · function · L71-L72 — def auth(token)
+- create_kanban_view · function · L75-L81 — def create_kanban_view(api_client, setup, **extra)
+- kanban_url · function · L84-L88 — def kanban_url(view_id)
+- stack_url · function · L91-L95 — def stack_url(view_id, select_option_id)
+- test_kanban_view_type_is_registered · function · L99-L102 — def test_kanban_view_type_is_registered()
+- test_kanban_board_lists_stacks_with_counts · function · L106-L124 — def test_kanban_board_lists_stacks_with_counts(api_client, kanban_setup)
+- test_kanban_board_without_grouping_field_is_empty · function · L128-L135 — def test_kanban_board_without_grouping_field_is_empty(api_client, kanban_setup)
+- test_kanban_stack_rows · function · L139-L162 — def test_kanban_stack_rows(api_client, kanban_setup)
+- test_kanban_stack_rows_errors · function · L166-L181 — def test_kanban_stack_rows_errors(api_client, kanban_setup)
+- test_kanban_view_validates_field_references · function · L185-L191 — def test_kanban_view_validates_field_references(api_client, kanban_setup)
+- test_kanban_view_rejects_foreign_table_field · function · L195-L208 — def test_kanban_view_rejects_foreign_table_field(api_client, data_fixture)
+- test_kanban_field_delete_clears_grouping_reference · function · L212-L226 — def test_kanban_field_delete_clears_grouping_reference( api_client, data_fixture, kanban_setup )
+- test_kanban_grouping_field_can_be_set_via_view_endpoint · function · L230-L263 — def test_kanban_grouping_field_can_be_set_via_view_endpoint(api_client, kanban_setup)
+- test_kanban_view_supports_decorations · function · L267-L286 — def test_kanban_view_supports_decorations(api_client, data_fixture, kanban_setup)
+- test_kanban_view_is_read_only_for_viewers · function · L290-L320 — def test_kanban_view_is_read_only_for_viewers(api_client, data_fixture, kanban_setup)

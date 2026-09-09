@@ -1,0 +1,15 @@
+# backend/tests/jadawel/contrib/database/api/webhooks/test_webhook_views.py
+
+- avoid_external_dns_in_url_validation · function · L19-L25 — def avoid_external_dns_in_url_validation(monkeypatch)
+- test_list_webhooks · function · L29-L89 — def test_list_webhooks(api_client, data_fixture)
+- test_list_webhooks_truncated_calls · function · L93-L116 — def test_list_webhooks_truncated_calls(api_client, data_fixture)
+- test_list_webhooks_empty_request_and_response · function · L120-L139 — def test_list_webhooks_empty_request_and_response(api_client, data_fixture)
+- test_create_webhooks · function · L143-L288 — def test_create_webhooks(api_client, data_fixture)
+- test_create_webhook_with_event_config · function · L292-L335 — def test_create_webhook_with_event_config(api_client, data_fixture)
+- test_create_webhook_with_event_config_unrelated_fields · function · L339-L362 — def test_create_webhook_with_event_config_unrelated_fields(api_client, data_fixture)
+- test_get_webhook · function · L366-L404 — def test_get_webhook(api_client, data_fixture)
+- test_update_webhook · function · L408-L493 — def test_update_webhook(api_client, data_fixture)
+- test_update_webhook_with_event_config · function · L497-L571 — def test_update_webhook_with_event_config(api_client, data_fixture)
+- test_delete_webhook · function · L575-L603 — def test_delete_webhook(api_client, data_fixture)
+- test_trigger_test_call · function · L609-L669 — def test_trigger_test_call(api_client, data_fixture)
+- test_can_query_private_http_addresses_when_env_var_on · function · L677-L724 — def test_can_query_private_http_addresses_when_env_var_on(api_client, data_fixture)

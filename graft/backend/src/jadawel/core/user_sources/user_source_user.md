@@ -1,0 +1,28 @@
+# backend/src/jadawel/core/user_sources/user_source_user.py
+
+- UserSourceUser · class · L17-L155 — class UserSourceUser
+- __init__ · method · L29-L49 — def __init__( self, user_source, original_user, user_id, username, email, role="", is_staff=False, is_superuser=False, **kwargs, ) -> None
+- __str__ · method · L51-L52 — def __str__(self) -> str
+- pk · method · L54-L55 — def pk(self) -> Union[int, str]
+- user_source_id · method · L57-L58 — def user_source_id(self)
+- get_refresh_token · method · L60-L74 — def get_refresh_token(self)
+- update_refresh_token · method · L76-L90 — def update_refresh_token(self, refresh)
+- __eq__ · method · L92-L95 — def __eq__(self, other: object) -> bool
+- __ne__ · method · L97-L98 — def __ne__(self, other: object) -> bool
+- __hash__ · method · L100-L101 — def __hash__(self) -> int
+- save · method · L103-L104 — def save(self) -> None
+- delete · method · L106-L107 — def delete(self) -> None
+- set_password · method · L109-L110 — def set_password(self, raw_password: str) -> None
+- check_password · method · L112-L113 — def check_password(self, raw_password: str) -> None
+- groups · method · L116-L117 — def groups(self) -> auth_models.Group
+- user_permissions · method · L120-L121 — def user_permissions(self) -> auth_models.Permission
+- get_group_permissions · method · L123-L124 — def get_group_permissions(self, obj: Optional[object] = None) -> set
+- get_all_permissions · method · L126-L127 — def get_all_permissions(self, obj: Optional[object] = None) -> set
+- has_perm · method · L129-L130 — def has_perm(self, perm: str, obj: Optional[object] = None) -> bool
+- has_perms · method · L132-L133 — def has_perms(self, perm_list: List[str], obj: Optional[object] = None) -> bool
+- has_module_perms · method · L135-L136 — def has_module_perms(self, module: str) -> bool
+- is_anonymous · method · L139-L140 — def is_anonymous(self) -> bool
+- is_authenticated · method · L143-L144 — def is_authenticated(self) -> bool
+- get_username · method · L146-L147 — def get_username(self) -> str
+- get_role · method · L149-L150 — def get_role(self) -> str
+- __getattr__ · method · L152-L155 — def __getattr__(self, attr: str) -> Optional[Any]

@@ -1,0 +1,23 @@
+# backend/src/jadawel/core/user_sources/registries.py
+
+- UserSourceCount · class · L32-L34 — class UserSourceCount(NamedTuple)
+- UserSourceType · class · L37-L381 — class UserSourceType( ModelInstanceMixin[UserSource], EasyImportExportMixin[UserSourceSubClass], CustomFieldsInstanceMixin, Instance, ABC, )
+- enhance_queryset · method · L55-L61 — def enhance_queryset(self, queryset)
+- prepare_values · method · L63-L91 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: Optional[UserSourceSubClass] = None, ) -> Dict[str, Any]
+- after_create · method · L93-L113 — def after_create(self, user, user_source, values)
+- after_update · method · L115-L144 — def after_update( self, user: AbstractUser, user_source: UserSource, values: Dict[str, Any], trigger_user_count_update: bool = False, )
+- serialize_property · method · L146-L169 — def serialize_property( self, instance: UserSource, prop_name: str, files_zip=None, storage=None, cache=None, )
+- deserialize_property · method · L171-L197 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Dict[int, int]], files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- import_serialized · method · L199-L232 — def import_serialized( self, parent: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], files_zip=None, storage=None, cache=None, **kwargs, ) -> UserSourceSubClass
+- get_default_user_role · method · L234-L245 — def get_default_user_role(self, user_source: UserSource) -> str
+- gen_uid · method · L248-L253 — def gen_uid(self, user_source)
+- list_users · method · L256-L266 — def list_users( self, user_source: UserSource, count: int = 5, search: str = "" ) -> Iterable[UserSourceUser]
+- get_roles · method · L269-L275 — def get_roles(self, user_source: UserSource) -> List[str]
+- create_user · method · L278-L288 — def create_user( self, user_source: UserSource, email: str, name: str ) -> UserSourceUser
+- get_user · method · L291-L299 — def get_user(self, user_source: UserSource, **kwargs) -> UserSourceUser
+- get_or_create_user · method · L301-L311 — def get_or_create_user( self, user_source: UserSource, email: str, name: str ) -> Tuple[UserSourceUser, bool]
+- authenticate · method · L314-L320 — def authenticate(self, user_source: UserSource, **kwargs) -> UserSourceUser
+- after_user_source_update_requires_user_recount · method · L322-L344 — def after_user_source_update_requires_user_recount( self, user_source: UserSource, prepared_values: dict[str, Any], ) -> bool
+- update_user_count · method · L347-L362 — def update_user_count( self, user_sources: QuerySet[UserSource] = None, ) -> Optional[UserSourceCount]
+- get_user_count · method · L365-L381 — def get_user_count( self, user_source: UserSource, force_recount: bool = False, update_if_uncached: bool = True, ) -> UserSourceCount
+- UserSourceTypeRegistry · class · L387-L396 — class UserSourceTypeRegistry( ModelRegistryMixin[UserSourceSubClass, UserSourceTypeSubClass], Registry[UserSourceTypeSubClass], CustomFieldsRegistryMixin, )

@@ -1,0 +1,22 @@
+# backend/tests/jadawel/contrib/database/search/test_search_handler.py
+
+- test_escape_query · function · L25-L33 — def test_escape_query(): # Spacing is standardized.
+- test_get_default_search_mode_for_table_with_workspace_search_data · function · L37-L43 — def test_get_default_search_mode_for_table_with_workspace_search_data(data_fixture)
+- test_get_default_search_mode_for_table_with_tsvectors_for_templates · function · L47-L56 — def test_get_default_search_mode_for_table_with_tsvectors_for_templates()
+- test_escape_postgres_query_with_per_token_wildcard · function · L59-L64 — def test_escape_postgres_query_with_per_token_wildcard(): # Doesn't attempt to match the current search
+- test_escape_postgres_query_without_per_token_wildcard · function · L67-L72 — def test_escape_postgres_query_without_per_token_wildcard(): # Attempts to match the current search as closely as possible
+- test_get_fields_missing_search_index · function · L76-L94 — def test_get_fields_missing_search_index(data_fixture)
+- get_uninitialized_fields · function · L83-L84 — def get_uninitialized_fields()
+- test_create_workspace_search_table · function · L98-L107 — def test_create_workspace_search_table(data_fixture)
+- test_delete_workspace_search_table · function · L111-L123 — def test_delete_workspace_search_table(data_fixture)
+- test_delete_search_data · function · L127-L217 — def test_delete_search_data(data_fixture)
+- get_marked_for_deletion · function · L154-L157 — def get_marked_for_deletion()
+- test_initialize_missing_search_data · function · L221-L266 — def test_initialize_missing_search_data(data_fixture)
+- test_update_rows_create_update_entries_for_all_updated_fields · function · L270-L317 — def test_update_rows_create_update_entries_for_all_updated_fields(data_fixture)
+- test_update_rows_process_update_entries · function · L322-L376 — def test_update_rows_process_update_entries(mock, data_fixture)
+- test_update_search_data · function · L380-L523 — def test_update_search_data(data_fixture)
+- get_search_data · function · L410-L415 — def get_search_data()
+- get_marked_for_deletion · function · L471-L474 — def get_marked_for_deletion()
+- test_creating_a_snapshot_doesnt_schedule_search_updates · function · L527-L556 — def test_creating_a_snapshot_doesnt_schedule_search_updates(data_fixture)
+- test_not_schedule_task_if_workspace_is_none · function · L560-L571 — def test_not_schedule_task_if_workspace_is_none(data_fixture)
+- test_search_data_updates_dont_clear_concurrent_updates · function · L576-L611 — def test_search_data_updates_dont_clear_concurrent_updates(mock, data_fixture)

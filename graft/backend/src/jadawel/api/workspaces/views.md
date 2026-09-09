@@ -1,0 +1,27 @@
+# backend/src/jadawel/api/workspaces/views.py
+
+- ListExportWorkspaceApplicationsSerializer · class · L85-L86 — class ListExportWorkspaceApplicationsSerializer(serializers.Serializer)
+- WorkspacesView · class · L89-L146 — class WorkspacesView(APIView)
+- get · method · L105-L123 — def get(self, request)
+- post · method · L140-L146 — def post(self, request, data)
+- WorkspaceView · class · L149-L249 — class WorkspaceView(APIView)
+- patch · method · L192-L199 — def patch(self, request, data, workspace_id)
+- delete · method · L242-L249 — def delete(self, request, workspace_id: int)
+- WorkspaceLeaveView · class · L252-L299 — class WorkspaceLeaveView(APIView)
+- post · method · L291-L299 — def post(self, request, workspace_id)
+- WorkspaceOrderView · class · L302-L330 — class WorkspaceOrderView(APIView)
+- post · method · L324-L330 — def post(self, request, data)
+- WorkspacePermissionsView · class · L333-L374 — class WorkspacePermissionsView(APIView)
+- get · method · L365-L374 — def get(self, request, workspace_id)
+- CreateInitialWorkspaceView · class · L377-L398 — class CreateInitialWorkspaceView(APIView)
+- post · method · L394-L398 — def post(self, request)
+- ListExportWorkspaceApplicationsView · class · L401-L437 — class ListExportWorkspaceApplicationsView(APIView)
+- get · method · L429-L437 — def get(self, request, workspace_id)
+- AsyncExportWorkspaceApplicationsView · class · L440-L509 — class AsyncExportWorkspaceApplicationsView(APIView)
+- post · method · L493-L509 — def post(self, request, data: Dict, workspace_id: int) -> Response
+- ImportExportResourceUploadFileView · class · L512-L571 — class ImportExportResourceUploadFileView(APIView)
+- post · method · L558-L571 — def post(self, request, workspace_id: int) -> Response
+- ImportExportResourceView · class · L574-L608 — class ImportExportResourceView(APIView)
+- delete · method · L603-L608 — def delete(self, request, workspace_id, resource_id: str) -> Response
+- AsyncImportApplicationsView · class · L611-L670 — class AsyncImportApplicationsView(APIView)
+- post · method · L660-L670 — def post(self, request, data: Dict, workspace_id: int) -> Response

@@ -1,0 +1,23 @@
+# web-frontend/modules/database/databaseScratchTrackFieldsStepType.js
+
+- DatabaseScratchTrackFieldsOnboardingType · class · L22-L91 — class DatabaseScratchTrackFieldsOnboardingType extends Registerable
+- getType · method · L23-L25 — static getType()
+- getField · method · L27-L40 — getField(name, fieldType, fieldProps, rows)
+- getOwnFields · method · L42-L79 — getOwnFields()
+- getFields · method · L81-L83 — getFields()
+- afterFieldCreated · method · L85-L90 — afterFieldCreated(field, response)
+- DatabaseScratchTrackProjectFieldsOnboardingType · class · L93-L165 — class DatabaseScratchTrackProjectFieldsOnboardingType extends DatabaseScratchTrackFieldsOnboardingType
+- getType · method · L94-L96 — static getType()
+- getFields · method · L98-L164 — getFields()
+- DatabaseScratchTrackTeamFieldsOnboardingType · class · L167-L215 — class DatabaseScratchTrackTeamFieldsOnboardingType extends DatabaseScratchTrackFieldsOnboardingType
+- getType · method · L168-L170 — static getType()
+- getFields · method · L172-L214 — getFields()
+- DatabaseScratchTrackTaskFieldsOnboardingType · class · L217-L245 — class DatabaseScratchTrackTaskFieldsOnboardingType extends DatabaseScratchTrackFieldsOnboardingType
+- getType · method · L218-L220 — static getType()
+- getFields · method · L222-L244 — getFields()
+- DatabaseScratchTrackCampaignFieldsOnboardingType · class · L247-L282 — class DatabaseScratchTrackCampaignFieldsOnboardingType extends DatabaseScratchTrackFieldsOnboardingType
+- getType · method · L248-L250 — static getType()
+- getFields · method · L252-L281 — getFields()
+- DatabaseScratchTrackCustomFieldsOnboardingType · class · L284-L314 — class DatabaseScratchTrackCustomFieldsOnboardingType extends DatabaseScratchTrackFieldsOnboardingType
+- getType · method · L285-L287 — static getType()
+- getFields · method · L289-L313 — getFields()

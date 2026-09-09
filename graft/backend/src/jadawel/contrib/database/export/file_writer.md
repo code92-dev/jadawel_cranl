@@ -1,0 +1,24 @@
+# backend/src/jadawel/contrib/database/export/file_writer.py
+
+- FileWriter · class · L17-L65 — class FileWriter(abc.ABC)
+- __init__ · method · L25-L26 — def __init__(self, file)
+- write_bytes · method · L29-L34 — def write_bytes(self, value: bytes)
+- write · method · L37-L43 — def write(self, value: str, encoding="utf-8")
+- write_rows · method · L46-L62 — def write_rows( self, queryset: QuerySet, write_row: Callable[[Any, bool], None], progress_weight: int, )
+- get_csv_dict_writer · method · L64-L65 — def get_csv_dict_writer(self, headers, **kwargs)
+- PaginatedExportJobFileWriter · class · L68-L154 — class PaginatedExportJobFileWriter(FileWriter)
+- __init__ · method · L77-L80 — def __init__(self, file, job)
+- update_check · method · L82-L83 — def update_check(self)
+- write_bytes · method · L85-L86 — def write_bytes(self, value: bytes)
+- write · method · L88-L89 — def write(self, value: str, encoding="utf-8")
+- write_rows · method · L91-L121 — def write_rows(self, queryset, write_row, progress_weight=100)
+- _check_and_update_job · method · L123-L154 — def _check_and_update_job(self, current_row, total_rows, progress_weight=100)
+- QuerysetSerializer · class · L157-L267 — class QuerysetSerializer(abc.ABC)
+- __init__ · method · L165-L171 — def __init__(self, queryset, ordered_field_objects)
+- write_to_file · method · L174-L180 — def write_to_file(self, file_writer: FileWriter, **kwargs)
+- for_table · method · L183-L193 — def for_table(cls, table) -> "QuerysetSerializer"
+- for_view · method · L196-L226 — def for_view(cls, view, visible_field_ids_in_order=None) -> "QuerysetSerializer"
+- add_ad_hoc_filters_dict_to_queryset · method · L228-L231 — def add_ad_hoc_filters_dict_to_queryset(self, filters_dict, only_by_field_ids=None)
+- add_add_hoc_order_by_to_queryset · method · L233-L236 — def add_add_hoc_order_by_to_queryset(self, order_by, only_by_field_ids=None)
+- _get_field_serializer · method · L238-L267 — def _get_field_serializer(self, field_object: FieldObject) -> Callable[[Any], Any]
+- serializer_func · function · L251-L265 — def serializer_func(row)

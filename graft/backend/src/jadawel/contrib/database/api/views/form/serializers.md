@@ -1,0 +1,22 @@
+# backend/src/jadawel/contrib/database/api/views/form/serializers.py
+
+- FormViewFieldOptionsConditionGroupSerializer · class · L18-L26 — class FormViewFieldOptionsConditionGroupSerializer(serializers.ModelSerializer)
+- Meta · class · L23-L26 — class Meta
+- FormViewFieldOptionsConditionSerializer · class · L29-L36 — class FormViewFieldOptionsConditionSerializer(serializers.ModelSerializer)
+- Meta · class · L33-L36 — class Meta
+- FormViewFieldOptionsSerializer · class · L39-L84 — class FormViewFieldOptionsSerializer(serializers.ModelSerializer)
+- Meta · class · L54-L69 — class Meta
+- validate · method · L71-L84 — def validate(self, data)
+- PublicFormViewFieldSerializer · class · L87-L94 — class PublicFormViewFieldSerializer(FieldSerializer)
+- Meta · class · L88-L94 — class Meta
+- PublicFormViewFieldOptionsSerializer · class · L97-L146 — class PublicFormViewFieldOptionsSerializer(FieldSerializer)
+- Meta · class · L112-L126 — class Meta
+- get_field · method · L130-L142 — def get_field(self, instance): # If not all the select options must be included, then we'll override the # `select_options` of the field with the `allowed_select_options` so that the # original select options are not exposed publicly to visitors of the form that # don't have full access to the Jadawel table.
+- get_name · method · L145-L146 — def get_name(self, instance)
+- PublicFormViewSerializer · class · L149-L173 — class PublicFormViewSerializer(serializers.ModelSerializer)
+- Meta · class · L161-L173 — class Meta
+- FormViewSubmittedSerializer · class · L176-L186 — class FormViewSubmittedSerializer(serializers.ModelSerializer)
+- Meta · class · L179-L186 — class Meta
+- FormViewNotifyOnSubmitSerializerMixin · class · L189-L215 — class FormViewNotifyOnSubmitSerializerMixin(serializers.Serializer)
+- get_receive_notification_on_submit · method · L196-L201 — def get_receive_notification_on_submit(self, obj)
+- to_internal_value · method · L203-L215 — def to_internal_value(self, data)

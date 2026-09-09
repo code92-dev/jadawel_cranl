@@ -1,0 +1,20 @@
+# backend/src/jadawel/core/formula/parser/generated/JadawelFormulaVisitor.py
+
+- JadawelFormulaVisitor · class · L10-L94 — class JadawelFormulaVisitor(ParseTreeVisitor): # Visit a parse tree produced by JadawelFormula#root.
+- visitRoot · method · L13-L14 — def visitRoot(self, ctx:JadawelFormula.RootContext)
+- visitFieldReference · method · L18-L19 — def visitFieldReference(self, ctx:JadawelFormula.FieldReferenceContext)
+- visitStringLiteral · method · L23-L24 — def visitStringLiteral(self, ctx:JadawelFormula.StringLiteralContext)
+- visitBrackets · method · L28-L29 — def visitBrackets(self, ctx:JadawelFormula.BracketsContext)
+- visitBooleanLiteral · method · L33-L34 — def visitBooleanLiteral(self, ctx:JadawelFormula.BooleanLiteralContext)
+- visitRightWhitespaceOrComments · method · L38-L39 — def visitRightWhitespaceOrComments(self, ctx:JadawelFormula.RightWhitespaceOrCommentsContext)
+- visitDecimalLiteral · method · L43-L44 — def visitDecimalLiteral(self, ctx:JadawelFormula.DecimalLiteralContext)
+- visitLeftWhitespaceOrComments · method · L48-L49 — def visitLeftWhitespaceOrComments(self, ctx:JadawelFormula.LeftWhitespaceOrCommentsContext)
+- visitFunctionCall · method · L53-L54 — def visitFunctionCall(self, ctx:JadawelFormula.FunctionCallContext)
+- visitFieldByIdReference · method · L58-L59 — def visitFieldByIdReference(self, ctx:JadawelFormula.FieldByIdReferenceContext)
+- visitLookupFieldReference · method · L63-L64 — def visitLookupFieldReference(self, ctx:JadawelFormula.LookupFieldReferenceContext)
+- visitIntegerLiteral · method · L68-L69 — def visitIntegerLiteral(self, ctx:JadawelFormula.IntegerLiteralContext)
+- visitBinaryOp · method · L73-L74 — def visitBinaryOp(self, ctx:JadawelFormula.BinaryOpContext)
+- visitWs_or_comment · method · L78-L79 — def visitWs_or_comment(self, ctx:JadawelFormula.Ws_or_commentContext)
+- visitFunc_name · method · L83-L84 — def visitFunc_name(self, ctx:JadawelFormula.Func_nameContext)
+- visitField_reference · method · L88-L89 — def visitField_reference(self, ctx:JadawelFormula.Field_referenceContext)
+- visitIdentifier · method · L93-L94 — def visitIdentifier(self, ctx:JadawelFormula.IdentifierContext)

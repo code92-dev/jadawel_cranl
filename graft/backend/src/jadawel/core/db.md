@@ -1,0 +1,37 @@
+# backend/src/jadawel/core/db.py
+
+- get_approximate_row_count · function · L49-L67 — def get_approximate_row_count(queryset: QuerySet) -> int
+- get_database_dsn · function · L70-L78 — def get_database_dsn() -> str
+- LockedAtomicTransaction · class · L81-L112 — class LockedAtomicTransaction(Atomic)
+- __init__ · method · L89-L94 — def __init__(self, model, using=None, savepoint=True, durable=False)
+- __enter__ · method · L96-L109 — def __enter__(self)
+- __exit__ · method · L111-L112 — def __exit__(self, *args, **kwargs)
+- specific_iterator · function · L118-L261 — def specific_iterator( queryset_or_list: QuerySet[T] | Iterable[T], per_content_type_queryset_hook: Callable[[T, QuerySet[T]], QuerySet[T]] | None = None, base_model: T | None = None, select_related: List[str] = None, skip_missing_specific_objects: bool = False, ) -> List[T]
+- specific_queryset · function · L264-L313 — def specific_queryset( queryset: QuerySet[T], per_content_type_queryset_hook: Callable[[T, QuerySet[T]], QuerySet[T]] | None = None, ) -> QuerySet[T]
+- SpecificIterable · class · L290-L309 — class SpecificIterable(clone._iterable_class)
+- __iter__ · method · L291-L309 — def __iter__(self)
+- IsolationLevel · class · L316-L319 — class IsolationLevel
+- transaction_atomic · function · L323-L342 — def transaction_atomic( using=None, savepoint=True, durable=False, isolation_level: Optional[str] = None, first_sql_to_run_in_transaction_with_args: Optional[ Tuple[sql.SQL, List[Any]] ] = None, )
+- get_unique_orders_before_item · function · L345-L380 — def get_unique_orders_before_item( before: Model, queryset: QuerySet, amount: int = 1, field: str = "order", ) -> List[Decimal]
+- get_highest_order_of_queryset · function · L383-L399 — def get_highest_order_of_queryset( queryset: QuerySet, amount: int = 1, field: str = "order", ) -> List[Decimal]
+- recalculate_full_orders · function · L402-L466 — def recalculate_full_orders( model: Optional[Model] = None, field="order", queryset: Optional[QuerySet] = None, )
+- get_collation_name · function · L470-L491 — def get_collation_name() -> Optional[str]
+- collate_expression · function · L494-L502 — def collate_expression(expression)
+- MultiFieldPrefetchQuerysetMixin · class · L505-L554 — class MultiFieldPrefetchQuerysetMixin(Generic[ModelInstance])
+- __init__ · method · L518-L521 — def __init__(self, *args, **kwargs)
+- _fetch_all · method · L523-L532 — def _fetch_all(self)
+- _clone · method · L534-L539 — def _clone(self, *args, **kwargs)
+- multi_field_prefetch · method · L541-L546 — def multi_field_prefetch( self, custom_prefetch_function: Callable[[QuerySet, List[ModelInstance]], None] )
+- clear_multi_field_prefetch · method · L548-L551 — def clear_multi_field_prefetch(self)
+- get_multi_field_prefetches · method · L553-L554 — def get_multi_field_prefetches(self)
+- CombinedForeignKeyAndManyToManyMultipleFieldPrefetch · class · L557-L855 — class CombinedForeignKeyAndManyToManyMultipleFieldPrefetch
+- __init__ · method · L581-L600 — def __init__( self, target_model: Model, field_names: Optional[Set] = None, skip_target_check: Optional[bool] = False, )
+- add_field_names · method · L602-L613 — def add_field_names(self, field_names: List[str])
+- __call__ · method · L615-L639 — def __call__(self, queryset: QuerySet, result_set: List[ModelInstance])
+- set_prefetched_values_on_result_set · method · L641-L696 — def set_prefetched_values_on_result_set( self, queryset, row_id_to_field_name_to_target_ids: Dict[int, Dict[str, List]], result_set: List[ModelInstance], target_instances: Dict[int, ModelInstance], ) -> List[ModelInstance]
+- fetch_target_instances · method · L698-L722 — def fetch_target_instances( self, row_id_to_field_name_to_target_ids: Dict[int, Dict[str, List]] ) -> Dict[int, ModelInstance]
+- collect_foreign_key_target_ids · method · L724-L770 — def collect_foreign_key_target_ids( self, queryset: QuerySet, result_set: List[ModelInstance], row_id_to_field_name_to_target_ids: Dict[int, Dict[str, List]], )
+- collect_many_to_many_key_target_ids · method · L772-L855 — def collect_many_to_many_key_target_ids( self, queryset: QuerySet, result_set, row_id_to_field_name_to_target_ids )
+- atomic_with_retry_on_deadlock · function · L858-L907 — def atomic_with_retry_on_deadlock( max_retries: Optional[int] = None, initial_backoff: Optional[float] = None, jitter: Optional[float] = 1.0, )
+- decorator · function · L881-L905 — def decorator(func: Callable) -> Callable
+- wrapper · function · L883-L903 — def wrapper(*args, **kwargs) -> Any

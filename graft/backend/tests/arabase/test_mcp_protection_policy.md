@@ -1,0 +1,18 @@
+# backend/tests/arabase/test_mcp_protection_policy.py
+
+- test_new_endpoint_gets_one_explicit_empty_policy · function · L24-L34 — def test_new_endpoint_gets_one_explicit_empty_policy(data_fixture)
+- test_legacy_endpoint_creation_rolls_back_when_policy_creation_fails · function · L38-L54 — def test_legacy_endpoint_creation_rolls_back_when_policy_creation_fails( data_fixture, monkeypatch )
+- fail_policy_creation · function · L44-L45 — def fail_policy_creation(**kwargs)
+- test_missing_policy_fails_mcp_closed · function · L58-L65 — def test_missing_policy_fails_mcp_closed(data_fixture)
+- test_cross_workspace_field_relation_fails_mcp_closed · function · L69-L86 — def test_cross_workspace_field_relation_fails_mcp_closed(data_fixture)
+- test_policy_constraints_reject_duplicate_field_relations · function · L90-L102 — def test_policy_constraints_reject_duplicate_field_relations(data_fixture)
+- test_policy_constraints_reject_inconsistent_status_and_reason · function · L106-L112 — def test_policy_constraints_reject_inconsistent_status_and_reason(data_fixture)
+- test_policy_readiness_is_content_blind_and_fails_on_missing_policy · function · L116-L124 — def test_policy_readiness_is_content_blind_and_fails_on_missing_policy(data_fixture)
+- test_owner_reads_safe_policy_metadata · function · L128-L172 — def test_owner_reads_safe_policy_metadata(api_client, data_fixture)
+- test_policy_metadata_hides_type_when_field_adapter_is_unavailable · function · L176-L205 — def test_policy_metadata_hides_type_when_field_adapter_is_unavailable( api_client, data_fixture, monkeypatch )
+- unavailable_adapter · function · L190-L191 — def unavailable_adapter(_field)
+- test_policy_metadata_count_excludes_suspended_fields · function · L209-L232 — def test_policy_metadata_count_excludes_suspended_fields(api_client, data_fixture)
+- test_policy_read_hides_display_metadata_without_current_field_permission · function · L236-L264 — def test_policy_read_hides_display_metadata_without_current_field_permission( api_client, data_fixture, monkeypatch )
+- test_policy_read_is_owner_only · function · L268-L282 — def test_policy_read_is_owner_only(api_client, data_fixture)
+- test_endpoint_summaries_include_safe_policy_status · function · L286-L306 — def test_endpoint_summaries_include_safe_policy_status(api_client, data_fixture)
+- test_workspace_admin_summaries_include_blocked_endpoint_without_secrets · function · L310-L347 — def test_workspace_admin_summaries_include_blocked_endpoint_without_secrets( api_client, data_fixture )

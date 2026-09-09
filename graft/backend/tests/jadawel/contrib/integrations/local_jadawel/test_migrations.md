@@ -1,0 +1,7 @@
+# backend/tests/jadawel/contrib/integrations/local_jadawel/test_migrations.py
+
+- _generate_filter_for_every_compatible_field_type · function · L17-L30 — def _generate_filter_for_every_compatible_field_type(filter_model, **filter_kwargs)
+- test_0003_migrate_local_jadawel_table_service_filter_values_to_formulas_reduce_to_filter_types_to_migrate · function · L34-L44 — def test_0003_migrate_local_jadawel_table_service_filter_values_to_formulas_reduce_to_filter_types_to_migrate(): # noqa: E501
+- test_0003_migrate_local_jadawel_table_service_filter_values_to_formulas_forwards · function · L48-L140 — def test_0003_migrate_local_jadawel_table_service_filter_values_to_formulas_forwards( migrator, teardown_table_metadata )
+- test_0004_migrate_local_jadawel_getrow_list_rows_search_query_to_formulas_forwards · function · L144-L208 — def test_0004_migrate_local_jadawel_getrow_list_rows_search_query_to_formulas_forwards( migrator, teardown_table_metadata )
+- test_0006_migrate_local_jadawel_table_service_filter_formulas_to_value_is_formula_forwards · function · L212-L304 — def test_0006_migrate_local_jadawel_table_service_filter_formulas_to_value_is_formula_forwards( # noqa: E501 migrator, teardown_table_metadata )

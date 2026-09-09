@@ -1,0 +1,23 @@
+# backend/src/jadawel/api/decorators.py
+
+- map_exceptions · function · L33-L121 — def map_exceptions(exceptions: ExceptionMappingType = None)
+- map_exceptions_decorator · function · L114-L119 — def map_exceptions_decorator(func)
+- func_wrapper · function · L115-L117 — def func_wrapper(*args, **kwargs)
+- validate_query_parameters · function · L124-L186 — def validate_query_parameters( serializer: serializers.Serializer, return_validated=False )
+- validate_decorator · function · L165-L184 — def validate_decorator(func)
+- func_wrapper · function · L166-L182 — def func_wrapper(*args, **kwargs)
+- validate_body · function · L189-L246 — def validate_body( serializer_class, partial: bool = False, return_validated: bool = False, )
+- validate_decorator · function · L229-L244 — def validate_decorator(func)
+- func_wrapper · function · L230-L242 — def func_wrapper(*args, **kwargs)
+- validate_body_custom_fields · function · L249-L317 — def validate_body_custom_fields( registry, base_serializer_class=None, serializer_class_context: Optional[Dict[str, Any]] = None, type_attribute_name="type", partial=False, allow_empty_type=False, return_validated=False, )
+- validate_decorator · function · L283-L315 — def validate_decorator(func)
+- func_wrapper · function · L284-L313 — def func_wrapper(*args, **kwargs)
+- allowed_includes · function · L320-L360 — def allowed_includes(*allowed)
+- validate_decorator · function · L347-L358 — def validate_decorator(func)
+- func_wrapper · function · L348-L356 — def func_wrapper(*args, **kwargs)
+- accept_timezone · function · L363-L404 — def accept_timezone()
+- validate_decorator · function · L378-L402 — def validate_decorator(func)
+- func_wrapper · function · L379-L400 — def func_wrapper(*args, **kwargs)
+- require_request_data_type · function · L407-L451 — def require_request_data_type(*rtypes: Type) -> Callable
+- wrapper · function · L430-L449 — def wrapper(f)
+- _wrap · function · L432-L447 — def _wrap(_self, request, *args, **kwargs)

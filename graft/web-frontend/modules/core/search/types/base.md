@@ -1,0 +1,22 @@
+# web-frontend/modules/core/search/types/base.js
+
+- BaseSearchType · class · L1-L112 — class BaseSearchType
+- constructor · method · L2-L8 — constructor(context = {})
+- buildUrl · method · L17-L19 — buildUrl(result, context = null)
+- getIcon · method · L21-L23 — getIcon()
+- getName · method · L25-L27 — getName()
+- getType · method · L29-L31 — getType()
+- getPriority · method · L33-L35 — getPriority()
+- formatResultDisplay · method · L44-L50 — formatResultDisplay(result, context = null)
+- isNavigable · method · L59-L61 — isNavigable(result, context = null)
+- _getApplicationId · method · L69-L72 — _getApplicationId(result)
+- focusInSidebar · method · L80-L97 — focusInSidebar(result, context = null)
+- getEmptyLabel · method · L106-L111 — getEmptyLabel(result, context = null)
+- ApplicationSearchType · class · L114-L164 — class ApplicationSearchType extends BaseSearchType
+- constructor · method · L115-L117 — constructor(context = {})
+- _getApplicationChildren · method · L119-L121 — _getApplicationChildren(application)
+- _getApplicationPath · method · L123-L125 — _getApplicationPath(application, children)
+- _getApplicationId · method · L127-L129 — _getApplicationId(result)
+- _getApplicationWithChildren · method · L131-L146 — _getApplicationWithChildren(result, context)
+- buildUrl · method · L148-L159 — buildUrl(result, context = null)
+- isNavigable · method · L161-L163 — isNavigable(result, context = null)

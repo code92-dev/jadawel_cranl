@@ -1,0 +1,17 @@
+# web-frontend/modules/core/components/nodeExplorer/NodeExplorerContent.vue
+
+- data · method · L130-L132 — data()
+- hasChildren · method · L134-L137 — hasChildren()
+- sortedNodes · method · L138-L144 — sortedNodes()
+- isOpen · method · L145-L155 — isOpen()
+- isSelected · method · L156-L158 — isSelected()
+- shouldShow · method · L159-L162 — shouldShow()
+- nextCount · method · L163-L165 — nextCount()
+- nextIncrement · method · L166-L168 — nextIncrement()
+- arrayNodes · method · L169-L187 — arrayNodes()
+- allowArraySelection · method · L190-L195 — allowArraySelection(node)
+- handleClick · method · L196-L208 — handleClick(node, isNode)
+- getIcon · method · L209-L216 — getIcon(node)
+- onNodeHover · method · L217-L239 — onNodeHover($event, node)
+- onNodeLeave · method · L240-L247 — onNodeLeave()
+- hideTooltip · method · L248-L252 — hideTooltip()

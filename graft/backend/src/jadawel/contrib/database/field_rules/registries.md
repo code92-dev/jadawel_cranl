@@ -1,0 +1,24 @@
+# backend/src/jadawel/contrib/database/field_rules/registries.py
+
+- RowRuleChanges · class · L22-L25 — class RowRuleChanges(NamedTuple)
+- RowRuleValidity · class · L28-L31 — class RowRuleValidity(NamedTuple)
+- FieldRuleValidity · class · L34-L38 — class FieldRuleValidity(NamedTuple)
+- FieldRuleType · class · L41-L210 — class FieldRuleType(ModelInstanceMixin, CustomFieldsInstanceMixin, Instance, ABC)
+- enhance_table_queryset · method · L75-L80 — def enhance_table_queryset(self, queryset) -> QuerySet[Table]
+- enhance_queryset · method · L82-L87 — def enhance_queryset(self, queryset, rule: FieldRule) -> QuerySet[FieldRule]
+- before_row_updated · method · L89-L99 — def before_row_updated( self, row: GeneratedTableModel, rule: FieldRule, updated_values: dict, collector: FieldRuleCollector, ) -> list[RowRuleChanges] | None
+- before_row_created · method · L101-L110 — def before_row_created( self, model: type[GeneratedTableModel], row_data: dict, rule: FieldRule, collector: FieldRuleCollector, ) -> list[RowRuleChanges] | None
+- validate_row · method · L113-L122 — def validate_row( self, row: GeneratedTableModel, rule: FieldRule ) -> RowRuleValidity
+- after_rule_created · method · L124-L127 — def after_rule_created(self, rule)
+- after_rule_updated · method · L129-L132 — def after_rule_updated(self, rule)
+- after_rule_deleted · method · L134-L137 — def after_rule_deleted(self, rule)
+- validate_rows · method · L140-L147 — def validate_rows( self, table: Table, rule: FieldRule, queryset: QuerySet | None = None )
+- prepare_values_for_import · method · L149-L155 — def prepare_values_for_import(self, rule_data: dict, id_mapping: dict) -> dict
+- can_create_rule · method · L157-L165 — def can_create_rule(self, table: Table) -> None
+- prepare_values_for_create · method · L167-L173 — def prepare_values_for_create(self, table, in_data: dict) -> dict
+- prepare_values_for_update · method · L175-L181 — def prepare_values_for_update(self, rule: FieldRule, in_data: dict) -> dict
+- before_rule_created · method · L183-L189 — def before_rule_created(self, table: Table, in_data: dict)
+- before_rule_deleted · method · L191-L194 — def before_rule_deleted(self, rule)
+- validate_rule · method · L197-L203 — def validate_rule(self, rule: FieldRule) -> FieldRuleValidity
+- prepare_values_for_export · method · L205-L210 — def prepare_values_for_export(self, rule_data: dict) -> dict
+- FieldRulesTypeRegistry · class · L213-L216 — class FieldRulesTypeRegistry( ModelRegistryMixin, CustomFieldsRegistryMixin, Registry[FieldRuleType] )

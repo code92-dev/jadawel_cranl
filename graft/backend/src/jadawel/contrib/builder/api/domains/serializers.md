@@ -1,0 +1,33 @@
+# backend/src/jadawel/contrib/builder/api/domains/serializers.py
+
+- DomainSerializer · class · L35-L49 — class DomainSerializer(serializers.ModelSerializer)
+- get_type · method · L39-L40 — def get_type(self, instance)
+- Meta · class · L42-L49 — class Meta
+- CreateDomainSerializer · class · L52-L64 — class CreateDomainSerializer(serializers.ModelSerializer)
+- Meta · class · L59-L64 — class Meta
+- UpdateDomainSerializer · class · L67-L83 — class UpdateDomainSerializer(serializers.ModelSerializer)
+- Meta · class · L78-L83 — class Meta
+- OrderDomainsSerializer · class · L86-L90 — class OrderDomainsSerializer(serializers.Serializer)
+- PublicElementSerializer · class · L93-L159 — class PublicElementSerializer(serializers.ModelSerializer)
+- get_type · method · L101-L102 — def get_type(self, instance)
+- Meta · class · L114-L159 — class Meta
+- PublicPageSerializer · class · L162-L187 — class PublicPageSerializer(serializers.ModelSerializer)
+- Meta · class · L170-L187 — class Meta
+- PublicPolymorphicAppAuthProviderSerializer · class · L190-L197 — class PublicPolymorphicAppAuthProviderSerializer(PolymorphicSerializer)
+- BasePublicUserSourceSerializer · class · L200-L234 — class BasePublicUserSourceSerializer(serializers.ModelSerializer)
+- get_type · method · L208-L209 — def get_type(self, instance)
+- Meta · class · L217-L234 — class Meta
+- PolymorphicPublicUserSourceSerializer · class · L237-L244 — class PolymorphicPublicUserSourceSerializer(PolymorphicSerializer)
+- PublicBuilderSerializer · class · L247-L288 — class PublicBuilderSerializer(BuilderSerializer)
+- Meta · class · L258-L259 — class Meta
+- get_pages · method · L262-L272 — def get_pages(self, instance: Builder) -> List
+- get_user_sources · method · L275-L285 — def get_user_sources(self, instance: Builder) -> List
+- get_workspace · method · L287-L288 — def get_workspace(self, obj)
+- PublicDataSourceSerializer · class · L291-L358 — class PublicDataSourceSerializer(PublicServiceSerializer)
+- get_type · method · L313-L317 — def get_type(self, instance)
+- get_id · method · L320-L321 — def get_id(self, instance)
+- get_name · method · L324-L325 — def get_name(self, instance)
+- get_page_id · method · L328-L329 — def get_page_id(self, instance)
+- get_order · method · L332-L333 — def get_order(self, instance)
+- get_context_data · method · L336-L343 — def get_context_data(self, instance)
+- Meta · class · L345-L358 — class Meta(PublicServiceSerializer.Meta)

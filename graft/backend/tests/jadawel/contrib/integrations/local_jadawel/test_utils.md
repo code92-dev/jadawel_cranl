@@ -1,0 +1,15 @@
+# backend/tests/jadawel/contrib/integrations/local_jadawel/test_utils.py
+
+- test_guess_type_for_response_serialize_field_permutations · function · L47-L116 — def test_guess_type_for_response_serialize_field_permutations()
+- FakeSerializer · class · L67-L79 — class FakeSerializer(Serializer)
+- get_answer · method · L74-L75 — def get_answer(self, instance)
+- get_url · method · L78-L79 — def get_url(self, instance)
+- test_guess_cast_function_from_response_serialize_field · function · L137-L140 — def test_guess_cast_function_from_response_serialize_field(serializer, expected)
+- test_guess_cast_function_for_filefieldserializer · function · L144-L171 — def test_guess_cast_function_for_filefieldserializer(data_fixture, fake)
+- test_prepare_file_for_db · function · L186-L189 — def test_prepare_file_for_db(data_fixture, value, result)
+- test_prepare_file_for_db_with_file · function · L193-L254 — def test_prepare_file_for_db_with_file(data_fixture, fake)
+- test_prepare_file_for_db_with_url · function · L259-L307 — def test_prepare_file_for_db_with_url(data_fixture, fake)
+- test_prepare_file_for_db_with_unreachable_url · function · L312-L325 — def test_prepare_file_for_db_with_unreachable_url(data_fixture)
+- test_prepare_file_for_db_with_toolarge_url · function · L330-L343 — def test_prepare_file_for_db_with_toolarge_url(data_fixture, fake)
+- test_prepare_file_for_db_with_existing_file · function · L347-L390 — def test_prepare_file_for_db_with_existing_file(data_fixture)
+- test_prepare_file_for_db_with_mix · function · L395-L458 — def test_prepare_file_for_db_with_mix(data_fixture, fake)

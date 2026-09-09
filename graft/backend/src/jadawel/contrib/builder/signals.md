@@ -1,0 +1,17 @@
+# backend/src/jadawel/contrib/builder/signals.py
+
+- element_created · function · L30-L31 — def element_created(sender, element, user, before_id=None, **kwargs)
+- elements_created · function · L35-L36 — def elements_created(sender, elements, page, user, **kwargs)
+- element_updated · function · L40-L41 — def element_updated(sender, element, user, **kwargs)
+- element_deleted · function · L45-L46 — def element_deleted(sender, page, element_id, user, **kwargs)
+- wa_created · function · L53-L56 — def wa_created(sender, workflow_action, user, before_id=None, **kwargs)
+- wa_updated · function · L60-L63 — def wa_updated(sender, workflow_action, user, **kwargs)
+- wa_deleted · function · L67-L68 — def wa_deleted(sender, workflow_action_id, page, user, **kwargs)
+- ds_created · function · L75-L78 — def ds_created(sender, data_source, user, before_id=None, **kwargs)
+- ds_updated · function · L82-L85 — def ds_updated(sender, data_source, user, **kwargs)
+- ds_deleted · function · L89-L90 — def ds_deleted(sender, data_source_id, page, user, **kwargs)
+- page_deleted · function · L97-L98 — def page_deleted(sender, builder, page_id, user, **kwargs)
+- page_updated · function · L102-L103 — def page_updated(sender, page, user, **kwargs)
+- us_created · function · L110-L114 — def us_created(sender, user_source, user, before_id=None, **kwargs)
+- us_updated · function · L118-L122 — def us_updated(sender, user_source, user, **kwargs)
+- us_deleted · function · L126-L130 — def us_deleted(sender, user_source_id, application, user, **kwargs)

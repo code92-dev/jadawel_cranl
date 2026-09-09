@@ -1,0 +1,24 @@
+# backend/tests/jadawel/core/jobs/test_jobs_handler.py
+
+- test_create_and_start_job · function · L22-L35 — def test_create_and_start_job(mock_run_async_job, data_fixture)
+- test_create_and_start_job_with_system_exit · function · L40-L55 — def test_create_and_start_job_with_system_exit(mock_run_async_job, data_fixture)
+- test_exceeding_max_job_count · function · L59-L70 — def test_exceeding_max_job_count(data_fixture)
+- test_get_job · function · L74-L85 — def test_get_job(data_fixture)
+- test_job_progress_changed_bug_regression · function · L89-L120 — def test_job_progress_changed_bug_regression(data_fixture, mutable_job_type_registry)
+- IdlingJobType · class · L94-L102 — class IdlingJobType(JobType)
+- run · method · L98-L102 — def run(self, job, progress)
+- test_job_cancel_before_run · function · L125-L170 — def test_job_cancel_before_run(data_fixture, test_thread, mutable_job_type_registry): # marker that the job started
+- IdlingJobType · class · L135-L144 — class IdlingJobType(JobType)
+- run · method · L140-L144 — def run(self, job, progress)
+- test_job_cancel_when_running · function · L175-L229 — def test_job_cancel_when_running(data_fixture, test_thread, mutable_job_type_registry): # marker that the job started
+- IdlingJobType · class · L185-L196 — class IdlingJobType(JobType)
+- run · method · L190-L196 — def run(self, job, progress)
+- test_job_cancel_failed · function · L234-L271 — def test_job_cancel_failed(data_fixture, test_thread, mutable_job_type_registry): # marker that the job started
+- IdlingJobType · class · L238-L245 — class IdlingJobType(JobType)
+- run · method · L243-L245 — def run(self, job, progress)
+- test_job_cancel_finished · function · L276-L314 — def test_job_cancel_finished(data_fixture, test_thread, mutable_job_type_registry)
+- IdlingJobType · class · L281-L289 — class IdlingJobType(JobType)
+- run · method · L286-L289 — def run(self, job, progress)
+- test_job_cancel_cancelled · function · L319-L362 — def test_job_cancel_cancelled(data_fixture, test_thread, mutable_job_type_registry)
+- IdlingJobType · class · L324-L335 — class IdlingJobType(JobType)
+- run · method · L329-L335 — def run(self, job, progress)

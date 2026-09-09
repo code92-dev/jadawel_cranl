@@ -1,0 +1,33 @@
+# backend/src/jadawel/contrib/builder/data_providers/data_provider_types.py
+
+- BuilderDataProviderType · class · L42-L50 — class BuilderDataProviderType(DataProviderType)
+- get_request_serializer · method · L43-L50 — def get_request_serializer(self)
+- PageParameterDataProviderType · class · L53-L76 — class PageParameterDataProviderType(BuilderDataProviderType)
+- get_data_chunk · method · L61-L76 — def get_data_chunk( self, dispatch_context: BuilderDispatchContext, path: List[str] ) -> Union[int, str]
+- FormDataProviderType · class · L79-L138 — class FormDataProviderType(BuilderDataProviderType)
+- validate_data_chunk · method · L82-L103 — def validate_data_chunk( self, element_id: str, data_chunk: Any, dispatch_context: DispatchContext )
+- get_data_chunk · method · L105-L120 — def get_data_chunk(self, dispatch_context: DispatchContext, path: List[str]): # The path can come in two lengths: # - 1: The field id alone, if it's single-valued. # - 2a: The field id and '*', if it's multivalued. # - 2b: The field id and an index, if it's multivalued, # but we're picking a single item. # Any other length is not supported and results in a None return.
+- import_path · method · L122-L138 — def import_path(self, path, id_mapping, **kwargs)
+- DataSourceDataProviderType · class · L141-L257 — class DataSourceDataProviderType(BuilderDataProviderType)
+- get_request_serializer · method · L148-L158 — def get_request_serializer(self)
+- get_data_chunk · method · L160-L191 — def get_data_chunk(self, dispatch_context: BuilderDispatchContext, path: List[str])
+- import_path · method · L193-L217 — def import_path(self, path, id_mapping, **kwargs)
+- extract_properties · method · L219-L257 — def extract_properties(self, path: List[str], **kwargs) -> Dict[str, List[str]]
+- DataSourceContextDataProviderType · class · L260-L340 — class DataSourceContextDataProviderType(BuilderDataProviderType)
+- get_data_chunk · method · L267-L283 — def get_data_chunk(self, dispatch_context: BuilderDispatchContext, path: List[str])
+- import_path · method · L285-L305 — def import_path(self, path: List[str], id_mapping: Dict, **kwargs)
+- extract_properties · method · L307-L340 — def extract_properties(self, path: List[str], **kwargs) -> Dict[str, List[str]]
+- CurrentRecordDataProviderType · class · L343-L461 — class CurrentRecordDataProviderType(BuilderDataProviderType)
+- get_data_chunk · method · L350-L388 — def get_data_chunk(self, dispatch_context: BuilderDispatchContext, path: List[str])
+- import_path · method · L390-L412 — def import_path(self, path, id_mapping, data_source_id=None, **kwargs)
+- extract_properties · method · L414-L461 — def extract_properties( self, path: List[str], data_source_id: Optional[int] = None, schema_property: Optional[str] = None, **kwargs, ) -> Dict[str, List[str]]
+- PreviousActionProviderType · class · L464-L603 — class PreviousActionProviderType(BuilderDataProviderType)
+- get_dispatch_action_cache_key · method · L471-L477 — def get_dispatch_action_cache_key(self, dispatch_id: str, action_id: int) -> str
+- get_data_chunk · method · L479-L514 — def get_data_chunk(self, dispatch_context: DispatchContext, path: List[str])
+- post_dispatch · method · L516-L543 — def post_dispatch( self, dispatch_context: DispatchContext, workflow_action: WorkflowAction, dispatch_result: DispatchResult, ) -> None
+- import_path · method · L545-L562 — def import_path(self, path, id_mapping, **kwargs)
+- extract_properties · method · L564-L603 — def extract_properties( self, path: List[str], **kwargs, ) -> Dict[str, List[str]]
+- UserDataProviderType · class · L606-L660 — class UserDataProviderType(BuilderDataProviderType)
+- get_request_serializer · method · L615-L624 — def get_request_serializer(self)
+- translate_default_user_role · method · L626-L638 — def translate_default_user_role(self, user: UserSourceUser) -> str
+- get_data_chunk · method · L640-L660 — def get_data_chunk(self, dispatch_context: DispatchContext, path: List[str])

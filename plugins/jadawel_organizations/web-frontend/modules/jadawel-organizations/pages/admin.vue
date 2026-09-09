@@ -1,7 +1,9 @@
 <template>
   <main class="organizations-admin-page">
-    <h1>{{ $t("organizations.adminTitle") }}</h1>
-    <p>{{ $t("organizations.freeNote") }}</p>
+    <header class="organizations-admin-page__header">
+      <h1>{{ $t("organizations.adminTitle") }}</h1>
+      <p>{{ $t("organizations.freeNote") }}</p>
+    </header>
     <form class="organization-search" @submit.prevent="load">
       <label>
         {{ $t("organizations.search") }}
@@ -12,7 +14,7 @@
           :placeholder="$t('organizations.searchOrganizations')"
         />
       </label>
-      <Button type="secondary" :disabled="loading">
+      <Button type="secondary" button-type="submit" :disabled="loading">
         {{ $t("organizations.search") }}
       </Button>
     </form>
@@ -66,7 +68,7 @@
           class="input"
         />
       </label>
-      <Button :disabled="busy">
+      <Button button-type="submit" :disabled="busy">
         {{ $t("organizations.create") }}
       </Button>
     </form>
@@ -74,24 +76,39 @@
     <p v-else-if="!organizations.length">{{ $t("organizations.empty") }}</p>
     <ul v-else>
       <li v-for="organization in organizations" :key="organization.id">
-        <NuxtLink :to="`/organizations/${organization.id}`">
-          {{ organization.name }}
-        </NuxtLink>
-        <span>
-          — {{ $t(`organizations.statuses.${organization.status}`) }} ·
-          {{ $t("organizations.accessSource") }}:
-          {{ $t(`organizations.sources.${organization.effective_source}`) }}
-          · {{ $t("organizations.seats") }}:
-          {{ organization.effective_seat_limit }}
+        <div class="organizations-admin-page__identity">
+          <NuxtLink :to="`/organizations/${organization.id}`">
+            {{ organization.name }}
+          </NuxtLink>
+          <bdi>{{
+            organization.owner_email || $t("organizations.ownerNotAssigned")
+          }}</bdi>
+        </div>
+        <div class="organizations-admin-page__details">
+          <span>
+            {{ $t("organizations.status") }}:
+            {{ $t(`organizations.statuses.${organization.status}`) }}
+          </span>
+          <span>
+            {{ $t("organizations.accessSource") }}:
+            {{ $t(`organizations.sources.${organization.effective_source}`) }}
+          </span>
+          <span>
+            {{ $t("organizations.seats") }}:
+            {{ organization.effective_seat_limit }}
+          </span>
+          <span>
+            {{ organization.members_count }} {{ $t("organizations.members") }}
+          </span>
           <span v-if="organization.subscription_status">
-            — {{ $t("organizations.paymentStatus") }}:
+            {{ $t("organizations.paymentStatus") }}:
             {{
               $t(
                 `organizations.subscriptionStatuses.${organization.subscription_status}`,
               )
             }}
           </span>
-        </span>
+        </div>
         <span v-if="organization.pending_owner_email">
           — {{ $t("organizations.pendingOwner") }}:
           <bdi>{{ organization.pending_owner_email }}</bdi>
@@ -139,7 +156,9 @@ definePageMeta({
 </script>
 
 <script>
+/* eslint-disable import/first -- Nuxt page metadata uses a separate setup block. */
 import { uuid } from "@jadawel/modules/core/utils/string";
+/* eslint-enable import/first */
 
 export default {
   name: "OrganizationsAdmin",
@@ -166,6 +185,8 @@ export default {
   },
   methods: {
     async load() {
+      this.loading = true;
+      this.error = false;
       try {
         const [organizations, plans] = await Promise.all([
           this.$client.get("/organizations/admin/", {
@@ -252,10 +273,54 @@ export default {
 
 <style scoped>
 .organizations-admin-page {
-  max-inline-size: 840px;
+  max-inline-size: 1040px;
   margin-inline: auto;
   padding: 32px;
   background: var(--jadawel-content-background, #fcfdfc);
+}
+.organizations-admin-page__header {
+  margin-block-end: 24px;
+}
+.organizations-admin-page__header p {
+  margin-block: 6px 0;
+  color: var(--jadawel-text-secondary, #66756d);
+}
+.organizations-admin-page article {
+  margin-block: 20px;
+  padding: 20px;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 12px;
+  background: var(--jadawel-raised-background, #fbfdfb);
+  box-shadow: 0 8px 24px rgb(20 65 42 / 6%);
+}
+.organizations-admin-page ul {
+  padding: 0;
+  list-style: none;
+}
+.organizations-admin-page li {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding: 12px;
+  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
+}
+.organizations-admin-page__identity {
+  display: grid;
+  gap: 4px;
+  min-inline-size: 220px;
+}
+.organizations-admin-page__identity bdi {
+  color: var(--jadawel-text-secondary, #66756d);
+  font-size: 13px;
+}
+.organizations-admin-page__details {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
+  align-items: center;
+  color: var(--jadawel-text-secondary, #66756d);
+  font-size: 13px;
 }
 
 .organizations-admin-page form {
@@ -303,5 +368,15 @@ export default {
   outline: 2px solid
     color-mix(in srgb, var(--jadawel-primary-500, #278053) 28%, transparent);
   outline-offset: 1px;
+}
+
+@media (max-width: 640px) {
+  .organizations-admin-page {
+    padding: 20px 16px;
+  }
+  .organizations-admin-page section,
+  .organizations-admin-page article {
+    padding: 16px;
+  }
 }
 </style>

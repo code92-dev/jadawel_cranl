@@ -1,15 +1,25 @@
 {
   "organizations": {
     "title": "المنظمات",
+    "description": "أنشئ الفرق التي تشارك الوصول إلى جداول وأدرها.",
     "adminTitle": "إدارة المنظمات",
     "name": "اسم المنظمة",
     "owner": "المالك",
     "ownerEmail": "البريد الإلكتروني للمالك (إعداد مالك جديد)",
     "pendingOwner": "المالك المعلّق",
+    "ownerNotAssigned": "لم يُعيَّن مالك بعد",
     "resendOwner": "إعادة إرسال الإعداد",
     "reassignOwner": "إعادة تعيين الإعداد",
     "ownerSetupToken": "رمز إعداد المالك",
     "settings": "الإعدادات",
+    "sectionNavigation": "أقسام المنظمة",
+    "sections": {
+      "members": "الأعضاء",
+      "invitations": "الدعوات",
+      "workspaces": "مساحات العمل",
+      "activity": "النشاط",
+      "settings": "الإعدادات ودورة الحياة"
+    },
     "saveSettings": "حفظ الإعدادات",
     "plan": "باقة الفريق المجانية",
     "noGrant": "إنشاء بدون منح وصول",

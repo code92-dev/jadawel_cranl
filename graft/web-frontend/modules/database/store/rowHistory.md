@@ -1,0 +1,17 @@
+# web-frontend/modules/database/store/rowHistory.js
+
+- state · function · L7-L14 — state = ()
+- ADD_ENTRIES · method · L17-L27 — ADD_ENTRIES(state, { entries })
+- RESET_ENTRIES · method · L28-L31 — RESET_ENTRIES(state)
+- SET_LOADING · method · L32-L34 — SET_LOADING(state, loading)
+- SET_LOADED · method · L35-L37 — SET_LOADED(state, loaded)
+- SET_LOADED_TABLE_AND_ROW · method · L38-L41 — SET_LOADED_TABLE_AND_ROW(state, { tableId, rowId })
+- SET_TOTAL_COUNT · method · L42-L44 — SET_TOTAL_COUNT(state, totalCount)
+- fetchInitial · method · L48-L66 — async fetchInitial({ commit }, { tableId, rowId })
+- fetchNextPage · method · L67-L82 — async fetchNextPage({ commit, getters }, { tableId, rowId })
+- forceCreate · method · L83-L88 — forceCreate({ commit, state }, { rowHistoryEntry, rowId, tableId })
+- getSortedEntries · method · L92-L94 — getSortedEntries(state)
+- getCurrentCount · method · L95-L97 — getCurrentCount(state)
+- getTotalCount · method · L98-L100 — getTotalCount(state)
+- getLoading · method · L101-L103 — getLoading(state)
+- getLoaded · method · L104-L106 — getLoaded(state)

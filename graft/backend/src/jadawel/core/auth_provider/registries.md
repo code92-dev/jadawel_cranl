@@ -1,0 +1,21 @@
+# backend/src/jadawel/core/auth_provider/registries.py
+
+- BaseAuthProviderType · class · L33-L224 — class BaseAuthProviderType( MapAPIExceptionsInstanceMixin, APIUrlsInstanceMixin, CustomFieldsInstanceMixin, ModelInstanceMixin, ImportExportMixin, Instance, ABC, )
+- can_create_new_providers · method · L50-L55 — def can_create_new_providers(self, **kwargs) -> bool
+- can_delete_existing_providers · method · L57-L62 — def can_delete_existing_providers(self) -> bool
+- prepare_values · method · L64-L83 — def prepare_values( self, values: Dict[str, Any], user: "AbstractUser", instance: Optional["AuthProviderModelSubClass"] = None, ) -> Dict[str, Any]
+- before_create · method · L85-L94 — def before_create(self, user: "AbstractUser", **values)
+- create · method · L96-L109 — def create(self, **kwargs) -> "AuthProviderModelSubClass"
+- after_create · method · L111-L119 — def after_create( self, user: "AbstractUser", auth_provider: "AuthProviderModelSubClass" )
+- before_update · method · L121-L130 — def before_update( self, user: "AbstractUser", auth_provider: "AuthProviderModelSubClass", **values )
+- update · method · L132-L150 — def update( self, auth_provider: "AuthProviderModelSubClass", **values ) -> "AuthProviderModelSubClass"
+- after_update · method · L152-L160 — def after_update( self, user: "AbstractUser", auth_provider: "AuthProviderModelSubClass" )
+- before_delete · method · L162-L173 — def before_delete( self, user: "AbstractUser", auth_provider: "AuthProviderModelSubClass" )
+- delete · method · L175-L182 — def delete(self, auth_provider: "AuthProviderModelSubClass")
+- after_delete · method · L184-L192 — def after_delete( self, user: "AbstractUser", auth_provider: "AuthProviderModelSubClass" )
+- list_providers · method · L194-L206 — def list_providers( self, base_queryset=None ) -> QuerySet["AuthProviderModelSubClass"]
+- get_or_create_user_and_sign_in · method · L209-L224 — def get_or_create_user_and_sign_in( self, auth_provider: "AuthProviderModelSubClass", user_info: Dict[str, Any] ) -> Tuple["AbstractUser", bool]
+- AuthenticationProviderTypeRegistry · class · L227-L258 — class AuthenticationProviderTypeRegistry( MapAPIExceptionsInstanceMixin, APIUrlsRegistryMixin, ModelRegistryMixin, Registry )
+- __init__ · method · L241-L243 — def __init__(self, *args, **kwargs)
+- get_login_options · method · L246-L250 — def get_login_options(self, **kwargs) -> Optional[Dict[str, Any]]
+- get_all_available_login_options · method · L252-L258 — def get_all_available_login_options(self)

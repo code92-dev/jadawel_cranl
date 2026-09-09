@@ -1,0 +1,18 @@
+# backend/tests/jadawel/api/integrations/test_integration_views.py
+
+- test_get_integrations · function · L16-L52 — def test_get_integrations(api_client, data_fixture)
+- test_create_integration · function · L56-L90 — def test_create_integration(api_client, data_fixture)
+- test_create_integration_permission_denied · function · L94-L110 — def test_create_integration_permission_denied( api_client, data_fixture, stub_check_permissions )
+- test_create_integration_application_does_not_exist · function · L114-L125 — def test_create_integration_application_does_not_exist(api_client, data_fixture)
+- test_create_integration_bad_application_type · function · L129-L142 — def test_create_integration_bad_application_type(api_client, data_fixture)
+- test_update_integration · function · L146-L162 — def test_update_integration(api_client, data_fixture)
+- test_update_integration_bad_request · function · L167-L182 — def test_update_integration_bad_request(api_client, data_fixture)
+- test_update_integration_does_not_exist · function · L186-L197 — def test_update_integration_does_not_exist(api_client, data_fixture)
+- test_move_integration_empty_payload · function · L201-L223 — def test_move_integration_empty_payload(api_client, data_fixture)
+- test_move_integration_null_before_id · function · L227-L249 — def test_move_integration_null_before_id(api_client, data_fixture)
+- test_move_integration_before · function · L253-L276 — def test_move_integration_before(api_client, data_fixture)
+- test_move_integration_before_not_in_same_application · function · L280-L303 — def test_move_integration_before_not_in_same_application(api_client, data_fixture)
+- test_move_integration_bad_before_id · function · L307-L321 — def test_move_integration_bad_before_id(api_client, data_fixture)
+- test_delete_integration · function · L325-L338 — def test_delete_integration(api_client, data_fixture)
+- test_delete_integration_permission_denied · function · L342-L361 — def test_delete_integration_permission_denied( api_client, data_fixture, stub_check_permissions )
+- test_delete_integration_integration_not_exist · function · L365-L376 — def test_delete_integration_integration_not_exist(api_client, data_fixture)

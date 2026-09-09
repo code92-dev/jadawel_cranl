@@ -1,0 +1,34 @@
+# backend/tests/jadawel/contrib/database/utils.py
+
+- received_message · function · L33-L43 — async def received_message(communicator: WebsocketCommunicator, message_type: str)
+- get_message · function · L46-L61 — async def get_message(communicator: WebsocketCommunicator, message_type: str)
+- LookupFieldSetup · class · L65-L77 — class LookupFieldSetup
+- FormulaFieldSetup · class · L81-L92 — class FormulaFieldSetup
+- boolean_field_factory · function · L95-L96 — def boolean_field_factory(data_fixture, table, user)
+- text_field_factory · function · L99-L100 — def text_field_factory(data_fixture, table, user, name: str | None = None)
+- long_text_field_factory · function · L103-L104 — def long_text_field_factory(data_fixture, table, user)
+- url_field_factory · function · L107-L108 — def url_field_factory(data_fixture, table, user)
+- email_field_factory · function · L111-L112 — def email_field_factory(data_fixture, table, user)
+- phone_number_field_factory · function · L115-L116 — def phone_number_field_factory(data_fixture, table, user)
+- uuid_field_factory · function · L119-L122 — def uuid_field_factory(data_fixture, table, user, **kwargs)
+- autonumber_field_factory · function · L125-L128 — def autonumber_field_factory(data_fixture, table, user, **kwargs)
+- single_select_field_factory · function · L131-L137 — def single_select_field_factory(data_fixture, table, user)
+- single_select_field_value_factory · function · L140-L145 — def single_select_field_value_factory(data_fixture, target_field, value=None)
+- multiple_select_field_factory · function · L148-L154 — def multiple_select_field_factory(data_fixture, table, user)
+- multiple_select_field_value_factory · function · L157-L161 — def multiple_select_field_value_factory(data_fixture, target_field, value=None)
+- multiple_collaborators_field_factory · function · L164-L169 — def multiple_collaborators_field_factory(data_fixture, table, user)
+- file_field_factory · function · L172-L183 — def file_field_factory(data_fixture, table, user)
+- duration_field_factory · function · L186-L191 — def duration_field_factory( data_fixture, table, user, duration_format: str = "d h mm", name: str | None = None )
+- number_field_factory · function · L194-L197 — def number_field_factory(data_fixture: Fixtures, table, user, **kwargs)
+- text_field_value_factory · function · L200-L201 — def text_field_value_factory(data_fixture, target_field, value=None)
+- date_field_factory · function · L204-L205 — def date_field_factory(data_fixture, table, user)
+- datetime_field_factory · function · L208-L211 — def datetime_field_factory(data_fixture, table, user)
+- setup_linked_table_and_lookup · function · L214-L258 — def setup_linked_table_and_lookup( data_fixture, target_field_factory, helper_fields_other_table: Iterable[Callable] = frozenset(), helper_fields_table: Iterable[Callable] = frozenset(), ) -> LookupFieldSetup
+- setup_formula_field · function · L261-L317 — def setup_formula_field( data_fixture, formula_text: str, formula_type: str, data_field_factory, extra_fields: Iterable[Callable], formula_extra_kwargs: dict | None = None, ) -> FormulaFieldSetup
+- get_deadlock_error · function · L320-L323 — def get_deadlock_error(message: str = "Deadlock detected")
+- DummyFieldRuleType · class · L326-L347 — class DummyFieldRuleType(FieldRuleType)
+- validate_row · method · L330-L333 — def validate_row( self, row: GeneratedTableModel, rule: FieldRule ) -> RowRuleValidity
+- validate_rows · method · L335-L338 — def validate_rows( self, table: Table, rule: FieldRule, queryset: QuerySet | None = None )
+- validate_rule · method · L340-L347 — def validate_rule(self, rule: FieldRule) -> FieldRuleValidity
+- DummyUniqueFieldRuleType · class · L350-L355 — class DummyUniqueFieldRuleType(DummyFieldRuleType)
+- before_rule_created · method · L353-L355 — def before_rule_created(self, table: Table, in_data: dict)

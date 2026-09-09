@@ -1,0 +1,15 @@
+# web-frontend/modules/database/mixins/rowEditFieldInput.js
+
+- setup · method · L9-L11 — setup()
+- data · method · L12-L23 — data()
+- value · method · L25-L29 — value(value)
+- created · method · L31-L33 — created()
+- select · method · L39-L45 — select()
+- prepareCopy · method · L46-L48 — prepareCopy(value)
+- prepareValue · method · L49-L51 — prepareValue(copy)
+- unselect · method · L57-L66 — unselect()
+- save · method · L71-L85 — save()
+- beforeSave · method · L90-L92 — beforeSave(value)
+- afterSave · method · L97-L97 — afterSave()
+- getError · method · L102-L106 — getError()
+- validations · method · L108-L112 — validations()

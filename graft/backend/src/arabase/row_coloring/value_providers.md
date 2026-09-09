@@ -1,0 +1,26 @@
+# backend/src/arabase/row_coloring/value_providers.py
+
+- SingleSelectColorConfSerializer · class · L21-L22 — class SingleSelectColorConfSerializer(serializers.Serializer)
+- get_single_select_field_or_raise · function · L25-L50 — def get_single_select_field_or_raise(view, conf) -> Field
+- SingleSelectColorValueProviderType · class · L53-L135 — class SingleSelectColorValueProviderType(DecoratorValueProviderType)
+- before_update_decoration · method · L73-L77 — def before_update_decoration(self, view_decoration, user)
+- set_import_serialized_value · method · L79-L89 — def set_import_serialized_value( self, value: Dict[str, Any], id_mapping: Dict[str, Dict[int, Any]] ) -> Dict[str, Any]
+- _delete_decorations_for_fields · method · L91-L104 — def _delete_decorations_for_fields(self, fields)
+- after_field_delete · method · L106-L107 — def after_field_delete(self, deleted_field: Field)
+- after_fields_type_change · method · L109-L119 — def after_fields_type_change(self, fields)
+- prepare_value_provider_conf_for_public · method · L121-L129 — def prepare_value_provider_conf_for_public(self, view_decoration, public_field_ids): # The color is resolved client-side from the row value, which the # public rows response only includes for visible fields. A hidden # field would leak its existence through the conf, so the decoration # is hidden entirely instead.
+- validate_conf_for_view · method · L131-L135 — def validate_conf_for_view(self, view, conf) -> Union[Field, None]
+- ConditionalColorFilterSerializer · class · L138-L160 — class ConditionalColorFilterSerializer(serializers.Serializer)
+- validate_type · method · L156-L160 — def validate_type(self, value)
+- ConditionalColorGroupSerializer · class · L163-L170 — class ConditionalColorGroupSerializer(serializers.Serializer)
+- ConditionalColorRuleSerializer · class · L173-L188 — class ConditionalColorRuleSerializer(serializers.Serializer)
+- ConditionalColorConfSerializer · class · L191-L192 — class ConditionalColorConfSerializer(serializers.Serializer)
+- get_conditional_color_problems · function · L195-L213 — def get_conditional_color_problems(view, conf) -> List[str]
+- ConditionalColorValueProviderType · class · L216-L317 — class ConditionalColorValueProviderType(DecoratorValueProviderType)
+- before_update_decoration · method · L230-L236 — def before_update_decoration(self, view_decoration, user)
+- set_import_serialized_value · method · L238-L255 — def set_import_serialized_value( self, value: Dict[str, Any], id_mapping: Dict[str, Dict[int, Any]] ) -> Dict[str, Any]
+- _delete_decorations_for_fields · method · L257-L282 — def _delete_decorations_for_fields(self, fields)
+- after_field_delete · method · L284-L285 — def after_field_delete(self, deleted_field: Field)
+- after_fields_type_change · method · L287-L295 — def after_fields_type_change(self, fields): # After a type change the stored conditions may no longer be # compatible with the new field type (the operator set itself is # field-agnostic). Removing the stale configuration keeps views # predictable; users simply configure the coloring again. # Batched: core calls this hook once per registered provider type, so # a per-field loop would break core's num-queries assertions for the # field change path.
+- prepare_value_provider_conf_for_public · method · L297-L311 — def prepare_value_provider_conf_for_public(self, view_decoration, public_field_ids): # A rule's filter values can describe hidden data ("the secret # budget field is above X"), so any rule referencing a field that is # not publicly visible is dropped wholesale. Rules that only touch # public fields — including the empty-condition default rule — stay.
+- validate_conf_for_view · method · L313-L317 — def validate_conf_for_view(self, view, conf) -> List[str]

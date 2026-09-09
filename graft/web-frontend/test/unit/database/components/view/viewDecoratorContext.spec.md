@@ -1,0 +1,21 @@
+# web-frontend/test/unit/database/components/view/viewDecoratorContext.spec.js
+
+- FakeDecoratorType · class · L11-L47 — class FakeDecoratorType extends ViewDecoratorType
+- getType · method · L12-L14 — static getType()
+- getName · method · L16-L18 — getName()
+- getDescription · method · L20-L22 — getDescription()
+- getImage · method · L24-L26 — getImage()
+- isCompatible · method · L28-L30 — isCompatible(view)
+- isDeactivated · method · L32-L34 — isDeactivated(workspaceId)
+- getDeactivatedText · method · L36-L38 — getDeactivatedText()
+- getComponent · method · L40-L42 — getComponent()
+- canAdd · method · L44-L46 — canAdd({ view })
+- FakeValueProviderType · class · L49-L73 — class FakeValueProviderType extends DecoratorValueProviderType
+- getType · method · L50-L52 — static getType()
+- getName · method · L54-L56 — getName()
+- getDescription · method · L58-L60 — getDescription()
+- getIconClass · method · L62-L64 — getIconClass()
+- isCompatible · method · L66-L68 — isCompatible()
+- getFormComponent · method · L70-L72 — getFormComponent()
+- populateStore · function · L149-L170 — populateStore = async ({ viewId = 1, decorations } = {})
+- mountComponent · function · L172-L182 — mountComponent = async (props)

@@ -1,0 +1,74 @@
+# backend/src/jadawel/core/registries.py
+
+- ImportExportConfig · class · L64-L115 — class ImportExportConfig
+- Plugin · class · L118-L238 — class Plugin(APIUrlsInstanceMixin, Instance)
+- get_urls · method · L153-L177 — def get_urls(self)
+- user_created · method · L179-L202 — def user_created( self, user: "AbstractUser", workspace: "Workspace" = None, workspace_invitation: "WorkspaceInvitation" = None, template: "Template" = None, )
+- create_initial_workspace · method · L204-L216 — def create_initial_workspace( self, user: "AbstractUser", workspace: "Workspace" = None, )
+- user_signed_in · method · L218-L224 — def user_signed_in(self, user)
+- enhance_workspace_queryset · method · L226-L238 — def enhance_workspace_queryset( self, queryset: QuerySet["Workspace"] ) -> QuerySet["Workspace"]
+- PluginRegistry · class · L241-L263 — class PluginRegistry(APIUrlsRegistryMixin, Registry[Plugin])
+- urls · method · L251-L263 — def urls(self)
+- ApplicationType · class · L266-L628 — class ApplicationType( APIUrlsInstanceMixin, ModelInstanceMixin["Application"], PublicCustomFieldsInstanceMixin, CustomFieldsInstanceMixin, Instance, )
+- prepare_value_for_db · method · L324-L334 — def prepare_value_for_db(self, values: dict, instance: "Application | None" = None)
+- after_create · method · L336-L343 — def after_create(self, instance: "Application", values: Dict)
+- after_update · method · L345-L355 — def after_update( self, instance: "Application", values: Dict, )
+- pre_delete · method · L357-L363 — def pre_delete(self, application)
+- export_safe_transaction_context · method · L365-L379 — def export_safe_transaction_context(self, application: "Application") -> Atomic
+- create_application · method · L381-L402 — def create_application( self, user, workspace: "Workspace", init_with_data: bool = False, **kwargs ) -> "Application"
+- init_application · method · L404-L411 — def init_application(self, user, application: "Application") -> None
+- export_serialized_structure_with_registry · method · L413-L432 — def export_serialized_structure_with_registry( self, workspace: "Workspace", scope, exported_structure: dict, import_export_config: ImportExportConfig, ) -> dict
+- import_serialized_structure_with_registry · method · L434-L459 — def import_serialized_structure_with_registry( self, id_mapping: Dict[str, Any], scope, serialized_scope: dict, import_export_config: ImportExportConfig, workspace: Optional["Workspace"] = None, ) -> None
+- export_serialized · method · L461-L501 — def export_serialized( self, application: "Application", import_export_config: ImportExportConfig, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, )
+- import_serialized · method · L503-L578 — def import_serialized( self, workspace: "Workspace", serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> "Application"
+- enhance_queryset · method · L580-L593 — def enhance_queryset( self, queryset: QuerySet["Application"] ) -> QuerySet["Application"]
+- enhance_and_filter_queryset · method · L595-L610 — def enhance_and_filter_queryset( self, queryset: QuerySet["Application"], user: "AbstractUser", workspace: "Workspace", ) -> QuerySet["Application"]
+- get_application_urls · method · L612-L617 — def get_application_urls(self, application: "Application") -> list[str]
+- get_application_id_for_url · method · L620-L628 — def get_application_id_for_url(cls, url: str) -> int | None
+- ApplicationTypeRegistry · class · L636-L651 — class ApplicationTypeRegistry( APIUrlsRegistryMixin, ModelRegistryMixin[ApplicationSubClassInstance, ApplicationType], Registry[ApplicationType], CustomFieldsRegistryMixin, )
+- PermissionManagerType · class · L654-L812 — class PermissionManagerType(abc.ABC, Instance)
+- actor_is_supported · method · L671-L678 — def actor_is_supported(self, actor: Actor)
+- check_permissions · method · L680-L722 — def check_permissions( self, actor: Actor, operation_name: str, workspace: Optional["Workspace"] = None, context: Optional[Any] = None, include_trash: bool = False, ) -> Optional[bool]
+- check_multiple_permissions · method · L725-L757 — def check_multiple_permissions( self, checks: List[PermissionCheck], workspace: "Workspace" = None, include_trash: bool = False, ) -> Dict[PermissionCheck, Union[bool, PermissionException]]
+- get_permissions_object · method · L759-L782 — def get_permissions_object( self, actor: Actor, workspace: Optional["Workspace"] = None ) -> Any
+- filter_queryset · method · L784-L805 — def filter_queryset( self, actor: Actor, operation_name: str, queryset: QuerySet, workspace: Optional["Workspace"] = None, ) -> QuerySet
+- get_roles · method · L807-L812 — def get_roles(self) -> List
+- PermissionManagerTypeRegistry · class · L815-L825 — class PermissionManagerTypeRegistry(Registry[PermissionManagerType])
+- ObjectScopeType · class · L828-L1054 — class ObjectScopeType(Instance, ModelInstanceMixin)
+- get_parent_scope · method · L839-L846 — def get_parent_scope(self) -> Optional["ObjectScopeType"]
+- get_parent_scopes · method · L848-L859 — def get_parent_scopes(self) -> List["ObjectScopeType"]
+- get_parents · method · L861-L879 — def get_parents(self, context: ContextObject) -> List[ContextObject]
+- get_all_context_objects_in_scope · method · L881-L890 — def get_all_context_objects_in_scope(self, scope: ScopeObject) -> Iterable
+- get_filter_for_scope_type · method · L892-L907 — def get_filter_for_scope_type( self, scope_type: "ObjectScopeType", scopes: List[Any] ) -> Q
+- get_base_queryset · method · L909-L920 — def get_base_queryset(self, include_trash: bool = False) -> QuerySet
+- get_enhanced_queryset · method · L922-L931 — def get_enhanced_queryset(self, include_trash: bool = False) -> QuerySet
+- are_objects_child_of · method · L933-L958 — def are_objects_child_of( self, child_objects: List[Any], parent_object: ScopeObject ) -> List[bool]
+- get_filter_for_scopes · method · L960-L985 — def get_filter_for_scopes(self, scopes: List[Any]) -> Dict[Any, Any]
+- get_objects_in_scopes · method · L987-L1028 — def get_objects_in_scopes(self, scopes: List[Any]) -> Dict[Any, Any]
+- contains · method · L1030-L1039 — def contains(self, context: ContextObject)
+- level · method · L1042-L1054 — def level(self) -> int
+- ObjectScopeTypeRegistry · class · L1057-L1148 — class ObjectScopeTypeRegistry( Registry[ObjectScopeType], ModelRegistryMixin[Any, ObjectScopeType] )
+- get_parent · method · L1067-L1089 — def get_parent(self, context, at_scope_type=None)
+- scope_includes_context · method · L1091-L1119 — def scope_includes_context( self, scope: ScopeObject, context: ContextObject, scope_type: Optional[ObjectScopeType] = None, ) -> bool
+- scope_type_includes_scope_type · method · L1121-L1145 — def scope_type_includes_scope_type( self, parent_scope_type: ObjectScopeType, child_scope_type: ObjectScopeType, ) -> bool
+- SubjectType · class · L1151-L1199 — class SubjectType(abc.ABC, Instance, ModelInstanceMixin)
+- is_in_workspace · method · L1157-L1163 — def is_in_workspace(self, subject: Subject, workspace: "Workspace") -> bool
+- are_in_workspace · method · L1166-L1175 — def are_in_workspace( self, subjects: List[Subject], workspace: "Workspace" ) -> List[bool]
+- get_serializer · method · L1178-L1187 — def get_serializer(self, model_instance, **kwargs) -> Serializer
+- get_users_included_in_subject · method · L1190-L1199 — def get_users_included_in_subject(self, subject) -> List["AbstractUser"]
+- SubjectTypeRegistry · class · L1202-L1221 — class SubjectTypeRegistry(Registry[SubjectType], ModelRegistryMixin[Any, SubjectType])
+- get_serializer · method · L1210-L1221 — def get_serializer(self, model_instance, **kwargs) -> Serializer
+- OperationType · class · L1224-L1279 — class OperationType(abc.ABC, Instance)
+- type · method · L1239-L1244 — def type(cls) -> str
+- context_scope_name · method · L1249-L1256 — def context_scope_name(cls) -> str
+- context_scope · method · L1261-L1266 — def context_scope(self) -> ObjectScopeType
+- object_scope · method · L1269-L1279 — def object_scope(self)
+- OperationTypeRegistry · class · L1282-L1291 — class OperationTypeRegistry(Registry[OperationType])
+- SerializationProcessorType · class · L1294-L1327 — class SerializationProcessorType(abc.ABC, Instance)
+- import_serialized · method · L1301-L1313 — def import_serialized( cls, workspace: "Workspace", scope: SerializationProcessorScope, serialized_scope: dict, import_export_config: ImportExportConfig, )
+- export_serialized · method · L1316-L1327 — def export_serialized( cls, workspace: "Workspace", scope: SerializationProcessorScope, import_export_config: ImportExportConfig, ) -> Optional[Dict[str, Any]]
+- SerializationProcessorRegistry · class · L1330-L1337 — class SerializationProcessorRegistry(Registry[SerializationProcessorType])
+- EmailContextType · class · L1340-L1348 — class EmailContextType(abc.ABC, Instance)
+- get_context · method · L1345-L1348 — def get_context(self)
+- EmailContextRegistry · class · L1351-L1364 — class EmailContextRegistry(Registry[EmailContextType])
+- get_context · method · L1354-L1364 — def get_context(self)

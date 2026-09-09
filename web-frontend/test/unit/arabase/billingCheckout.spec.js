@@ -36,6 +36,24 @@ describe('Billing payment recovery', () => {
     expect(JSON.parse(app.mock.history.post[0].data)).toEqual({})
   })
 
+  test('keeps payment history available when the provider is unavailable', async () => {
+    app.dontFailOnErrorResponses()
+    app.mock
+      .onGet('/billing/checkout/')
+      .reply(503, { detail: 'payment_verification_unavailable' })
+    app.mock.onGet('/billing/orders/').reply(200, {
+      results: [],
+      next: null,
+    })
+
+    const wrapper = await app.mount(Billing)
+    await flushPromises()
+
+    expect(wrapper.vm.checkoutUnavailable).toBe(true)
+    expect(wrapper.text()).toContain('billing.checkoutUnavailable')
+    expect(wrapper.get('.billing-page__history').exists()).toBe(true)
+  })
+
   test('loads account access and can cancel a paid renewal', async () => {
     app.mock.onGet('/billing/checkout/').reply(200, {
       accounts: [{ id: 'account-1', kind: 'INDIVIDUAL' }],
@@ -78,6 +96,16 @@ describe('Billing payment recovery', () => {
       .find((item) => item.text().includes('billing.cancelRenewal'))
     expect(button).toBeDefined()
     await button.trigger('click')
+    await flushPromises()
+
+    expect(app.mock.history.post).toHaveLength(0)
+    const confirmation = wrapper.find('.billing-page__confirmation')
+    expect(confirmation.exists()).toBe(true)
+    const confirmButton = confirmation
+      .findAll('button')
+      .find((item) => item.text().includes('billing.confirm'))
+    expect(confirmButton).toBeDefined()
+    await confirmButton.trigger('click')
     await flushPromises()
 
     expect(app.mock.history.post).toHaveLength(1)

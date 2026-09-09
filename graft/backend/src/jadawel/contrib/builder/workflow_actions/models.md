@@ -1,0 +1,23 @@
+# backend/src/jadawel/contrib/builder/workflow_actions/models.py
+
+- EventTypes · class · L13-L16 — class EventTypes(models.TextChoices)
+- BuilderWorkflowAction · class · L19-L70 — class BuilderWorkflowAction( WorkflowAction, OrderableMixin, )
+- is_dynamic_event · method · L40-L46 — def is_dynamic_event(cls, event: str) -> bool
+- get_type_registry · method · L49-L54 — def get_type_registry() -> ModelRegistryMixin
+- get_parent · method · L56-L57 — def get_parent(self)
+- get_last_order_element_scope · method · L60-L62 — def get_last_order_element_scope(cls, element: Element)
+- get_last_order_page_scope · method · L65-L67 — def get_last_order_page_scope(cls, page: Page)
+- Meta · class · L69-L70 — class Meta
+- NotificationWorkflowAction · class · L73-L75 — class NotificationWorkflowAction(BuilderWorkflowAction)
+- OpenPageWorkflowAction · class · L78-L79 — class OpenPageWorkflowAction(BuilderWorkflowAction, NavigationElementMixin)
+- LogoutWorkflowAction · class · L82-L83 — class LogoutWorkflowAction(BuilderWorkflowAction)
+- RefreshDataSourceWorkflowAction · class · L86-L92 — class RefreshDataSourceWorkflowAction(BuilderWorkflowAction)
+- BuilderWorkflowServiceAction · class · L95-L103 — class BuilderWorkflowServiceAction(BuilderWorkflowAction)
+- Meta · class · L102-L103 — class Meta
+- LocalJadawelCreateRowWorkflowAction · class · L106-L106 — class LocalJadawelCreateRowWorkflowAction(BuilderWorkflowServiceAction)
+- LocalJadawelUpdateRowWorkflowAction · class · L109-L109 — class LocalJadawelUpdateRowWorkflowAction(BuilderWorkflowServiceAction)
+- LocalJadawelDeleteRowWorkflowAction · class · L112-L112 — class LocalJadawelDeleteRowWorkflowAction(BuilderWorkflowServiceAction)
+- CoreHTTPRequestWorkflowAction · class · L115-L115 — class CoreHTTPRequestWorkflowAction(BuilderWorkflowServiceAction)
+- CoreSMTPEmailWorkflowAction · class · L118-L118 — class CoreSMTPEmailWorkflowAction(BuilderWorkflowServiceAction)
+- AIAgentWorkflowAction · class · L121-L121 — class AIAgentWorkflowAction(BuilderWorkflowServiceAction)
+- SlackWriteMessageWorkflowAction · class · L124-L124 — class SlackWriteMessageWorkflowAction(BuilderWorkflowServiceAction)

@@ -1,0 +1,10 @@
+# backend/tests/jadawel/contrib/automation/workflows/test_workflow_tasks.py
+
+- test_automation_periodic_cleanup_keeps_max_entries_per_workflow · function · L17-L49 — def test_automation_periodic_cleanup_keeps_max_entries_per_workflow(data_fixture)
+- test_automation_periodic_cleanup_excludes_started_from_date_cleanup · function · L58-L94 — def test_automation_periodic_cleanup_excludes_started_from_date_cleanup(data_fixture)
+- test_automation_periodic_cleanup_excludes_started_from_count_cleanup · function · L103-L125 — def test_automation_periodic_cleanup_excludes_started_from_count_cleanup(data_fixture)
+- test_automation_periodic_cleanup_deletes_entries_older_than_max_days · function · L130-L149 — def test_automation_periodic_cleanup_deletes_entries_older_than_max_days(data_fixture)
+- test_automation_periodic_cleanup_keeps_entries_within_both_limits · function · L157-L177 — def test_automation_periodic_cleanup_keeps_entries_within_both_limits(data_fixture)
+- test_automation_periodic_cleanup_marks_timed_out_entries · function · L182-L203 — def test_automation_periodic_cleanup_marks_timed_out_entries(data_fixture)
+- test_automation_periodic_cleanup_marks_timeout_before_cleanup · function · L211-L222 — def test_automation_periodic_cleanup_marks_timeout_before_cleanup(data_fixture)
+- test_automation_periodic_cleanup_max_entries_with_different_clones · function · L227-L275 — def test_automation_periodic_cleanup_max_entries_with_different_clones(data_fixture)

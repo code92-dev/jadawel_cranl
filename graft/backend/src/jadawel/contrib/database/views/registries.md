@@ -1,0 +1,88 @@
+# backend/src/jadawel/contrib/database/views/registries.py
+
+- ViewType · class · L72-L1045 — class ViewType( MapAPIExceptionsInstanceMixin, APIUrlsInstanceMixin, CustomFieldsInstanceMixin, ModelInstanceMixin, ImportExportMixin, Instance, )
+- model_reference_field_name · method · L201-L211 — def model_reference_field_name(self)
+- __init__ · method · L213-L228 — def __init__(self, *args, **kwargs)
+- export_serialized · method · L230-L334 — def export_serialized( self, view: "View", import_export_config: ImportExportConfig, cache: Dict, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, ) -> Dict[str, Any]
+- import_serialized · method · L336-L565 — def import_serialized( self, table: "Table", serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], cache: Dict, files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, ) -> Optional["View"]
+- _export_default_row_values · method · L567-L613 — def _export_default_row_values(self, view, cache, files_zip, storage)
+- _import_default_row_values · method · L615-L670 — def _import_default_row_values( self, table, view, default_row_values, id_mapping, files_zip, storage, cache, )
+- get_visible_fields_and_model · method · L672-L688 — def get_visible_fields_and_model( self, view: "View" ) -> Tuple[List["FieldObject"], django_models.Model]
+- get_field_options_serializer_class · method · L690-L731 — def get_field_options_serializer_class( self, create_if_missing: bool = False ) -> Type[Serializer]
+- before_field_options_update · method · L733-L747 — def before_field_options_update( self, view: "View", field_options: Dict[str, Any], fields: List["Field"] ) -> Dict[str, Any]
+- after_field_options_update · method · L749-L767 — def after_field_options_update( self, view: "View", field_options: Dict[str, Any], fields: List["Field"], update_field_option_instances: List[Any], )
+- after_fields_type_change · method · L769-L775 — def after_fields_type_change(self, fields: List["Field"]) -> None
+- after_field_delete · method · L777-L783 — def after_field_delete(self, field: "Field") -> None
+- before_view_create · method · L785-L792 — def before_view_create(self, values: dict, table: "Table", user: AbstractUser)
+- before_view_update · method · L794-L801 — def before_view_update(self, values: dict, view: "View", user: AbstractUser)
+- prepare_values · method · L803-L818 — def prepare_values( self, values: Dict[str, Any], table: "Table", user: AbstractUser ) -> Dict[str, Any]
+- view_created · method · L820-L825 — def view_created(self, view: "View")
+- get_visible_field_options_in_order · method · L827-L843 — def get_visible_field_options_in_order( self, view: "View" ) -> django_models.QuerySet
+- get_aggregations · method · L845-L857 — def get_aggregations( self, view: "View" ) -> Iterable[Tuple[django_models.Field, str]]
+- after_field_value_update · method · L859-L870 — def after_field_value_update( self, updated_fields: Union[Iterable["Field"], "Field"] )
+- after_field_update · method · L872-L879 — def after_field_update(self, updated_fields: Union[Iterable["Field"], "Field"])
+- after_filter_update · method · L881-L887 — def after_filter_update(self, view: "View")
+- export_prepared_values · method · L889-L919 — def export_prepared_values(self, view: "View") -> Dict[str, Any]
+- enhance_queryset · method · L921-L936 — def enhance_queryset( self, queryset: django_models.QuerySet ) -> django_models.QuerySet
+- enhance_field_options_queryset · method · L938-L950 — def enhance_field_options_queryset( self, queryset: django_models.QuerySet ) -> django_models.QuerySet
+- get_hidden_fields · method · L952-L971 — def get_hidden_fields( self, view: "View", field_ids_to_check: Optional[List[int]] = None, ) -> Set[int]
+- after_field_moved_between_tables · method · L973-L989 — def after_field_moved_between_tables(self, field: "Field", original_table_id: int)
+- prepare_field_options · method · L991-L1022 — def prepare_field_options( self, view: "View", field_id: "int" ) -> Type[django_models.Model]
+- check_view_update_permissions · method · L1024-L1045 — def check_view_update_permissions( self, user: AbstractUser, view: "View", data: Dict[str, Any] )
+- ViewTypeRegistry · class · L1048-L1067 — class ViewTypeRegistry( APIUrlsRegistryMixin, CustomFieldsRegistryMixin, ModelRegistryMixin, Registry )
+- get_field_options_serializer_map · method · L1061-L1067 — def get_field_options_serializer_map(self)
+- ViewFilterType · class · L1070-L1208 — class ViewFilterType(Instance)
+- default_filter_on_exception · method · L1104-L1107 — def default_filter_on_exception(self)
+- get_filter · method · L1109-L1126 — def get_filter(self, field_name, value, model_field, field) -> OptionallyAnnotatedQ
+- get_preload_values · method · L1128-L1140 — def get_preload_values(self, view_filter) -> dict
+- get_export_serialized_value · method · L1142-L1154 — def get_export_serialized_value(self, value: str | None, id_mapping: dict) -> str
+- set_import_serialized_value · method · L1156-L1170 — def set_import_serialized_value(self, value: str | None, id_mapping: dict) -> str
+- field_is_compatible · method · L1172-L1195 — def field_is_compatible(self, field: "Field") -> bool
+- time_sensitive · method · L1198-L1208 — def time_sensitive(self) -> bool
+- ViewFilterTypeRegistry · class · L1211-L1236 — class ViewFilterTypeRegistry(Registry)
+- get_time_sensitive_filter_types · method · L1223-L1236 — def get_time_sensitive_filter_types(self) -> List[str]
+- ViewAggregationType · class · L1239-L1286 — class ViewAggregationType(Instance)
+- get_aggregation · method · L1247-L1268 — def get_aggregation( self, field_name: str, model_field: django_models.Field, field: "Field", ) -> django_models.Aggregate
+- field_is_compatible · method · L1270-L1286 — def field_is_compatible(self, field: "Field") -> bool
+- ViewAggregationTypeRegistry · class · L1289-L1297 — class ViewAggregationTypeRegistry(Registry)
+- DecoratorType · class · L1300-L1321 — class DecoratorType(Instance)
+- before_create_decoration · method · L1305-L1311 — def before_create_decoration(self, view, user: Union[AbstractUser, None])
+- before_update_decoration · method · L1313-L1321 — def before_update_decoration( self, view_decoration, user: Union[AbstractUser, None] )
+- DecoratorTypeRegistry · class · L1324-L1329 — class DecoratorTypeRegistry(Registry)
+- DecoratorValueProviderType · class · L1332-L1456 — class DecoratorValueProviderType(CustomFieldsInstanceMixin, Instance)
+- __init__ · method · L1346-L1360 — def __init__(self, *args, **kwargs)
+- before_create_decoration · method · L1362-L1368 — def before_create_decoration(self, view, user: Union[AbstractUser, None])
+- before_update_decoration · method · L1370-L1378 — def before_update_decoration( self, view_decoration, user: Union[AbstractUser, None] )
+- set_import_serialized_value · method · L1380-L1395 — def set_import_serialized_value( self, value: Dict[str, Any], id_mapping: Dict[str, Dict[int, Any]] ) -> Dict[str, Any]
+- after_field_delete · method · L1397-L1403 — def after_field_delete(self, deleted_field: "Field")
+- after_fields_type_change · method · L1405-L1411 — def after_fields_type_change(self, fields: List["Field"])
+- prepare_value_provider_conf_for_public · method · L1413-L1428 — def prepare_value_provider_conf_for_public( self, view_decoration: "ViewDecoration", public_field_ids: Set[int] ) -> Optional[Dict[str, Any]]
+- get_serializer_class · method · L1430-L1436 — def get_serializer_class(self, *args, **kwargs): # Add meta ref name to avoid name collision
+- decorator_is_compatible · method · L1438-L1450 — def decorator_is_compatible(self, decorator_type: DecoratorType) -> bool
+- model_class · method · L1453-L1456 — def model_class(self)
+- DecoratorValueProviderTypeRegistry · class · L1459-L1466 — class DecoratorValueProviderTypeRegistry(Registry)
+- FormViewModeType · class · L1469-L1486 — class FormViewModeType(Instance)
+- before_form_create · method · L1470-L1477 — def before_form_create(self, values: dict, table: "Table", user: AbstractUser)
+- before_form_update · method · L1479-L1486 — def before_form_update(self, values: dict, form: "FormView", user: AbstractUser)
+- FormViewModeRegistry · class · L1489-L1504 — class FormViewModeRegistry(Registry)
+- get_default_type · method · L1497-L1498 — def get_default_type(self)
+- get_default_choice · method · L1500-L1501 — def get_default_choice(self) -> str
+- get_choices · method · L1503-L1504 — def get_choices(self) -> List[Tuple[str, str]]
+- ViewOwnershipType · class · L1507-L1726 — class ViewOwnershipType(Instance)
+- can_import_view · method · L1512-L1517 — def can_import_view(self, serialized_data: Dict, id_mapping: Dict) -> bool
+- get_trashed_item_owner · method · L1519-L1522 — def get_trashed_item_owner(self, view)
+- should_broadcast_signal_to · method · L1524-L1542 — def should_broadcast_signal_to( self, view: "View" ) -> Tuple[Literal["table", "users", "refresh", ""], Optional[List[int]]]
+- is_compatible_with_view_type · method · L1544-L1553 — def is_compatible_with_view_type(self, view_type: ViewType) -> bool
+- before_form_view_submitted · method · L1555-L1566 — def before_form_view_submitted(self, form, request)
+- before_public_view_accessed · method · L1568-L1578 — def before_public_view_accessed(self, view)
+- get_operation_to_check_to_create_view · method · L1580-L1588 — def get_operation_to_check_to_create_view(self) -> Type[OperationType]
+- change_ownership_type · method · L1590-L1609 — def change_ownership_type(self, user: AbstractUser, view: "View") -> "View"
+- view_created · method · L1611-L1619 — def view_created(self, user: AbstractUser, view: "View", workspace: Workspace)
+- enforce_apply_filters · method · L1621-L1632 — def enforce_apply_filters(self, user: Optional[AbstractUser], view: "View") -> bool
+- prepare_views_for_user · method · L1634-L1656 — def prepare_views_for_user( self, user: Optional[AbstractUser], views: List["View"], includes: Optional[Set[str]] = None, ) -> List["View"]
+- can_modify_rows · method · L1658-L1673 — def can_modify_rows( self, view: "View", row_ids: Optional[List[int]] = None ) -> bool
+- get_hidden_field_ids_for_user · method · L1675-L1685 — def get_hidden_field_ids_for_user( self, user: Optional["AbstractUser"], view: "View" ) -> Set[int]
+- get_users_to_notify_for_row_comment · method · L1687-L1710 — def get_users_to_notify_for_row_comment( self, table: "Table", row_id: int, users: List["AbstractUser"], ) -> List["AbstractUser"]
+- enhance_list_fields_queryset · method · L1712-L1726 — def enhance_list_fields_queryset( self, user: "AbstractUser", view: "View", queryset: django_models.QuerySet ) -> django_models.QuerySet
+- ViewOwnershipTypeRegistry · class · L1729-L1773 — class ViewOwnershipTypeRegistry(Registry)
+- prepare_views_of_different_types_for_user · method · L1737-L1773 — def prepare_views_of_different_types_for_user( self, user: AbstractUser, views: List["View"], includes: Optional[Set[str]] = None, ) -> List["View"]

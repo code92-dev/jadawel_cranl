@@ -1,0 +1,18 @@
+# web-frontend/modules/builder/components/elements/components/forms/general/TableElementForm.vue
+
+- setup · method · L291-L293 — setup()
+- data · method · L294-L315 — data()
+- ORIENTATIONS · method · L318-L320 — ORIENTATIONS()
+- orderedCollectionTypes · method · L321-L323 — orderedCollectionTypes()
+- collectionTypes · method · L324-L326 — collectionTypes()
+- collectionFieldBaseTheme · method · L327-L329 — collectionFieldBaseTheme()
+- get · method · L331-L333 — get()
+- set · method · L334-L340 — set(newValue)
+- addField · method · L347-L358 — addField()
+- changeFieldType · method · L359-L375 — changeFieldType(fieldToUpdate, newType)
+- updateField · method · L376-L385 — updateField(fieldToUpdate, values)
+- removeField · method · L386-L390 — removeField(field)
+- orderFields · method · L391-L398 — orderFields(newOrder)
+- getFieldErrorMessage · method · L399-L405 — getFieldErrorMessage(field)
+- refreshFieldsFromDataSource · method · L406-L421 — refreshFieldsFromDataSource()
+- validations · method · L423-L456 — validations()

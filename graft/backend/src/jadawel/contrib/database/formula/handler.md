@@ -1,0 +1,21 @@
+# backend/src/jadawel/contrib/database/formula/handler.py
+
+- _needs_periodic_update · function · L56-L60 — def _needs_periodic_update(expression: JadawelExpression)
+- _expression_requires_refresh_after_insert · function · L63-L86 — def _expression_requires_refresh_after_insert(expression: JadawelExpression)
+- _has_lookup_expressions · function · L89-L96 — def _has_lookup_expressions(expression)
+- FormulaHandler · class · L99-L435 — class FormulaHandler(metaclass=jadawel_trace_methods(tracer))
+- jadawel_expression_to_update_django_expression · method · L106-L121 — def jadawel_expression_to_update_django_expression( cls, expression: JadawelExpression, model: Type[Model] ) -> Expression
+- jadawel_expression_to_row_update_django_expression · method · L124-L145 — def jadawel_expression_to_row_update_django_expression( cls, expression: JadawelExpression, model_instance: Model, ) -> Expression
+- jadawel_expression_to_insert_django_expression · method · L148-L172 — def jadawel_expression_to_insert_django_expression( cls, expression: JadawelExpression, model_instance: Model, ) -> Expression
+- get_normal_field_reference_expression · method · L175-L192 — def get_normal_field_reference_expression( cls, field, formula_type: JadawelFormulaType ) -> JadawelExpression
+- rename_field_references_in_formula_string · method · L195-L229 — def rename_field_references_in_formula_string( cls, formula_to_update: str, field_renames: Dict[str, str], via_field: Optional[str] = None, field_ids_to_replace_with_name_refs: Optional[Dict[int, str]] = None, field_names_to_replace_with_id_refs: Optional[Dict[str, int]] = None, ) -> str
+- get_field_dependencies_from_expression · method · L232-L246 — def get_field_dependencies_from_expression( cls, source_field, expression: JadawelExpression, table, field_cache ) -> FieldDependencies
+- get_field_dependencies · method · L249-L266 — def get_field_dependencies(cls, formula_field, field_cache)
+- raw_formula_to_untyped_expression · method · L269-L280 — def raw_formula_to_untyped_expression(cls, formula_string)
+- get_formula_type_from_field · method · L283-L295 — def get_formula_type_from_field(cls, formula_field) -> JadawelFormulaType
+- get_typed_internal_expression_from_field · method · L298-L333 — def get_typed_internal_expression_from_field( cls, formula_field ) -> JadawelExpression[JadawelFormulaType]
+- recalculate_formula_field_cached_properties · method · L336-L369 — def recalculate_formula_field_cached_properties(cls, formula_field, field_cache)
+- get_parse_tree_for_formula · method · L372-L384 — def get_parse_tree_for_formula(cls, formula: str)
+- get_dependencies_field_names · method · L387-L396 — def get_dependencies_field_names(cls, formula: str) -> Set[Tuple[str, str]]
+- recalculate_formula_and_get_update_expression · method · L399-L427 — def recalculate_formula_and_get_update_expression( cls, field: "FormulaField", old_field: "FormulaField", field_cache: "FieldCache", force_recreate_column: bool = False, ) -> Expression
+- get_lookup_field_reference_expression · method · L430-L435 — def get_lookup_field_reference_expression(cls, field, primary_field, formula_type)

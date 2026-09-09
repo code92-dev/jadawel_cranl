@@ -1,0 +1,7 @@
+# backend/tests/jadawel/contrib/integrations/local_jadawel/test_integration_signals.py
+
+- test_local_jadawel_upsert_row_handle_field_mapping_field_changes · function · L17-L39 — def test_local_jadawel_upsert_row_handle_field_mapping_field_changes( data_fixture, )
+- test_local_jadawel_upsert_row_send_action_done_signal_when_creating_row · function · L43-L78 — def test_local_jadawel_upsert_row_send_action_done_signal_when_creating_row( data_fixture, )
+- test_local_jadawel_upsert_row_send_action_done_signal_when_updating_row · function · L82-L118 — def test_local_jadawel_upsert_row_send_action_done_signal_when_updating_row( data_fixture, )
+- test_local_jadawel_upsert_row_send_action_done_signal_when_deleting_row · function · L122-L155 — def test_local_jadawel_upsert_row_send_action_done_signal_when_deleting_row( data_fixture, )
+- test_local_jadawel_service_filters_delete_when_field_type_changes_to_incompatible_type · function · L159-L180 — def test_local_jadawel_service_filters_delete_when_field_type_changes_to_incompatible_type( data_fixture, )

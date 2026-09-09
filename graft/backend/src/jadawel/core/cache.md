@@ -1,0 +1,21 @@
+# backend/src/jadawel/core/cache.py
+
+- LocalCache · class · L25-L118 — class LocalCache
+- __init__ · method · L47-L48 — def __init__(self)
+- get · method · L50-L74 — def get(self, key: str, default: T | Callable[[], T] = None) -> T
+- delete · method · L76-L96 — def delete(self, key: str)
+- clear · method · L98-L104 — def clear(self)
+- context · method · L107-L118 — def context(self)
+- LocalCacheMiddleware · class · L124-L142 — class LocalCacheMiddleware
+- __init__ · method · L137-L138 — def __init__(self, get_response)
+- __call__ · method · L140-L142 — def __call__(self, request)
+- GlobalCache · class · L148-L336 — class GlobalCache
+- _get_version_cache_key · method · L172-L186 — def _get_version_cache_key( self, key: str, invalidate_key: None | str = None ) -> str
+- _get_cache_key_with_version · method · L188-L197 — def _get_cache_key_with_version(self, key: str) -> str
+- _get_versioned_cache_key · method · L199-L210 — def _get_versioned_cache_key( self, key: str, invalidate_key: None | str = None ) -> str
+- get · method · L212-L277 — def get( self, key: str, default: T | Callable[[], T] | None = None, invalidate_key: None | str = None, timeout: int = 60, ) -> T
+- update · method · L279-L312 — def update( self, key: str, callback: Callable[[T], T], default_value: T | Callable[[], T] | None = None, invalidate_key: None | str = None, timeout: int = 60, ) -> T
+- invalidate · method · L314-L336 — def invalidate(self, key: None | str = None, invalidate_key: None | str = None)
+- get_cached_settings · function · L345-L348 — def get_cached_settings() -> Settings | None
+- set_cached_settings · function · L351-L354 — def set_cached_settings(instance: Settings) -> None
+- invalidate_cached_settings · function · L357-L360 — def invalidate_cached_settings() -> None

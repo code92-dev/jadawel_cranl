@@ -1,0 +1,389 @@
+# backend/src/jadawel/contrib/database/formula/ast/function_defs.py
+
+- JadawelTimezoneMixinOverride · class · L135-L137 — class JadawelTimezoneMixinOverride(TimezoneMixin)
+- get_tzname · method · L136-L137 — def get_tzname(self)
+- JadawelExtract · class · L140-L141 — class JadawelExtract(JadawelTimezoneMixinOverride, Extract)
+- register_formula_functions · function · L144-L275 — def register_formula_functions(registry): # Text functions
+- JadawelUpper · class · L278-L292 — class JadawelUpper(OneArgumentJadawelFunction)
+- type_function · method · L282-L289 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L291-L292 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelLower · class · L295-L309 — class JadawelLower(OneArgumentJadawelFunction)
+- type_function · method · L299-L306 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L308-L309 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelDatetimeFormat · class · L312-L341 — class JadawelDatetimeFormat(TwoArgumentJadawelFunction)
+- type_function · method · L317-L325 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L327-L341 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelDatetimeFormatTz · class · L344-L374 — class JadawelDatetimeFormatTz(ThreeArgumentJadawelFunction)
+- type_function · method · L350-L357 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], arg3: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L359-L374 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- JadawelEncodeUri · class · L377-L395 — class JadawelEncodeUri(OneArgumentJadawelFunction)
+- type_function · method · L381-L388 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L390-L395 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelEncodeUriComponent · class · L398-L416 — class JadawelEncodeUriComponent(OneArgumentJadawelFunction)
+- type_function · method · L402-L409 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L411-L416 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelToText · class · L419-L438 — class JadawelToText(OneArgumentJadawelFunction)
+- type_function · method · L424-L431 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L433-L438 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelToVarchar · class · L441-L462 — class JadawelToVarchar(OneArgumentJadawelFunction)
+- type_function · method · L452-L459 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L461-L462 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelT · class · L465-L482 — class JadawelT(OneArgumentJadawelFunction)
+- type_function · method · L469-L479 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L481-L482 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelConcat · class · L485-L510 — class JadawelConcat(JadawelFunctionDefinition)
+- arg_types · method · L491-L492 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_function_given_valid_args · method · L494-L502 — def type_function_given_valid_args( self, args: List[JadawelExpression[JadawelFormulaValidType]], expression: "JadawelFunctionCall[UnTyped]", ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression_given_args · method · L504-L510 — def to_django_expression_given_args( self, expr_args: List[WrappedExpressionWithMetadata], *args, **kwargs ) -> WrappedExpressionWithMetadata
+- JadawelAdd · class · L513-L557 — class JadawelAdd(TwoArgumentJadawelFunction)
+- arg_types · method · L520-L527 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_checker · function · L521-L525 — def type_checker(arg_index: int, arg_types: List[JadawelFormulaType])
+- type_function · method · L529-L535 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L537-L557 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression: # date + interval = date # non date/interval types + non date/interval types = first arg type always
+- JadawelMultiply · class · L560-L592 — class JadawelMultiply(TwoArgumentJadawelFunction)
+- arg_types · method · L567-L574 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_checker · function · L568-L572 — def type_checker(arg_index: int, arg_types: List[JadawelFormulaType])
+- type_function · method · L576-L582 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L584-L592 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelMinus · class · L595-L638 — class JadawelMinus(TwoArgumentJadawelFunction)
+- arg_types · method · L602-L611 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_checker · function · L603-L609 — def type_checker(arg_index: int, arg_types: List[JadawelFormulaType])
+- type_function · method · L613-L619 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L621-L638 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelGreatest · class · L641-L659 — class JadawelGreatest(TwoArgumentJadawelFunction)
+- type_function · method · L647-L656 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L658-L659 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelLeast · class · L662-L680 — class JadawelLeast(TwoArgumentJadawelFunction)
+- type_function · method · L668-L677 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L679-L680 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelRound · class · L683-L728 — class JadawelRound(TwoArgumentJadawelFunction)
+- type_function · method · L688-L707 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L709-L728 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelMod · class · L731-L756 — class JadawelMod(TwoArgumentJadawelFunction)
+- type_function · method · L736-L744 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L746-L756 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelPower · class · L759-L775 — class JadawelPower(TwoArgumentJadawelFunction)
+- type_function · method · L764-L772 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L774-L775 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelLog · class · L778-L813 — class JadawelLog(TwoArgumentJadawelFunction)
+- type_function · method · L783-L791 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L793-L813 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelAbs · class · L816-L828 — class JadawelAbs(OneArgumentJadawelFunction)
+- type_function · method · L820-L825 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L827-L828 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelExp · class · L831-L843 — class JadawelExp(OneArgumentJadawelFunction)
+- type_function · method · L835-L840 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L842-L843 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelEven · class · L846-L862 — class JadawelEven(OneArgumentJadawelFunction)
+- type_function · method · L850-L855 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L857-L862 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelOdd · class · L865-L881 — class JadawelOdd(OneArgumentJadawelFunction)
+- type_function · method · L869-L874 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L876-L881 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelLn · class · L884-L908 — class JadawelLn(OneArgumentJadawelFunction)
+- type_function · method · L888-L893 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L895-L908 — def to_django_expression(self, arg: Expression) -> Expression: # If we get given a negative number ln will crash, instead just return NaN.
+- JadawelSqrt · class · L911-L933 — class JadawelSqrt(OneArgumentJadawelFunction)
+- type_function · method · L915-L920 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L922-L933 — def to_django_expression(self, arg: Expression) -> Expression: # If we get given a negative number sqrt will crash, instead just return NaN.
+- JadawelSign · class · L936-L950 — class JadawelSign(OneArgumentJadawelFunction)
+- type_function · method · L940-L947 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L949-L950 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelCeil · class · L953-L967 — class JadawelCeil(OneArgumentJadawelFunction)
+- type_function · method · L957-L964 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L966-L967 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelFloor · class · L970-L984 — class JadawelFloor(OneArgumentJadawelFunction)
+- type_function · method · L974-L981 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L983-L984 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelSplitPart · class · L987-L1028 — class JadawelSplitPart(ThreeArgumentJadawelFunction)
+- type_function · method · L993-L1006 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaTextType], arg2: JadawelExpression[JadawelFormulaTextType], arg3: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1008-L1028 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- JadawelTrunc · class · L1031-L1047 — class JadawelTrunc(OneArgumentJadawelFunction)
+- type_function · method · L1035-L1044 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1046-L1047 — def to_django_expression(self, arg: Expression) -> Expression
+- int_like_numeric_output_field · function · L1050-L1053 — def int_like_numeric_output_field() -> fields.DecimalField
+- JadawelIsNaN · class · L1056-L1072 — class JadawelIsNaN(OneArgumentJadawelFunction)
+- type_function · method · L1060-L1067 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1069-L1072 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelWhenNan · class · L1075-L1091 — class JadawelWhenNan(TwoArgumentJadawelFunction)
+- type_function · method · L1080-L1088 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1090-L1091 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelInt · class · L1094-L1100 — class JadawelInt(JadawelTrunc)
+- trunc_numeric_to_int · function · L1103-L1107 — def trunc_numeric_to_int(expr: Expression) -> Expression
+- handle_arg_being_nan · function · L1110-L1128 — def handle_arg_being_nan( arg_to_check_if_nan: Expression, when_nan: Expression, when_not_nan: Expression, ) -> Expression
+- JadawelDivide · class · L1131-L1186 — class JadawelDivide(TwoArgumentJadawelFunction)
+- arg_types · method · L1139-L1146 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_checker · function · L1140-L1144 — def type_checker(arg_index: int, arg_types: List[JadawelFormulaType])
+- type_function · method · L1148-L1156 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaNumberType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]: # Show all the decimal places we can by default if the user makes a formula # with a division to prevent weird results like `1/3=0`
+- to_django_expression · method · L1158-L1186 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelHasOption · class · L1189-L1248 — class JadawelHasOption(TwoArgumentJadawelFunction)
+- type_function · method · L1199-L1212 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaTextType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1214-L1224 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- to_django_expression_given_args · method · L1226-L1248 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelEqual · class · L1251-L1299 — class JadawelEqual(TwoArgumentJadawelFunction)
+- arg_types · method · L1261-L1268 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_checker · function · L1262-L1266 — def type_checker(arg_index: int, arg_types: List[JadawelFormulaType])
+- type_function · method · L1270-L1289 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1291-L1299 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelIf · class · L1302-L1349 — class JadawelIf(ThreeArgumentJadawelFunction)
+- type_function · method · L1311-L1340 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], arg3: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1342-L1349 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- JadawelDurationToSeconds · class · L1352-L1366 — class JadawelDurationToSeconds(OneArgumentJadawelFunction)
+- type_function · method · L1356-L1363 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1365-L1366 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelSecondsToDuration · class · L1369-L1397 — class JadawelSecondsToDuration(OneArgumentJadawelFunction)
+- type_function · method · L1373-L1378 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1380-L1397 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelToNumber · class · L1400-L1418 — class JadawelToNumber(OneArgumentJadawelFunction)
+- type_function · method · L1404-L1411 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1413-L1418 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelErrorToNan · class · L1421-L1436 — class JadawelErrorToNan(OneArgumentJadawelFunction)
+- type_function · method · L1426-L1431 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1433-L1436 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelErrorToNull · class · L1439-L1460 — class JadawelErrorToNull(OneArgumentJadawelFunction)
+- type_function · method · L1444-L1455 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]: # FIXME: This function should set `nullable=True` on the resulting type, # but since this is used as the most external wrapper function, don't # want to loose the real nullable state of the expression. This should # be fixed in the future (e.g. saving only the inner expression and wrapping # at runtime somehow).
+- to_django_expression · method · L1457-L1460 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelIsBlank · class · L1463-L1482 — class JadawelIsBlank(OneArgumentJadawelFunction)
+- type_function · method · L1467-L1472 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1474-L1482 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelIsNull · class · L1485-L1498 — class JadawelIsNull(OneArgumentJadawelFunction)
+- type_function · method · L1490-L1495 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1497-L1498 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelNot · class · L1501-L1513 — class JadawelNot(OneArgumentJadawelFunction)
+- type_function · method · L1505-L1510 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaBooleanType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1512-L1513 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelNotEqual · class · L1516-L1525 — class JadawelNotEqual(JadawelEqual)
+- to_django_expression · method · L1520-L1525 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- BaseLimitComparableFunction · class · L1528-L1549 — class BaseLimitComparableFunction(TwoArgumentJadawelFunction, ABC): # Overridden by the arg_types property below
+- arg_types · method · L1534-L1541 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_checker · function · L1535-L1539 — def type_checker(arg_index: int, arg_types: List[JadawelFormulaType])
+- type_function · method · L1543-L1549 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- JadawelGreaterThan · class · L1552-L1561 — class JadawelGreaterThan(BaseLimitComparableFunction)
+- to_django_expression · method · L1556-L1561 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelGreaterThanOrEqual · class · L1564-L1573 — class JadawelGreaterThanOrEqual(BaseLimitComparableFunction)
+- to_django_expression · method · L1568-L1573 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelLessThan · class · L1576-L1585 — class JadawelLessThan(BaseLimitComparableFunction)
+- to_django_expression · method · L1580-L1585 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelLessThanOrEqual · class · L1588-L1597 — class JadawelLessThanOrEqual(BaseLimitComparableFunction)
+- to_django_expression · method · L1592-L1597 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelNow · class · L1600-L1623 — class JadawelNow(ZeroArgumentJadawelFunction)
+- type_function · method · L1604-L1611 — def type_function( self, func_call: JadawelFunctionCall[UnTyped] ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1613-L1614 — def to_django_expression(self) -> Expression
+- to_django_expression_given_args · method · L1616-L1623 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelToday · class · L1626-L1652 — class JadawelToday(ZeroArgumentJadawelFunction)
+- type_function · method · L1630-L1640 — def type_function( self, func_call: JadawelFunctionCall[UnTyped] ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1642-L1643 — def to_django_expression(self) -> Expression
+- to_django_expression_given_args · method · L1645-L1652 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelToDate · class · L1655-L1681 — class JadawelToDate(TwoArgumentJadawelFunction)
+- type_function · method · L1660-L1673 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1675-L1681 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelToDateTz · class · L1684-L1717 — class JadawelToDateTz(ThreeArgumentJadawelFunction)
+- type_function · method · L1690-L1706 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], arg3: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1708-L1717 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- JadawelDay · class · L1720-L1736 — class JadawelDay(OneArgumentJadawelFunction)
+- type_function · method · L1724-L1733 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1735-L1736 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelMonth · class · L1739-L1757 — class JadawelMonth(OneArgumentJadawelFunction)
+- type_function · method · L1743-L1752 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1754-L1757 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelDateDiff · class · L1760-L1788 — class JadawelDateDiff(ThreeArgumentJadawelFunction)
+- type_function · method · L1767-L1777 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], arg3: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1779-L1788 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- JadawelAnd · class · L1791-L1806 — class JadawelAnd(TwoArgumentJadawelFunction)
+- type_function · method · L1797-L1803 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1805-L1806 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelOr · class · L1809-L1823 — class JadawelOr(TwoArgumentJadawelFunction)
+- type_function · method · L1814-L1820 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1822-L1823 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelDateInterval · class · L1826-L1840 — class JadawelDateInterval(OneArgumentJadawelFunction)
+- type_function · method · L1830-L1835 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1837-L1840 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelReplace · class · L1843-L1861 — class JadawelReplace(ThreeArgumentJadawelFunction)
+- type_function · method · L1849-L1856 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], arg3: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1858-L1861 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- JadawelSearch · class · L1864-L1880 — class JadawelSearch(TwoArgumentJadawelFunction)
+- type_function · method · L1869-L1877 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1879-L1880 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelContains · class · L1883-L1899 — class JadawelContains(TwoArgumentJadawelFunction)
+- type_function · method · L1888-L1894 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1896-L1899 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelRowId · class · L1902-L1933 — class JadawelRowId(ZeroArgumentJadawelFunction)
+- type_function · method · L1906-L1912 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1914-L1915 — def to_django_expression(self) -> Expression
+- to_django_expression_given_args · method · L1917-L1933 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelLength · class · L1936-L1950 — class JadawelLength(OneArgumentJadawelFunction)
+- type_function · method · L1940-L1947 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1949-L1950 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelReverse · class · L1953-L1965 — class JadawelReverse(OneArgumentJadawelFunction)
+- type_function · method · L1957-L1962 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1964-L1965 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelWhenEmpty · class · L1968-L1989 — class JadawelWhenEmpty(TwoArgumentJadawelFunction)
+- type_function · method · L1974-L1986 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L1988-L1989 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- _calculate_aggregate_orders · function · L1992-L1997 — def _calculate_aggregate_orders(join_ids: JoinIdsType)
+- array_agg_expression · function · L2000-L2039 — def array_agg_expression( args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, nest_in_value: bool, )
+- string_agg_array_of_multiple_select_field · function · L2042-L2118 — def string_agg_array_of_multiple_select_field( expr_with_metadata: WrappedExpressionWithMetadata, model, delimiter=", " ) -> WrappedExpressionWithMetadata
+- aggregate_many_to_many_values · function · L2121-L2198 — def aggregate_many_to_many_values( expr_with_metadata: WrappedExpressionWithMetadata, model ) -> WrappedExpressionWithMetadata
+- JadawelArrayAgg · class · L2201-L2221 — class JadawelArrayAgg(OneArgumentJadawelFunction, CollapseManyJadawelFunction)
+- type_function · method · L2206-L2211 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2213-L2214 — def to_django_expression(self, arg: Expression) -> Expression
+- to_django_expression_given_args · method · L2216-L2221 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelArrayAggNoNesting · class · L2224-L2235 — class JadawelArrayAggNoNesting(JadawelArrayAgg, CollapseManyJadawelFunction)
+- to_django_expression · method · L2227-L2228 — def to_django_expression(self, arg: Expression) -> Expression
+- to_django_expression_given_args · method · L2230-L2235 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelManyToManyAgg · class · L2238-L2263 — class JadawelManyToManyAgg(OneArgumentJadawelFunction, CollapseManyJadawelFunction)
+- type_function · method · L2247-L2252 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2254-L2255 — def to_django_expression(self, arg: Expression) -> Expression
+- to_django_expression_given_args · method · L2257-L2263 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelMultipleSelectOptionsAgg · class · L2268-L2269 — class JadawelMultipleSelectOptionsAgg(JadawelManyToManyAgg)
+- Jadawel2dArrayAgg · class · L2272-L2299 — class Jadawel2dArrayAgg(OneArgumentJadawelFunction, CollapseManyJadawelFunction)
+- type_function · method · L2277-L2282 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2284-L2289 — def to_django_expression(self, arg: Expression) -> Expression
+- to_django_expression_given_args · method · L2291-L2299 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelManyToManyCount · class · L2302-L2344 — class JadawelManyToManyCount(OneArgumentJadawelFunction)
+- can_accept_arg · method · L2310-L2313 — def can_accept_arg(self, arg)
+- type_function · method · L2315-L2322 — def type_function( self, func_call: JadawelFunctionCall, arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2324-L2325 — def to_django_expression(self, arg: Expression) -> Expression
+- to_django_expression_given_args · method · L2327-L2344 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelMultipleSelectCount · class · L2349-L2354 — class JadawelMultipleSelectCount(JadawelManyToManyCount)
+- can_accept_arg · method · L2353-L2354 — def can_accept_arg(self, arg)
+- JadawelStringAggManyToManyValues · class · L2357-L2401 — class JadawelStringAggManyToManyValues(OneArgumentJadawelFunction)
+- __init__ · method · L2365-L2368 — def __init__(self, *args, **kwargs)
+- type_function · method · L2370-L2379 — def type_function( self, func_call: JadawelFunctionCall, arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2381-L2387 — def to_django_expression(self, arg: Expression) -> Expression
+- to_django_expression_given_args · method · L2389-L2401 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelStringAggMultipleSelectValues · class · L2406-L2407 — class JadawelStringAggMultipleSelectValues(JadawelStringAggManyToManyValues)
+- JadawelCount · class · L2410-L2447 — class JadawelCount(OneArgumentJadawelFunction)
+- type_function · method · L2421-L2434 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2436-L2447 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelGetFileCount · class · L2450-L2474 — class JadawelGetFileCount(OneArgumentJadawelFunction)
+- can_accept_arg · method · L2454-L2457 — def can_accept_arg(self, arg)
+- type_function · method · L2459-L2469 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2471-L2474 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelArrayUnique · class · L2477-L2504 — class JadawelArrayUnique(OneArgumentJadawelFunction)
+- type_function · method · L2481-L2501 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]: # When referencing a lookup field, unwrap_at_field_level converts it # back to a "many" expression. Collapse it to an array first.
+- to_django_expression · method · L2503-L2504 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelArraySlice · class · L2507-L2611 — class JadawelArraySlice(ThreeArgumentJadawelFunction)
+- type_function · method · L2513-L2528 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaNumberType], arg3: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2530-L2611 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- JadawelIndexShortcut · class · L2614-L2640 — class JadawelIndexShortcut(OneArgumentJadawelFunction)
+- type_function · method · L2618-L2637 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2639-L2640 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelFirst · class · L2643-L2645 — class JadawelFirst(JadawelIndexShortcut)
+- JadawelLast · class · L2648-L2650 — class JadawelLast(JadawelIndexShortcut)
+- JadawelArrayLength · class · L2653-L2669 — class JadawelArrayLength(OneArgumentJadawelFunction)
+- type_function · method · L2657-L2664 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2666-L2669 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelArrayJoinValues · class · L2672-L2686 — class JadawelArrayJoinValues(TwoArgumentJadawelFunction)
+- type_function · method · L2677-L2683 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2685-L2686 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelFilter · class · L2689-L2726 — class JadawelFilter(TwoArgumentJadawelFunction)
+- type_function · method · L2694-L2710 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2712-L2713 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- to_django_expression_given_args · method · L2715-L2726 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- _to_django_aggregate_number_or_duration_expression · function · L2729-L2746 — def _to_django_aggregate_number_or_duration_expression( func: Expression, arg: Expression, **func_kwargs )
+- JadawelAny · class · L2749-L2762 — class JadawelAny(OneArgumentJadawelFunction)
+- type_function · method · L2754-L2759 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2761-L2762 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelEvery · class · L2765-L2778 — class JadawelEvery(OneArgumentJadawelFunction)
+- type_function · method · L2770-L2775 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2777-L2778 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelMax · class · L2781-L2803 — class JadawelMax(OneArgumentJadawelFunction)
+- type_function · method · L2795-L2800 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2802-L2803 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelMin · class · L2806-L2828 — class JadawelMin(OneArgumentJadawelFunction)
+- type_function · method · L2820-L2825 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2827-L2828 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelAvg · class · L2831-L2847 — class JadawelAvg(OneArgumentJadawelFunction)
+- type_function · method · L2839-L2844 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2846-L2847 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelStdDevPop · class · L2850-L2868 — class JadawelStdDevPop(OneArgumentJadawelFunction)
+- type_function · method · L2858-L2863 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2865-L2868 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelStdDevSample · class · L2871-L2889 — class JadawelStdDevSample(OneArgumentJadawelFunction)
+- type_function · method · L2879-L2884 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2886-L2889 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelAggJoin · class · L2892-L2940 — class JadawelAggJoin(TwoArgumentJadawelFunction)
+- type_function · method · L2898-L2906 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2908-L2909 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- to_django_expression_given_args · method · L2911-L2940 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelSum · class · L2943-L2958 — class JadawelSum(OneArgumentJadawelFunction)
+- type_function · method · L2950-L2955 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2957-L2958 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelVarianceSample · class · L2961-L2979 — class JadawelVarianceSample(OneArgumentJadawelFunction)
+- type_function · method · L2969-L2974 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2976-L2979 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelVariancePop · class · L2982-L3000 — class JadawelVariancePop(OneArgumentJadawelFunction)
+- type_function · method · L2990-L2995 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L2997-L3000 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelGetSingleSelectValue · class · L3003-L3022 — class JadawelGetSingleSelectValue(OneArgumentJadawelFunction)
+- type_function · method · L3007-L3014 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3016-L3022 — def to_django_expression(self, arg: Expression) -> Expression
+- _index_output_field · function · L3025-L3035 — def _index_output_field(mode)
+- _unwrap_literal_value · function · L3038-L3052 — def _unwrap_literal_value(django_expr)
+- JadawelIndex · class · L3055-L3123 — class JadawelIndex(JadawelFunctionDefinition)
+- arg_types · method · L3060-L3069 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_checker · function · L3061-L3067 — def type_checker(arg_index, arg_types)
+- type_function_given_valid_args · method · L3071-L3103 — def type_function_given_valid_args( self, args: List[JadawelExpression[JadawelFormulaValidType]], func_call: JadawelFunctionCall[UnTyped], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression_given_args · method · L3105-L3123 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- JadawelJsonbExtractPathText · class · L3126-L3163 — class JadawelJsonbExtractPathText(JadawelFunctionDefinition)
+- arg_types · method · L3131-L3138 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_checker · function · L3132-L3136 — def type_checker(arg_index: int, arg_types: List[JadawelFormulaType])
+- type_function_given_valid_args · method · L3140-L3145 — def type_function_given_valid_args( self, args: List[JadawelExpression[JadawelFormulaValidType]], expression: "JadawelFunctionCall[UnTyped]", ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression_given_args · method · L3147-L3156 — def to_django_expression_given_args( self, expr_args: List[WrappedExpressionWithMetadata], *args, **kwargs ) -> WrappedExpressionWithMetadata
+- __call__ · method · L3158-L3163 — def __call__( self, arg: JadawelExpression[JadawelJSONBObjectBaseType], *path: JadawelExpression[JadawelFormulaTextType], ) -> JadawelFunctionCall[JadawelFormulaTextType]
+- JadawelGetFileVisibleName · class · L3166-L3178 — class JadawelGetFileVisibleName(OneArgumentJadawelFunction)
+- type_function · method · L3170-L3175 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaSingleFileType], ) -> JadawelExpression[JadawelFormulaTextType]
+- to_django_expression · method · L3177-L3178 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelGetFileMimeType · class · L3181-L3193 — class JadawelGetFileMimeType(OneArgumentJadawelFunction)
+- type_function · method · L3185-L3190 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaSingleFileType], ) -> JadawelExpression[JadawelFormulaTextType]
+- to_django_expression · method · L3192-L3193 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelGetFileSize · class · L3196-L3220 — class JadawelGetFileSize(OneArgumentJadawelFunction)
+- type_function · method · L3200-L3209 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaSingleFileType], ) -> JadawelExpression[JadawelFormulaNumberType]
+- to_django_expression · method · L3211-L3220 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelGetImageWidth · class · L3223-L3245 — class JadawelGetImageWidth(OneArgumentJadawelFunction)
+- type_function · method · L3227-L3234 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaSingleFileType], ) -> JadawelExpression[JadawelFormulaNumberType]
+- to_django_expression · method · L3236-L3245 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelGetImageHeight · class · L3248-L3270 — class JadawelGetImageHeight(OneArgumentJadawelFunction)
+- type_function · method · L3252-L3259 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaSingleFileType], ) -> JadawelExpression[JadawelFormulaNumberType]
+- to_django_expression · method · L3261-L3270 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelIsImage · class · L3273-L3299 — class JadawelIsImage(OneArgumentJadawelFunction)
+- type_function · method · L3277-L3284 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaSingleFileType], ) -> JadawelExpression[JadawelFormulaBooleanType]
+- to_django_expression · method · L3286-L3299 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelGetLinkUrl · class · L3302-L3321 — class JadawelGetLinkUrl(OneArgumentJadawelFunction)
+- type_function · method · L3306-L3313 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3315-L3321 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelGetLinkLabel · class · L3324-L3343 — class JadawelGetLinkLabel(OneArgumentJadawelFunction)
+- type_function · method · L3328-L3335 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3337-L3343 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelLeft · class · L3346-L3366 — class JadawelLeft(TwoArgumentJadawelFunction)
+- type_function · method · L3351-L3357 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3359-L3366 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelRight · class · L3369-L3393 — class JadawelRight(TwoArgumentJadawelFunction)
+- type_function · method · L3374-L3380 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaNumberType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3382-L3393 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelRegexReplace · class · L3396-L3422 — class JadawelRegexReplace(ThreeArgumentJadawelFunction)
+- type_function · method · L3402-L3409 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], arg3: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3411-L3422 — def to_django_expression( self, arg1: Expression, arg2: Expression, arg3: Expression ) -> Expression
+- JadawelLink · class · L3425-L3454 — class JadawelLink(JadawelFunctionDefinition)
+- arg_types · method · L3431-L3432 — def arg_types(self) -> JadawelArgumentTypeChecker
+- type_function_given_valid_args · method · L3434-L3442 — def type_function_given_valid_args( self, args: List[JadawelExpression[JadawelFormulaValidType]], expression: "JadawelFunctionCall[UnTyped]", ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression_given_args · method · L3444-L3454 — def to_django_expression_given_args( self, expr_args: List[WrappedExpressionWithMetadata], *args, **kwargs ) -> WrappedExpressionWithMetadata
+- JadawelButton · class · L3457-L3473 — class JadawelButton(TwoArgumentJadawelFunction)
+- type_function · method · L3462-L3470 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3472-L3473 — def to_django_expression(self, arg1: Expression, arg2: Expression) -> Expression
+- JadawelTrim · class · L3476-L3490 — class JadawelTrim(OneArgumentJadawelFunction)
+- type_function · method · L3480-L3485 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3487-L3490 — def to_django_expression(self, arg: Expression) -> Expression: # This function should always be completely substituted when typing and replaced # with JadawelRegexReplace and hence this should never be called.
+- JadawelYear · class · L3493-L3509 — class JadawelYear(OneArgumentJadawelFunction)
+- type_function · method · L3497-L3506 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3508-L3509 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelSecond · class · L3512-L3535 — class JadawelSecond(OneArgumentJadawelFunction)
+- type_function · method · L3516-L3530 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaDateType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3532-L3535 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelBcToNull · class · L3538-L3562 — class JadawelBcToNull(OneArgumentJadawelFunction)
+- type_function · method · L3543-L3548 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3550-L3562 — def to_django_expression(self, arg: Expression) -> Expression
+- JadawelToURL · class · L3565-L3578 — class JadawelToURL(OneArgumentJadawelFunction)
+- type_function · method · L3570-L3575 — def type_function( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- to_django_expression · method · L3577-L3578 — def to_django_expression(self, arg: Expression) -> Expression

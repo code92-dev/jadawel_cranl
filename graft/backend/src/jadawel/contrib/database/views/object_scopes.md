@@ -1,0 +1,32 @@
+# backend/src/jadawel/contrib/database/views/object_scopes.py
+
+- DatabaseViewObjectScopeType · class · L20-L52 — class DatabaseViewObjectScopeType(ObjectScopeType)
+- get_parent_scope · method · L24-L25 — def get_parent_scope(self)
+- get_base_queryset · method · L27-L32 — def get_base_queryset(self, include_trash: bool = False) -> QuerySet
+- get_enhanced_queryset · method · L34-L37 — def get_enhanced_queryset(self, include_trash: bool = False) -> QuerySet
+- get_filter_for_scope_type · method · L39-L52 — def get_filter_for_scope_type(self, scope_type, scopes)
+- DatabaseViewDecorationObjectScopeType · class · L55-L90 — class DatabaseViewDecorationObjectScopeType(ObjectScopeType)
+- get_parent_scope · method · L59-L60 — def get_parent_scope(self)
+- get_base_queryset · method · L62-L67 — def get_base_queryset(self, include_trash: bool = False) -> QuerySet
+- get_enhanced_queryset · method · L69-L72 — def get_enhanced_queryset(self, include_trash: bool = False) -> QuerySet
+- get_filter_for_scope_type · method · L74-L90 — def get_filter_for_scope_type(self, scope_type, scopes)
+- DatabaseViewSortObjectScopeType · class · L93-L128 — class DatabaseViewSortObjectScopeType(ObjectScopeType)
+- get_parent_scope · method · L97-L98 — def get_parent_scope(self)
+- get_base_queryset · method · L100-L105 — def get_base_queryset(self, include_trash: bool = False) -> QuerySet
+- get_enhanced_queryset · method · L107-L110 — def get_enhanced_queryset(self, include_trash: bool = False) -> QuerySet
+- get_filter_for_scope_type · method · L112-L128 — def get_filter_for_scope_type(self, scope_type, scopes)
+- DatabaseViewFilterObjectScopeType · class · L131-L166 — class DatabaseViewFilterObjectScopeType(ObjectScopeType)
+- get_parent_scope · method · L135-L136 — def get_parent_scope(self)
+- get_base_queryset · method · L138-L143 — def get_base_queryset(self, include_trash: bool = False) -> QuerySet
+- get_enhanced_queryset · method · L145-L148 — def get_enhanced_queryset(self, include_trash: bool = False) -> QuerySet
+- get_filter_for_scope_type · method · L150-L166 — def get_filter_for_scope_type(self, scope_type, scopes)
+- DatabaseViewFilterGroupObjectScopeType · class · L169-L204 — class DatabaseViewFilterGroupObjectScopeType(ObjectScopeType)
+- get_parent_scope · method · L173-L174 — def get_parent_scope(self)
+- get_base_queryset · method · L176-L181 — def get_base_queryset(self, include_trash: bool = False) -> QuerySet
+- get_enhanced_queryset · method · L183-L186 — def get_enhanced_queryset(self, include_trash: bool = False) -> QuerySet
+- get_filter_for_scope_type · method · L188-L204 — def get_filter_for_scope_type(self, scope_type, scopes)
+- DatabaseViewGroupByObjectScopeType · class · L207-L242 — class DatabaseViewGroupByObjectScopeType(ObjectScopeType)
+- get_parent_scope · method · L211-L212 — def get_parent_scope(self)
+- get_base_queryset · method · L214-L219 — def get_base_queryset(self, include_trash: bool = False) -> QuerySet
+- get_enhanced_queryset · method · L221-L224 — def get_enhanced_queryset(self, include_trash: bool = False) -> QuerySet
+- get_filter_for_scope_type · method · L226-L242 — def get_filter_for_scope_type(self, scope_type, scopes)

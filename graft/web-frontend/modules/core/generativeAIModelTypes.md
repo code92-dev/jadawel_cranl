@@ -1,0 +1,42 @@
+# web-frontend/modules/core/generativeAIModelTypes.js
+
+- GenerativeAIModelType · class · L4-L39 — class GenerativeAIModelType extends Registerable
+- name · method · L5-L7 — get name()
+- canPromptWithFiles · method · L13-L15 — canPromptWithFiles()
+- getOrder · method · L17-L19 — getOrder()
+- getMaxTemperature · method · L21-L23 — getMaxTemperature()
+- getSettings · method · L36-L38 — getSettings()
+- modelSettings · function · L41-L54 — modelSettings = (label, description)
+- OpenAIModelType · class · L56-L101 — class OpenAIModelType extends GenerativeAIModelType
+- getType · method · L57-L59 — static getType()
+- getName · method · L61-L64 — getName()
+- getSettings · method · L66-L92 — getSettings()
+- canPromptWithFiles · method · L94-L96 — canPromptWithFiles()
+- getOrder · method · L98-L100 — getOrder()
+- AnthropicModelType · class · L103-L139 — class AnthropicModelType extends GenerativeAIModelType
+- getType · method · L104-L106 — static getType()
+- getName · method · L108-L111 — getName()
+- getSettings · method · L113-L126 — getSettings()
+- getOrder · method · L128-L130 — getOrder()
+- canPromptWithFiles · method · L132-L134 — canPromptWithFiles()
+- getMaxTemperature · method · L136-L138 — getMaxTemperature()
+- MistralModelType · class · L141-L177 — class MistralModelType extends GenerativeAIModelType
+- getType · method · L142-L144 — static getType()
+- getName · method · L146-L149 — getName()
+- getSettings · method · L151-L164 — getSettings()
+- getOrder · method · L166-L168 — getOrder()
+- canPromptWithFiles · method · L170-L172 — canPromptWithFiles()
+- getMaxTemperature · method · L174-L176 — getMaxTemperature()
+- OllamaModelType · class · L179-L215 — class OllamaModelType extends GenerativeAIModelType
+- getType · method · L180-L182 — static getType()
+- getName · method · L184-L187 — getName()
+- getSettings · method · L189-L202 — getSettings()
+- canPromptWithFiles · method · L204-L206 — canPromptWithFiles()
+- getOrder · method · L208-L210 — getOrder()
+- getMaxTemperature · method · L212-L214 — getMaxTemperature()
+- OpenRouterModelType · class · L217-L256 — class OpenRouterModelType extends GenerativeAIModelType
+- getType · method · L218-L220 — static getType()
+- getName · method · L222-L225 — getName()
+- getSettings · method · L227-L247 — getSettings()
+- canPromptWithFiles · method · L249-L251 — canPromptWithFiles()
+- getOrder · method · L253-L255 — getOrder()

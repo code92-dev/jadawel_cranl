@@ -1,0 +1,23 @@
+# backend/src/jadawel/contrib/database/rows/webhook_event_types.py
+
+- RespectSendWebhookEvents · class · L21-L35 — class RespectSendWebhookEvents
+- listener · method · L22-L35 — def listener(self, **kwargs: dict)
+- RowsEventType · class · L38-L368 — class RowsEventType(RespectSendWebhookEvents, WebhookEventType)
+- get_row_serializer · method · L39-L45 — def get_row_serializer(self, webhook, model)
+- get_filters_for_related_webhook_to_call · method · L47-L115 — def get_filters_for_related_webhook_to_call( self, model: GeneratedTableModel, rows: List[GeneratedTableModel], updated_fields_ids: List[int] | None = None, **kwargs, ) -> Q
+- get_payload_for_related_webhook · method · L117-L139 — def get_payload_for_related_webhook( self, event_id: str, webhook: TableWebhook, row_ids: List[int], **kwargs ) -> Dict[str, Any]
+- get_related_table_row_ids_with_changes · method · L141-L187 — def get_related_table_row_ids_with_changes( self, related_table: Table, rows: List[GeneratedTableModel], old_items: List[Dict[str, Any]] | None = None, ) -> List[int]
+- _paginate_payload · method · L189-L224 — def _paginate_payload( self, webhook: TableWebhook, event_id: str, payload: Dict[str, Any] ) -> Tuple[Dict[str, Any], Dict[str, Any] | None]
+- _get_filters_for_webhooks_to_call · method · L226-L236 — def _get_filters_for_webhooks_to_call( self, model: GeneratedTableModel, table: Table, **kwargs ) -> Q
+- get_filters_for_webhooks_to_call · method · L238-L259 — def get_filters_for_webhooks_to_call( self, model: GeneratedTableModel, table: Table, **kwargs ) -> Q
+- get_default_payload · method · L261-L291 — def get_default_payload( self, event_id: str, webhook: TableWebhook, model: GeneratedTableModel, table: Table, rows: List[GeneratedTableModel], **kwargs, ) -> Dict[str, Any]
+- get_related_table_payload · method · L293-L319 — def get_related_table_payload( self, event_id: str, webhook: TableWebhook, model: GeneratedTableModel, rows: List[GeneratedTableModel], **kwargs, ) -> Dict[str, Any]
+- get_payload · method · L321-L368 — def get_payload( self, event_id: str, webhook: TableWebhook, model: GeneratedTableModel, table: Table, rows: List[GeneratedTableModel], **kwargs, ) -> Dict[str, Any]
+- RowsCreatedEventType · class · L371-L384 — class RowsCreatedEventType(RowsEventType)
+- get_test_call_payload · method · L375-L384 — def get_test_call_payload(self, table, model, event_id, webhook)
+- RowsUpdatedEventType · class · L387-L430 — class RowsUpdatedEventType(RowsEventType)
+- _get_filters_for_webhooks_to_call · method · L391-L414 — def _get_filters_for_webhooks_to_call(self, table: Table, **kwargs) -> Q
+- get_test_call_payload · method · L416-L430 — def get_test_call_payload(self, table, model, event_id, webhook)
+- RowsDeletedEventType · class · L433-L452 — class RowsDeletedEventType(RowsEventType)
+- get_default_payload · method · L437-L440 — def get_default_payload(self, event_id, webhook, table, model, rows, **kwargs)
+- get_test_call_payload · method · L442-L452 — def get_test_call_payload(self, table, model, event_id, webhook)

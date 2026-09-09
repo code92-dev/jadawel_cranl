@@ -1,0 +1,17 @@
+# web-frontend/modules/core/components/ColorPicker.vue
+
+- data · method · L112-L125 — data()
+- currentValue · method · L128-L130 — currentValue()
+- handler · method · L134-L136 — handler(value)
+- mounted · method · L140-L149 — mounted()
+- beforeUnmount · method · L150-L155 — beforeUnmount()
+- startMovingThumbWithMouse · method · L157-L160 — startMovingThumbWithMouse(event, originatedIn)
+- startMovingThumbWithTouch · method · L161-L164 — startMovingThumbWithTouch(event, originatedIn)
+- stopMovingThumb · method · L165-L167 — stopMovingThumb()
+- moveThumbWithMouse · method · L168-L174 — moveThumbWithMouse(event)
+- moveThumbWithTouch · method · L175-L181 — moveThumbWithTouch(event)
+- moveThumb · method · L182-L214 — moveThumb(clientX, clientY)
+- getNewThumbPosition · method · L215-L224 — getNewThumbPosition(colorSpace, clientX, clientY)
+- setColorFromValue · method · L225-L229 — setColorFromValue(value)
+- setColor · method · L230-L241 — setColor(format, color, emit = true)
+- applyColorUpdates · method · L242-L250 — applyColorUpdates(sourceFormat, newColor)

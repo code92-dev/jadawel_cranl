@@ -1,0 +1,18 @@
+# backend/tests/arabase/mcp/protection/test_artifact_boundary.py
+
+- protected_page · function · L40-L54 — def protected_page(data_fixture)
+- test_mcp_page_update_stays_pending_until_human_approval · function · L58-L89 — def test_mcp_page_update_stays_pending_until_human_approval(protected_page)
+- test_approval_is_invalidated_when_view_configuration_changes · function · L93-L108 — def test_approval_is_invalidated_when_view_configuration_changes(protected_page)
+- test_approved_artifact_remains_active_while_replacement_awaits_review · function · L112-L141 — def test_approved_artifact_remains_active_while_replacement_awaits_review( protected_page, )
+- test_duplicated_protected_view_starts_without_approval · function · L145-L163 — def test_duplicated_protected_view_starts_without_approval(protected_page)
+- test_public_and_authenticated_approvals_are_separate · function · L167-L185 — def test_public_and_authenticated_approvals_are_separate(protected_page)
+- test_private_approval_remains_independent_when_public_audience_is_approved · function · L189-L225 — def test_private_approval_remains_independent_when_public_audience_is_approved( protected_page, )
+- test_approved_protected_page_rejects_search_before_queryset · function · L229-L251 — def test_approved_protected_page_rejects_search_before_queryset( api_client, protected_page )
+- test_public_only_artifact_removes_protected_projection · function · L255-L270 — def test_public_only_artifact_removes_protected_projection(protected_page)
+- test_manual_artifact_revocation_blocks_document_and_row_projection · function · L274-L296 — def test_manual_artifact_revocation_blocks_document_and_row_projection(protected_page)
+- test_protected_query_dependency_is_rejected · function · L300-L311 — def test_protected_query_dependency_is_rejected(protected_page)
+- test_artifact_review_api_exposes_only_safe_state · function · L315-L364 — def test_artifact_review_api_exposes_only_safe_state(api_client, data_fixture)
+- test_artifact_draft_api_validates_inputs_before_boundary · function · L368-L400 — def test_artifact_draft_api_validates_inputs_before_boundary( api_client, protected_page )
+- test_artifact_approval_api_returns_a_safe_not_found · function · L404-L416 — def test_artifact_approval_api_returns_a_safe_not_found(api_client, data_fixture)
+- test_direct_view_patch_routes_html_to_a_new_draft · function · L420-L443 — def test_direct_view_patch_routes_html_to_a_new_draft(api_client, protected_page)
+- test_artifact_html_never_accepts_a_mask_envelope · function · L446-L448 — def test_artifact_html_never_accepts_a_mask_envelope()

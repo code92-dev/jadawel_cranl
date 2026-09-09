@@ -1,0 +1,18 @@
+# web-frontend/modules/database/components/view/ViewsContext.vue
+
+- data · method · L125-L130 — data()
+- viewTypes · method · L132-L134 — viewTypes()
+- selectedViews · method · L135-L137 — selectedViews()
+- viewOwnershipTypes · method · L142-L144 — viewOwnershipTypes()
+- availableViewOwnershipTypesForCreation · method · L145-L149 — availableViewOwnershipTypesForCreation()
+- activeViewOwnershipTypes · method · L150-L154 — activeViewOwnershipTypes()
+- shown · method · L157-L164 — shown()
+- selectedView · method · L165-L168 — selectedView(view)
+- scrollViewDropdownIfNeeded · method · L175-L190 — scrollViewDropdownIfNeeded()
+- getSelectedViewItem · method · L195-L198 — getSelectedViewItem()
+- isSelectedViewOutOfDropdownView · method · L203-L207 — isSelectedViewOutOfDropdownView(selectedViewItem, dropdownHeight)
+- calculateOffsetToSelectedViewItem · method · L212-L227 — calculateOffsetToSelectedViewItem(dropdownElement, selectedViewItem)
+- searchAndOrder · method · L228-L237 — searchAndOrder(views)
+- viewsByOwnership · method · L238-L242 — viewsByOwnership(views, ownershipType)
+- order · method · L243-L254 — async order(ownershipType, order, oldOrder)
+- createOrderCall · method · L255-L259 — createOrderCall(ownershipType)

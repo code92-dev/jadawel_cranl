@@ -1,0 +1,21 @@
+# web-frontend/modules/database/dataSyncTypes.js
+
+- DataSyncType · class · L6-L69 — class DataSyncType extends Registerable
+- getIconClass · method · L11-L13 — getIconClass()
+- getName · method · L18-L20 — getName()
+- getFormComponent · method · L26-L28 — getFormComponent()
+- constructor · method · L30-L38 — constructor(...args)
+- serialize · method · L40-L46 — serialize()
+- isDeactivated · method · L51-L53 — isDeactivated(workspaceId)
+- getDeactivatedClickModal · method · L58-L60 — getDeactivatedClickModal()
+- getTwoWayDataSyncStrategy · method · L66-L68 — getTwoWayDataSyncStrategy()
+- ICalCalendarDataSyncType · class · L71-L88 — class ICalCalendarDataSyncType extends DataSyncType
+- getType · method · L72-L74 — static getType()
+- getIconClass · method · L76-L78 — getIconClass()
+- getName · method · L80-L83 — getName()
+- getFormComponent · method · L85-L87 — getFormComponent()
+- PostgreSQLDataSyncType · class · L90-L107 — class PostgreSQLDataSyncType extends DataSyncType
+- getType · method · L91-L93 — static getType()
+- getIconClass · method · L95-L97 — getIconClass()
+- getName · method · L99-L102 — getName()
+- getFormComponent · method · L104-L106 — getFormComponent()

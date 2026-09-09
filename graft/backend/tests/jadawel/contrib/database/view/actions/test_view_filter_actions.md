@@ -1,0 +1,15 @@
+# backend/tests/jadawel/contrib/database/view/actions/test_view_filter_actions.py
+
+- test_can_undo_creating_view_filter · function · L20-L48 — def test_can_undo_creating_view_filter(data_fixture)
+- test_can_undo_redo_creating_view_filter · function · L53-L92 — def test_can_undo_redo_creating_view_filter(data_fixture)
+- test_can_undo_updating_view_filter · function · L97-L143 — def test_can_undo_updating_view_filter(data_fixture)
+- test_can_undo_redo_updating_view_filter · function · L148-L180 — def test_can_undo_redo_updating_view_filter(data_fixture)
+- test_can_undo_deleting_view_filter · function · L185-L217 — def test_can_undo_deleting_view_filter(data_fixture)
+- test_can_undo_redo_deleting_view_filter · function · L222-L250 — def test_can_undo_redo_deleting_view_filter(data_fixture)
+- test_can_undo_creating_view_filter_group · function · L255-L278 — def test_can_undo_creating_view_filter_group(data_fixture)
+- test_can_undo_redo_creating_view_filter_group · function · L283-L315 — def test_can_undo_redo_creating_view_filter_group(data_fixture)
+- test_can_undo_updating_view_filter_group · function · L320-L346 — def test_can_undo_updating_view_filter_group(data_fixture)
+- test_can_undo_redo_updating_view_filter_group · function · L351-L378 — def test_can_undo_redo_updating_view_filter_group(data_fixture)
+- test_can_undo_deleting_view_filter_group · function · L383-L425 — def test_can_undo_deleting_view_filter_group(data_fixture)
+- test_can_undo_redo_deleting_view_filter_group · function · L430-L468 — def test_can_undo_redo_deleting_view_filter_group(data_fixture)
+- test_can_undo_redo_deleting_view_filter_group_with_nested_filters_and_groups · function · L473-L560 — def test_can_undo_redo_deleting_view_filter_group_with_nested_filters_and_groups( data_fixture, )

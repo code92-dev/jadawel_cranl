@@ -1,0 +1,22 @@
+# backend/src/jadawel/contrib/database/formula/parser/update_field_names.py
+
+- UpdateFieldNameFormulaVisitor · class · L16-L162 — class UpdateFieldNameFormulaVisitor(JadawelFormulaVisitor)
+- __init__ · method · L23-L40 — def __init__( self, field_names_to_update: Optional[Dict[str, str]] = None, field_ids_to_replace_with_name_refs: Optional[Dict[int, str]] = None, field_names_to_replace_with_id_refs: Optional[Dict[str, int]] = None, via_field: Optional[str] = None, )
+- visitRoot · method · L42-L43 — def visitRoot(self, ctx: JadawelFormula.RootContext)
+- visitStringLiteral · method · L45-L46 — def visitStringLiteral(self, ctx: JadawelFormula.StringLiteralContext)
+- visitDecimalLiteral · method · L48-L49 — def visitDecimalLiteral(self, ctx: JadawelFormula.DecimalLiteralContext)
+- visitBooleanLiteral · method · L51-L52 — def visitBooleanLiteral(self, ctx: JadawelFormula.BooleanLiteralContext)
+- visitBrackets · method · L54-L56 — def visitBrackets(self, ctx: JadawelFormula.BracketsContext)
+- visitFunctionCall · method · L58-L62 — def visitFunctionCall(self, ctx: JadawelFormula.FunctionCallContext)
+- visitBinaryOp · method · L64-L66 — def visitBinaryOp(self, ctx: JadawelFormula.BinaryOpContext)
+- visitFunc_name · method · L68-L69 — def visitFunc_name(self, ctx: JadawelFormula.Func_nameContext)
+- visitIdentifier · method · L71-L72 — def visitIdentifier(self, ctx: JadawelFormula.IdentifierContext)
+- visitIntegerLiteral · method · L74-L75 — def visitIntegerLiteral(self, ctx: JadawelFormula.IntegerLiteralContext)
+- visitFieldReference · method · L77-L96 — def visitFieldReference(self, ctx: JadawelFormula.FieldReferenceContext)
+- visitLookupFieldReference · method · L98-L129 — def visitLookupFieldReference( self, ctx: JadawelFormula.LookupFieldReferenceContext )
+- _rebuild_lookup · method · L131-L135 — def _rebuild_lookup(self, ctx, via, lookup)
+- _rename_and_escape · method · L137-L142 — def _rename_and_escape(self, current_name, is_single_quote)
+- visitFieldByIdReference · method · L144-L150 — def visitFieldByIdReference(self, ctx: JadawelFormula.FieldByIdReferenceContext)
+- visitLeftWhitespaceOrComments · method · L152-L156 — def visitLeftWhitespaceOrComments( self, ctx: JadawelFormula.LeftWhitespaceOrCommentsContext )
+- visitRightWhitespaceOrComments · method · L158-L162 — def visitRightWhitespaceOrComments( self, ctx: JadawelFormula.RightWhitespaceOrCommentsContext )
+- update_field_names · function · L165-L197 — def update_field_names( formula: str, field_names_to_update: Optional[Dict[str, str]] = None, field_ids_to_replace_with_name_refs: Optional[Dict[int, str]] = None, field_names_to_replace_with_id_refs: Optional[Dict[str, int]] = None, via_field: Optional[str] = None, ) -> str

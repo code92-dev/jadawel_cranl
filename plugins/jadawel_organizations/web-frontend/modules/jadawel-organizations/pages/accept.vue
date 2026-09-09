@@ -1,25 +1,27 @@
 <template>
   <main class="organization-invitation-page">
-    <h1>{{ $t("organizations.accept") }}</h1>
-    <form @submit.prevent="accept">
-      <label>
-        {{ $t("organizations.tokenInput") }}
-        <input
-          v-model="token"
-          dir="ltr"
-          minlength="20"
-          required
-          class="input"
-        />
-      </label>
-      <Button :disabled="busy">
-        {{ $t("organizations.accept") }}
-      </Button>
-    </form>
-    <p v-if="accepted" role="status">
-      {{ $t("organizations.invitationAccepted") }}
-    </p>
-    <p v-if="error" role="alert">{{ $t("organizations.error") }}</p>
+    <section class="organization-invitation-page__card">
+      <h1>{{ $t("organizations.accept") }}</h1>
+      <form @submit.prevent="accept">
+        <label>
+          {{ $t("organizations.tokenInput") }}
+          <input
+            v-model="token"
+            dir="ltr"
+            minlength="20"
+            required
+            class="input"
+          />
+        </label>
+        <Button button-type="submit" :disabled="busy">
+          {{ $t("organizations.accept") }}
+        </Button>
+      </form>
+      <p v-if="accepted" role="status">
+        {{ $t("organizations.invitationAccepted") }}
+      </p>
+      <p v-if="error" role="alert">{{ $t("organizations.error") }}</p>
+    </section>
   </main>
 </template>
 
@@ -66,6 +68,13 @@ export default {
   margin-inline: auto;
   padding: 32px;
 }
+.organization-invitation-page__card {
+  padding: 32px;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 14px;
+  background: var(--jadawel-raised-background, #fbfdfb);
+  box-shadow: 0 12px 30px rgb(20 65 42 / 8%);
+}
 
 .organization-invitation-page form {
   display: grid;
@@ -76,5 +85,14 @@ export default {
 .organization-invitation-page label {
   display: grid;
   gap: 8px;
+}
+
+@media (max-width: 640px) {
+  .organization-invitation-page {
+    padding: 20px 16px;
+  }
+  .organization-invitation-page__card {
+    padding: 20px 16px;
+  }
 }
 </style>

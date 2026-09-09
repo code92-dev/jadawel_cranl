@@ -1,0 +1,16 @@
+# backend/tests/jadawel/api/applications/test_application_views.py
+
+- stub_filter_queryset · function · L26-L27 — def stub_filter_queryset(u, o, q, **kwargs)
+- test_can_create_different_application_types · function · L32-L52 — def test_can_create_different_application_types( application_type, api_client, data_fixture )
+- test_list_applications · function · L56-L196 — def test_list_applications(api_client, data_fixture, django_assert_num_queries)
+- test_list_applications_with_permissions · function · L200-L220 — def test_list_applications_with_permissions(api_client, data_fixture)
+- test_list_applications_without_workspace · function · L224-L231 — def test_list_applications_without_workspace(api_client, data_fixture)
+- test_create_application · function · L235-L288 — def test_create_application(api_client, data_fixture)
+- test_get_application · function · L292-L331 — def test_get_application(api_client, data_fixture)
+- test_update_application · function · L335-L399 — def test_update_application(api_client, data_fixture)
+- test_delete_application · function · L403-L426 — def test_delete_application(api_client, data_fixture)
+- test_order_applications · function · L430-L495 — def test_order_applications(api_client, data_fixture)
+- test_duplicate_application_errors · function · L499-L531 — def test_duplicate_application_errors(api_client, data_fixture)
+- test_duplicate_application_schedule_job · function · L536-L576 — def test_duplicate_application_schedule_job( mock_run_async_job, api_client, data_fixture )
+- test_duplicate_job_response_serializer · function · L580-L610 — def test_duplicate_job_response_serializer(api_client, data_fixture)
+- test_anon_user_can_list_apps_of_app_in_template_workspace · function · L614-L638 — def test_anon_user_can_list_apps_of_app_in_template_workspace( api_client, data_fixture, )

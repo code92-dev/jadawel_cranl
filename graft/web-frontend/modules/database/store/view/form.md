@@ -1,0 +1,15 @@
+# web-frontend/modules/database/store/view/form.js
+
+- state · function · L5-L7 — state = ()
+- REPLACE_ALL_FIELD_OPTIONS · method · L10-L12 — REPLACE_ALL_FIELD_OPTIONS(state, fieldOptions)
+- UPDATE_ALL_FIELD_OPTIONS · method · L13-L15 — UPDATE_ALL_FIELD_OPTIONS(state, fieldOptions)
+- UPDATE_FIELD_OPTIONS_OF_FIELD · method · L16-L24 — UPDATE_FIELD_OPTIONS_OF_FIELD(state, { fieldId, values })
+- DELETE_FIELD_OPTIONS · method · L25-L29 — DELETE_FIELD_OPTIONS(state, fieldId)
+- fetchInitial · method · L33-L37 — async fetchInitial({ dispatch, commit, getters }, { formId })
+- setFieldOptionsOfField · method · L42-L47 — setFieldOptionsOfField({ commit }, { field, values })
+- updateAllFieldOptions · method · L52-L69 — async updateAllFieldOptions( { dispatch, getters }, { form, newFieldOptions, oldFieldOptions } )
+- forceUpdateAllFieldOptions · method · L73-L75 — forceUpdateAllFieldOptions({ commit }, fieldOptions)
+- updateFieldOptionsOrder · method · L80-L110 — async updateFieldOptionsOrder( { commit, getters, dispatch }, { form, order } )
+- forceDeleteFieldOptions · method · L114-L116 — forceDeleteFieldOptions({ commit }, fieldId)
+- updateFieldOptionsOfField · method · L120-L151 — async updateFieldOptionsOfField( { commit, getters }, { form, field, values } )
+- getAllFieldOptions · method · L155-L157 — getAllFieldOptions(state)

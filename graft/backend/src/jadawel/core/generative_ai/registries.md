@@ -1,0 +1,33 @@
+# backend/src/jadawel/core/generative_ai/registries.py
+
+- FileHandler · class · L20-L257 — class FileHandler
+- _has_embed_budget · method · L38-L54 — def _has_embed_budget( self, file_size: int, embed_count: int, embed_payload_size: int ) -> bool
+- _can_inline_file · method · L56-L74 — def _can_inline_file( self, ext: str, size: int, embed_count: int, embed_payload_size: int ) -> bool
+- _can_embed_file · method · L76-L92 — def _can_embed_file( self, ext: str, size: int, embed_count: int, embed_payload_size: int ) -> bool
+- _can_upload_file · method · L94-L103 — def _can_upload_file(self, ext: str, size: int) -> bool
+- _embed · method · L105-L119 — def _embed(self, ai_file: "AIFile") -> None
+- _inline_text · method · L121-L143 — def _inline_text(self, ai_file: "AIFile") -> bool
+- _upload · method · L145-L164 — def _upload( self, ai_file: "AIFile", workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- prepare_files · method · L166-L212 — def prepare_files( self, files: list["AIFile"], workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> list["AIFile"]
+- delete_file · method · L214-L232 — def delete_file( self, ai_file: "AIFile", workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- cleanup_files · method · L234-L257 — def cleanup_files( self, files: list["AIFile"], workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- GenerativeAIModelType · class · L260-L608 — class GenerativeAIModelType(Instance)
+- file_handler · method · L262-L269 — def file_handler(self) -> FileHandler | None
+- supports_files · method · L272-L275 — def supports_files(self) -> bool
+- prepare_files · method · L277-L300 — def prepare_files( self, files: list["AIFile"], workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> list["AIFile"]
+- cleanup_files · method · L302-L323 — def cleanup_files( self, files: list["AIFile"], workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- get_workspace_setting · method · L325-L349 — def get_workspace_setting( self, workspace: Optional[Workspace], key: str, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- get_api_key · method · L351-L364 — def get_api_key( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- is_enabled · method · L366-L384 — def is_enabled( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> bool
+- get_enabled_models · method · L386-L399 — def get_enabled_models( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> list[str]
+- get_ai_model · method · L401-L415 — def get_ai_model( self, model_name: str, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- _prepare_model_settings · method · L417-L430 — def _prepare_model_settings( self, temperature: Optional[float] = None ) -> dict[str, Any]
+- _is_choices · method · L432-L442 — def _is_choices(self, output_type: Any) -> bool
+- _build_user_prompt · method · L444-L478 — def _build_user_prompt( self, prompt: str, output_type: Any = None, content: Optional[list[UserContent]] = None, ) -> str | list[UserContent]
+- _build_agent · method · L480-L496 — def _build_agent(self, output_type: Any = None) -> "Agent"
+- _resolve_choices · method · L498-L524 — def _resolve_choices( self, text: str, choices: list[str], cutoff: float = 0.6 ) -> Optional[str]
+- prompt · method · L526-L584 — def prompt( self, model: str, prompt: str, workspace: Optional[Workspace] = None, temperature: Optional[float] = None, settings_override: Optional[dict[str, Any]] = None, output_type: Any = None, content: Optional[list[UserContent]] = None, ) -> Any
+- get_settings_serializer · method · L586-L596 — def get_settings_serializer(self) -> type
+- get_serializer · method · L598-L608 — def get_serializer(self) -> type
+- GenerativeAIModelTypeRegistry · class · L611-L622 — class GenerativeAIModelTypeRegistry(Registry)
+- get_enabled_models_per_type · method · L615-L622 — def get_enabled_models_per_type( self, workspace: Optional[Workspace] = None ) -> dict[str, list[str]]

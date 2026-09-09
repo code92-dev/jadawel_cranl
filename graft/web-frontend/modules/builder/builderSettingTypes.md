@@ -1,0 +1,41 @@
+# web-frontend/modules/builder/builderSettingTypes.js
+
+- BuilderSettingType · class · L15-L47 — class BuilderSettingType extends Registerable
+- getType · method · L16-L18 — static getType()
+- name · method · L20-L22 — get name()
+- icon · method · L24-L26 — get icon()
+- component · method · L28-L30 — get component()
+- componentPadding · method · L32-L34 — get componentPadding()
+- isDeactivated · method · L36-L38 — isDeactivated({ workspace })
+- isDeactivatedReason · method · L40-L42 — isDeactivatedReason({ workspace })
+- getDeactivatedModal · method · L44-L46 — getDeactivatedModal({ workspace })
+- GeneralBuilderSettingsType · class · L49-L69 — class GeneralBuilderSettingsType extends BuilderSettingType
+- getType · method · L50-L52 — static getType()
+- name · method · L54-L56 — get name()
+- icon · method · L58-L60 — get icon()
+- getOrder · method · L62-L64 — getOrder()
+- component · method · L66-L68 — get component()
+- IntegrationsBuilderSettingsType · class · L71-L91 — class IntegrationsBuilderSettingsType extends BuilderSettingType
+- getType · method · L72-L74 — static getType()
+- name · method · L76-L78 — get name()
+- icon · method · L80-L82 — get icon()
+- getOrder · method · L84-L86 — getOrder()
+- component · method · L88-L90 — get component()
+- ThemeBuilderSettingsType · class · L93-L113 — class ThemeBuilderSettingsType extends BuilderSettingType
+- getType · method · L94-L96 — static getType()
+- name · method · L98-L100 — get name()
+- icon · method · L102-L104 — get icon()
+- getOrder · method · L106-L108 — getOrder()
+- component · method · L110-L112 — get component()
+- DomainsBuilderSettingsType · class · L115-L135 — class DomainsBuilderSettingsType extends BuilderSettingType
+- getType · method · L116-L118 — static getType()
+- name · method · L120-L122 — get name()
+- icon · method · L124-L126 — get icon()
+- getOrder · method · L128-L130 — getOrder()
+- component · method · L132-L134 — get component()
+- UserSourcesBuilderSettingsType · class · L137-L157 — class UserSourcesBuilderSettingsType extends BuilderSettingType
+- getType · method · L138-L140 — static getType()
+- name · method · L142-L144 — get name()
+- icon · method · L146-L148 — get icon()
+- getOrder · method · L150-L152 — getOrder()
+- component · method · L154-L156 — get component()

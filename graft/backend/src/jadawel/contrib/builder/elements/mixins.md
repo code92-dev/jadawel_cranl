@@ -1,0 +1,45 @@
+# backend/src/jadawel/contrib/builder/elements/mixins.py
+
+- ContainerElementTypeMixin · class · L47-L148 — class ContainerElementTypeMixin: # Container element types are imported first.
+- SerializedDict · class · L51-L52 — class SerializedDict(ElementDict)
+- child_types_allowed · method · L55-L66 — def child_types_allowed(self) -> List[str]
+- get_new_place_in_container · method · L68-L80 — def get_new_place_in_container( self, container_element: ContainerElement, places_removed: List[str] ) -> Optional[str]
+- get_places_in_container_removed · method · L82-L94 — def get_places_in_container_removed( self, values: Dict, instance: ContainerElement ) -> List[str]
+- apply_order_by_children · method · L96-L104 — def apply_order_by_children(self, queryset: QuerySet[Element]) -> QuerySet[Element]
+- prepare_value_for_db · method · L106-L119 — def prepare_value_for_db( self, values: Dict, instance: Optional[ContainerElement] = None )
+- validate_place_in_container · method · L121-L132 — def validate_place_in_container( self, place_in_container: str, instance: ContainerElement )
+- after_move · method · L134-L148 — def after_move(self, instance: ElementSubClass)
+- CollectionElementTypeMixin · class · L151-L588 — class CollectionElementTypeMixin
+- SerializedDict · class · L183-L188 — class SerializedDict(ElementDict)
+- enhance_queryset · method · L190-L191 — def enhance_queryset(self, queryset)
+- after_update · method · L193-L226 — def after_update( self, instance: CollectionElementSubClass, values, changes: Dict[str, Tuple] )
+- after_move · method · L228-L241 — def after_move(self, element: ElementSubClass)
+- serializer_field_overrides · method · L244-L294 — def serializer_field_overrides(self)
+- prepare_value_for_db · method · L296-L371 — def prepare_value_for_db( self, values: Dict, instance: Optional[CollectionElementSubClass] = None )
+- serialize_property · method · L373-L405 — def serialize_property( self, element: CollectionElementSubClass, prop_name: str, files_zip=None, storage=None, cache=None, **kwargs, )
+- deserialize_property · method · L407-L428 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- import_context_addition · method · L430-L463 — def import_context_addition(self, instance: CollectionElement) -> Dict[str, int]
+- create_instance_from_serialized · method · L465-L543 — def create_instance_from_serialized( self, serialized_values: Dict[str, Any], id_mapping, files_zip=None, storage=None, cache=None, **kwargs, ) -> CollectionElementSubClass
+- extract_properties · method · L545-L588 — def extract_properties(self, instance: Element, **kwargs) -> Dict[int, List[str]]
+- CollectionElementWithFieldsTypeMixin · class · L591-L831 — class CollectionElementWithFieldsTypeMixin(CollectionElementTypeMixin)
+- serializer_field_names · method · L598-L599 — def serializer_field_names(self)
+- serializer_field_overrides · method · L602-L606 — def serializer_field_overrides(self)
+- SerializedDict · class · L608-L609 — class SerializedDict(CollectionElementTypeMixin.SerializedDict)
+- serialize_property · method · L611-L638 — def serialize_property( self, element: CollectionElementSubClass, prop_name: str, files_zip=None, storage=None, cache=None, **kwargs, )
+- after_create · method · L640-L667 — def after_create(self, instance: CollectionElementSubClass, values)
+- after_update · method · L669-L705 — def after_update( self, instance: CollectionElementSubClass, values, changes: Dict[str, Tuple] )
+- before_delete · method · L707-L712 — def before_delete(self, instance: CollectionElementSubClass): # Call the before_delete hook of all fields
+- create_instance_from_serialized · method · L714-L756 — def create_instance_from_serialized( self, serialized_values: Dict[str, Any], id_mapping, files_zip=None, storage=None, cache=None, **kwargs, )
+- import_serialized · method · L758-L803 — def import_serialized( self, page: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], files_zip: ZipFile | None = None, storage: Storage | None = None, cache: Dict[str, Any] | None = None, **kwargs, ) -> ElementSubClass
+- extract_properties · method · L805-L831 — def extract_properties( self, instance: CollectionElementSubClass, **kwargs, ) -> Dict[int, List[str]]
+- FormElementTypeMixin · class · L834-L854 — class FormElementTypeMixin
+- is_valid · method · L835-L854 — def is_valid( self, element: Type[FormElement], value: Any, dispatch_context: DispatchContext, ) -> Any
+- MultiPageElementTypeMixin · class · L857-L970 — class MultiPageElementTypeMixin
+- serializer_field_names · method · L861-L865 — def serializer_field_names(self)
+- allowed_fields · method · L868-L871 — def allowed_fields(self)
+- SerializedDict · class · L873-L875 — class SerializedDict(ElementDict)
+- after_create · method · L877-L893 — def after_create(self, instance, values)
+- after_update · method · L895-L912 — def after_update(self, instance: Any, values: Dict, changes: Dict[str, Tuple])
+- serialize_property · method · L914-L938 — def serialize_property( self, element: "MultiPageElementTypeMixin", prop_name: str, files_zip=None, storage=None, cache=None, **kwargs, )
+- create_instance_from_serialized · method · L940-L967 — def create_instance_from_serialized( self, serialized_values: Dict[str, Any], id_mapping, files_zip=None, storage=None, cache=None, **kwargs, )
+- get_pytest_params · method · L969-L970 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]

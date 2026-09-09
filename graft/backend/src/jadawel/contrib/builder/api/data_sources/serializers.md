@@ -1,0 +1,25 @@
+# backend/src/jadawel/contrib/builder/api/data_sources/serializers.py
+
+- DataSourceSerializer · class · L22-L100 — class DataSourceSerializer(ServiceSerializer)
+- _get_service_instance · method · L40-L44 — def _get_service_instance(self, instance): # We generate the service schema using a `Service` instance. # If the `instance` is a `DataSource` instance, traverse its # 1-1 relation to `Service` and serialize it.
+- get_type · method · L47-L52 — def get_type(self, instance)
+- get_id · method · L55-L56 — def get_id(self, instance)
+- get_name · method · L59-L60 — def get_name(self, instance)
+- get_page_id · method · L63-L64 — def get_page_id(self, instance)
+- get_order · method · L67-L68 — def get_order(self, instance)
+- get_schema · method · L71-L75 — def get_schema(self, instance)
+- get_context_data · method · L78-L83 — def get_context_data(self, instance)
+- get_context_data_schema · method · L86-L91 — def get_context_data_schema(self, instance)
+- Meta · class · L93-L100 — class Meta(ServiceSerializer.Meta)
+- CreateDataSourceSerializer · class · L103-L135 — class CreateDataSourceSerializer(CreateServiceSerializer)
+- Meta · class · L130-L135 — class Meta(ServiceSerializer.Meta)
+- BaseUpdateDataSourceSerializer · class · L138-L144 — class BaseUpdateDataSourceSerializer(serializers.ModelSerializer)
+- Meta · class · L139-L144 — class Meta(ServiceSerializer.Meta)
+- UpdateDataSourceSerializer · class · L147-L151 — class UpdateDataSourceSerializer(UpdateServiceSerializer)
+- Meta · class · L150-L151 — class Meta(ServiceSerializer.Meta)
+- MoveDataSourceSerializer · class · L154-L162 — class MoveDataSourceSerializer(serializers.Serializer)
+- GetRecordIdsSerializer · class · L165-L166 — class GetRecordIdsSerializer(serializers.Serializer)
+- DynamicMetadataSerializer · class · L169-L190 — class DynamicMetadataSerializer(serializers.Serializer)
+- __init__ · method · L174-L180 — def __init__(self, *args, **kwargs)
+- to_internal_value · method · L182-L190 — def to_internal_value(self, data): # Accept either a string or a dict
+- DispatchDataSourceRequestSerializer · class · L193-L199 — class DispatchDataSourceRequestSerializer(serializers.Serializer)

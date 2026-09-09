@@ -1,0 +1,56 @@
+# backend/src/jadawel/contrib/database/rows/actions.py
+
+- are_equal_on_create · function · L42-L63 — def are_equal_on_create(field_identifier, after_value, before_value) -> bool
+- get_row_values · function · L66-L77 — def get_row_values( row: GeneratedTableModel, fields: Iterable[FieldObject] ) -> dict[str, Any]
+- CreateRowActionType · class · L80-L205 — class CreateRowActionType(UndoableActionType)
+- Params · class · L92-L101 — class Params
+- do · method · L104-L189 — def do( cls, user: AbstractUser, table: Table, values: Optional[Dict[str, Any]] = None, model: Optional[Type[GeneratedTableModel]] = None, before_row: Optional[GeneratedTableModel] = None, view: Optional[View] = None, user_field_names: bool = False, send_webhook_events: bool = True, ) -> GeneratedTableModel
+- scope · method · L192-L193 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L196-L199 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L202-L205 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- CreateRowsActionType · class · L208-L337 — class CreateRowsActionType(UndoableActionType)
+- Params · class · L220-L230 — class Params
+- do · method · L233-L316 — def do( cls, user: AbstractUser, table: Table, rows_values: List[Dict[str, Any]], before_row: Optional[GeneratedTableModel] = None, view: Optional[View] = None, model: Optional[Type[GeneratedTableModel]] = None, send_webhook_events: bool = True, ) -> List[GeneratedTableModel]
+- scope · method · L319-L320 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L323-L328 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L331-L337 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- ImportRowsActionType · class · L340-L428 — class ImportRowsActionType(UndoableActionType)
+- Params · class · L348-L354 — class Params
+- do · method · L357-L407 — def do( cls, user: AbstractUser, table: Table, data: FileImportDict, progress: Optional[Progress] = None, ) -> Tuple[List[GeneratedTableModel], Dict[str, Any]]
+- scope · method · L410-L411 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L414-L419 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L422-L428 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DeleteRowActionType · class · L431-L534 — class DeleteRowActionType(UndoableActionType)
+- Params · class · L443-L452 — class Params
+- do · method · L455-L518 — def do( cls, user: AbstractUser, table: Table, row_id: int, model: Optional[Type[GeneratedTableModel]] = None, view: Optional[View] = None, send_webhook_events: bool = True, )
+- scope · method · L521-L522 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L525-L528 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L531-L534 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DeleteRowsActionType · class · L537-L648 — class DeleteRowsActionType(UndoableActionType)
+- Params · class · L549-L559 — class Params
+- do · method · L562-L627 — def do( cls, user: AbstractUser, table: Table, row_ids: List[int], model: Optional[Type[GeneratedTableModel]] = None, view: Optional[View] = None, send_webhook_events: bool = True, )
+- scope · method · L630-L631 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L634-L640 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L643-L648 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- get_rows_displacement · function · L651-L677 — def get_rows_displacement( model: Type[GeneratedTableModel], original_row_order: Decimal, new_row_order: Decimal, ) -> int
+- get_displacement · function · L664-L672 — def get_displacement( lower_order: Decimal, higher_order: Decimal, ) -> int
+- get_before_row_from_displacement · function · L680-L716 — def get_before_row_from_displacement( row: GeneratedTableModel, model: Type[GeneratedTableModel], displacement: int, ) -> Optional[GeneratedTableModel]
+- MoveRowActionType · class · L719-L833 — class MoveRowActionType(UndoableActionType)
+- Params · class · L727-L733 — class Params
+- do · method · L736-L801 — def do( cls, user: AbstractUser, table: Table, row_id: int, before_row: Optional[GeneratedTableModel] = None, model: Optional[Type[GeneratedTableModel]] = None, send_webhook_events: bool = True, ) -> GeneratedTableModelForUpdate
+- scope · method · L804-L805 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L808-L819 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L822-L833 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- UpdateRowActionType · class · L837-L948 — class UpdateRowActionType(UndoableActionType)
+- Params · class · L845-L854 — class Params
+- do · method · L857-L930 — def do( cls, user: AbstractUser, table: Table, row_id: int, values: Dict[str, Any], model: Optional[Type[GeneratedTableModel]] = None, view: Optional["View"] = None, user_field_names: bool = False, ) -> GeneratedTableModelForUpdate
+- scope · method · L933-L934 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L937-L941 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L944-L948 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- UpdateRowsActionType · class · L951-L1082 — class UpdateRowsActionType(UndoableActionType)
+- Params · class · L962-L975 — class Params
+- do · method · L978-L1042 — def do( cls, user: AbstractUser, table: Table, rows_values: List[Dict[str, Any]], model: Optional[Type[GeneratedTableModel]] = None, view: Optional[View] = None, send_webhook_events: bool = True, ) -> UpdatedRowsData
+- serialized_to_params · method · L1045-L1067 — def serialized_to_params(cls, serialized_params: Any) -> Any
+- scope · method · L1070-L1071 — def scope(cls, table_id) -> ActionScopeStr
+- undo · method · L1074-L1077 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L1080-L1082 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)

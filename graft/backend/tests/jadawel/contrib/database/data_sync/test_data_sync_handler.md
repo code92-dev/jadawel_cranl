@@ -1,0 +1,62 @@
+# backend/tests/jadawel/contrib/database/data_sync/test_data_sync_handler.py
+
+- test_create_data_sync_table_invalid_property · function · L262-L275 — def test_create_data_sync_table_invalid_property(data_fixture)
+- test_create_data_sync_table_no_unique_primary · function · L279-L310 — def test_create_data_sync_table_no_unique_primary(data_fixture)
+- TmpICalCalendarDataSync · class · L282-L290 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType): # Intentionally remove the `unique_primary` properties to trigger the # exception when creating.
+- get_properties · method · L285-L290 — def get_properties(self, *args, **kwargs) -> dict
+- test_create_data_sync_table_without_permissions · function · L314-L327 — def test_create_data_sync_table_without_permissions(data_fixture)
+- test_create_data_sync_table_with_the_multiple_same_properties · function · L331-L346 — def test_create_data_sync_table_with_the_multiple_same_properties(data_fixture)
+- test_create_data_sync_table · function · L351-L416 — def test_create_data_sync_table(send_mock, data_fixture)
+- test_create_data_sync_table_automatically_add_unique_properties · function · L421-L444 — def test_create_data_sync_table_automatically_add_unique_properties( send_mock, data_fixture )
+- test_update_data_sync_table_without_permissions · function · L448-L470 — def test_update_data_sync_table_without_permissions(data_fixture)
+- test_update_data_sync_table · function · L475-L536 — def test_update_data_sync_table(send_mock, data_fixture)
+- test_sync_data_sync_table_create_update_delete_row · function · L541-L655 — def test_sync_data_sync_table_create_update_delete_row(data_fixture)
+- test_sync_data_sync_table_property_removed_from_data_sync_type · function · L660-L714 — def test_sync_data_sync_table_property_removed_from_data_sync_type(data_fixture)
+- TmpICalCalendarDataSync · class · L683-L688 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_properties · method · L684-L688 — def get_properties(self, *args, **kwargs) -> dict
+- test_sync_data_sync_table_multiple_unique_primary_properties · function · L719-L780 — def test_sync_data_sync_table_multiple_unique_primary_properties(data_fixture)
+- TmpICalCalendarDataSync · class · L742-L748 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_properties · method · L743-L748 — def get_properties(self, *args, **kwargs) -> dict
+- test_sync_data_sync_table_refresh_called · function · L786-L812 — def test_sync_data_sync_table_refresh_called(send_mock, data_fixture)
+- test_sync_data_sync_table_sync_error · function · L817-L844 — def test_sync_data_sync_table_sync_error(data_fixture)
+- test_sync_data_sync_table_exception_raised · function · L851-L869 — def test_sync_data_sync_table_exception_raised(mock_get_all_rows, data_fixture)
+- test_sync_data_sync_table_with_formula_field_dependency · function · L874-L919 — def test_sync_data_sync_table_with_formula_field_dependency(data_fixture)
+- test_sync_data_sync_table_without_all_fields_rows_updated · function · L924-L950 — def test_sync_data_sync_table_without_all_fields_rows_updated(data_fixture)
+- test_sync_data_sync_table_without_permissions · function · L955-L963 — def test_sync_data_sync_table_without_permissions(data_fixture)
+- test_sync_data_sync_table_already_running · function · L968-L993 — def test_sync_data_sync_table_already_running(data_fixture)
+- test_sync_data_sync_table_lock_is_removed · function · L998-L1021 — def test_sync_data_sync_table_lock_is_removed(data_fixture)
+- test_sync_data_sync_table_lock_is_removed_on_sync_error · function · L1026-L1050 — def test_sync_data_sync_table_lock_is_removed_on_sync_error(data_fixture)
+- test_sync_data_sync_table_lock_is_removed_on_failure · function · L1055-L1092 — def test_sync_data_sync_table_lock_is_removed_on_failure(data_fixture)
+- TmpICalCalendarDataSync · class · L1079-L1081 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_all_rows · method · L1080-L1081 — def get_all_rows(self, *args, **kwargs) -> dict
+- test_set_data_sync_synced_properties_not_existing_property · function · L1097-L1124 — def test_set_data_sync_synced_properties_not_existing_property(data_fixture)
+- test_set_data_sync_synced_properties_without_permissions · function · L1129-L1148 — def test_set_data_sync_synced_properties_without_permissions(data_fixture)
+- test_set_data_sync_synced_properties_field_name_already_exists · function · L1153-L1183 — def test_set_data_sync_synced_properties_field_name_already_exists(data_fixture)
+- test_set_data_sync_synced_properties_field_types_changed · function · L1188-L1236 — def test_set_data_sync_synced_properties_field_types_changed(data_fixture)
+- TmpUIDICalCalendarDataSyncProperty · class · L1211-L1213 — class TmpUIDICalCalendarDataSyncProperty(UIDICalCalendarDataSyncProperty)
+- to_jadawel_field · method · L1212-L1213 — def to_jadawel_field(self) -> TextField
+- TmpICalCalendarDataSync · class · L1215-L1219 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_properties · method · L1216-L1219 — def get_properties(self, *args, **kwargs) -> dict
+- test_set_data_sync_synced_properties_property_removed_from_data_sync · function · L1241-L1286 — def test_set_data_sync_synced_properties_property_removed_from_data_sync(data_fixture)
+- TmpICalCalendarDataSync · class · L1264-L1269 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_properties · method · L1265-L1269 — def get_properties(self, *args, **kwargs) -> dict
+- test_set_data_sync_synced_properties_property_immutable_properties_changed · function · L1291-L1359 — def test_set_data_sync_synced_properties_property_immutable_properties_changed( data_fixture, )
+- TmpICalCalendarDataSync · class · L1306-L1312 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_properties · method · L1307-L1312 — def get_properties(self, *args, **kwargs) -> dict
+- TmpICalCalendarDataSync · class · L1337-L1343 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_properties · method · L1338-L1343 — def get_properties(self, *args, **kwargs) -> dict
+- test_set_data_sync_synced_properties_property_unique_primary_changed · function · L1364-L1434 — def test_set_data_sync_synced_properties_property_unique_primary_changed(data_fixture)
+- TmpICalCalendarDataSync · class · L1377-L1385 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_properties · method · L1378-L1385 — def get_properties(self, *args, **kwargs) -> dict
+- TmpICalCalendarDataSync · class · L1410-L1418 — class TmpICalCalendarDataSync(ICalCalendarDataSyncType)
+- get_properties · method · L1411-L1418 — def get_properties(self, *args, **kwargs) -> dict
+- test_set_data_sync_synced_properties_with_multiple_same_synced_properties · function · L1439-L1471 — def test_set_data_sync_synced_properties_with_multiple_same_synced_properties( data_fixture, )
+- test_set_data_sync_synced_properties · function · L1476-L1527 — def test_set_data_sync_synced_properties(data_fixture)
+- test_set_data_sync_synced_properties_correctly_removing_field · function · L1532-L1579 — def test_set_data_sync_synced_properties_correctly_removing_field(data_fixture)
+- test_delete_sync_data_sync_table · function · L1584-L1608 — def test_delete_sync_data_sync_table(data_fixture)
+- test_delete_unique_primary_data_sync_field · function · L1613-L1640 — def test_delete_unique_primary_data_sync_field(data_fixture)
+- test_delete_non_unique_primary_data_sync_field · function · L1645-L1671 — def test_delete_non_unique_primary_data_sync_field(data_fixture)
+- test_trash_field_and_then_sync · function · L1676-L1702 — def test_trash_field_and_then_sync(data_fixture)
+- test_trash_field_is_synced · function · L1707-L1747 — def test_trash_field_is_synced(data_fixture)
+- test_set_data_sync_not_recreate_trashed_field_property_on_sync · function · L1752-L1778 — def test_set_data_sync_not_recreate_trashed_field_property_on_sync(data_fixture)
+- test_duplicate_data_sync_field · function · L1784-L1820 — def test_duplicate_data_sync_field(data_fixture)

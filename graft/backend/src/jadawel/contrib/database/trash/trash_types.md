@@ -1,0 +1,50 @@
+# backend/src/jadawel/contrib/database/trash/trash_types.py
+
+- TableTrashableItemType · class · L49-L262 — class TableTrashableItemType(TrashableItemType)
+- get_parent · method · L53-L54 — def get_parent(self, trashed_item: Any) -> Optional[Any]
+- get_name · method · L56-L57 — def get_name(self, trashed_item: Table) -> str
+- lookup_trashed_item · method · L59-L67 — def lookup_trashed_item( self, trashed_entry, trash_item_lookup_cache: Dict[str, Any] = None )
+- fields_to_restore · method · L69-L98 — def fields_to_restore(self, trashed_item: Table, trash_entry: TrashEntry)
+- restore · method · L100-L121 — def restore(self, trashed_item: Table, trash_entry: TrashEntry)
+- permanently_delete_item · method · L123-L150 — def permanently_delete_item( self, trashed_item: Table, trash_item_lookup_cache=None, )
+- trash · method · L153-L259 — def trash( self, item_to_trash: Table, requesting_user: User, trash_entry: TrashEntry, )
+- get_restore_operation_type · method · L261-L262 — def get_restore_operation_type(self) -> str
+- FieldTrashableItemType · class · L265-L317 — class FieldTrashableItemType(TrashableItemType)
+- get_parent · method · L269-L270 — def get_parent(self, trashed_item: Any) -> Optional[Any]
+- get_name · method · L272-L273 — def get_name(self, trashed_item: Field) -> str
+- restore · method · L275-L276 — def restore(self, trashed_item: Field, trash_entry: TrashEntry)
+- permanently_delete_item · method · L278-L314 — def permanently_delete_item( self, field: Field, trash_item_lookup_cache=None, )
+- get_restore_operation_type · method · L316-L317 — def get_restore_operation_type(self) -> str
+- RowTrashableItemType · class · L320-L432 — class RowTrashableItemType(TrashableItemType)
+- requires_parent_id · method · L325-L328 — def requires_parent_id(self) -> bool: # A row is not unique just with its ID. We also need the table id (parent id) # to uniquely identify and lookup a specific row.
+- get_parent · method · L330-L331 — def get_parent(self, trashed_item: Any) -> Optional[Any]
+- _get_table · method · L334-L342 — def _get_table(parent_id)
+- get_name · method · L344-L345 — def get_name(self, trashed_item) -> str
+- get_names · method · L347-L348 — def get_names(self, trashed_item: Any) -> str
+- restore · method · L350-L381 — def restore(self, trashed_item, trash_entry: TrashEntry)
+- permanently_delete_item · method · L383-L387 — def permanently_delete_item(self, row, trash_item_lookup_cache=None)
+- lookup_trashed_item · method · L389-L422 — def lookup_trashed_item( self, trashed_entry: TrashEntry, trash_item_lookup_cache=None )
+- _get_table_model · method · L424-L426 — def _get_table_model(self, table_id)
+- get_restore_operation_type · method · L428-L429 — def get_restore_operation_type(self) -> str
+- get_restore_operation_context · method · L431-L432 — def get_restore_operation_context(self, trashed_entry, trashed_item) -> str
+- RowsTrashableItemType · class · L435-L547 — class RowsTrashableItemType(TrashableItemType)
+- requires_parent_id · method · L440-L442 — def requires_parent_id(self) -> bool: # A row is not unique just with its ID. We also need the table id (parent id)
+- get_parent · method · L444-L445 — def get_parent(self, trashed_item: Any) -> Optional[Any]
+- _get_table · method · L448-L456 — def _get_table(parent_id)
+- get_name · method · L458-L459 — def get_name(self, trashed_item) -> str
+- get_names · method · L461-L472 — def get_names(self, trashed_item) -> list: # When trashing the item, we store the row objects on the `trashed_item`, # so that we can re-use it later and prevent a possibly expensive query.
+- restore · method · L474-L511 — def restore(self, trashed_item, trash_entry: TrashEntry)
+- trash · method · L513-L519 — def trash(self, item_to_trash, requesting_user, trash_entry: TrashEntry)
+- permanently_delete_item · method · L521-L529 — def permanently_delete_item(self, trashed_item, trash_item_lookup_cache=None)
+- lookup_trashed_item · method · L531-L537 — def lookup_trashed_item( self, trashed_entry: TrashEntry, trash_item_lookup_cache=None )
+- _get_table_model · method · L539-L541 — def _get_table_model(self, table_id)
+- get_restore_operation_type · method · L543-L544 — def get_restore_operation_type(self) -> str
+- get_restore_operation_context · method · L546-L547 — def get_restore_operation_context(self, trashed_entry, trashed_item) -> str
+- ViewTrashableItemType · class · L550-L587 — class ViewTrashableItemType(TrashableItemType)
+- requires_parent_id · method · L555-L556 — def requires_parent_id(self) -> bool
+- permanently_delete_item · method · L558-L562 — def permanently_delete_item( self, trashed_item: View, trash_item_lookup_cache: Dict[str, View] = None )
+- get_owner · method · L564-L567 — def get_owner(self, trashed_item: View) -> Optional[AbstractUser]
+- get_parent · method · L569-L570 — def get_parent(self, trashed_item: View) -> Optional[Any]
+- restore · method · L572-L581 — def restore(self, trashed_item: View, trash_entry)
+- get_name · method · L583-L584 — def get_name(self, trashed_item: View) -> str
+- get_restore_operation_type · method · L586-L587 — def get_restore_operation_type(self) -> str
