@@ -121,9 +121,7 @@ class DashboardShareHandler:
             if public_workspace_allowed and not public_workspace_allowed(
                 dashboard.workspace
             ):
-                raise DashboardShareDoesNotExist(
-                    "The public dashboard does not exist."
-                )
+                raise DashboardShareDoesNotExist("The public dashboard does not exist.")
 
         return share
 
