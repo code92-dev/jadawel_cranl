@@ -1,0 +1,37 @@
+# backend/src/arabase/integrations/local_jadawel/service_types.py
+
+- LocalJadawelGroupedAggregateRowsUserServiceType · class · L58-L893 — class LocalJadawelGroupedAggregateRowsUserServiceType( LocalJadawelTableServiceSearchableMixin, LocalJadawelTableServiceFilterableMixin, LocalJadawelViewServiceType, )
+- get_schema_name · method · L81-L82 — def get_schema_name(self, service: LocalJadawelGroupedAggregateRows) -> str
+- simple_formula_fields · method · L85-L89 — def simple_formula_fields(self)
+- allowed_fields · method · L92-L97 — def allowed_fields(self)
+- serializer_field_names · method · L100-L109 — def serializer_field_names(self)
+- serializer_field_overrides · method · L112-L134 — def serializer_field_overrides(self)
+- SerializedDict · class · L136-L143 — class SerializedDict( LocalJadawelViewServiceType.SerializedDict, LocalJadawelTableServiceSearchableMixin.SerializedDict, LocalJadawelTableServiceFilterableMixin.SerializedDict, )
+- enhance_queryset · method · L145-L154 — def enhance_queryset(self, queryset)
+- _validate_series · method · L158-L221 — def _validate_series( self, aggregation_series: List[Dict], table, ) -> List[Dict]
+- _validate_group_bys · method · L223-L245 — def _validate_group_bys(self, group_bys: List[Dict], table) -> List[Dict]: # v1 supports a single group by. The relation is a list so that adding a # second grouping level later does not need a data migration.
+- prepare_values · method · L247-L277 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: Optional[ServiceSubClass] = None, ) -> Dict[str, Any]
+- after_create · method · L279-L281 — def after_create(self, instance: LocalJadawelGroupedAggregateRows, values: Dict)
+- after_update · method · L283-L309 — def after_update( self, instance: LocalJadawelGroupedAggregateRows, values: Dict, changes: Dict[str, tuple], ) -> None
+- _write_relations · method · L311-L353 — def _write_relations( self, instance: LocalJadawelGroupedAggregateRows, values: Dict ) -> None
+- export_prepared_values · method · L355-L375 — def export_prepared_values( self, instance: LocalJadawelGroupedAggregateRows ) -> dict
+- serialize_property · method · L379-L411 — def serialize_property( self, service: LocalJadawelGroupedAggregateRows, prop_name: str, files_zip=None, storage=None, cache=None, )
+- deserialize_property · method · L413-L448 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, )
+- _remap_series_reference · method · L451-L463 — def _remap_series_reference(reference: str, field_mapping: Dict) -> str
+- create_instance_from_serialized · method · L465-L512 — def create_instance_from_serialized( self, serialized_values, id_mapping, files_zip=None, storage=None, cache=None, **kwargs, )
+- generate_schema · method · L516-L569 — def generate_schema( self, service: LocalJadawelGroupedAggregateRows, allowed_fields: Optional[List[str]] = None, ) -> Optional[Dict[str, Any]]
+- get_context_data · method · L571-L603 — def get_context_data( self, service: LocalJadawelGroupedAggregateRows, allowed_fields: Optional[List[str]] = None, ) -> dict
+- serialize · function · L586-L587 — def serialize(field)
+- get_context_data_schema · method · L605-L608 — def get_context_data_schema( self, service: LocalJadawelGroupedAggregateRows, **kwargs ) -> dict | None
+- extract_properties · method · L610-L613 — def extract_properties(self, service, path: List[str], **kwargs) -> List[str]
+- _untrashed_series · method · L618-L623 — def _untrashed_series(service) -> List[LocalJadawelTableServiceAggregationSeries]
+- _untrashed_group_bys · method · L626-L633 — def _untrashed_group_bys( service, ) -> List[LocalJadawelTableServiceAggregationGroupBy]
+- resolve_service_formulas · method · L635-L651 — def resolve_service_formulas( self, service: LocalJadawelGroupedAggregateRows, dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- _annotation_for_series · method · L653-L675 — def _annotation_for_series(self, queryset, model, series)
+- _group_by_expression · method · L677-L701 — def _group_by_expression(self, queryset, group_by_field)
+- dispatch_data · method · L703-L770 — def dispatch_data( self, service: LocalJadawelGroupedAggregateRows, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- _apply_sorts · method · L772-L802 — def _apply_sorts(self, rows, service, group_alias, series)
+- dispatch_transform · method · L804-L854 — def dispatch_transform(self, data: Dict[str, Any]) -> DispatchResult
+- _serialize_value · method · L857-L867 — def _serialize_value(series, value)
+- _label_resolver · method · L870-L893 — def _label_resolver(group_by_field)
+- resolve · function · L888-L891 — def resolve(value)

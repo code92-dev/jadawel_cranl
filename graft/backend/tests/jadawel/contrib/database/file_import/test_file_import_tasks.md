@@ -1,0 +1,23 @@
+# backend/tests/jadawel/contrib/database/file_import/test_file_import_tasks.py
+
+- test_run_file_import_task · function · L35-L256 — def test_run_file_import_task(data_fixture, patch_filefield_storage)
+- test_run_file_import_task_for_special_fields · function · L260-L470 — def test_run_file_import_task_for_special_fields(data_fixture, patch_filefield_storage)
+- test_run_file_import_test_chunk · function · L474-L529 — def test_run_file_import_test_chunk(data_fixture, patch_filefield_storage)
+- test_run_file_import_limit · function · L533-L600 — def test_run_file_import_limit(data_fixture, patch_filefield_storage)
+- test_run_file_import_task_big_data · function · L609-L629 — def test_run_file_import_task_big_data(data_fixture, patch_filefield_storage)
+- test_cleanup_file_import_job · function · L633-L678 — def test_cleanup_file_import_job(data_fixture, settings, patch_filefield_storage)
+- test_run_file_import_task_with_upsert_fields_not_in_table · function · L682-L711 — def test_run_file_import_task_with_upsert_fields_not_in_table( data_fixture, patch_filefield_storage )
+- test_run_file_import_task_with_upsert_fields_not_usable · function · L715-L767 — def test_run_file_import_task_with_upsert_fields_not_usable( data_fixture, patch_filefield_storage )
+- test_run_file_import_task_with_upsert_fields_invalid_length · function · L771-L803 — def test_run_file_import_task_with_upsert_fields_invalid_length( data_fixture, patch_filefield_storage )
+- test_run_file_import_task_with_upsert · function · L807-L997 — def test_run_file_import_task_with_upsert(data_fixture, patch_filefield_storage)
+- UpsertData · class · L1000-L1003 — class UpsertData(NamedTuple)
+- prepare_upsert_data · function · L1006-L1102 — def prepare_upsert_data( data_fixture, patch_filefield_storage, open_test_file, upsert_field_idx: list[int], upsert_file_name: str | None, ) -> UpsertData
+- test_run_file_import_task_with_upsert_for_single_field_type · function · L1122-L1160 — def test_run_file_import_task_with_upsert_for_single_field_type( data_fixture, patch_filefield_storage, open_test_file, upsert_field_idx: list[int], upsert_file_name: str | None, )
+- test_run_file_import_task_with_upsert_for_multiple_field_types · function · L1272-L1307 — def test_run_file_import_task_with_upsert_for_multiple_field_types( data_fixture, patch_filefield_storage, open_test_file, upsert_field_idx: list[int], upsert_file_name: str | None, ): # upsert_file_name contains 5-element update: # one with duplicated on import side, that will produce 1 update + 1 insert # one duplicated on table side, that will produce 1 update + 1 insert # one new, that will produce 1 insert
+- test_run_file_import_task_with_date_validation · function · L1311-L1353 — def test_run_file_import_task_with_date_validation( data_fixture, patch_filefield_storage )
+- test_run_file_import_task_with_field_constraints · function · L1358-L1424 — def test_run_file_import_task_with_field_constraints( data_fixture, patch_filefield_storage )
+- test_run_file_import_task_with_upsert_and_field_constraints · function · L1429-L1512 — def test_run_file_import_task_with_upsert_and_field_constraints( data_fixture, patch_filefield_storage )
+- test_run_file_import_task_with_upsert_and_valid_skipped_fields · function · L1516-L1589 — def test_run_file_import_task_with_upsert_and_valid_skipped_fields( data_fixture, patch_filefield_storage )
+- test_run_file_import_task_with_upsert_and_invalid_skipped_fields · function · L1593-L1640 — def test_run_file_import_task_with_upsert_and_invalid_skipped_fields( data_fixture, patch_filefield_storage )
+- test_run_file_import_task_with_upsert_and_none_skipped_fields · function · L1644-L1717 — def test_run_file_import_task_with_upsert_and_none_skipped_fields( data_fixture, patch_filefield_storage )
+- test_file_import_task_number_field · function · L1721-L1771 — def test_file_import_task_number_field(data_fixture, patch_filefield_storage)

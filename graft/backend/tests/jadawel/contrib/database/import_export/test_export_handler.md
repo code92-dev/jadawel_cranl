@@ -1,0 +1,55 @@
+# backend/tests/jadawel/contrib/database/import_export/test_export_handler.py
+
+- _parse_datetime · function · L49-L50 — def _parse_datetime(datetime)
+- _parse_date · function · L53-L54 — def _parse_date(date)
+- test_hidden_fields_are_excluded · function · L59-L83 — def test_hidden_fields_are_excluded(get_storage_mock, data_fixture)
+- test_csv_is_sorted_by_sorts · function · L88-L110 — def test_csv_is_sorted_by_sorts(get_storage_mock, data_fixture)
+- test_csv_is_filtered_by_filters · function · L115-L139 — def test_csv_is_filtered_by_filters(get_storage_mock, data_fixture)
+- test_exporting_table_ignores_view_filters_sorts_hides · function · L144-L183 — def test_exporting_table_ignores_view_filters_sorts_hides( get_storage_mock, data_fixture )
+- test_exporting_public_view_without_user_fails_if_not_publicly_shared_and_allowed · function · L188-L220 — def test_exporting_public_view_without_user_fails_if_not_publicly_shared_and_allowed( get_storage_mock, data_fixture )
+- test_exporting_public_view_without_user · function · L225-L242 — def test_exporting_public_view_without_user(get_storage_mock, data_fixture)
+- test_columns_are_exported_by_order_then_field_id · function · L247-L286 — def test_columns_are_exported_by_order_then_field_id(get_storage_mock, data_fixture)
+- test_can_export_every_interesting_different_field_to_csv · function · L291-L436 — def test_can_export_every_interesting_different_field_to_csv( get_storage_mock, data_fixture )
+- show_diff · function · L415-L434 — def show_diff(actual, expected)
+- run_export_job_over_interesting_table · function · L439-L447 — def run_export_job_over_interesting_table(data_fixture, storage_mock, options)
+- test_can_export_special_characters_in_arabic_encoding_to_csv · function · L452-L483 — def test_can_export_special_characters_in_arabic_encoding_to_csv( get_storage_mock, data_fixture )
+- test_creating_a_new_export_job_will_cancel_any_already_running_jobs_for_that_user · function · L487-L510 — def test_creating_a_new_export_job_will_cancel_any_already_running_jobs_for_that_user( data_fixture, )
+- test_a_complete_export_job_which_has_expired_will_have_its_file_deleted · function · L515-L546 — def test_a_complete_export_job_which_has_expired_will_have_its_file_deleted( get_storage_mock, data_fixture, settings )
+- test_a_pending_job_which_has_expired_will_be_cleaned_up · function · L551-L587 — def test_a_pending_job_which_has_expired_will_be_cleaned_up( get_storage_mock, data_fixture, settings, )
+- test_a_running_export_job_which_has_expired_will_be_stopped · function · L592-L628 — def test_a_running_export_job_which_has_expired_will_be_stopped( get_storage_mock, data_fixture, settings )
+- test_attempting_to_export_a_table_for_a_type_which_doesnt_support_it_fails · function · L632-L668 — def test_attempting_to_export_a_table_for_a_type_which_doesnt_support_it_fails( data_fixture, )
+- CantExportTableExporter · class · L639-L660 — class CantExportTableExporter(TableExporter)
+- file_extension · method · L643-L644 — def file_extension(self) -> str
+- can_export_table · method · L647-L648 — def can_export_table(self) -> bool
+- supported_views · method · L651-L652 — def supported_views(self) -> List[str]
+- option_serializer_class · method · L655-L656 — def option_serializer_class(self)
+- queryset_serializer_class · method · L659-L660 — def queryset_serializer_class(self)
+- test_attempting_to_export_a_view_for_a_type_which_doesnt_support_it_fails · function · L672-L709 — def test_attempting_to_export_a_view_for_a_type_which_doesnt_support_it_fails( data_fixture, )
+- CantExportViewExporter · class · L680-L701 — class CantExportViewExporter(TableExporter)
+- file_extension · method · L684-L685 — def file_extension(self) -> str
+- can_export_table · method · L688-L689 — def can_export_table(self) -> bool
+- supported_views · method · L692-L693 — def supported_views(self) -> List[str]
+- option_serializer_class · method · L696-L697 — def option_serializer_class(self)
+- queryset_serializer_class · method · L700-L701 — def queryset_serializer_class(self)
+- test_an_export_job_which_fails_will_be_marked_as_a_failed_job · function · L714-L772 — def test_an_export_job_which_fails_will_be_marked_as_a_failed_job( get_storage_mock, data_fixture, )
+- BrokenTestFileExporter · class · L724-L745 — class BrokenTestFileExporter(TableExporter)
+- file_extension · method · L728-L729 — def file_extension(self) -> str
+- can_export_table · method · L732-L733 — def can_export_table(self) -> bool
+- supported_views · method · L736-L737 — def supported_views(self) -> List[str]
+- option_serializer_class · method · L740-L741 — def option_serializer_class(self)
+- queryset_serializer_class · method · L744-L745 — def queryset_serializer_class(self)
+- CancelledTestFileExporter · class · L747-L752 — class CancelledTestFileExporter(BrokenTestFileExporter)
+- queryset_serializer_class · method · L751-L752 — def queryset_serializer_class(self)
+- test_can_export_csv_without_header · function · L777-L791 — def test_can_export_csv_without_header(get_storage_mock, data_fixture)
+- test_can_export_csv_with_different_charsets · function · L797-L816 — def test_can_export_csv_with_different_charsets(get_storage_mock, data_fixture)
+- test_can_export_csv_with_different_column_separators · function · L821-L844 — def test_can_export_csv_with_different_column_separators( get_storage_mock, data_fixture )
+- test_adding_more_rows_doesnt_increase_number_of_queries_run · function · L849-L897 — def test_adding_more_rows_doesnt_increase_number_of_queries_run( get_storage_mock, data_fixture, django_assert_num_queries )
+- test_creating_job_with_view_that_is_not_in_the_table · function · L901-L910 — def test_creating_job_with_view_that_is_not_in_the_table( data_fixture, )
+- run_export_job_with_mock_storage · function · L913-L934 — def run_export_job_with_mock_storage( table, grid_view, storage_mock, user, options=None )
+- setup_testing_table · function · L937-L1012 — def setup_testing_table(data_fixture)
+- add_linked_row · function · L989-L996 — def add_linked_row(text)
+- add_row · function · L1000-L1010 — def add_row(text, date, option, price, files, linked_row_ids)
+- setup_table_and_run_export_decoding_result · function · L1015-L1041 — def setup_table_and_run_export_decoding_result( data_fixture, storage_mock, options=None )
+- test_a_column_without_a_grid_view_option_has_an_option_made_and_is_exported · function · L1046-L1078 — def test_a_column_without_a_grid_view_option_has_an_option_made_and_is_exported( get_storage_mock, data_fixture )
+- test_action_done_is_emitted_when_the_export_finish · function · L1083-L1105 — def test_action_done_is_emitted_when_the_export_finish(get_storage_mock, data_fixture)
+- test_csv_is_escaped · function · L1110-L1126 — def test_csv_is_escaped(get_storage_mock, data_fixture)

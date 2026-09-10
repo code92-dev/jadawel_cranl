@@ -1,0 +1,33 @@
+# web-frontend/modules/builder/pageSidePanelTypes.js
+
+- pageSidePanelType · class · L7-L52 — class pageSidePanelType extends Registerable
+- label · method · L8-L10 — get label()
+- component · method · L12-L14 — get component()
+- getDeactivatedText · method · L21-L23 — getDeactivatedText()
+- getErrorMessage · method · L30-L32 — getErrorMessage(applicationContext)
+- isDeactivated · method · L34-L36 — isDeactivated(element)
+- getOrder · method · L38-L40 — getOrder()
+- isInError · method · L49-L51 — isInError(applicationContext)
+- GeneralPageSidePanelType · class · L54-L70 — class GeneralPageSidePanelType extends pageSidePanelType
+- getType · method · L55-L57 — static getType()
+- label · method · L59-L61 — get label()
+- component · method · L63-L65 — get component()
+- getOrder · method · L67-L69 — getOrder()
+- StylePageSidePanelType · class · L72-L88 — class StylePageSidePanelType extends pageSidePanelType
+- getType · method · L73-L75 — static getType()
+- label · method · L77-L79 — get label()
+- component · method · L81-L83 — get component()
+- getOrder · method · L85-L87 — getOrder()
+- VisibilityPageSidePanelType · class · L90-L106 — class VisibilityPageSidePanelType extends pageSidePanelType
+- getType · method · L91-L93 — static getType()
+- label · method · L95-L97 — get label()
+- component · method · L99-L101 — get component()
+- getOrder · method · L103-L105 — getOrder()
+- EventsPageSidePanelType · class · L108-L175 — class EventsPageSidePanelType extends pageSidePanelType
+- getType · method · L109-L111 — static getType()
+- label · method · L113-L115 — get label()
+- component · method · L117-L119 — get component()
+- getDeactivatedText · method · L126-L129 — getDeactivatedText()
+- isDeactivated · method · L131-L134 — isDeactivated(element)
+- getOrder · method · L136-L138 — getOrder()
+- getErrorMessage · method · L145-L174 — getErrorMessage(applicationContext)

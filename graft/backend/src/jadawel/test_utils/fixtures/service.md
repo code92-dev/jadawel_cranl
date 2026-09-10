@@ -1,0 +1,23 @@
+# backend/src/jadawel/test_utils/fixtures/service.py
+
+- ServiceFixtures · class · L28-L162 — class ServiceFixtures
+- create_local_jadawel_get_row_service · method · L29-L31 — def create_local_jadawel_get_row_service(self, **kwargs) -> LocalJadawelGetRow
+- create_local_jadawel_list_rows_service · method · L33-L35 — def create_local_jadawel_list_rows_service(self, **kwargs) -> LocalJadawelListRows
+- create_local_jadawel_upsert_row_service · method · L37-L41 — def create_local_jadawel_upsert_row_service( self, **kwargs ) -> LocalJadawelUpsertRow
+- create_local_jadawel_delete_row_service · method · L43-L47 — def create_local_jadawel_delete_row_service( self, **kwargs ) -> LocalJadawelDeleteRow
+- create_local_jadawel_aggregate_rows_service · method · L49-L53 — def create_local_jadawel_aggregate_rows_service( self, **kwargs ) -> LocalJadawelAggregateRows
+- create_local_jadawel_rows_created_service · method · L55-L59 — def create_local_jadawel_rows_created_service( self, **kwargs ) -> LocalJadawelRowsCreated
+- create_local_jadawel_rows_updated_service · method · L61-L65 — def create_local_jadawel_rows_updated_service( self, **kwargs ) -> LocalJadawelRowsUpdated
+- create_local_jadawel_rows_deleted_service · method · L67-L71 — def create_local_jadawel_rows_deleted_service( self, **kwargs ) -> LocalJadawelRowsDeleted
+- create_local_jadawel_table_service_filter · method · L73-L80 — def create_local_jadawel_table_service_filter( self, **kwargs ) -> LocalJadawelTableServiceFilter
+- create_local_jadawel_table_service_sort · method · L82-L85 — def create_local_jadawel_table_service_sort( self, **kwargs ) -> LocalJadawelTableServiceSort
+- create_core_http_request_service · method · L87-L89 — def create_core_http_request_service(self, **kwargs) -> CoreHTTPRequestService
+- create_core_smtp_email_service · method · L91-L104 — def create_core_smtp_email_service(self, **kwargs) -> CoreSMTPEmailService
+- create_ai_agent_service · method · L106-L107 — def create_ai_agent_service(self, **kwargs)
+- create_slack_write_message_service · method · L109-L110 — def create_slack_write_message_service(self, **kwargs)
+- create_core_iterator_service · method · L112-L113 — def create_core_iterator_service(self, **kwargs)
+- create_core_router_service · method · L115-L116 — def create_core_router_service(self, **kwargs)
+- create_core_router_service_edge · method · L118-L136 — def create_core_router_service_edge(self, service: CoreRouterService, **kwargs)
+- create_core_http_trigger_service · method · L138-L142 — def create_core_http_trigger_service(self, **kwargs) -> CoreSMTPEmailService
+- create_core_periodic_service · method · L144-L145 — def create_core_periodic_service(self, **kwargs) -> CorePeriodicService
+- create_service · method · L147-L162 — def create_service(self, model_class, **kwargs)

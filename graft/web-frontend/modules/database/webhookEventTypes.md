@@ -1,0 +1,56 @@
+# web-frontend/modules/database/webhookEventTypes.js
+
+- WebhookEventType · class · L3-L85 — class WebhookEventType extends Registerable
+- getName · method · L4-L6 — getName()
+- constructor · method · L8-L15 — constructor(...args)
+- serialize · method · L17-L21 — serialize()
+- getExamplePayload · method · L26-L34 — getExamplePayload(database, table, rowExample)
+- getHasRelatedFields · method · L41-L43 — getHasRelatedFields()
+- getRelatedFieldsPlaceholder · method · L45-L47 — getRelatedFieldsPlaceholder()
+- getRelatedFieldsHelpText · method · L49-L51 — getRelatedFieldsHelpText()
+- getHasRelatedView · method · L58-L60 — getHasRelatedView()
+- getRelatedViewPlaceholder · method · L62-L64 — getRelatedViewPlaceholder()
+- getRelatedViewHelpText · method · L66-L68 — getRelatedViewHelpText()
+- getDeactivatedText · method · L70-L72 — getDeactivatedText()
+- getDeactivatedClickModal · method · L74-L76 — getDeactivatedClickModal()
+- isDeactivated · method · L78-L80 — isDeactivated(workspaceId)
+- getFeatureName · method · L82-L84 — getFeatureName()
+- RowsCreatedWebhookEventType · class · L87-L102 — class RowsCreatedWebhookEventType extends WebhookEventType
+- getType · method · L88-L90 — static getType()
+- getName · method · L92-L95 — getName()
+- getExamplePayload · method · L97-L101 — getExamplePayload(database, table, rowExample)
+- RowsUpdatedWebhookEventType · class · L104-L134 — class RowsUpdatedWebhookEventType extends WebhookEventType
+- getType · method · L105-L107 — static getType()
+- getName · method · L109-L112 — getName()
+- getExamplePayload · method · L114-L119 — getExamplePayload(database, table, rowExample)
+- getHasRelatedFields · method · L121-L123 — getHasRelatedFields()
+- getRelatedFieldsPlaceholder · method · L125-L128 — getRelatedFieldsPlaceholder()
+- getRelatedFieldsHelpText · method · L130-L133 — getRelatedFieldsHelpText()
+- RowsDeletedWebhookEventType · class · L136-L151 — class RowsDeletedWebhookEventType extends WebhookEventType
+- getType · method · L137-L139 — static getType()
+- getName · method · L141-L144 — getName()
+- getExamplePayload · method · L146-L150 — getExamplePayload(database, table, rowExample)
+- FieldCreatedWebhookEventType · class · L166-L181 — class FieldCreatedWebhookEventType extends WebhookEventType
+- getType · method · L167-L169 — static getType()
+- getName · method · L171-L174 — getName()
+- getExamplePayload · method · L176-L180 — getExamplePayload(database, table, rowExample)
+- FieldUpdatedWebhookEventType · class · L183-L198 — class FieldUpdatedWebhookEventType extends WebhookEventType
+- getType · method · L184-L186 — static getType()
+- getName · method · L188-L191 — getName()
+- getExamplePayload · method · L193-L197 — getExamplePayload(database, table, rowExample)
+- FieldDeletedWebhookEventType · class · L200-L215 — class FieldDeletedWebhookEventType extends WebhookEventType
+- getType · method · L201-L203 — static getType()
+- getName · method · L205-L208 — getName()
+- getExamplePayload · method · L210-L214 — getExamplePayload(database, table, rowExample)
+- ViewCreatedWebhookEventType · class · L241-L256 — class ViewCreatedWebhookEventType extends WebhookEventType
+- getType · method · L242-L244 — static getType()
+- getName · method · L246-L249 — getName()
+- getExamplePayload · method · L251-L255 — getExamplePayload(database, table, rowExample)
+- ViewUpdatedWebhookEventType · class · L258-L273 — class ViewUpdatedWebhookEventType extends WebhookEventType
+- getType · method · L259-L261 — static getType()
+- getName · method · L263-L266 — getName()
+- getExamplePayload · method · L268-L272 — getExamplePayload(database, table, rowExample)
+- ViewDeletedWebhookEventType · class · L275-L290 — class ViewDeletedWebhookEventType extends WebhookEventType
+- getType · method · L276-L278 — static getType()
+- getName · method · L280-L283 — getName()
+- getExamplePayload · method · L285-L289 — getExamplePayload(database, table, rowExample)

@@ -1,0 +1,44 @@
+# web-frontend/modules/core/adminTypes.js
+
+- AdminType · class · L8-L89 — class AdminType extends Registerable
+- getIconClass · method · L15-L17 — getIconClass()
+- getName · method · L23-L25 — getName()
+- getCategory · method · L31-L34 — getCategory()
+- getOrder · method · L39-L41 — getOrder()
+- getRouteName · method · L43-L45 — getRouteName()
+- constructor · method · L47-L62 — constructor(...args)
+- serialize · method · L67-L74 — serialize()
+- isDeactivated · method · L79-L81 — isDeactivated()
+- getDeactivatedModal · method · L86-L88 — getDeactivatedModal()
+- DashboardAdminType · class · L91-L112 — class DashboardAdminType extends AdminType
+- getType · method · L92-L94 — static getType()
+- getIconClass · method · L96-L98 — getIconClass()
+- getName · method · L100-L103 — getName()
+- getRouteName · method · L105-L107 — getRouteName()
+- getOrder · method · L109-L111 — getOrder()
+- UsersAdminType · class · L114-L140 — class UsersAdminType extends AdminType
+- getType · method · L115-L117 — static getType()
+- getIconClass · method · L119-L121 — getIconClass()
+- getName · method · L123-L126 — getName()
+- getCategory · method · L128-L131 — getCategory()
+- getRouteName · method · L133-L135 — getRouteName()
+- getOrder · method · L137-L139 — getOrder()
+- WorkspacesAdminType · class · L142-L168 — class WorkspacesAdminType extends AdminType
+- getType · method · L143-L145 — static getType()
+- getIconClass · method · L147-L149 — getIconClass()
+- getName · method · L151-L154 — getName()
+- getCategory · method · L156-L159 — getCategory()
+- getRouteName · method · L161-L163 — getRouteName()
+- getOrder · method · L165-L167 — getOrder()
+- SettingsAdminType · class · L170-L191 — class SettingsAdminType extends AdminType
+- getType · method · L171-L173 — static getType()
+- getIconClass · method · L175-L177 — getIconClass()
+- getName · method · L179-L182 — getName()
+- getRouteName · method · L184-L186 — getRouteName()
+- getOrder · method · L188-L190 — getOrder()
+- HealthCheckAdminType · class · L193-L214 — class HealthCheckAdminType extends AdminType
+- getType · method · L194-L196 — static getType()
+- getIconClass · method · L198-L200 — getIconClass()
+- getName · method · L202-L205 — getName()
+- getRouteName · method · L207-L209 — getRouteName()
+- getOrder · method · L211-L213 — getOrder()

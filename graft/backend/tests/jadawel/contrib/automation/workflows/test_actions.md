@@ -1,0 +1,17 @@
+# backend/tests/jadawel/contrib/automation/workflows/test_actions.py
+
+- test_create_do · function · L17-L25 — def test_create_do(data_fixture)
+- test_create_undo · function · L30-L50 — def test_create_undo(data_fixture)
+- test_create_redo · function · L55-L77 — def test_create_redo(data_fixture)
+- test_update_do · function · L82-L94 — def test_update_do(data_fixture)
+- test_update_undo · function · L99-L124 — def test_update_undo(data_fixture)
+- test_update_redo · function · L129-L157 — def test_update_redo(data_fixture)
+- test_delete_do · function · L162-L172 — def test_delete_do(data_fixture)
+- test_delete_undo · function · L177-L200 — def test_delete_undo(data_fixture)
+- test_delete_redo · function · L205-L230 — def test_delete_redo(data_fixture)
+- test_duplicate_do · function · L235-L246 — def test_duplicate_do(data_fixture)
+- test_duplicate_undo · function · L251-L273 — def test_duplicate_undo(data_fixture)
+- test_duplicate_redo · function · L278-L303 — def test_duplicate_redo(data_fixture)
+- test_order_do · function · L308-L326 — def test_order_do(data_fixture)
+- test_order_undo · function · L331-L359 — def test_order_undo(data_fixture)
+- test_order_redo · function · L364-L394 — def test_order_redo(data_fixture)

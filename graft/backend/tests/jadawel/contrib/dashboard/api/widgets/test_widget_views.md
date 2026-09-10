@@ -1,0 +1,17 @@
+# backend/tests/jadawel/contrib/dashboard/api/widgets/test_widget_views.py
+
+- test_get_widgets · function · L17-L76 — def test_get_widgets(api_client, data_fixture)
+- test_get_widgets_dashboard_doesnt_exist · function · L80-L91 — def test_get_widgets_dashboard_doesnt_exist(api_client, data_fixture)
+- test_get_widgets_permissions_denied · function · L95-L107 — def test_get_widgets_permissions_denied(api_client, data_fixture)
+- test_create_widget · function · L111-L142 — def test_create_widget(api_client, data_fixture)
+- test_create_widget_wrong_widget_type · function · L146-L162 — def test_create_widget_wrong_widget_type(api_client, data_fixture)
+- test_create_widget_permission_denied · function · L166-L182 — def test_create_widget_permission_denied(api_client, data_fixture)
+- test_create_widget_dashboard_doesnt_exist · function · L186-L200 — def test_create_widget_dashboard_doesnt_exist(api_client, data_fixture)
+- test_create_widget_empty_title · function · L204-L253 — def test_create_widget_empty_title(api_client, data_fixture)
+- test_update_widget · function · L257-L305 — def test_update_widget(api_client, data_fixture)
+- test_update_widget_permissions_denied · function · L309-L332 — def test_update_widget_permissions_denied(api_client, data_fixture)
+- test_update_widget_doesnt_exist · function · L336-L349 — def test_update_widget_doesnt_exist(api_client, data_fixture)
+- test_update_widget_empty_title · function · L353-L408 — def test_update_widget_empty_title(api_client, data_fixture)
+- test_delete_widget · function · L412-L432 — def test_delete_widget(api_client, data_fixture)
+- test_delete_widget_permissions_denied · function · L436-L457 — def test_delete_widget_permissions_denied(api_client, data_fixture)
+- test_delete_widget_not_found · function · L461-L472 — def test_delete_widget_not_found(api_client, data_fixture)

@@ -1,0 +1,16 @@
+# backend/tests/jadawel/core/two_factor_auth/test_two_factor_registries.py
+
+- test_totp_configure_already_configured · function · L21-L26 — def test_totp_configure_already_configured(data_fixture)
+- test_totp_configure_from_scratch · function · L30-L52 — def test_totp_configure_from_scratch(data_fixture)
+- test_totp_configure_finish_configuration · function · L56-L70 — def test_totp_configure_finish_configuration(data_fixture)
+- test_totp_configure_finish_configuration_failed · function · L74-L79 — def test_totp_configure_finish_configuration_failed(data_fixture)
+- test_totp_configure_finish_configuration_secret_expired · function · L83-L93 — def test_totp_configure_finish_configuration_secret_expired(data_fixture)
+- test_store_backup_codes · function · L97-L110 — def test_store_backup_codes(data_fixture)
+- test_generate_backup_codes · function · L114-L122 — def test_generate_backup_codes()
+- test_verify_with_code · function · L126-L137 — def test_verify_with_code(data_fixture)
+- test_verify_with_code_fails_wrong_code · function · L141-L146 — def test_verify_with_code_fails_wrong_code(data_fixture)
+- test_verify_with_code_code_cannot_be_reused · function · L150-L181 — def test_verify_with_code_code_cannot_be_reused(data_fixture)
+- test_verify_with_backup_code · function · L185-L191 — def test_verify_with_backup_code(data_fixture)
+- test_verify_with_backup_code_fails · function · L195-L200 — def test_verify_with_backup_code_fails(data_fixture)
+- test_verify_no_provider · function · L204-L208 — def test_verify_no_provider(data_fixture)
+- test_totp_disable · function · L212-L224 — def test_totp_disable(data_fixture)

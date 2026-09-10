@@ -1,0 +1,27 @@
+# web-frontend/modules/database/notificationTypes.js
+
+- CollaboratorAddedToRowNotificationType · class · L10-L30 — class CollaboratorAddedToRowNotificationType extends NotificationType
+- getType · method · L11-L13 — static getType()
+- getIconComponent · method · L15-L17 — getIconComponent()
+- getContentComponent · method · L19-L21 — getContentComponent()
+- getRoute · method · L23-L29 — getRoute(notificationData)
+- FormSubmittedNotificationType · class · L32-L52 — class FormSubmittedNotificationType extends NotificationType
+- getType · method · L33-L35 — static getType()
+- getIconComponent · method · L37-L39 — getIconComponent()
+- getContentComponent · method · L41-L43 — getContentComponent()
+- getRoute · method · L45-L51 — getRoute(notificationData)
+- UserMentionInRichTextFieldNotificationType · class · L54-L74 — class UserMentionInRichTextFieldNotificationType extends NotificationType
+- getType · method · L55-L57 — static getType()
+- getIconComponent · method · L59-L61 — getIconComponent()
+- getContentComponent · method · L63-L65 — getContentComponent()
+- getRoute · method · L67-L73 — getRoute(notificationData)
+- WebhookDeactivatedNotificationType · class · L76-L99 — class WebhookDeactivatedNotificationType extends NotificationType
+- getType · method · L77-L79 — static getType()
+- getIconComponent · method · L81-L83 — getIconComponent()
+- getContentComponent · method · L85-L87 — getContentComponent()
+- getRoute · method · L89-L98 — getRoute(notificationData)
+- WebhookPayloadTooLargedNotificationType · class · L101-L124 — class WebhookPayloadTooLargedNotificationType extends NotificationType
+- getType · method · L102-L104 — static getType()
+- getIconComponent · method · L106-L108 — getIconComponent()
+- getContentComponent · method · L110-L112 — getContentComponent()
+- getRoute · method · L114-L123 — getRoute(notificationData)

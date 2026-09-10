@@ -1,0 +1,15 @@
+# web-frontend/modules/database/components/view/grid/fields/GridViewFieldLinkRow.vue
+
+- data · method · L107-L114 — data()
+- publicGrid · method · L116-L118 — publicGrid()
+- getPersistentFieldOptionsKey · method · L121-L123 — getPersistentFieldOptionsKey(fieldId)
+- select · method · L124-L157 — select()
+- beforeUnSelect · method · L158-L160 — beforeUnSelect()
+- canUnselectByClickingOutside · method · L167-L194 — canUnselectByClickingOutside(event)
+- removeValue · method · L200-L203 — removeValue(event, value, id)
+- showModal · method · L204-L211 — showModal()
+- hideModal · method · L212-L214 — hideModal()
+- canSelectNext · method · L219-L221 — canSelectNext()
+- canKeyDown · method · L222-L224 — canKeyDown()
+- canKeyboardShortcut · method · L225-L227 — canKeyboardShortcut()
+- showForeignRowModal · method · L228-L243 — async showForeignRowModal(item)

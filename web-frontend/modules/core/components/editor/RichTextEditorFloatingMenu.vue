@@ -2,6 +2,7 @@
   <BubbleMenu
     v-if="editor"
     v-show="open"
+    :key="rtl ? 'rtl' : 'ltr'"
     ref="menu"
     class="rich-text-editor__menu-container"
     :editor="editor"
@@ -122,6 +123,7 @@
 </template>
 
 <script>
+import { unref } from 'vue'
 import { posToDOMRect } from '@tiptap/core'
 import { BubbleMenu } from '@tiptap/vue-3/menus'
 import { isElement } from '@jadawel/modules/core/utils/dom'
@@ -159,10 +161,20 @@ export default {
     }
   },
   computed: {
+    rtl() {
+      // `$i18n.locale` keeps this computed value reactive when the user switches
+      // languages; `<html dir>` remains the source of truth for the actual layout.
+      const locale = unref(this.$i18n?.locale)
+      return (
+        Boolean(locale) &&
+        typeof document !== 'undefined' &&
+        document.documentElement.dir === 'rtl'
+      )
+    },
     menuOptions() {
       const opts = {
         strategy: 'fixed',
-        placement: 'left',
+        placement: this.rtl ? 'right' : 'left',
         offset: { mainAxis: 14, crossAxis: 0 },
         flip: false,
         duration: 0,
@@ -300,12 +312,13 @@ export default {
           const { from } = view.state.selection
           const cursorRect = posToDOMRect(view, from, from)
           const editorRect = view.dom.getBoundingClientRect()
+          const inlineEdge = this.rtl ? editorRect.right : editorRect.left
           return {
             top: cursorRect.top,
             bottom: cursorRect.bottom,
-            left: editorRect.left,
-            right: editorRect.left,
-            x: editorRect.left,
+            left: inlineEdge,
+            right: inlineEdge,
+            x: inlineEdge,
             y: cursorRect.top,
             width: 0,
             height: cursorRect.height,

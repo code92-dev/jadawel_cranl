@@ -1,0 +1,17 @@
+# backend/src/jadawel/api/sessions.py
+
+- _raise_if_not_valid_untrusted_client_session_id · function · L17-L24 — def _raise_if_not_valid_untrusted_client_session_id(value: Any)
+- set_untrusted_client_session_id_from_request_or_raise_if_invalid · function · L27-L43 — def set_untrusted_client_session_id_from_request_or_raise_if_invalid( user: AbstractUser, request )
+- set_untrusted_client_session_id · function · L46-L47 — def set_untrusted_client_session_id(user: AbstractUser, session_id: str)
+- get_untrusted_client_session_id · function · L50-L51 — def get_untrusted_client_session_id(user: AbstractUser)
+- _raise_if_not_valid_undo_redo_action_group_id · function · L54-L58 — def _raise_if_not_valid_undo_redo_action_group_id(value: Any)
+- set_client_undo_redo_action_group_id_from_request_or_raise_if_invalid · function · L61-L79 — def set_client_undo_redo_action_group_id_from_request_or_raise_if_invalid( user: AbstractUser, request )
+- set_client_undo_redo_action_group_id · function · L82-L83 — def set_client_undo_redo_action_group_id(user: AbstractUser, action_group_id: str)
+- get_client_undo_redo_action_group_id · function · L86-L87 — def get_client_undo_redo_action_group_id(user: AbstractUser)
+- set_user_websocket_id · function · L90-L91 — def set_user_websocket_id(user, request)
+- _set_user_websocket_id · function · L94-L95 — def _set_user_websocket_id(user, websocket_id)
+- get_user_remote_ip_address_from_request · function · L98-L109 — def get_user_remote_ip_address_from_request(request)
+- set_user_remote_addr_ip_from_request · function · L112-L114 — def set_user_remote_addr_ip_from_request(user, request)
+- set_user_remote_addr_ip · function · L117-L118 — def set_user_remote_addr_ip(user, ip_address)
+- get_user_remote_addr_ip · function · L121-L122 — def get_user_remote_addr_ip(user)
+- set_user_session_data_from_request · function · L125-L137 — def set_user_session_data_from_request(user, request)

@@ -1,0 +1,68 @@
+# backend/src/jadawel/contrib/database/table/models.py
+
+- FieldObject · class · L84-L87 — class FieldObject(TypedDict)
+- TableModelQuerySet · class · L90-L448 — class TableModelQuerySet(MultiFieldPrefetchQuerysetMixin, JadawelCTEQuerySet)
+- pg_search · method · L91-L118 — def pg_search( self, input_search: str, only_search_by_field_ids: Optional[Iterable[int]] = None, ) -> QuerySet
+- count · method · L120-L122 — def count(self)
+- enhance_by_fields · method · L124-L151 — def enhance_by_fields( self, only_field_ids: Optional[List[int]] = None, **kwargs ) -> QuerySet
+- search_all_fields · method · L153-L187 — def search_all_fields( self, search: str, only_search_by_field_ids: Optional[Iterable[int]] = None, search_mode: Optional[SearchMode] = None, )
+- compat_search · method · L189-L215 — def compat_search(self, search: str, only_search_by_field_ids=None)
+- _get_field_name · method · L217-L233 — def _get_field_name(self, field: str) -> str
+- order_by_fields_string · method · L235-L323 — def order_by_fields_string( self, order_string, user_field_names=False, only_order_by_field_ids=None )
+- filter_by_fields_object · method · L325-L448 — def filter_by_fields_object( self, filter_object, filter_type=FILTER_TYPE_AND, only_filter_by_field_ids=None, user_field_names=False, )
+- TableModelTrashAndObjectsManager · class · L451-L462 — class TableModelTrashAndObjectsManager(models.Manager)
+- from_queryset · method · L453-L458 — def from_queryset(cls, queryset_class, class_name=None)
+- get_queryset · method · L460-L462 — def get_queryset(self)
+- TableModelManager · class · L465-L467 — class TableModelManager(TableModelTrashAndObjectsManager)
+- get_queryset · method · L466-L467 — def get_queryset(self)
+- GeneratedTableModel · class · L470-L656 — class GeneratedTableModel(HierarchicalModelMixin, models.Model)
+- info · method · L478-L513 — def info(cls)
+- get_parent · method · L516-L517 — def get_parent(cls)
+- get_root · method · L520-L521 — def get_root(cls)
+- fields_requiring_refresh_after_insert · method · L524-L535 — def fields_requiring_refresh_after_insert(cls)
+- fields_requiring_refresh_after_update · method · L538-L543 — def fields_requiring_refresh_after_update(cls)
+- get_field_object · method · L546-L554 — def get_field_object( cls, field_name: str, include_trash: bool = False ) -> FieldObject
+- get_field_object_by_id · method · L557-L565 — def get_field_object_by_id( cls, field_id: int, include_trash: bool = False ) -> FieldObject
+- get_field_object_by_user_field_name · method · L568-L576 — def get_field_object_by_user_field_name( cls, field_name: str, include_trash: bool = False ) -> FieldObject
+- get_field_objects · method · L579-L585 — def get_field_objects(cls, include_trash: bool = False) -> List[FieldObject]
+- get_field_objects_to_always_update · method · L588-L595 — def get_field_objects_to_always_update(cls) -> List[FieldObject]
+- get_fields_with_uninitialized_search_data · method · L598-L614 — def get_fields_with_uninitialized_search_data( cls, include_trash: bool = False ) -> List[Field]
+- get_searchable_fields · method · L617-L631 — def get_searchable_fields(cls, include_trash: bool = False) -> Iterator[Field]
+- get_fields · method · L634-L635 — def get_fields(cls, include_trash=False) -> List[Field]
+- get_primary_field · method · L638-L647 — def get_primary_field(self) -> Field
+- Meta · class · L649-L650 — class Meta
+- get_primary_field_value · method · L652-L656 — def get_primary_field_value(self)
+- GeneratedModelAppsProxy · class · L659-L759 — class GeneratedModelAppsProxy
+- __init__ · method · L678-L680 — def __init__(self, jadawel_models=None, app_label=None)
+- get_models · method · L682-L691 — def get_models(self, *args, **kwargs)
+- register_model · method · L693-L723 — def register_model(self, app_label, model)
+- _clear_jadawel_models_cache · method · L725-L727 — def _clear_jadawel_models_cache(self)
+- do_all_pending_operations · method · L729-L756 — def do_all_pending_operations(self)
+- __getattr__ · method · L758-L759 — def __getattr__(self, attr)
+- patch_meta_get_field · function · L762-L783 — def patch_meta_get_field(_meta)
+- get_field · function · L765-L781 — def get_field(self, field_name, *args, **kwargs)
+- TableUsageUpdate · class · L786-L822 — class TableUsageUpdate(models.Model)
+- TableUsage · class · L825-L844 — class TableUsage(models.Model)
+- Table · class · L847-L1350 — class Table( HierarchicalModelMixin, TrashableModelMixin, CreatedAndUpdatedOnMixin, OrderableMixin, models.Model, )
+- Meta · class · L907-L908 — class Meta
+- is_data_synced_table · method · L911-L912 — def is_data_synced_table(self) -> bool
+- is_read_only_data_synced_table · method · L915-L916 — def is_read_only_data_synced_table(self) -> bool
+- is_two_way_data_synced_table · method · L919-L920 — def is_two_way_data_synced_table(self) -> bool
+- get_parent · method · L922-L923 — def get_parent(self)
+- get_primary_field · method · L925-L926 — def get_primary_field(self) -> Field
+- get_last_order · method · L929-L931 — def get_last_order(cls, database)
+- get_table_model_name · method · L934-L935 — def get_table_model_name(cls, table_id)
+- get_database_table_name · method · L937-L938 — def get_database_table_name(self)
+- get_model · method · L941-L951 — def get_model(self, **kwargs)
+- _get_model · method · L953-L1163 — def _get_model( self, fields=None, field_ids=None, field_names=None, attribute_names=False, manytomany_models=None, add_dependencies=True, managed=False, use_cache=True, app_label: Optional[str] = None, ) -> Type[GeneratedTableModel]
+- __str__ · function · L1040-L1053 — def __str__(self)
+- _add_needs_background_update_column · method · L1165-L1170 — def _add_needs_background_update_column(self, field_attrs, indexes)
+- _add_created_by · method · L1172-L1181 — def _add_created_by(self, field_attrs, indexes)
+- _add_last_modified_by · method · L1183-L1192 — def _add_last_modified_by(self, field_attrs, indexes)
+- _add_field_rules_valid · method · L1194-L1199 — def _add_field_rules_valid(self, field_attrs, indexes)
+- _after_model_generation · method · L1202-L1215 — def _after_model_generation(self, attrs, model): # In some situations the field can only be added once the model class has been # generated. So for each field we will call the after_model_generation with # the generated model as argument in order to do this. This is for example used # by the link row field. It can also be used to make other changes to the # class.
+- _fetch_and_generate_field_attrs · method · L1218-L1344 — def _fetch_and_generate_field_attrs( self, add_dependencies, attribute_names, field_ids, field_names, fields, filtered, )
+- get_collision_safe_order_id_idx_name · method · L1349-L1350 — def get_collision_safe_order_id_idx_name(self)
+- DuplicateTableJob · class · L1353-L1370 — class DuplicateTableJob( JobWithUserIpAddress, JobWithWebsocketId, JobWithUndoRedoIds, Job )
+- RichTextFieldMention · class · L1373-L1405 — class RichTextFieldMention(models.Model)
+- Meta · class · L1401-L1405 — class Meta

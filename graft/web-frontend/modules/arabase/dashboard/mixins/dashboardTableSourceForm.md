@@ -1,0 +1,15 @@
+# web-frontend/modules/arabase/dashboard/mixins/dashboardTableSourceForm.js
+
+- get · method · L37-L39 — get()
+- set · method · L40-L45 — set(tableId)
+- integration · method · L47-L51 — integration()
+- databases · method · L52-L54 — databases()
+- databaseSelected · method · L55-L59 — databaseSelected()
+- tables · method · L60-L62 — tables()
+- tableIds · method · L63-L65 — tableIds()
+- tableViews · method · L66-L72 — tableViews()
+- handler · method · L76-L85 — async handler()
+- mounted · method · L89-L91 — mounted()
+- getTableId · method · L94-L96 — getTableId()
+- onTableChanged · method · L97-L100 — onTableChanged()
+- isValidTableId · method · L101-L103 — isValidTableId(value)

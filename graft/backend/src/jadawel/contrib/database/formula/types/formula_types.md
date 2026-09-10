@@ -1,0 +1,269 @@
+# backend/src/jadawel/contrib/database/formula/types/formula_types.py
+
+- JadawelJSONBObjectBaseType · class · L82-L100 — class JadawelJSONBObjectBaseType(JadawelFormulaValidType, ABC)
+- parse_filter_value · method · L86-L100 — def parse_filter_value(self, field, model_field, value)
+- JadawelFormulaBaseTextType · class · L103-L149 — class JadawelFormulaBaseTextType(JadawelFormulaTypeHasEmptyJadawelExpression)
+- comparable_types · method · L107-L115 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L118-L122 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]: # Force users to explicitly convert to text before doing any limit comparison # operators as lexicographical comparison can be surprising and so should be opt # in
+- addable_types · method · L125-L126 — def addable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- add · method · L128-L136 — def add( self, add_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaTextType]", arg2: "JadawelExpression[JadawelFormulaTextType]", )
+- placeholder_empty_value · method · L138-L139 — def placeholder_empty_value(self)
+- placeholder_empty_jadawel_expression · method · L141-L144 — def placeholder_empty_jadawel_expression( self, ) -> "JadawelExpression[JadawelFormulaValidType]"
+- _get_order_field_expression · method · L146-L149 — def _get_order_field_expression(self, field_name: str) -> Expression | F
+- JadawelFormulaTextType · class · L152-L197 — class JadawelFormulaTextType( HasValueEmptyFilterSupport, HasValueEqualFilterSupport, HasValueContainsFilterSupport, HasValueContainsWordFilterSupport, HasValueLengthIsLowerThanFilterSupport, JadawelFormulaBaseTextType, JadawelFormulaTypeHasEmptyJadawelExpression, JadawelFormulaValidType, )
+- __init__ · method · L167-L170 — def __init__(self, *args, **kwargs)
+- cast_to_text · method · L172-L187 — def cast_to_text( self, to_text_func_call: "JadawelFunctionCall[UnTyped]", arg: "JadawelExpression[JadawelFormulaValidType]", ) -> "JadawelExpression[JadawelFormulaType]"
+- get_order_by_in_array_expr · method · L189-L194 — def get_order_by_in_array_expr(self, field, field_name, order_direction)
+- get_in_array_empty_value · method · L196-L197 — def get_in_array_empty_value(self, field: "Field") -> Any
+- JadawelFormulaURLType · class · L200-L202 — class JadawelFormulaURLType(JadawelFormulaTextType, JadawelFormulaValidType)
+- JadawelFormulaCharType · class · L205-L221 — class JadawelFormulaCharType(JadawelFormulaTextType, JadawelFormulaValidType)
+- get_order_by_in_array_expr · method · L211-L216 — def get_order_by_in_array_expr(self, field, field_name, order_direction)
+- placeholder_empty_jadawel_expression · method · L218-L221 — def placeholder_empty_jadawel_expression( self, ) -> "JadawelExpression[JadawelFormulaValidType]"
+- JadawelFormulaLinkType · class · L224-L352 — class JadawelFormulaLinkType(JadawelJSONBObjectBaseType)
+- comparable_types · method · L231-L234 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L237-L238 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- addable_types · method · L241-L242 — def addable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- subtractable_types · method · L245-L246 — def subtractable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- cast_to_text · method · L248-L253 — def cast_to_text( self, to_text_func_call: "JadawelFunctionCall[UnTyped]", arg: "JadawelExpression[JadawelFormulaValidType]", ) -> "JadawelExpression[JadawelFormulaType]"
+- get_jadawel_field_instance_and_type · method · L255-L256 — def get_jadawel_field_instance_and_type(self)
+- db_column_fields · method · L259-L260 — def db_column_fields(self) -> Set[str]
+- get_model_field · method · L262-L266 — def get_model_field(self, instance, **kwargs) -> models.Field
+- get_response_serializer_field · method · L268-L269 — def get_response_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_serializer_field · method · L271-L278 — def get_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_export_value · method · L280-L289 — def get_export_value(self, value, field_object, rich_value=False) -> Any
+- contains_query · method · L291-L298 — def contains_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_old_value · method · L300-L304 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_human_readable_value · method · L306-L313 — def get_human_readable_value(self, value: Any, field_object) -> str
+- placeholder_empty_value · method · L315-L316 — def placeholder_empty_value(self)
+- placeholder_empty_jadawel_expression · method · L318-L321 — def placeholder_empty_jadawel_expression( self, ) -> "JadawelExpression[JadawelFormulaValidType]"
+- get_search_expression · method · L323-L330 — def get_search_expression(self, field, queryset)
+- get_search_expression_in_array · method · L332-L349 — def get_search_expression_in_array(self, field, queryset)
+- transform_value_to_text_func · function · L333-L343 — def transform_value_to_text_func(x): # Make sure we don't send the keys of the jsonb to ts_vector by extracting # and re-ordering the label/url parameters to match the correct format
+- is_searchable · method · L351-L352 — def is_searchable(self, field)
+- JadawelFormulaButtonType · class · L355-L356 — class JadawelFormulaButtonType(JadawelFormulaLinkType)
+- JadawelFormulaNumberType · class · L359-L526 — class JadawelFormulaNumberType( HasValueEmptyFilterSupport, HasValueEqualFilterSupport, HasValueContainsFilterSupport, HasNumericValueComparableToFilterSupport, JadawelFormulaTypeHasEmptyJadawelExpression, JadawelFormulaValidType, )
+- get_serializer_field_names · method · L383-L384 — def get_serializer_field_names(cls)
+- get_serializer_field_overrides · method · L387-L392 — def get_serializer_field_overrides(cls)
+- __init__ · method · L394-L406 — def __init__( self, number_decimal_places: int, number_prefix: str = "", number_suffix: str = "", number_separator: str = "", **kwargs, )
+- comparable_types · method · L409-L413 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L416-L417 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- addable_types · method · L420-L421 — def addable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- subtractable_types · method · L424-L425 — def subtractable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- multipliable_types · method · L428-L429 — def multipliable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- dividable_types · method · L432-L433 — def dividable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- add · method · L435-L443 — def add( self, add_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaNumberType]", arg2: "JadawelExpression[JadawelFormulaNumberType]", )
+- minus · method · L445-L453 — def minus( self, minus_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaNumberType]", arg2: "JadawelExpression[JadawelFormulaNumberType]", )
+- multiply · method · L455-L466 — def multiply( self, multiply_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaNumberType]", arg2: "JadawelExpression[JadawelFormulaNumberType]", )
+- divide · method · L468-L478 — def divide( self, divide_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaNumberType]", arg2: "JadawelExpression[JadawelFormulaNumberType]", )
+- should_recreate_when_old_type_was · method · L480-L484 — def should_recreate_when_old_type_was(self, old_type: "JadawelFormulaType") -> bool
+- wrap_at_field_level · method · L486-L487 — def wrap_at_field_level(self, expr: "JadawelExpression[JadawelFormulaType]")
+- unwrap_at_field_level · method · L489-L490 — def unwrap_at_field_level(self, expr: "JadawelFunctionCall[JadawelFormulaType]")
+- placeholder_empty_value · method · L492-L495 — def placeholder_empty_value(self)
+- placeholder_empty_jadawel_expression · method · L497-L500 — def placeholder_empty_jadawel_expression( self, ) -> "JadawelExpression[JadawelFormulaValidType]"
+- get_order_by_in_array_expr · method · L502-L510 — def get_order_by_in_array_expr(self, field, field_name, order_direction)
+- get_in_array_empty_value · method · L512-L513 — def get_in_array_empty_value(self, field: "Field") -> Any
+- get_in_array_is_query · method · L515-L523 — def get_in_array_is_query( self, field_name: str, value: str, model_field: models.Field, field: "Field" ) -> OptionallyAnnotatedQ
+- __str__ · method · L525-L526 — def __str__(self) -> str
+- JadawelFormulaBooleanType · class · L529-L587 — class JadawelFormulaBooleanType( HasValueEmptyFilterSupport, HasAllValuesEqualFilterSupport, HasValueEqualFilterSupport, JadawelFormulaTypeHasEmptyJadawelExpression, JadawelFormulaValidType, )
+- get_in_array_empty_value · method · L544-L545 — def get_in_array_empty_value(self, field: "Field") -> Any
+- comparable_types · method · L548-L552 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L555-L557 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]: # true > true makes no sense
+- placeholder_empty_value · method · L559-L560 — def placeholder_empty_value(self)
+- placeholder_empty_jadawel_expression · method · L562-L565 — def placeholder_empty_jadawel_expression( self, ) -> "JadawelExpression[JadawelFormulaValidType]"
+- try_coerce_to_not_null · method · L567-L570 — def try_coerce_to_not_null( self, expr: "JadawelExpression[JadawelFormulaValidType]" )
+- get_in_array_is_query · method · L572-L577 — def get_in_array_is_query( self, field_name: str, value: bool, model_field: models.Field, field: "Field" ) -> OptionallyAnnotatedQ
+- get_order_by_in_array_expr · method · L579-L587 — def get_order_by_in_array_expr(self, field, field_name, order_direction)
+- _calculate_addition_interval_type · function · L590-L608 — def _calculate_addition_interval_type( arg1: JadawelExpression[JadawelFormulaValidType], arg2: JadawelExpression[JadawelFormulaValidType], ) -> JadawelFormulaValidType
+- JadawelFormulaDateIntervalTypeMixin · class · L611-L615 — class JadawelFormulaDateIntervalTypeMixin
+- JadawelFormulaDateIntervalType · class · L619-L728 — class JadawelFormulaDateIntervalType( JadawelFormulaTypeHasEmptyJadawelExpression, JadawelFormulaValidType, JadawelFormulaDateIntervalTypeMixin, )
+- comparable_types · method · L629-L630 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L633-L634 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- addable_types · method · L637-L638 — def addable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- subtractable_types · method · L641-L642 — def subtractable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- add · method · L644-L652 — def add( self, add_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaValidType]", arg2: "JadawelExpression[JadawelFormulaValidType]", )
+- minus · method · L654-L664 — def minus( self, minus_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaValidType]", arg2: "JadawelExpression[JadawelFormulaValidType]", )
+- get_jadawel_field_instance_and_type · method · L666-L668 — def get_jadawel_field_instance_and_type(self): # Until Jadawel has a duration field type implement the required methods below
+- db_column_fields · method · L671-L672 — def db_column_fields(self) -> Set[str]
+- get_model_field · method · L674-L682 — def get_model_field(self, instance, **kwargs) -> models.Field
+- get_response_serializer_field · method · L684-L685 — def get_response_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_serializer_field · method · L687-L692 — def get_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_export_value · method · L694-L698 — def get_export_value(self, value, field_object, rich_value=False) -> Any
+- contains_query · method · L700-L701 — def contains_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_old_value · method · L703-L704 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_human_readable_value · method · L706-L713 — def get_human_readable_value(self, value: Any, field_object) -> str
+- placeholder_empty_value · method · L715-L716 — def placeholder_empty_value(self)
+- placeholder_empty_jadawel_expression · method · L718-L722 — def placeholder_empty_jadawel_expression( self, ) -> "JadawelExpression[JadawelFormulaValidType]"
+- is_searchable · method · L724-L725 — def is_searchable(self, field)
+- get_search_expression · method · L727-L728 — def get_search_expression(self, field: Field, queryset: QuerySet) -> Expression
+- JadawelFormulaDurationType · class · L731-L862 — class JadawelFormulaDurationType( JadawelFormulaTypeHasEmptyJadawelExpression, JadawelFormulaValidType, JadawelFormulaDateIntervalTypeMixin, HasValueEmptyFilterSupport, )
+- __init__ · method · L745-L747 — def __init__(self, duration_format: str = D_H_M_S, **kwargs)
+- get_in_array_empty_value · method · L749-L750 — def get_in_array_empty_value(self, field: "Field") -> Any
+- comparable_types · method · L753-L754 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L757-L758 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- addable_types · method · L761-L762 — def addable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- multipliable_types · method · L765-L766 — def multipliable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- subtractable_types · method · L769-L770 — def subtractable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- dividable_types · method · L773-L774 — def dividable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- add · method · L776-L784 — def add( self, add_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaValidType]", arg2: "JadawelExpression[JadawelFormulaValidType]", )
+- minus · method · L786-L797 — def minus( self, minus_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaValidType]", arg2: "JadawelExpression[JadawelFormulaValidType]", )
+- multiply · method · L799-L810 — def multiply( self, multiply_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaNumberType]", arg2: "JadawelExpression[JadawelFormulaNumberType]", )
+- divide · method · L812-L823 — def divide( self, multiply_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaNumberType]", arg2: "JadawelExpression[JadawelFormulaNumberType]", )
+- placeholder_empty_value · method · L825-L826 — def placeholder_empty_value(self)
+- placeholder_empty_jadawel_expression · method · L828-L832 — def placeholder_empty_jadawel_expression( self, ) -> "JadawelExpression[JadawelFormulaValidType]"
+- get_order_by_in_array_expr · method · L834-L837 — def get_order_by_in_array_expr(self, field, field_name, order_direction)
+- get_has_numeric_value_comparable_to_filter_query · method · L839-L857 — def get_has_numeric_value_comparable_to_filter_query( self, field_name: str, value: str, model_field: models.Field, field: "Field", comparison_op: ComparisonOperator, ) -> "OptionallyAnnotatedQ"
+- get_in_array_is_query · method · L859-L862 — def get_in_array_is_query(self, field_name, value, model_field, field)
+- JadawelFormulaDateType · class · L865-L1023 — class JadawelFormulaDateType( HasValueEmptyFilterSupport, HasValueContainsFilterSupport, JadawelFormulaValidType )
+- __init__ · method · L884-L898 — def __init__( self, date_format: str, date_include_time: bool, date_time_format: str, date_show_tzinfo: bool = False, date_force_timezone: Optional[str] = None, **kwargs, )
+- array_index_sql · method · L901-L903 — def array_index_sql(self) -> str
+- comparable_types · method · L906-L910 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L913-L914 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- addable_types · method · L917-L918 — def addable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- subtractable_types · method · L921-L922 — def subtractable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- get_in_array_empty_value · method · L924-L925 — def get_in_array_empty_value(self, field: "Field") -> Any
+- add · method · L927-L935 — def add( self, add_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaValidType]", arg2: "JadawelExpression[JadawelFormulaValidType]", )
+- minus · method · L937-L953 — def minus( self, minus_func_call: "JadawelFunctionCall[UnTyped]", arg1: "JadawelExpression[JadawelFormulaValidType]", arg2: "JadawelExpression[JadawelFormulaValidType]", )
+- should_recreate_when_old_type_was · method · L955-L959 — def should_recreate_when_old_type_was(self, old_type: "JadawelFormulaType") -> bool
+- wrap_at_field_level · method · L961-L963 — def wrap_at_field_level(self, expr: "JadawelExpression[JadawelFormulaType]")
+- unwrap_at_field_level · method · L965-L967 — def unwrap_at_field_level(self, expr: "JadawelFunctionCall[JadawelFormulaType]")
+- cast_to_text · method · L969-L982 — def cast_to_text( self, to_text_func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaValidType]
+- placeholder_empty_value · method · L984-L990 — def placeholder_empty_value(self)
+- get_search_expression_in_array · method · L992-L1011 — def get_search_expression_in_array(self, field, queryset)
+- transform_value_to_text_func · function · L993-L1005 — def transform_value_to_text_func(x)
+- get_order_by_in_array_expr · method · L1013-L1016 — def get_order_by_in_array_expr(self, field, field_name, order_direction)
+- __str__ · method · L1018-L1023 — def __str__(self) -> str
+- JadawelFormulaSingleFileType · class · L1026-L1182 — class JadawelFormulaSingleFileType( HasValueEmptyFilterSupport, JadawelJSONBObjectBaseType )
+- is_searchable · method · L1038-L1039 — def is_searchable(self, field)
+- placeholder_empty_value · method · L1041-L1042 — def placeholder_empty_value(self)
+- comparable_types · method · L1045-L1046 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L1049-L1050 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- db_column_fields · method · L1053-L1054 — def db_column_fields(self) -> Set[str]
+- get_all_empty_query · method · L1056-L1074 — def get_all_empty_query( self, field_name: str, model_field: Field, field, in_array: bool = True, ) -> OptionallyAnnotatedQ
+- get_in_array_empty_query · method · L1076-L1083 — def get_in_array_empty_query( self, field_name, model_field, field ) -> OptionallyAnnotatedQ: # Use get_jsonb_has_any_in_value_filter_expr with size() to check if the array # is empty.
+- get_model_field · method · L1085-L1086 — def get_model_field(self, instance, **kwargs) -> models.Field
+- get_jadawel_field_instance_and_type · method · L1088-L1089 — def get_jadawel_field_instance_and_type(self)
+- get_response_serializer_field · method · L1091-L1096 — def get_response_serializer_field(self, instance, **kwargs)
+- get_serializer_field · method · L1098-L1110 — def get_serializer_field(self, instance, **kwargs)
+- get_export_value · method · L1112-L1138 — def get_export_value(self, value, field_object, rich_value=False) -> Any
+- contains_query · method · L1140-L1145 — def contains_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_old_value · method · L1147-L1151 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_human_readable_value · method · L1153-L1156 — def get_human_readable_value(self, value, field_object) -> str
+- cast_to_text · method · L1158-L1168 — def cast_to_text( self, to_text_func_call: "JadawelFunctionCall[UnTyped]", arg: "JadawelExpression[JadawelFormulaValidType]", ) -> "JadawelExpression[JadawelFormulaType]"
+- get_search_expression · method · L1170-L1173 — def get_search_expression(self, field, queryset)
+- get_search_expression_in_array · method · L1175-L1182 — def get_search_expression_in_array(self, field, queryset)
+- JadawelFormulaArrayType · class · L1185-L1477 — class JadawelFormulaArrayType( JadawelFormulaArrayFilterSupportMixin, JadawelFormulaValidType, )
+- __init__ · method · L1196-L1199 — def __init__(self, sub_type: JadawelFormulaValidType, **kwargs)
+- get_search_expression · method · L1201-L1202 — def get_search_expression(self, field, queryset)
+- is_searchable · method · L1204-L1205 — def is_searchable(self, field)
+- construct_type_from_formula_field · method · L1208-L1213 — def construct_type_from_formula_field(cls, formula_field)
+- persist_onto_formula_field · method · L1215-L1218 — def persist_onto_formula_field(self, formula_field)
+- new_type_with_user_and_calculated_options_merged · method · L1220-L1224 — def new_type_with_user_and_calculated_options_merged(self, formula_field)
+- collapse_many · method · L1226-L1227 — def collapse_many(self, expr: "JadawelExpression[JadawelFormulaType]")
+- placeholder_empty_value · method · L1229-L1244 — def placeholder_empty_value(self)
+- wrap_at_field_level · method · L1246-L1247 — def wrap_at_field_level(self, expr: "JadawelExpression[JadawelFormulaType]")
+- unwrap_at_field_level · method · L1249-L1275 — def unwrap_at_field_level(self, expr: "JadawelFunctionCall[JadawelFormulaType]")
+- jadawel_field_type · method · L1278-L1279 — def jadawel_field_type(self) -> str
+- comparable_types · method · L1282-L1283 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L1286-L1287 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- get_jadawel_field_instance_and_type · method · L1289-L1291 — def get_jadawel_field_instance_and_type(self): # Until Jadawel has a array field type implement the required methods below
+- db_column_fields · method · L1294-L1295 — def db_column_fields(self) -> Set[str]
+- get_model_field · method · L1297-L1298 — def get_model_field(self, instance, **kwargs) -> models.Field
+- get_response_serializer_field · method · L1300-L1301 — def get_response_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_serializer_field · method · L1303-L1329 — def get_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_export_value · method · L1331-L1353 — def get_export_value(self, value, field_object, rich_value=False) -> Any
+- contains_query · method · L1355-L1356 — def contains_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_old_value · method · L1358-L1359 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_human_readable_value · method · L1361-L1380 — def get_human_readable_value(self, value: Any, field_object) -> str
+- _map_safely_across_lookup_json_value_list · method · L1382-L1406 — def _map_safely_across_lookup_json_value_list( self, map_func, lookup_json_value_list )
+- can_order_by · method · L1409-L1410 — def can_order_by(self) -> bool
+- get_order · method · L1412-L1429 — def get_order( self, field, field_name, order_direction, table_model=None ) -> OptionallyAnnotatedOrderBy
+- get_value_for_filter · method · L1431-L1432 — def get_value_for_filter(self, row, field) -> any
+- check_if_compatible_with · method · L1434-L1436 — def check_if_compatible_with(self, compatible_formula_types: List[str])
+- __str__ · method · L1438-L1439 — def __str__(self) -> str
+- formula_array_type_as_str · method · L1442-L1443 — def formula_array_type_as_str(cls, sub_type)
+- can_represent_files · method · L1445-L1446 — def can_represent_files(self, field)
+- can_represent_select_options · method · L1448-L1449 — def can_represent_select_options(self, field) -> bool
+- can_represent_collaborators · method · L1451-L1452 — def can_represent_collaborators(self, field)
+- get_serializer_field_overrides · method · L1455-L1474 — def get_serializer_field_overrides(cls)
+- parse_filter_value · method · L1476-L1477 — def parse_filter_value(self, field, model_field, value)
+- JadawelFormulaSingleSelectType · class · L1480-L1629 — class JadawelFormulaSingleSelectType( SingleSelectFormulaTypeFilterSupport, JadawelJSONBObjectBaseType, )
+- comparable_types · method · L1491-L1495 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- can_represent_select_options · method · L1498-L1499 — def can_represent_select_options(self) -> bool
+- limit_comparable_types · method · L1502-L1503 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- get_jadawel_field_instance_and_type · method · L1505-L1506 — def get_jadawel_field_instance_and_type(self)
+- db_column_fields · method · L1509-L1510 — def db_column_fields(self) -> Set[str]
+- get_model_field · method · L1512-L1513 — def get_model_field(self, instance, **kwargs) -> models.Field
+- get_response_serializer_field · method · L1515-L1517 — def get_response_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_serializer_field · method · L1519-L1521 — def get_serializer_field(self, *args, **kwargs) -> Optional[Field]
+- get_export_value · method · L1523-L1526 — def get_export_value(self, value, field_object, rich_value=False) -> Any
+- contains_query · method · L1528-L1533 — def contains_query(self, field_name, value, model_field, field)
+- contains_word_query · method · L1535-L1541 — def contains_word_query(self, field_name, value, model_field, field)
+- get_alter_column_prepare_old_value · method · L1543-L1547 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- get_human_readable_value · method · L1549-L1552 — def get_human_readable_value(self, value, field_object) -> str
+- cast_to_text · method · L1554-L1564 — def cast_to_text( self, to_text_func_call: "JadawelFunctionCall[UnTyped]", arg: "JadawelExpression[JadawelFormulaValidType]", ) -> "JadawelExpression[JadawelFormulaType]"
+- get_search_expression · method · L1566-L1567 — def get_search_expression(self, field, queryset)
+- get_search_expression_in_array · method · L1569-L1577 — def get_search_expression_in_array(self, field, queryset)
+- is_searchable · method · L1579-L1580 — def is_searchable(self, field)
+- get_order · method · L1582-L1592 — def get_order( self, field, field_name, order_direction, table_model=None ) -> OptionallyAnnotatedOrderBy
+- get_value_for_filter · method · L1594-L1595 — def get_value_for_filter(self, row, field) -> any
+- get_order_by_in_array_expr · method · L1597-L1607 — def get_order_by_in_array_expr(self, field, field_name, order_direction)
+- get_serializer_field_names · method · L1610-L1611 — def get_serializer_field_names(cls) -> List[str]
+- get_serializer_field_overrides · method · L1614-L1629 — def get_serializer_field_overrides(cls)
+- JadawelFormulaMultipleSelectType · class · L1632-L1750 — class JadawelFormulaMultipleSelectType( MultipleSelectFormulaTypeFilterSupport, JadawelJSONBObjectBaseType )
+- comparable_types · method · L1642-L1643 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L1646-L1647 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- get_jadawel_field_instance_and_type · method · L1649-L1650 — def get_jadawel_field_instance_and_type(self)
+- get_alter_column_prepare_old_value · method · L1652-L1653 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- can_represent_select_options · method · L1656-L1657 — def can_represent_select_options(self) -> bool
+- db_column_fields · method · L1660-L1661 — def db_column_fields(self) -> Set[str]
+- get_model_field · method · L1663-L1664 — def get_model_field(self, instance, **kwargs) -> models.Field
+- get_response_serializer_field · method · L1666-L1668 — def get_response_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_serializer_field · method · L1670-L1672 — def get_serializer_field(self, *args, **kwargs) -> Optional[Field]
+- get_export_value · method · L1674-L1683 — def get_export_value(self, value, field_object, rich_value=False)
+- get_human_readable_value · method · L1685-L1688 — def get_human_readable_value(self, value, field_object)
+- is_searchable · method · L1690-L1691 — def is_searchable(self, field)
+- get_search_expression · method · L1693-L1696 — def get_search_expression(self, field, queryset)
+- get_search_expression_in_array · method · L1698-L1714 — def get_search_expression_in_array(self, field, queryset)
+- cast_to_text · method · L1716-L1725 — def cast_to_text( self, to_text_func_call: "JadawelFunctionCall[UnTyped]", arg: "JadawelExpression[JadawelFormulaValidType]", ) -> "JadawelExpression[JadawelFormulaType]"
+- is_blank · method · L1727-L1734 — def is_blank( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaBooleanType]
+- collapse_many · method · L1736-L1737 — def collapse_many(self, expr: JadawelExpression[JadawelFormulaType])
+- count · method · L1739-L1744 — def count( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- contains_query · method · L1746-L1747 — def contains_query(self, field_name, value, model_field, field)
+- contains_word_query · method · L1749-L1750 — def contains_word_query(self, field_name, value, model_field, field)
+- JadawelFormulaMultipleCollaboratorsType · class · L1753-L1963 — class JadawelFormulaMultipleCollaboratorsType( HasValueContainsWordFilterSupport, HasValueContainsFilterSupport, HasValueEmptyFilterSupport, HasValueEqualFilterSupport, JadawelJSONBObjectBaseType, )
+- get_in_array_contains_word_query · method · L1766-L1771 — def get_in_array_contains_word_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- get_in_array_contains_query · method · L1773-L1778 — def get_in_array_contains_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- get_in_array_is_query · method · L1780-L1791 — def get_in_array_is_query( self, field_name: str, value: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- get_in_array_empty_query · method · L1793-L1798 — def get_in_array_empty_query( self, field_name: str, model_field: DjangoField, field: "Field" ) -> OptionallyAnnotatedQ
+- get_all_empty_query · method · L1800-L1823 — def get_all_empty_query( self, field_name: str, model_field: Field, field, in_array: bool = True ) -> OptionallyAnnotatedQ
+- comparable_types · method · L1826-L1827 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L1830-L1831 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- get_jadawel_field_instance_and_type · method · L1833-L1834 — def get_jadawel_field_instance_and_type(self)
+- get_alter_column_prepare_old_value · method · L1836-L1837 — def get_alter_column_prepare_old_value(self, connection, from_field, to_field)
+- can_represent_collaborators · method · L1840-L1841 — def can_represent_collaborators(self) -> bool
+- db_column_fields · method · L1844-L1845 — def db_column_fields(self) -> Set[str]
+- get_model_field · method · L1847-L1848 — def get_model_field(self, instance, **kwargs) -> models.Field
+- get_response_serializer_field · method · L1850-L1852 — def get_response_serializer_field(self, instance, **kwargs) -> Optional[Field]
+- get_serializer_field · method · L1854-L1856 — def get_serializer_field(self, *args, **kwargs) -> Optional[Field]
+- get_export_value · method · L1858-L1875 — def get_export_value(self, value, field_object, rich_value=False)
+- get_human_readable_value · method · L1877-L1880 — def get_human_readable_value(self, value, field_object)
+- is_searchable · method · L1882-L1883 — def is_searchable(self, field)
+- get_search_expression · method · L1885-L1888 — def get_search_expression(self, field, queryset)
+- get_search_expression_in_array · method · L1890-L1908 — def get_search_expression_in_array(self, field, queryset)
+- cast_to_text · method · L1910-L1919 — def cast_to_text( self, to_text_func_call: "JadawelFunctionCall[UnTyped]", arg: "JadawelExpression[JadawelFormulaValidType]", ) -> "JadawelExpression[JadawelFormulaType]"
+- is_blank · method · L1921-L1928 — def is_blank( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaBooleanType]
+- collapse_many · method · L1930-L1931 — def collapse_many(self, expr: JadawelExpression[JadawelFormulaType])
+- count · method · L1933-L1938 — def count( self, func_call: JadawelFunctionCall[UnTyped], arg: JadawelExpression[JadawelFormulaValidType], ) -> JadawelExpression[JadawelFormulaType]
+- custom_string_agg_value_key · method · L1941-L1947 — def custom_string_agg_value_key(self)
+- get_serializer_field_overrides · method · L1950-L1959 — def get_serializer_field_overrides(cls)
+- get_serializer_field_names · method · L1962-L1963 — def get_serializer_field_names(cls) -> List[str]
+- get_jadawel_formula_type_serializer_field_overrides · function · L2014-L2019 — def get_jadawel_formula_type_serializer_field_overrides()
+- calculate_number_type · function · L2022-L2048 — def calculate_number_type( arg_types: List[JadawelFormulaNumberType], min_decimal_places=0 )
+- _lookup_formula_type_from_string · function · L2051-L2055 — def _lookup_formula_type_from_string(formula_type_string)
+- literal · function · L2058-L2082 — def literal( arg: Union[str, int, bool, Decimal], ) -> JadawelExpression[JadawelFormulaValidType]
+- JSONBSingleKeyArrayExpression · class · L2085-L2109 — class JSONBSingleKeyArrayExpression(Expression)
+- __init__ · method · L2095-L2099 — def __init__(self, field_name: str, key_name: str, data_type: str, **kwargs)
+- as_sql · method · L2101-L2109 — def as_sql(self, compiler, connection, template=None)
+- JSONBSingleInnerKeyArrayExpression · class · L2112-L2148 — class JSONBSingleInnerKeyArrayExpression(Expression)
+- __init__ · method · L2122-L2136 — def __init__( self, field_name: str, key_name: str, data_type: str, inner_key_name: str, inner_data_type: str, **kwargs, )
+- as_sql · method · L2138-L2148 — def as_sql(self, compiler, connection, template=None)

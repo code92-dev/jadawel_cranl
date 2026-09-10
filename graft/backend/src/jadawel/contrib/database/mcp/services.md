@@ -1,0 +1,22 @@
+# backend/src/jadawel/contrib/database/mcp/services.py
+
+- filter_tables · function · L29-L31 — def filter_tables(user: AbstractUser, workspace: Workspace)
+- get_table · function · L34-L40 — def get_table(user: AbstractUser, workspace: Workspace, table_id: int) -> Table
+- list_databases · function · L48-L70 — def list_databases(user: AbstractUser, workspace: Workspace) -> list
+- get_database · function · L73-L94 — def get_database(user: AbstractUser, workspace: Workspace, database_id: int)
+- create_database · function · L97-L105 — def create_database(user: AbstractUser, workspace: Workspace, name: str)
+- list_tables · function · L113-L125 — def list_tables( user: AbstractUser, workspace: Workspace, database_id: int | None = None ) -> list[Table]
+- get_table_schema · function · L128-L175 — def get_table_schema( user: AbstractUser, workspace: Workspace, table_ids: list[int] ) -> list[dict]
+- _serialize_field · function · L178-L218 — def _serialize_field(field) -> dict
+- create_table · function · L229-L274 — def create_table( user: AbstractUser, workspace: Workspace, database_id: int, name: str, fields: list[dict] | None = None, ) -> dict
+- update_table · function · L277-L286 — def update_table( user: AbstractUser, workspace: Workspace, table_id: int, name: str ) -> dict
+- delete_table · function · L289-L294 — def delete_table(user: AbstractUser, workspace: Workspace, table_id: int) -> None
+- get_field · function · L302-L317 — def get_field(user: AbstractUser, workspace: Workspace, field_id: int)
+- create_fields · function · L320-L345 — def create_fields( user: AbstractUser, workspace: Workspace, table_id: int, fields: list[dict] ) -> list[dict]
+- update_fields · function · L348-L370 — def update_fields( user: AbstractUser, workspace: Workspace, fields: list[dict] ) -> list[dict]
+- delete_fields · function · L373-L381 — def delete_fields( user: AbstractUser, workspace: Workspace, field_ids: list[int] ) -> None
+- list_rows · function · L389-L424 — def list_rows( user: AbstractUser, workspace: Workspace, table_id: int, search: str = "", page: int = 1, size: int = 100, ) -> dict
+- _map_user_field_names · function · L427-L452 — def _map_user_field_names(model, rows: list[dict]) -> list[dict]
+- create_rows · function · L455-L473 — def create_rows( user: AbstractUser, workspace: Workspace, table_id: int, rows: list[dict] ) -> list[dict]
+- update_rows · function · L476-L498 — def update_rows( user: AbstractUser, workspace: Workspace, table_id: int, rows: list[dict] ) -> list[dict]
+- delete_rows · function · L501-L508 — def delete_rows( user: AbstractUser, workspace: Workspace, table_id: int, row_ids: list[int] ) -> None

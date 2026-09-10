@@ -1,0 +1,25 @@
+# web-frontend/modules/core/permissionManagerTypes.js
+
+- PermissionManagerType · class · L5-L35 — class PermissionManagerType extends Registerable
+- hasPermission · method · L19-L19 — hasPermission(permissions, operation, context, workspaceId)
+- getOrder · method · L24-L26 — getOrder()
+- getRolesTranslations · method · L32-L34 — getRolesTranslations()
+- CorePermissionManagerType · class · L37-L47 — class CorePermissionManagerType extends PermissionManagerType
+- getType · method · L38-L40 — static getType()
+- hasPermission · method · L42-L46 — hasPermission(permissions, operation, context, workspaceId)
+- StaffPermissionManagerType · class · L49-L59 — class StaffPermissionManagerType extends PermissionManagerType
+- getType · method · L50-L52 — static getType()
+- hasPermission · method · L54-L58 — hasPermission(permissions, operation, context, workspaceId)
+- WorkspaceMemberPermissionManagerType · class · L61-L69 — class WorkspaceMemberPermissionManagerType extends PermissionManagerType
+- getType · method · L62-L64 — static getType()
+- hasPermission · method · L66-L68 — hasPermission(permissions, operation, context, workspaceId)
+- BasicPermissionManagerType · class · L71-L106 — class BasicPermissionManagerType extends PermissionManagerType
+- getType · method · L72-L74 — static getType()
+- getRolesTranslations · method · L76-L89 — getRolesTranslations()
+- hasPermission · method · L91-L105 — hasPermission(permissions, operation, context, workspaceId)
+- StaffOnlySettingOperationPermissionManagerType · class · L108-L132 — class StaffOnlySettingOperationPermissionManagerType extends PermissionManagerType
+- getType · method · L109-L111 — static getType()
+- hasPermission · method · L113-L131 — hasPermission(permissions, operation, context, workspaceId)
+- AllowIfTemplateOperationPermissionManagerType · class · L134-L153 — class AllowIfTemplateOperationPermissionManagerType extends PermissionManagerType
+- getType · method · L135-L137 — static getType()
+- hasPermission · method · L139-L152 — hasPermission(permissions, operation, context, workspaceId)

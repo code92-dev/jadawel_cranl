@@ -1,0 +1,8 @@
+# backend/tests/jadawel/contrib/database/ws/public/test_public_ws_view_signals.py
+
+- test_when_view_filter_created_for_public_view_force_refresh_sent · function · L14-L40 — def test_when_view_filter_created_for_public_view_force_refresh_sent( mock_broadcast_to_channel_group, data_fixture, public_realtime_view_tester )
+- test_when_view_filter_updated_for_public_view_force_refresh_event_sent · function · L45-L72 — def test_when_view_filter_updated_for_public_view_force_refresh_event_sent( mock_broadcast_to_channel_group, data_fixture, public_realtime_view_tester )
+- test_when_view_filter_deleted_for_public_view_force_refresh_event_sent · function · L77-L104 — def test_when_view_filter_deleted_for_public_view_force_refresh_event_sent( mock_broadcast_to_channel_group, data_fixture, public_realtime_view_tester )
+- test_when_field_hidden_in_public_view_field_force_refresh_sent · function · L109-L163 — def test_when_field_hidden_in_public_view_field_force_refresh_sent( mock_broadcast_to_channel_group, data_fixture, public_realtime_view_tester )
+- test_when_field_unhidden_in_public_view_force_refresh_sent · function · L168-L240 — def test_when_field_unhidden_in_public_view_force_refresh_sent( mock_broadcast_to_channel_group, data_fixture, public_realtime_view_tester )
+- test_when_only_field_options_updated_in_public_grid_view_force_refresh_sent · function · L245-L323 — def test_when_only_field_options_updated_in_public_grid_view_force_refresh_sent( mock_broadcast_to_channel_group, data_fixture, public_realtime_view_tester )

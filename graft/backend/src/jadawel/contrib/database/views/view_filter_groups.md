@@ -1,0 +1,23 @@
+# backend/src/jadawel/contrib/database/views/view_filter_groups.py
+
+- get_q_from_view_filter · function · L26-L55 — def get_q_from_view_filter( view_filter: ViewFilter, table_model: GeneratedTableModel ) -> Union[Q, AnnotatedQ]
+- ViewGroupedFiltersAdapter · class · L58-L71 — class ViewGroupedFiltersAdapter(GroupedFiltersAdapter)
+- __init__ · method · L59-L60 — def __init__(self, instance: View, model: GeneratedTableModel, **kwargs)
+- filters · method · L63-L64 — def filters(self)
+- groups · method · L67-L68 — def groups(self)
+- get_q_from_filter · method · L70-L71 — def get_q_from_filter(self, _filter) -> Union[Q, AnnotatedQ]
+- APIViewFilter · class · L74-L91 — class APIViewFilter
+- __init__ · method · L82-L87 — def __init__(self, field_id, type, value, group_id, pk=None)
+- id · method · L90-L91 — def id(self)
+- APIFilterGroup · class · L94-L111 — class APIFilterGroup
+- __init__ · method · L102-L107 — def __init__(self, filter_type, parent_group_id=None, pk=None)
+- id · method · L110-L111 — def id(self)
+- APIGroupedFiltersAdapter · class · L114-L245 — class APIGroupedFiltersAdapter(GroupedFiltersAdapter)
+- __init__ · method · L121-L132 — def __init__( self, filter_type: str, filters: List[APIViewFilter], groups: List[APIFilterGroup], model: GeneratedTableModel, **kwargs, )
+- filter_type · method · L135-L136 — def filter_type(self)
+- filters · method · L139-L140 — def filters(self)
+- groups · method · L143-L144 — def groups(self)
+- get_q_from_filter · method · L146-L147 — def get_q_from_filter(self, _filter) -> Union[Q, AnnotatedQ]
+- from_serialized_filter_tree · method · L150-L245 — def from_serialized_filter_tree( serialized_filter_tree: Dict[str, Any], model: GeneratedTableModel, only_filter_by_field_ids: Optional[List[int]] = None, user_field_names: Optional[bool] = False, ) -> "APIGroupedFiltersAdapter"
+- extract_filters_and_groups · function · L188-L229 — def extract_filters_and_groups( filter_tree: Dict[str, Any], parent_group_id: Optional[int] = None )
+- construct_filter_builder_from_grouped_api_filters · function · L248-L272 — def construct_filter_builder_from_grouped_api_filters( api_filters: Dict[str, Any], model: GeneratedTableModel, only_filter_by_field_ids: Optional[List[int]] = None, user_field_names: Optional[bool] = False, ) -> FilterBuilder

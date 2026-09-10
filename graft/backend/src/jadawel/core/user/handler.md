@@ -1,0 +1,31 @@
+# backend/src/jadawel/core/user/handler.py
+
+- UserHandler · class · L86-L994 — class UserHandler(metaclass=jadawel_trace_methods(tracer))
+- get_active_user · method · L87-L125 — def get_active_user( self, user_id: Optional[int] = None, email: Optional[str] = None, exclude_users_scheduled_to_be_deleted: bool = False, ) -> AbstractUser
+- force_create_user · method · L127-L174 — def force_create_user(self, email, name, password, **kwargs)
+- create_user · method · L176-L316 — def create_user( self, name: str, email: str, password: str, language: Optional[str] = None, workspace_invitation_token: Optional[str] = None, template: Template = None, auth_provider: Optional[AuthProviderModel] = None, ) -> AbstractUser
+- update_user · method · L318-L374 — def update_user( self, user: AbstractUser, first_name: Optional[str] = None, language: Optional[str] = None, email_notification_frequency: Optional[str] = None, completed_onboarding: Optional[bool] = None, completed_guided_tours: Optional[str] = None, ) -> AbstractUser
+- _get_password_state_hash · method · L377-L397 — def _get_password_state_hash(user: AbstractUser) -> str
+- get_reset_password_signer · method · L399-L407 — def get_reset_password_signer(self) -> URLSafeTimedSerializer
+- get_change_email_signer · method · L409-L417 — def get_change_email_signer(self) -> URLSafeTimedSerializer
+- send_reset_password_email · method · L419-L452 — def send_reset_password_email(self, user: AbstractUser, base_url: str)
+- reset_password · method · L454-L518 — def reset_password(self, token: str, password: str) -> AbstractUser
+- change_password · method · L520-L560 — def change_password( self, user: AbstractUser, old_password: str, new_password: str ) -> AbstractUser
+- send_change_email_confirmation · method · L562-L623 — def send_change_email_confirmation( self, user: AbstractUser, new_email: str, password: str, base_url: str )
+- change_email · method · L625-L669 — def change_email(self, token: str) -> Tuple[AbstractUser, str]
+- user_signed_in_via_provider · method · L671-L682 — def user_signed_in_via_provider( self, user: AbstractUser, authentication_provider: AuthProviderModel )
+- update_last_login · method · L684-L693 — def update_last_login(self, user: AbstractUser)
+- user_signed_in · method · L695-L713 — def user_signed_in(self, user: AbstractUser)
+- delete_user_log_entries_older_than · method · L715-L723 — def delete_user_log_entries_older_than(self, cutoff: datetime)
+- schedule_user_deletion · method · L725-L763 — def schedule_user_deletion(self, user: AbstractUser)
+- cancel_user_deletion · method · L765-L780 — def cancel_user_deletion(self, user: AbstractUser)
+- delete_expired_users_and_related_workspaces_if_last_admin · method · L782-L845 — def delete_expired_users_and_related_workspaces_if_last_admin( self, grace_delay: Optional[timedelta] = None )
+- get_all_active_users_qs · method · L847-L857 — def get_all_active_users_qs(self) -> QuerySet
+- blacklist_refresh_token · method · L859-L878 — def blacklist_refresh_token(self, refresh_token: str, expires_at: datetime)
+- refresh_token_hash_is_blacklisted · method · L880-L888 — def refresh_token_hash_is_blacklisted(self, hashed_token: str) -> bool
+- refresh_token_is_blacklisted · method · L890-L899 — def refresh_token_is_blacklisted(self, refresh_token: str) -> bool
+- _get_email_verification_signer · method · L901-L902 — def _get_email_verification_signer(self) -> URLSafeSerializer
+- create_email_verification_token · method · L904-L920 — def create_email_verification_token(self, user: User) -> str
+- verify_email_address · method · L922-L958 — def verify_email_address(self, token: str) -> User
+- send_email_pending_verification · method · L960-L994 — def send_email_pending_verification(self, user: User)
+- send_email · function · L982-L988 — def send_email()

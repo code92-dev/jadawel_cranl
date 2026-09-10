@@ -1,0 +1,65 @@
+# web-frontend/modules/builder/workflowActionTypes.js
+
+- NotificationWorkflowActionType · class · L24-L51 — class NotificationWorkflowActionType extends WorkflowActionType
+- getType · method · L25-L27 — static getType()
+- icon · method · L29-L31 — get icon()
+- form · method · L33-L35 — get form()
+- label · method · L37-L39 — get label()
+- execute · method · L41-L46 — execute({ workflowAction: { title, description }, resolveFormula })
+- getDataSchema · method · L48-L50 — getDataSchema(applicationContext, workflowAction)
+- OpenPageWorkflowActionType · class · L53-L143 — class OpenPageWorkflowActionType extends WorkflowActionType
+- getType · method · L54-L56 — static getType()
+- icon · method · L58-L60 — get icon()
+- form · method · L62-L64 — get form()
+- label · method · L66-L68 — get label()
+- getErrorMessage · method · L76-L101 — getErrorMessage(workflowAction, applicationContext)
+- execute · method · L103-L138 — execute({ workflowAction, applicationContext: { builder, mode }, resolveFormula, })
+- getDataSchema · method · L140-L142 — getDataSchema(applicationContext, workflowAction)
+- LogoutWorkflowActionType · class · L145-L171 — class LogoutWorkflowActionType extends WorkflowActionType
+- getType · method · L146-L148 — static getType()
+- icon · method · L150-L152 — get icon()
+- form · method · L154-L156 — get form()
+- label · method · L158-L160 — get label()
+- execute · method · L162-L166 — execute({ applicationContext })
+- getDataSchema · method · L168-L170 — getDataSchema(applicationContext, workflowAction)
+- RefreshDataSourceWorkflowActionType · class · L173-L246 — class RefreshDataSourceWorkflowActionType extends WorkflowActionType
+- getType · method · L174-L176 — static getType()
+- icon · method · L178-L180 — get icon()
+- form · method · L182-L184 — get form()
+- label · method · L186-L188 — get label()
+- getErrorMessage · method · L190-L196 — getErrorMessage(workflowAction, applicationContext)
+- execute · method · L198-L241 — async execute({ workflowAction, applicationContext })
+- getDataSchema · method · L243-L245 — getDataSchema(workflowAction)
+- WorkflowActionServiceType · class · L248-L323 — class WorkflowActionServiceType extends WorkflowActionType
+- form · method · L249-L251 — get form()
+- label · method · L253-L255 — get label()
+- icon · method · L257-L259 — get icon()
+- image · method · L261-L263 — get image()
+- execute · method · L265-L285 — execute({ workflowAction: { id }, applicationContext, resolveFormula })
+- getDataSchema · method · L287-L302 — getDataSchema(workflowAction)
+- getErrorMessage · method · L304-L314 — getErrorMessage(workflowAction, applicationContext)
+- prepareValuePath · method · L316-L318 — prepareValuePath(workflowAction, path)
+- serviceType · method · L320-L322 — get serviceType()
+- CoreHTTPRequestWorkflowActionType · class · L325-L340 — class CoreHTTPRequestWorkflowActionType extends WorkflowActionServiceType
+- getType · method · L326-L328 — static getType()
+- serviceType · method · L330-L335 — get serviceType()
+- getOrder · method · L337-L339 — getOrder()
+- CoreSMTPEmailWorkflowActionType · class · L342-L354 — class CoreSMTPEmailWorkflowActionType extends WorkflowActionServiceType
+- getType · method · L343-L345 — static getType()
+- serviceType · method · L347-L349 — get serviceType()
+- getOrder · method · L351-L353 — getOrder()
+- CreateRowWorkflowActionType · class · L356-L367 — class CreateRowWorkflowActionType extends WorkflowActionServiceType
+- getType · method · L357-L359 — static getType()
+- serviceType · method · L361-L366 — get serviceType()
+- UpdateRowWorkflowActionType · class · L369-L380 — class UpdateRowWorkflowActionType extends WorkflowActionServiceType
+- getType · method · L370-L372 — static getType()
+- serviceType · method · L374-L379 — get serviceType()
+- DeleteRowWorkflowActionType · class · L382-L393 — class DeleteRowWorkflowActionType extends WorkflowActionServiceType
+- getType · method · L383-L385 — static getType()
+- serviceType · method · L387-L392 — get serviceType()
+- AIAgentWorkflowActionType · class · L395-L403 — class AIAgentWorkflowActionType extends WorkflowActionServiceType
+- getType · method · L396-L398 — static getType()
+- serviceType · method · L400-L402 — get serviceType()
+- SlackWriteMessageWorkflowActionType · class · L405-L416 — class SlackWriteMessageWorkflowActionType extends WorkflowActionServiceType
+- getType · method · L406-L408 — static getType()
+- serviceType · method · L410-L415 — get serviceType()

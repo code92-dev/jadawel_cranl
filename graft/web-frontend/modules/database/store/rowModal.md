@@ -1,0 +1,17 @@
+# web-frontend/modules/database/store/rowModal.js
+
+- state · function · L11-L24 — state = ()
+- CLEAR · method · L27-L29 — CLEAR(state, componentId)
+- OPEN · method · L30-L42 — OPEN(state, { componentId, tableId, id, exists, row })
+- SET_EXISTS · method · L43-L48 — SET_EXISTS(state, { componentId, value })
+- REPLACE_ROW · method · L49-L54 — REPLACE_ROW(state, { componentId, row })
+- UPDATE_ROW · method · L55-L57 — UPDATE_ROW(state, { componentId, row })
+- UPDATE_ROW_METADATA · method · L58-L64 — UPDATE_ROW_METADATA(state, { rowId, rowMetadataType, updateFunction })
+- clear · method · L68-L70 — clear({ commit }, { componentId })
+- open · method · L76-L78 — open({ commit }, { componentId, tableId, id, exists, row })
+- doesNotExist · method · L83-L85 — doesNotExist({ commit }, { componentId })
+- doesExist · method · L86-L89 — doesExist({ commit }, { componentId, row })
+- replace · method · L90-L92 — replace({ commit }, { componentId, row })
+- updated · method · L100-L113 — updated({ commit, getters }, { tableId, values })
+- updateRowMetadata · method · L119-L121 — updateRowMetadata({ commit }, { rowId, rowMetadataType, updateFunction })
+- getRows · method · L125-L127 — getRows(state)

@@ -7,6 +7,7 @@ export const routes = [
     name: 'admin-backup',
     path: '/admin/backup',
     file: path.resolve(__dirname, 'pages/adminBackup.vue'),
+    meta: { layout: 'app', middleware: 'staff' },
   },
   {
     name: 'arabase-public-dashboard',

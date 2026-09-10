@@ -1,0 +1,35 @@
+# web-frontend/modules/builder/pageHeaderItemTypes.js
+
+- PageHeaderItemType · class · L13-L51 — class PageHeaderItemType extends Registerable
+- label · method · L14-L16 — get label()
+- icon · method · L18-L20 — get icon()
+- component · method · L26-L28 — get component()
+- isInError · method · L36-L38 — isInError({ builder, page })
+- onClick · method · L44-L46 — onClick(component, button)
+- getOrder · method · L48-L50 — getOrder()
+- ElementsPageHeaderItemType · class · L53-L73 — class ElementsPageHeaderItemType extends PageHeaderItemType
+- getType · method · L54-L56 — static getType()
+- label · method · L58-L60 — get label()
+- icon · method · L62-L64 — get icon()
+- component · method · L66-L68 — get component()
+- getOrder · method · L70-L72 — getOrder()
+- DataSourcesPageHeaderItemType · class · L75-L111 — class DataSourcesPageHeaderItemType extends PageHeaderItemType
+- getType · method · L76-L78 — static getType()
+- label · method · L80-L82 — get label()
+- icon · method · L84-L86 — get icon()
+- component · method · L88-L90 — get component()
+- isInError · method · L97-L106 — isInError({ builder, page })
+- getOrder · method · L108-L110 — getOrder()
+- VariablesPageHeaderItemType · class · L113-L133 — class VariablesPageHeaderItemType extends PageHeaderItemType
+- getType · method · L114-L116 — static getType()
+- label · method · L118-L120 — get label()
+- icon · method · L122-L124 — get icon()
+- component · method · L126-L128 — get component()
+- getOrder · method · L130-L132 — getOrder()
+- SettingsPageHeaderItemType · class · L135-L159 — class SettingsPageHeaderItemType extends PageHeaderItemType
+- getType · method · L136-L138 — static getType()
+- label · method · L140-L142 — get label()
+- icon · method · L144-L146 — get icon()
+- component · method · L148-L150 — get component()
+- onClick · method · L152-L154 — onClick(component, button)
+- getOrder · method · L156-L158 — getOrder()

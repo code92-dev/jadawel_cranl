@@ -1,0 +1,5 @@
+# backend/src/jadawel/test_utils/fixtures/__init__.py
+
+- Fixtures · class · L44-L97 — class Fixtures( SettingsFixtures, UserFixtures, UserFileFixtures, WorkspaceFixtures, ApplicationFixtures, AutomationWorkflowFixtures, AutomationWorkflowHistoryFixtures, AutomationNodeFixtures, AutomationHistoryFixtures, TableFixtures, ViewFixtures, FieldFixtures, TokenFixtures, TwoFactorAuthFixtures, TemplateFixtures, RowFixture, TableWebhookFixture, AirtableFixtures, JobFixtures, FileImportFixtures, SnapshotFixtures, AuthProviderFixtures, PageFixtures, ElementFixtures, DomainFixtures, IntegrationFixtures, ServiceFixtures, DataSourceFixtures, NotificationsFixture, WorkflowActionFixture, UserSourceFixtures, AppAuthProviderFixtures, UserSourceUserFixtures, GenerativeAIFixtures, DataSyncFixtures, ImportExportWorkspaceFixtures, DashboardDataSourceFixtures, WidgetFixtures, MCPFixtures, )
+- __init__ · method · L85-L86 — def __init__(self, fake=None)
+- warm_cache_before_counting_queries · method · L88-L97 — def warm_cache_before_counting_queries(self)

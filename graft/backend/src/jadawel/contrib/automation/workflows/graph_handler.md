@@ -1,0 +1,29 @@
+# backend/src/jadawel/contrib/automation/workflows/graph_handler.py
+
+- _replace · function · L11-L18 — def _replace(list_, item_to_replace, replacement)
+- NodeGraphHandler · class · L21-L486 — class NodeGraphHandler
+- __init__ · method · L67-L68 — def __init__(self, workflow)
+- graph · method · L71-L72 — def graph(self)
+- _update_graph · method · L74-L82 — def _update_graph(self, graph=None)
+- get_info · method · L84-L97 — def get_info(self, node: AutomationNode | str | int | None) -> Dict[str, Any]
+- _get_node_map · method · L99-L102 — def _get_node_map(self) -> Dict[int, AutomationNode]
+- get_node · method · L104-L112 — def get_node(self, node_id: str | int) -> AutomationNode
+- get_node_at_position · method · L114-L144 — def get_node_at_position( self, reference_node: AutomationNode, position: NodePositionType, output: str ) -> AutomationNode
+- get_last_position · method · L146-L162 — def get_last_position(self) -> NodePositionTriplet
+- search_last · function · L155-L160 — def search_last(node_id)
+- get_position · method · L164-L184 — def get_position(self, node: AutomationNode) -> NodePositionTriplet
+- get_previous_positions · method · L186-L226 — def get_previous_positions( self, target_node: AutomationNode ) -> NodePositionTriplet
+- explore · function · L193-L220 — def explore(current_position, path)
+- _get_all_next_nodes · method · L228-L235 — def _get_all_next_nodes(self, node: AutomationNode)
+- get_next_nodes · method · L237-L251 — def get_next_nodes( self, node: AutomationNode, output: str | None = None ) -> List[AutomationNode]
+- get_children · method · L253-L258 — def get_children(self, node: AutomationNode) -> List[AutomationNode]
+- insert · method · L260-L310 — def insert( self, node: AutomationNode, reference_node: AutomationNode, position: NodePositionType, output: str, )
+- remove · method · L312-L360 — def remove(self, node_to_delete: AutomationNode, keep_info=False)
+- replace · method · L362-L392 — def replace(self, node_to_replace: AutomationNode, new_node: AutomationNode)
+- move · method · L394-L408 — def move( self, node_to_move: AutomationNode, reference_node: AutomationNode | None, position: NodePositionType, output: str, )
+- migrate_graph · method · L410-L441 — def migrate_graph(self, id_mapping)
+- map_node · function · L417-L418 — def map_node(nid)
+- map_output · function · L420-L423 — def map_output(uid)
+- _get_edge_label · method · L443-L449 — def _get_edge_label(self, node, uid)
+- labeled_graph · method · L451-L486 — def labeled_graph(self)
+- label · function · L459-L466 — def label(node_id)

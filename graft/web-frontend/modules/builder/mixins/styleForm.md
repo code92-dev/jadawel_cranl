@@ -1,0 +1,16 @@
+# web-frontend/modules/builder/mixins/styleForm.js
+
+- data · method · L23-L36 — data()
+- themeConfigBlocks · method · L38-L40 — themeConfigBlocks()
+- colorVariables · method · L41-L46 — colorVariables()
+- allowedStyles · method · L47-L49 — allowedStyles()
+- borders · method · L50-L57 — borders()
+- handler · method · L62-L66 — handler(newValue)
+- handler · method · L70-L74 — handler(newValue)
+- isStyleAllowed · method · L78-L80 — isStyleAllowed(style)
+- getBoxStyleValue · method · L81-L88 — getBoxStyleValue(pos)
+- setBoxStyleValue · method · L89-L96 — setBoxStyleValue(pos, newValue)
+- setRadiusStyleValue · method · L97-L99 — setRadiusStyleValue(key, newValue)
+- getAllowedStyles · method · L100-L118 — getAllowedStyles()
+- getAllowedValues · method · L119-L129 — getAllowedValues()
+- getValuesFromElement · method · L130-L136 — getValuesFromElement(allowedValues)

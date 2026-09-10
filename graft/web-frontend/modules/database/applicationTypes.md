@@ -1,0 +1,23 @@
+# web-frontend/modules/database/applicationTypes.js
+
+- DatabaseApplicationType · class · L12-L153 — class DatabaseApplicationType extends ApplicationType
+- getType · method · L13-L15 — static getType()
+- getRowExpandButtonComponent · method · L22-L24 — getRowExpandButtonComponent()
+- getIconClass · method · L26-L28 — getIconClass()
+- getName · method · L30-L33 — getName()
+- getNamePlural · method · L35-L38 — getNamePlural()
+- getDescription · method · L40-L43 — getDescription()
+- getDefaultName · method · L45-L48 — getDefaultName()
+- getSidebarComponent · method · L50-L52 — getSidebarComponent()
+- getApplicationContextComponent · method · L54-L56 — getApplicationContextComponent()
+- getTemplateSidebarComponent · method · L58-L60 — getTemplateSidebarComponent()
+- getTemplatesPageComponent · method · L62-L64 — getTemplatesPageComponent()
+- getTemplatePage · method · L66-L74 — getTemplatePage(application)
+- getDependentsName · method · L76-L78 — getDependentsName()
+- getDependents · method · L80-L88 — getDependents(database)
+- populate · method · L90-L96 — populate(application)
+- delete · method · L102-L107 — delete(application, { $router })
+- select · method · L109-L132 — async select(application, { $router, $store, $i18n })
+- prepareForStoreUpdate · method · L139-L144 — prepareForStoreUpdate(application, data)
+- getApplicationFormComponent · method · L146-L148 — getApplicationFormComponent()
+- getOrder · method · L150-L152 — getOrder()

@@ -1,0 +1,18 @@
+# web-frontend/modules/database/components/field/FieldLinkRowSubForm.vue
+
+- setup · method · L87-L89 — setup()
+- data · method · L90-L110 — data()
+- tables · method · L112-L128 — tables()
+- tablesWhereFieldsCanBeCreated · method · L129-L137 — tablesWhereFieldsCanBeCreated()
+- canDeleteInSelectedFieldTable · method · L138-L147 — canDeleteInSelectedFieldTable()
+- selectedFieldTable · method · L148-L152 — selectedFieldTable()
+- isSelectedFieldAccessible · method · L153-L158 — isSelectedFieldAccessible()
+- 'values.link_row_table_id' · method · L161-L171 — 'values.link_row_table_id'(newValueType, oldValue)
+- mounted · method · L173-L179 — mounted()
+- reset · method · L182-L188 — reset()
+- isValid · method · L189-L191 — isValid()
+- getFormValues · method · L192-L199 — getFormValues()
+- tableChange · method · L200-L205 — tableChange()
+- limitToViewToggleChange · method · L206-L211 — limitToViewToggleChange()
+- loadViewsIfNeeded · method · L212-L253 — async loadViewsIfNeeded()
+- validations · method · L255-L267 — validations()

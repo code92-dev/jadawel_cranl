@@ -1,0 +1,24 @@
+# backend/tests/jadawel/core/test_core_mixins.py
+
+- test_get_all_parents_and_self_with_single_model · function · L11-L25 — def test_get_all_parents_and_self_with_single_model(data_fixture)
+- TmpModel · class · L12-L22 — class TmpModel(PolymorphicContentTypeMixin, models.Model)
+- Meta · class · L21-L22 — class Meta
+- test_get_all_parents_and_self_with_one_level_of_inheritance · function · L29-L49 — def test_get_all_parents_and_self_with_one_level_of_inheritance(data_fixture)
+- RootParent · class · L30-L40 — class RootParent(PolymorphicContentTypeMixin, models.Model)
+- Meta · class · L39-L40 — class Meta
+- SubModel · class · L42-L44 — class SubModel(RootParent)
+- Meta · class · L43-L44 — class Meta
+- test_get_all_parents_and_self_with_two_levels_of_inheritance · function · L53-L88 — def test_get_all_parents_and_self_with_two_levels_of_inheritance(data_fixture)
+- RootParent2 · class · L54-L64 — class RootParent2(PolymorphicContentTypeMixin, models.Model)
+- Meta · class · L63-L64 — class Meta
+- SubModel2 · class · L66-L68 — class SubModel2(RootParent2)
+- Meta · class · L67-L68 — class Meta
+- SubSubModel · class · L70-L72 — class SubSubModel(SubModel2)
+- Meta · class · L71-L72 — class Meta
+- test_cant_define_model_with_multiple_parents_with_poly_mixin · function · L92-L122 — def test_cant_define_model_with_multiple_parents_with_poly_mixin(data_fixture)
+- ParentA · class · L93-L103 — class ParentA(PolymorphicContentTypeMixin, models.Model)
+- Meta · class · L102-L103 — class Meta
+- ParentB · class · L105-L115 — class ParentB(PolymorphicContentTypeMixin, models.Model)
+- Meta · class · L114-L115 — class Meta
+- SubModel3 · class · L117-L119 — class SubModel3(ParentA, ParentB)
+- Meta · class · L118-L119 — class Meta

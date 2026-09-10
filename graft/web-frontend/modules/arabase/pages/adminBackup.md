@@ -1,0 +1,16 @@
+# web-frontend/modules/arabase/pages/adminBackup.vue
+
+- data · method · L153-L172 — data()
+- healthLevel · method · L179-L188 — healthLevel()
+- healthIcon · method · L189-L196 — healthIcon()
+- healthTitle · method · L197-L199 — healthTitle()
+- healthDetail · method · L200-L205 — healthDetail()
+- mounted · method · L207-L209 — async mounted()
+- load · method · L211-L225 — async load()
+- applyOverview · method · L226-L230 — applyOverview(data)
+- changeFrequency · method · L231-L242 — async changeFrequency(frequency)
+- runNow · method · L243-L253 — async runNow()
+- openRestore · method · L254-L257 — openRestore(run)
+- formatDate · method · L258-L260 — formatDate(value)
+- formatDuration · method · L261-L269 — formatDuration(seconds)
+- formatSize · method · L270-L277 — formatSize(run)

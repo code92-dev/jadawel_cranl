@@ -1,0 +1,62 @@
+# backend/src/jadawel/core/registry.py
+
+- Instance · class · L46-L71 — class Instance(object)
+- __init__ · method · L59-L61 — def __init__(self)
+- after_register · method · L63-L66 — def after_register(self)
+- before_unregister · method · L68-L71 — def before_unregister(self)
+- ModelInstanceMixin · class · L77-L110 — class ModelInstanceMixin(Generic[DjangoModel])
+- __init__ · method · L85-L87 — def __init__(self)
+- get_content_type · method · L89-L96 — def get_content_type(self) -> "ContentType"
+- get_object_for_this_type · method · L98-L103 — def get_object_for_this_type(self, **kwargs) -> DjangoModel
+- get_all_objects_for_this_type · method · L105-L110 — def get_all_objects_for_this_type(self, **kwargs) -> models.QuerySet[DjangoModel]
+- CustomFieldsInstanceMixin · class · L113-L321 — class CustomFieldsInstanceMixin
+- __init__ · method · L164-L174 — def __init__(self)
+- get_serializer_class · method · L176-L228 — def get_serializer_class( self, *args, request_serializer: bool = False, meta_ref_name=None, base_class: Serializer = None, extra_params=None, **kwargs, ) -> serializers.ModelSerializer
+- get_serializer · method · L230-L270 — def get_serializer( self, model_instance_or_instances: Union[models.Model, List[models.Model]], base_class: Optional[serializers.ModelSerializer] = None, context: Optional[Dict[str, Any]] = None, request: bool = False, extra_params=None, **kwargs: Dict[str, Any], ) -> serializers.ModelSerializer
+- get_serializer_mixins · method · L272-L278 — def get_serializer_mixins( self, request_serializer: bool, extra_params: Dict, **kwargs ) -> List
+- get_field_overrides · method · L280-L286 — def get_field_overrides( self, request_serializer: bool, extra_params: Dict, **kwargs ) -> Dict
+- get_field_names · method · L288-L294 — def get_field_names( self, request_serializer: bool, extra_params: Dict, **kwargs ) -> List[str]
+- get_meta_ref_name · method · L296-L304 — def get_meta_ref_name( self, request_serializer: bool, extra_params: Dict, **kwargs ) -> Optional[str]
+- get_queryset · method · L306-L312 — def get_queryset(self)
+- enhance_queryset · method · L314-L321 — def enhance_queryset(self, queryset)
+- PublicCustomFieldsInstanceMixin · class · L324-L426 — class PublicCustomFieldsInstanceMixin(CustomFieldsInstanceMixin)
+- get_serializer_mixins · method · L366-L377 — def get_serializer_mixins( self, request_serializer: bool, extra_params=None, **kwargs ) -> List
+- get_field_overrides · method · L379-L393 — def get_field_overrides( self, request_serializer: bool, extra_params=None, **kwargs ) -> Dict
+- get_field_names · method · L395-L409 — def get_field_names( self, request_serializer: bool, extra_params=None, **kwargs ) -> List[str]
+- get_meta_ref_name · method · L411-L426 — def get_meta_ref_name( self, request_serializer: bool, extra_params=None, **kwargs, ) -> Optional[str]
+- APIUrlsInstanceMixin · class · L429-L455 — class APIUrlsInstanceMixin
+- get_api_urls · method · L430-L455 — def get_api_urls(self) -> List
+- MapAPIExceptionsInstanceMixin · class · L458-L492 — class MapAPIExceptionsInstanceMixin
+- map_api_exceptions · method · L484-L492 — def map_api_exceptions(self)
+- ImportExportMixin · class · L498-L526 — class ImportExportMixin(Generic[T], ABC)
+- export_serialized · method · L500-L510 — def export_serialized(self, instance: T) -> Dict[str, Any]
+- import_serialized · method · L513-L526 — def import_serialized( self, parent: Any, serialized_values: Dict[str, Any], id_mapping: Dict ) -> T
+- EasyImportExportMixin · class · L532-L731 — class EasyImportExportMixin(Generic[T], ABC)
+- serialize_property · method · L554-L574 — def serialize_property( self, instance: T, prop_name: str, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, ) -> Any
+- get_property_names · method · L576-L584 — def get_property_names(self)
+- export_serialized · method · L586-L620 — def export_serialized( self, instance: T, import_export_config: Optional[Any] = None, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, ) -> Dict[str, Any]
+- deserialize_property · method · L622-L642 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, **kwargs, ) -> Any
+- create_instance_from_serialized · method · L644-L664 — def create_instance_from_serialized( self, serialized_values: Dict[str, Any], id_mapping, files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, **kwargs, ) -> T
+- import_serialized · method · L666-L731 — def import_serialized( self, parent: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict[str, any]] = None, **kwargs, ) -> T
+- Registry · class · L734-L867 — class Registry(Generic[InstanceSubClass])
+- __init__ · method · L744-L751 — def __init__(self)
+- get · method · L753-L777 — def get(self, type_name: str) -> InstanceSubClass
+- get_by_type_name_by_compat · method · L779-L786 — def get_by_type_name_by_compat(self, compat_name: str) -> Optional[str]
+- get_by_type · method · L788-L789 — def get_by_type(self, instance_type: Type[InstanceSubClass]) -> InstanceSubClass
+- get_all · method · L791-L799 — def get_all(self) -> ValuesView[InstanceSubClass]
+- get_types · method · L801-L809 — def get_types(self) -> List[str]
+- get_types_as_tuples · method · L811-L819 — def get_types_as_tuples(self) -> List[Tuple[str, str]]
+- register · method · L821-L842 — def register(self, instance: InstanceSubClass)
+- unregister · method · L844-L867 — def unregister(self, value: Union[str, InstanceSubClass])
+- ModelRegistryMixin · class · L870-L957 — class ModelRegistryMixin(Generic[DjangoModel, InstanceSubClass])
+- get_by_model · method · L871-L889 — def get_by_model( self, model_instance: Union[DjangoModel, Type[DjangoModel]] ) -> InstanceSubClass
+- get_for_class · method · L892-L924 — def get_for_class(self, clazz: Type[DjangoModel]) -> InstanceSubClass
+- get_all_by_model_isinstance · method · L926-L942 — def get_all_by_model_isinstance( self, model_instance: DjangoModel ) -> List[InstanceSubClass]
+- get_model_names · method · L944-L957 — def get_model_names(self) -> list[tuple[str, str]]
+- CustomFieldsRegistryMixin · class · L960-L1011 — class CustomFieldsRegistryMixin(Generic[DjangoModel])
+- get_serializer · method · L961-L1011 — def get_serializer( self, model_instance_or_instances: Union[DjangoModel, List[DjangoModel]], base_class: Optional[Type[serializers.ModelSerializer]] = None, context: Optional[Dict[str, any]] = None, extra_params=None, **kwargs, )
+- APIUrlsRegistryMixin · class · L1014-L1027 — class APIUrlsRegistryMixin
+- api_urls · method · L1016-L1027 — def api_urls(self)
+- InstanceWithFormulaMixin · class · L1030-L1087 — class InstanceWithFormulaMixin
+- formula_generator · method · L1038-L1061 — def formula_generator( self, instance: Instance ) -> Generator[str | Instance, str, None]
+- import_formulas · method · L1063-L1087 — def import_formulas( self, instance: Instance, id_mapping: Dict[str, Any], import_formula: Callable[[str, Dict[str, Any]], str], **kwargs: Dict[str, Any], ) -> Set[Instance]

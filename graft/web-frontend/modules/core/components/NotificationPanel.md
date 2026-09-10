@@ -1,0 +1,16 @@
+# web-frontend/modules/core/components/NotificationPanel.vue
+
+- data · method · L127-L133 — data()
+- workspace · method · L144-L146 — workspace()
+- loaded · method · L149-L166 — loaded(isLoaded)
+- initialLoad · method · L169-L178 — async initialLoad()
+- show · method · L179-L197 — show(target)
+- hide · method · L198-L206 — hide()
+- toggle · method · L207-L213 — toggle(target)
+- markAllAsRead · method · L214-L220 — async markAllAsRead()
+- clearAll · method · L221-L227 — async clearAll()
+- getNotificationIcon · method · L228-L232 — getNotificationIcon(notification)
+- getNotificationIconProps · method · L233-L237 — getNotificationIconProps(notification)
+- getNotificationContent · method · L238-L242 — getNotificationContent(notification)
+- timeAgo · method · L243-L245 — timeAgo(timestamp)
+- loadNextPage · method · L246-L252 — async loadNextPage()

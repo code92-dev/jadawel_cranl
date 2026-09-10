@@ -1,0 +1,21 @@
+# backend/src/jadawel/contrib/automation/nodes/registries.py
+
+- AutomationNodeType · class · L29-L293 — class AutomationNodeType( PublicCustomFieldsInstanceMixin, InstanceWithFormulaMixin, EasyImportExportMixin, ModelInstanceMixin, Instance, )
+- SerializedDict · class · L49-L49 — class SerializedDict(AutomationNodeDict)
+- allowed_fields · method · L52-L56 — def allowed_fields(self)
+- before_delete · method · L58-L64 — def before_delete(self, node: AutomationNode) -> None
+- before_replace · method · L66-L80 — def before_replace(self, node: AutomationNode, new_node_type: Instance) -> None
+- before_move · method · L82-L89 — def before_move( self, node: AutomationNode, reference_node: AutomationNode | None, position: NodePositionType, output: str, )
+- before_create · method · L91-L101 — def before_create( self, workflow: AutomationWorkflow, reference_node: AutomationNode | None, position: NodePositionType, output: str, )
+- after_create · method · L103-L109 — def after_create(self, node: AutomationNode) -> None
+- get_service_type · method · L111-L114 — def get_service_type(self) -> Optional[ServiceTypeSubClass]
+- is_replaceable_with · method · L116-L127 — def is_replaceable_with(self, other_node_type: "AutomationNodeType") -> bool
+- export_prepared_values · method · L129-L145 — def export_prepared_values(self, node: AutomationNode) -> Dict[Any, Any]
+- serialize_property · method · L147-L167 — def serialize_property( self, node: AutomationNode, prop_name: str, files_zip=None, storage=None, cache=None, )
+- deserialize_property · method · L169-L216 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- import_serialized · method · L218-L233 — def import_serialized( self, parent: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[str, Any]], **kwargs, )
+- prepare_values · method · L235-L282 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: AutomationNode = None, ) -> Dict[str, Any]
+- get_pytest_params · method · L284-L284 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- dispatch · method · L286-L293 — def dispatch( self, automation_node: AutomationNode, dispatch_context: AutomationDispatchContext, ) -> DispatchResult
+- AutomationNodeTypeRegistry · class · L296-L303 — class AutomationNodeTypeRegistry( Registry, ModelRegistryMixin, CustomFieldsRegistryMixin, )
+- ReplaceAutomationNodeTrashOperationType · class · L306-L327 — class ReplaceAutomationNodeTrashOperationType(TrashOperationType)

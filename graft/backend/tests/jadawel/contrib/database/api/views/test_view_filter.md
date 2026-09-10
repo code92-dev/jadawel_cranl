@@ -1,0 +1,18 @@
+# backend/tests/jadawel/contrib/database/api/views/test_view_filter.py
+
+- test_list_view_filters · function · L23-L79 — def test_list_view_filters(api_client, data_fixture)
+- test_create_view_filter · function · L83-L193 — def test_create_view_filter(api_client, data_fixture)
+- test_get_view_filter · function · L197-L250 — def test_get_view_filter(api_client, data_fixture)
+- test_get_link_row_filter_type_preload_values · function · L254-L297 — def test_get_link_row_filter_type_preload_values(data_fixture, api_client)
+- test_update_view_filter · function · L301-L448 — def test_update_view_filter(api_client, data_fixture)
+- test_delete_view_filter · function · L452-L480 — def test_delete_view_filter(api_client, data_fixture)
+- test_list_views_including_filters · function · L484-L528 — def test_list_views_including_filters(api_client, data_fixture)
+- test_cant_update_view_filter_when_view_trashed · function · L532-L547 — def test_cant_update_view_filter_when_view_trashed(api_client, data_fixture)
+- test_cant_delete_view_filter_when_view_trashed · function · L551-L565 — def test_cant_delete_view_filter_when_view_trashed(api_client, data_fixture)
+- test_create_view_filter_group · function · L569-L615 — def test_create_view_filter_group(api_client, data_fixture)
+- test_get_view_filter_group · function · L619-L677 — def test_get_view_filter_group(api_client, data_fixture)
+- test_view_filter_group_can_be_nested · function · L681-L701 — def test_view_filter_group_can_be_nested(api_client, data_fixture)
+- test_view_filter_group_delete_all_nested_children · function · L705-L738 — def test_view_filter_group_delete_all_nested_children(api_client, data_fixture)
+- test_update_view_filter_group · function · L742-L802 — def test_update_view_filter_group(api_client, data_fixture)
+- test_delete_view_filter_group · function · L806-L849 — def test_delete_view_filter_group(api_client, data_fixture)
+- test_create_view_filter_group_and_add_filters · function · L853-L893 — def test_create_view_filter_group_and_add_filters(api_client, data_fixture)

@@ -1,0 +1,15 @@
+# web-frontend/modules/builder/components/theme/ImageThemeConfigBlock.vue
+
+- setup · method · L206-L208 — setup()
+- data · method · L209-L231 — data()
+- get · method · L234-L236 — get()
+- set · method · L237-L249 — set(newValue)
+- get · method · L252-L254 — get()
+- set · method · L255-L257 — set(value)
+- get · method · L260-L262 — get()
+- set · method · L263-L273 — set(value)
+- IMAGE_SOURCE_TYPES · method · L275-L277 — IMAGE_SOURCE_TYPES()
+- imageConstraintChoices · method · L278-L293 — imageConstraintChoices()
+- constraintDisabled · method · L296-L305 — constraintDisabled(name)
+- isAllowedKey · method · L306-L308 — isAllowedKey(key)
+- validations · method · L310-L358 — validations()

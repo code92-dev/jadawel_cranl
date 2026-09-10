@@ -1,0 +1,16 @@
+# web-frontend/modules/database/components/onboarding/DatabaseScratchTrackFieldsStep.vue
+
+- setup · method · L91-L93 — setup()
+- data · method · L94-L109 — data()
+- handler · method · L112-L115 — handler(field)
+- mounted · method · L119-L140 — mounted()
+- isChipDisabled · method · L142-L147 — isChipDisabled(name)
+- isChipActive · method · L148-L154 — isChipActive(name)
+- isValid · method · L155-L158 — isValid()
+- toggleSelection · method · L159-L196 — toggleSelection(value)
+- updateValue · method · L197-L200 — updateValue()
+- getSelectedFieldNames · method · L201-L205 — getSelectedFieldNames(excludeField)
+- useCount · method · L206-L210 — useCount(value, excludeField)
+- isNameUsed · method · L211-L214 — isNameUsed(value, excludeField)
+- forceValidation · method · L215-L226 — forceValidation(value)
+- validations · method · L228-L249 — validations()

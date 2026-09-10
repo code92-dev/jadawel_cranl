@@ -1,0 +1,18 @@
+# backend/src/jadawel/contrib/automation/api/workflows/views.py
+
+- AutomationWorkflowsView · class · L59-L103 — class AutomationWorkflowsView(APIView)
+- post · method · L97-L103 — def post(self, request, data: Dict, automation_id: int)
+- AutomationWorkflowView · class · L106-L218 — class AutomationWorkflowView(APIView)
+- get · method · L137-L139 — def get(self, request, workflow_id: int)
+- patch · method · L182-L188 — def patch(self, request, data: Dict, workflow_id: int)
+- delete · method · L215-L218 — def delete(self, request, workflow_id: int)
+- AutomationWorkflowHistoryView · class · L221-L284 — class AutomationWorkflowHistoryView(APIView)
+- get · method · L260-L284 — def get(self, request, workflow_id: int)
+- OrderAutomationWorkflowsView · class · L287-L332 — class OrderAutomationWorkflowsView(APIView)
+- post · method · L327-L332 — def post(self, request, data: Dict, automation_id: int)
+- AsyncAutomationDuplicateWorkflowView · class · L335-L384 — class AsyncAutomationDuplicateWorkflowView(APIView)
+- post · method · L374-L384 — def post(self, request, workflow_id)
+- AsyncPublishAutomationWorkflowView · class · L387-L435 — class AsyncPublishAutomationWorkflowView(APIView)
+- post · method · L426-L435 — def post(self, request, workflow_id: int)
+- AutomationTestWorkflowView · class · L438-L477 — class AutomationTestWorkflowView(APIView)
+- post · method · L468-L477 — def post(self, request, workflow_id: int)

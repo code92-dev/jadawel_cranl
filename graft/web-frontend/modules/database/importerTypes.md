@@ -1,0 +1,28 @@
+# web-frontend/modules/database/importerTypes.js
+
+- ImporterType · class · L8-L51 — class ImporterType extends Registerable
+- getIconClass · method · L13-L15 — getIconClass()
+- getName · method · L20-L22 — getName()
+- getFormComponent · method · L30-L32 — getFormComponent()
+- constructor · method · L34-L42 — constructor(...args)
+- serialize · method · L44-L50 — serialize()
+- CSVImporterType · class · L53-L70 — class CSVImporterType extends ImporterType
+- getType · method · L54-L56 — static getType()
+- getIconClass · method · L58-L60 — getIconClass()
+- getName · method · L62-L65 — getName()
+- getFormComponent · method · L67-L69 — getFormComponent()
+- PasteImporterType · class · L72-L89 — class PasteImporterType extends ImporterType
+- getType · method · L73-L75 — static getType()
+- getIconClass · method · L77-L79 — getIconClass()
+- getName · method · L81-L84 — getName()
+- getFormComponent · method · L86-L88 — getFormComponent()
+- XMLImporterType · class · L91-L108 — class XMLImporterType extends ImporterType
+- getType · method · L92-L94 — static getType()
+- getIconClass · method · L96-L98 — getIconClass()
+- getName · method · L100-L103 — getName()
+- getFormComponent · method · L105-L107 — getFormComponent()
+- JSONImporterType · class · L110-L127 — class JSONImporterType extends ImporterType
+- getType · method · L111-L113 — static getType()
+- getIconClass · method · L115-L117 — getIconClass()
+- getName · method · L119-L122 — getName()
+- getFormComponent · method · L124-L126 — getFormComponent()

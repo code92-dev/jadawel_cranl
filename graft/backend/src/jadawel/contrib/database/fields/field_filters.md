@@ -1,0 +1,30 @@
+# backend/src/jadawel/contrib/database/fields/field_filters.py
+
+- parse_ids_from_csv_string · function · L26-L38 — def parse_ids_from_csv_string(value: str) -> list[int]
+- map_ids_from_csv_string · function · L41-L74 — def map_ids_from_csv_string( value_string: str, mapping: Optional[dict] = None ) -> list[Union[str, int]]
+- AnnotatedQ · class · L77-L99 — class AnnotatedQ
+- __init__ · method · L84-L96 — def __init__(self, annotation: Dict[str, Any], q: Union[Q, Dict[str, Any]])
+- __invert__ · method · L98-L99 — def __invert__(self)
+- FilterBuilder · class · L105-L195 — class FilterBuilder
+- __init__ · method · L113-L128 — def __init__(self, filter_type: str = FILTER_TYPE_AND)
+- filter · method · L130-L154 — def filter( self, q: Union[Q, OptionallyAnnotatedQ, "FilterBuilder"] ) -> "FilterBuilder"
+- apply_to_queryset · method · L156-L174 — def apply_to_queryset(self, queryset)
+- get_filters_and_annotations · method · L176-L184 — def get_filters_and_annotations(self) -> Tuple[Q, Dict[str, Any]]
+- _annotate · method · L186-L187 — def _annotate(self, annotation_dict: Dict[str, Any])
+- _filter · method · L189-L195 — def _filter(self, q_filter: Q)
+- contains_filter · function · L198-L207 — def contains_filter( field_name, value, model_field, _, validate=True ) -> OptionallyAnnotatedQ
+- contains_word_filter · function · L210-L218 — def contains_word_filter(field_name, value, model_field, _) -> OptionallyAnnotatedQ
+- filename_contains_filter · function · L221-L236 — def filename_contains_filter(field_name, value, _, field) -> OptionallyAnnotatedQ
+- is_even_and_whole_number_filter · function · L239-L245 — def is_even_and_whole_number_filter( field_name, value, _, field ) -> OptionallyAnnotatedQ
+- FilterGroupNode · class · L248-L262 — class FilterGroupNode
+- __init__ · method · L253-L262 — def __init__( self, filter_builder: FilterBuilder, parent: Optional["FilterGroupNode"] = None, )
+- GroupedFiltersAdapter · class · L265-L294 — class GroupedFiltersAdapter(ABC)
+- __init__ · method · L271-L273 — def __init__(self, instance: any, model: "GeneratedTableModel", **kwargs)
+- filters · method · L277-L278 — def filters(self)
+- groups · method · L282-L283 — def groups(self)
+- filter_type · method · L286-L287 — def filter_type(self)
+- get_q_from_filter · method · L290-L294 — def get_q_from_filter(self, _filter) -> Union[Q, AnnotatedQ]
+- AdvancedFilterBuilder · class · L297-L364 — class AdvancedFilterBuilder(metaclass=jadawel_trace_methods(tracer))
+- __init__ · method · L307-L308 — def __init__(self, adapter: GroupedFiltersAdapter)
+- construct_filter_builder · method · L310-L347 — def construct_filter_builder(self) -> FilterBuilder
+- _construct_filter_builder_from_tree · method · L349-L364 — def _construct_filter_builder_from_tree( self, node: FilterGroupNode ) -> FilterBuilder

@@ -1,0 +1,25 @@
+# web-frontend/modules/builder/deviceTypes.js
+
+- DeviceType · class · L3-L19 — class DeviceType extends Registerable
+- iconClass · method · L4-L6 — get iconClass()
+- getOrder · method · L8-L10 — getOrder()
+- minWidth · method · L12-L14 — get minWidth()
+- maxWidth · method · L16-L18 — get maxWidth()
+- DesktopDeviceType · class · L21-L41 — class DesktopDeviceType extends DeviceType
+- getType · method · L22-L24 — static getType()
+- iconClass · method · L26-L28 — get iconClass()
+- getOrder · method · L30-L32 — getOrder()
+- minWidth · method · L34-L36 — get minWidth()
+- maxWidth · method · L38-L40 — get maxWidth()
+- TabletDeviceType · class · L43-L63 — class TabletDeviceType extends DeviceType
+- getType · method · L44-L46 — static getType()
+- iconClass · method · L48-L50 — get iconClass()
+- getOrder · method · L52-L54 — getOrder()
+- minWidth · method · L56-L58 — get minWidth()
+- maxWidth · method · L60-L62 — get maxWidth()
+- SmartphoneDeviceType · class · L65-L85 — class SmartphoneDeviceType extends DeviceType
+- getType · method · L66-L68 — static getType()
+- iconClass · method · L70-L72 — get iconClass()
+- getOrder · method · L74-L76 — getOrder()
+- minWidth · method · L78-L80 — get minWidth()
+- maxWidth · method · L82-L84 — get maxWidth()

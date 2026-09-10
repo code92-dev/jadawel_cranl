@@ -1,0 +1,60 @@
+# backend/src/jadawel/core/models.py
+
+- get_default_application_content_type · function · L76-L77 — def get_default_application_content_type()
+- Operation · class · L80-L85 — class Operation(models.Model)
+- Settings · class · L88-L164 — class Settings(models.Model)
+- EmailVerificationOptions · class · L96-L99 — class EmailVerificationOptions(models.TextChoices)
+- UserProfile · class · L167-L255 — class UserProfile(models.Model)
+- EmailNotificationFrequencyOptions · class · L175-L179 — class EmailNotificationFrequencyOptions(models.TextChoices)
+- iat_before_last_password_change · method · L233-L252 — def iat_before_last_password_change(self, iat: int) -> bool
+- is_jwt_token_valid · method · L254-L255 — def is_jwt_token_valid(self, token)
+- BlacklistedToken · class · L258-L260 — class BlacklistedToken(CreatedAndUpdatedOnMixin, models.Model)
+- Workspace · class · L263-L318 — class Workspace(HierarchicalModelMixin, TrashableModelMixin, CreatedAndUpdatedOnMixin)
+- get_parent · method · L273-L274 — def get_parent(self)
+- refresh_now · method · L276-L278 — def refresh_now(self)
+- get_now_or_set_if_null · method · L280-L283 — def get_now_or_set_if_null(self)
+- application_set_including_trash · method · L285-L290 — def application_set_including_trash(self)
+- has_template · method · L293-L294 — def has_template(self)
+- get_workspace_user · method · L296-L312 — def get_workspace_user( self, user: User, include_trash: bool = False ) -> "WorkspaceUser"
+- __str__ · method · L314-L315 — def __str__(self)
+- __repr__ · method · L317-L318 — def __repr__(self)
+- WorkspaceUser · class · L321-L357 — class WorkspaceUser( HierarchicalModelMixin, ParentWorkspaceTrashableModelMixin, CreatedAndUpdatedOnMixin, OrderableMixin, models.Model, )
+- get_parent · method · L347-L348 — def get_parent(self)
+- Meta · class · L350-L352 — class Meta
+- get_last_order · method · L355-L357 — def get_last_order(cls, user)
+- WorkspaceInvitation · class · L360-L400 — class WorkspaceInvitation( HierarchicalModelMixin, ParentWorkspaceTrashableModelMixin, CreatedAndUpdatedOnMixin, models.Model, )
+- get_parent · method · L395-L396 — def get_parent(self)
+- Meta · class · L398-L400 — class Meta
+- Application · class · L403-L447 — class Application( HierarchicalModelMixin, TrashableModelMixin, CreatedAndUpdatedOnMixin, OrderableMixin, PolymorphicContentTypeMixin, WithRegistry, models.Model, )
+- Meta · class · L428-L429 — class Meta
+- get_type_registry · method · L432-L435 — def get_type_registry()
+- get_last_order · method · L438-L440 — def get_last_order(cls, workspace)
+- get_parent · method · L442-L447 — def get_parent(self)
+- TemplateCategory · class · L450-L454 — class TemplateCategory(models.Model)
+- Meta · class · L453-L454 — class Meta
+- Template · class · L457-L497 — class Template(models.Model)
+- Meta · class · L493-L494 — class Meta
+- __str__ · method · L496-L497 — def __str__(self)
+- UserLogEntry · class · L500-L507 — class UserLogEntry(models.Model)
+- Meta · class · L505-L507 — class Meta
+- TrashEntry · class · L510-L623 — class TrashEntry(models.Model)
+- Meta · class · L591-L607 — class Meta
+- managed · method · L610-L618 — def managed(self) -> bool
+- get_operation_type · method · L620-L623 — def get_operation_type(self) -> TrashOperationType
+- DuplicateApplicationJob · class · L626-L642 — class DuplicateApplicationJob( JobWithUserIpAddress, JobWithWebsocketId, JobWithUndoRedoIds, Job )
+- SnapshotManager · class · L645-L667 — class SnapshotManager(BaseManager.from_queryset(QuerySet))
+- restorable · method · L646-L655 — def restorable(self) -> QuerySet
+- unusable · method · L657-L667 — def unusable(self) -> QuerySet
+- Snapshot · class · L670-L685 — class Snapshot(HierarchicalModelMixin, models.Model)
+- get_parent · method · L682-L683 — def get_parent(self)
+- InstallTemplateJob · class · L688-L704 — class InstallTemplateJob( JobWithUserIpAddress, JobWithWebsocketId, JobWithUndoRedoIds, Job, )
+- DefaultImportExportResourceManager · class · L707-L709 — class DefaultImportExportResourceManager(models.Manager)
+- get_queryset · method · L708-L709 — def get_queryset(self)
+- ImportExportResource · class · L712-L764 — class ImportExportResource(CreatedAndUpdatedOnMixin, models.Model)
+- get_archive_name · method · L758-L759 — def get_archive_name(self)
+- save · method · L761-L764 — def save(self, *args, **kwargs)
+- ExportApplicationsJob · class · L767-L790 — class ExportApplicationsJob( JobWithUserIpAddress, JobWithWebsocketId, JobWithUndoRedoIds, Job )
+- ImportApplicationsJob · class · L793-L819 — class ImportApplicationsJob( JobWithUserIpAddress, JobWithWebsocketId, JobWithUndoRedoIds, Job )
+- ImportExportTrustedSource · class · L822-L828 — class ImportExportTrustedSource(models.Model)
+- SchemaOperation · class · L831-L857 — class SchemaOperation(CreatedAndUpdatedOnMixin, models.Model)
+- Meta · class · L856-L857 — class Meta

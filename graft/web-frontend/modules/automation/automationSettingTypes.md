@@ -1,0 +1,22 @@
+# web-frontend/modules/automation/automationSettingTypes.js
+
+- AutomationSettingType · class · L9-L33 — class AutomationSettingType extends Registerable
+- getType · method · L10-L12 — static getType()
+- name · method · L14-L16 — get name()
+- icon · method · L18-L20 — get icon()
+- isDeactivated · method · L22-L24 — isDeactivated()
+- component · method · L26-L28 — get component()
+- componentPadding · method · L30-L32 — get componentPadding()
+- GeneralAutomationSettingsType · class · L35-L59 — class GeneralAutomationSettingsType extends AutomationSettingType
+- getType · method · L36-L38 — static getType()
+- name · method · L40-L42 — get name()
+- icon · method · L44-L46 — get icon()
+- isDeactivated · method · L48-L50 — isDeactivated()
+- getOrder · method · L52-L54 — getOrder()
+- component · method · L56-L58 — get component()
+- IntegrationsAutomationSettingsType · class · L61-L81 — class IntegrationsAutomationSettingsType extends AutomationSettingType
+- getType · method · L62-L64 — static getType()
+- name · method · L66-L68 — get name()
+- icon · method · L70-L72 — get icon()
+- getOrder · method · L74-L76 — getOrder()
+- component · method · L78-L80 — get component()

@@ -1,0 +1,21 @@
+# backend/tests/jadawel/contrib/integrations/local_jadawel/service_types/test_get_row_service_type.py
+
+- test_create_local_jadawel_get_row_service · function · L30-L52 — def test_create_local_jadawel_get_row_service(data_fixture)
+- test_export_import_local_jadawel_get_row_service · function · L56-L154 — def test_export_import_local_jadawel_get_row_service(data_fixture)
+- test_update_local_jadawel_get_row_service · function · L158-L180 — def test_update_local_jadawel_get_row_service(data_fixture)
+- test_local_jadawel_get_row_service_dispatch_transform · function · L184-L224 — def test_local_jadawel_get_row_service_dispatch_transform(data_fixture)
+- test_local_jadawel_get_row_service_dispatch_data_with_view_filter · function · L228-L260 — def test_local_jadawel_get_row_service_dispatch_data_with_view_filter(data_fixture): # Demonstrates that you can fetch a specific row (1) and filter for a specific # value to exclude it from the `dispatch_data` result.
+- test_local_jadawel_get_row_service_dispatch_data_with_service_search · function · L264-L294 — def test_local_jadawel_get_row_service_dispatch_data_with_service_search( data_fixture, disable_full_text_search ): # Demonstrates that you can fetch a specific row (1) and search for a specific # value to exclude it from the `dispatch_data` result.
+- test_local_jadawel_get_row_service_dispatch_data_with_service_integer_search · function · L298-L336 — def test_local_jadawel_get_row_service_dispatch_data_with_service_integer_search( data_fixture, disable_full_text_search )
+- test_local_jadawel_get_row_service_dispatch_data_permission_denied · function · L340-L371 — def test_local_jadawel_get_row_service_dispatch_data_permission_denied( data_fixture, stub_check_permissions )
+- test_local_jadawel_get_row_service_dispatch_validation_error · function · L375-L405 — def test_local_jadawel_get_row_service_dispatch_validation_error(data_fixture)
+- test_local_jadawel_get_row_service_dispatch_data_row_not_exist · function · L409-L425 — def test_local_jadawel_get_row_service_dispatch_data_row_not_exist(data_fixture)
+- test_local_jadawel_get_row_service_dispatch_data_no_row_id · function · L429-L479 — def test_local_jadawel_get_row_service_dispatch_data_no_row_id(data_fixture)
+- test_import_datasource_provider_formula_using_get_row_service_containing_no_field_fails_silently · function · L483-L515 — def test_import_datasource_provider_formula_using_get_row_service_containing_no_field_fails_silently( data_fixture, )
+- test_import_formula_local_jadawel_get_row_user_service_type · function · L519-L613 — def test_import_formula_local_jadawel_get_row_user_service_type(data_fixture)
+- test_local_jadawel_get_row_user_service_type_import_path · function · L666-L679 — def test_local_jadawel_get_row_user_service_type_import_path( path, database_fields, expected )
+- test_order_by_is_applied_depending_on_views_sorts · function · L693-L756 — def test_order_by_is_applied_depending_on_views_sorts( mock_core_handler, view_sorts, data_fixture )
+- test_dispatch_transform_passes_field_ids · function · L769-L798 — def test_dispatch_transform_passes_field_ids(mock_get_serializer, field_names)
+- test_extract_properties · function · L830-L842 — def test_extract_properties(path, expected)
+- test_can_dispatch_interesting_table · function · L846-L921 — def test_can_dispatch_interesting_table(data_fixture)
+- test_extract_properties_with_empty_path_returns_all_fields · function · L925-L939 — def test_extract_properties_with_empty_path_returns_all_fields(data_fixture)

@@ -44,6 +44,10 @@ const jadawel = jadawelModuleConfig()
 
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
+  // Routes are contributed by the core and optional plugin modules. There is
+  // intentionally no root pages/ directory, so keep Nuxt's pages subsystem
+  // enabled for module-provided routes.
+  pages: true,
   alias: {
     '@jadawel': '',
   },

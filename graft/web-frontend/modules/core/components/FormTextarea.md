@@ -1,0 +1,15 @@
+# web-frontend/modules/core/components/FormTextarea.vue
+
+- data · method · L133-L138 — data()
+- currentValue · method · L141-L143 — currentValue()
+- textBoxSize · method · L144-L152 — textBoxSize()
+- textBoxOverflow · method · L153-L157 — textBoxOverflow()
+- heightStyle · method · L158-L165 — heightStyle()
+- currentValue · method · L168-L170 — currentValue()
+- mounted · method · L172-L174 — mounted()
+- focus · method · L177-L179 — focus()
+- blur · method · L180-L182 — blur()
+- input · method · L183-L189 — input(event)
+- resizeTextArea · method · L190-L195 — resizeTextArea()
+- calculateContentHeight · method · L204-L241 — calculateContentHeight(ta, scanAmount)
+- calculateHeight · method · L242-L259 — calculateHeight(ta)

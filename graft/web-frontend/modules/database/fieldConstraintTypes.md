@@ -1,0 +1,29 @@
+# web-frontend/modules/database/fieldConstraintTypes.js
+
+- FieldConstraintType · class · L15-L165 — class FieldConstraintType extends Registerable
+- getName · method · L19-L21 — getName()
+- constructor · method · L23-L34 — constructor(...args)
+- serialize · method · L39-L45 — serialize()
+- getParametersComponent · method · L52-L54 — getParametersComponent()
+- getCompatibleFieldTypes · method · L59-L61 — getCompatibleFieldTypes()
+- fieldIsCompatible · method · L67-L70 — fieldIsCompatible(field)
+- getCompatibleFieldValue · method · L84-L91 — getCompatibleFieldValue(field, valuesMap, notFoundValue = null)
+- canSupportDefaultValue · method · L98-L100 — canSupportDefaultValue()
+- getErrorMap · method · L108-L117 — getErrorMap()
+- getErrorMessage · method · L124-L129 — getErrorMessage(error)
+- getTypeName · method · L136-L138 — getTypeName()
+- findEquivalentConstraintForFieldType · method · L146-L164 — findEquivalentConstraintForFieldType(fieldType, constraintTypesRegistry)
+- UniqueWithEmptyConstraintType · class · L167-L189 — class UniqueWithEmptyConstraintType extends FieldConstraintType
+- getName · method · L168-L171 — getName()
+- getTypeName · method · L173-L175 — getTypeName()
+- canSupportDefaultValue · method · L177-L179 — canSupportDefaultValue()
+- getErrorMap · method · L181-L188 — getErrorMap()
+- TextTypeUniqueWithEmptyConstraintType · class · L191-L204 — class TextTypeUniqueWithEmptyConstraintType extends UniqueWithEmptyConstraintType
+- getType · method · L192-L194 — static getType()
+- getCompatibleFieldTypes · method · L196-L203 — getCompatibleFieldTypes()
+- RatingTypeUniqueWithEmptyConstraintType · class · L206-L214 — class RatingTypeUniqueWithEmptyConstraintType extends UniqueWithEmptyConstraintType
+- getType · method · L207-L209 — static getType()
+- getCompatibleFieldTypes · method · L211-L213 — getCompatibleFieldTypes()
+- GenericUniqueWithEmptyConstraintType · class · L216-L229 — class GenericUniqueWithEmptyConstraintType extends UniqueWithEmptyConstraintType
+- getType · method · L217-L219 — static getType()
+- getCompatibleFieldTypes · method · L221-L228 — getCompatibleFieldTypes()

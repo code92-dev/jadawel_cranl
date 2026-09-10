@@ -1,0 +1,15 @@
+# backend/tests/jadawel/contrib/database/api/fields/test_multiple_collaborators_views.py
+
+- test_multiple_collaborators_field_type_create · function · L12-L37 — def test_multiple_collaborators_field_type_create(api_client, data_fixture)
+- test_multiple_collaborators_field_type_update · function · L42-L73 — def test_multiple_collaborators_field_type_update(api_client, data_fixture)
+- test_multiple_collaborators_field_type_delete · function · L78-L96 — def test_multiple_collaborators_field_type_delete(api_client, data_fixture)
+- test_multiple_collaborators_field_type_insert_row_validation · function · L102-L163 — def test_multiple_collaborators_field_type_insert_row_validation( api_client, data_fixture )
+- test_multiple_collaborators_field_type_insert_row · function · L169-L217 — def test_multiple_collaborators_field_type_insert_row(api_client, data_fixture)
+- test_multiple_collaborators_field_type_update_row_validation · function · L223-L301 — def test_multiple_collaborators_field_type_update_row_validation( api_client, data_fixture )
+- test_multiple_collaborators_field_type_update_row · function · L307-L361 — def test_multiple_collaborators_field_type_update_row(api_client, data_fixture)
+- test_multiple_collaborators_field_type_delete_row · function · L367-L391 — def test_multiple_collaborators_field_type_delete_row(api_client, data_fixture)
+- test_multiple_collaborators_field_type_batch_insert_rows_validation · function · L397-L478 — def test_multiple_collaborators_field_type_batch_insert_rows_validation( api_client, data_fixture )
+- test_multiple_collaborators_field_type_batch_insert_rows · function · L484-L552 — def test_multiple_collaborators_field_type_batch_insert_rows(api_client, data_fixture)
+- test_multiple_collaborators_field_type_batch_update_rows_validation · function · L558-L664 — def test_multiple_collaborators_field_type_batch_update_rows_validation( api_client, data_fixture )
+- test_multiple_collaborators_field_type_batch_update_rows · function · L670-L756 — def test_multiple_collaborators_field_type_batch_update_rows(api_client, data_fixture)
+- test_multiple_collaborators_field_type_batch_delete_rows · function · L762-L788 — def test_multiple_collaborators_field_type_batch_delete_rows(api_client, data_fixture)

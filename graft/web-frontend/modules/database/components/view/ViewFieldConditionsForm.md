@@ -1,0 +1,16 @@
+# web-frontend/modules/database/components/view/ViewFieldConditionsForm.vue
+
+- constructor · method · L84-L93 — constructor(group, parent = null, sorted = false)
+- groupsOrdered · method · L95-L103 — groupsOrdered()
+- filtersOrdered · method · L105-L111 — filtersOrdered()
+- findGroup · method · L113-L124 — findGroup(id)
+- addFilter · method · L126-L128 — addFilter(filter)
+- remove · method · L130-L134 — remove()
+- data · method · L244-L248 — data()
+- filterTypes · method · L250-L252 — filterTypes()
+- filtersTree · method · L253-L270 — filtersTree()
+- handler · method · L274-L280 — handler(filterId)
+- focusFilterValue · method · L285-L293 — focusFilterValue(filter)
+- allowedFilters · method · L297-L302 — allowedFilters(filterTypes, fields, fieldId)
+- deleteFilter · method · L303-L320 — deleteFilter({ filter, event })
+- updateFilter · method · L325-L363 — updateFilter({ filter, values })

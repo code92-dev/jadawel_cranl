@@ -1,0 +1,63 @@
+# backend/src/jadawel/core/utils.py
+
+- flatten · function · L51-L60 — def flatten(nested_list: List[Any])
+- split_attrs_and_m2m_fields · function · L63-L79 — def split_attrs_and_m2m_fields( field_names: List[str], instance: Type[Model] ) -> Tuple[List[str], List[str]]
+- set_allowed_m2m_fields · function · L82-L97 — def set_allowed_m2m_fields(values, allowed_fields, instance)
+- extract_allowed · function · L100-L128 — def extract_allowed(values, allowed_fields)
+- set_allowed_attrs · function · L131-L166 — def set_allowed_attrs(values, allowed_fields, instance)
+- get_non_unique_values · function · L169-L180 — def get_non_unique_values(values: List) -> List
+- to_camel_case · function · L183-L196 — def to_camel_case(value: str) -> str
+- to_pascal_case · function · L199-L209 — def to_pascal_case(value)
+- to_snake_case · function · L212-L222 — def to_snake_case(value)
+- remove_special_characters · function · L225-L241 — def remove_special_characters(value, remove_spaces=True)
+- model_default_values · function · L244-L262 — def model_default_values(model_class, not_provided=None)
+- dict_to_object · function · L265-L278 — def dict_to_object(values, name="Struct")
+- to_path · function · L285-L323 — def to_path(path)
+- replace · function · L314-L320 — def replace(match)
+- get_value_at_path · function · L326-L380 — def get_value_at_path(obj: Any, path: Union[str | List[str]], default=None) -> Any
+- _get_value_at_path · function · L353-L377 — def _get_value_at_path(obj: Any, keys: List[str]) -> Any
+- random_string · function · L383-L396 — def random_string(length)
+- sha256_hash · function · L399-L416 — def sha256_hash(stream, block_size=65536)
+- stream_size · function · L419-L432 — def stream_size(stream)
+- truncate_middle · function · L435-L468 — def truncate_middle(content, max_length, middle="...")
+- split_comma_separated_string · function · L471-L487 — def split_comma_separated_string(comma_separated_string: str) -> List[str]
+- list_to_comma_separated_string · function · L490-L509 — def list_to_comma_separated_string(value_list: List[str]) -> str
+- get_model_reference_field_name · function · L512-L540 — def get_model_reference_field_name(lookup_model, target_model)
+- remove_invalid_surrogate_characters · function · L543-L563 — def remove_invalid_surrogate_characters( content: bytes, encoding: Optional[str] = None ) -> str
+- split_ending_number · function · L566-L578 — def split_ending_number(name: str) -> Tuple[str, str]
+- find_unused_name · function · L581-L645 — def find_unused_name( variants_to_try: Iterable[str], existing_names: Iterable[str], max_length: int = None, suffix: str = " {0}", reserved_names: Optional[Set] = None, )
+- grouper · function · L648-L664 — def grouper(n: int, iterable: Iterable)
+- unique_dicts_in_list · function · L667-L708 — def unique_dicts_in_list( list_of_dicts: List[Dict[str, any]], unique_fields: List["str"] = None ) -> Tuple[List[Dict[str, any]], List[Dict[str, any]]]
+- Progress · class · L711-L887 — class Progress
+- __init__ · method · L754-L772 — def __init__( self, total: int, parent: Optional[Progress] = None, represents_progress: Optional[int] = None, )
+- progress · method · L775-L776 — def progress(self)
+- reset_with_total · method · L778-L780 — def reset_with_total(self, total)
+- register_updated_event · method · L782-L791 — def register_updated_event(self, event)
+- increment · method · L793-L804 — def increment(self, by: Optional[int] = 1, state: Optional[str] = None)
+- set_progress · method · L806-L844 — def set_progress(self, progress: int, state: Optional[str] = None)
+- create_child · method · L846-L868 — def create_child(self, represents_progress: int, total: int)
+- create_child_builder · method · L870-L881 — def create_child_builder(self, represents_progress: int)
+- track · method · L883-L887 — def track(self, represents_progress: int, state, iterable)
+- ChildProgressBuilder · class · L890-L902 — class ChildProgressBuilder
+- __init__ · method · L891-L893 — def __init__(self, parent: Progress, represents_progress: int)
+- build · method · L896-L902 — def build(cls, builder: Optional[ChildProgressBuilder], child_total: int)
+- MirrorDict · class · L905-L926 — class MirrorDict(defaultdict)
+- __missing__ · method · L919-L920 — def __missing__(self, key)
+- __contains__ · method · L922-L923 — def __contains__(self, key)
+- get · method · L925-L926 — def get(self, key, default=None)
+- atomic_if_not_already · function · L929-L936 — def atomic_if_not_already()
+- generate_hash · function · L939-L950 — def generate_hash(value: str)
+- find_intermediate_fraction · function · L953-L989 — def find_intermediate_fraction(p1: int, q1: int, p2: int, q2: int) -> Tuple[int, int]
+- find_intermediate_order · function · L992-L1033 — def find_intermediate_order( order_1: Union[float, Decimal], order_2: Union[float, Decimal], max_denominator: int = 10000000, ) -> float
+- exception_capturer · function · L1036-L1042 — def exception_capturer(e)
+- transaction_on_commit_if_not_already · function · L1045-L1048 — def transaction_on_commit_if_not_already(func)
+- escape_csv_cell · function · L1051-L1072 — def escape_csv_cell(payload)
+- hex_to_rgba · function · L1075-L1089 — def hex_to_rgba(hex_color: str) -> tuple
+- rgba_to_hex · function · L1092-L1102 — def rgba_to_hex(rgba: tuple)
+- lighten_color · function · L1105-L1131 — def lighten_color(hex_color: str, factor: float)
+- remove_duplicates · function · L1134-L1142 — def remove_duplicates(input_list)
+- merge_dicts_no_duplicates · function · L1145-L1168 — def merge_dicts_no_duplicates(*dicts)
+- get_all_ips · function · L1171-L1185 — def get_all_ips(hostname: str) -> Set
+- is_hostname_safe · function · L1188-L1221 — def is_hostname_safe(hostname: str) -> bool
+- are_hostnames_same · function · L1224-L1237 — def are_hostnames_same(hostname1: str, hostname2: str) -> bool
+- are_kwargs_default · function · L1240-L1256 — def are_kwargs_default(func, **kwargs)

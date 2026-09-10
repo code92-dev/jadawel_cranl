@@ -1,0 +1,130 @@
+# Moyasar billing and organization implementation progress
+
+Branch: `payment-Orgteam-plugins`. Executor: current Codex task. Review base:
+`a7d171a12de08174999adcf43f620b14569c08c0`. No deployment or live charge was
+performed.
+
+## Implemented slices
+
+The two standalone packages are now present in the working tree:
+
+- `plugins/jadawel_billing`: Individual and Team accounts, immutable plans and
+  price versions, complimentary grants, Moyasar quote/verification and webhook
+  reconciliation, receipts, saved payment methods, renewal state and grace
+  handling, scheduled subscription changes, prorated Team seat increases,
+  refunds, external payment records, and general-admin refund/payment controls.
+- `plugins/jadawel_organizations`: Team organization provisioning, owner/admin/
+  member roles, existing-user adds, hashed invitations and acceptance, revoke
+  and resend behavior, seat locking, workspace binding and member assignment,
+  organization permission enforcement, suspend/reactivate/archive, paid-Team
+  provisioning, guided Team-to-Individual transition, and the general-admin
+  pending-owner setup invitation with reserved owner capacity.
+
+The corresponding GitHub ticket frontier is #42–#61. The branch contains the
+implementation for the billing and organization management paths in those
+slices; the issues remain open until a maintainer reviews and lands the branch.
+
+## Verification completed
+
+Focused backend verification, with both plugin paths loaded, currently passes:
+
+```text
+83 passed
+```
+
+The same run covers complimentary access, role authority, seat reservation for
+suspended members, invitation mismatch/expiry/replay, workspace revocation and
+restoration, preservation of pre-existing workspace access, restricted operation
+handling, paid-Team idempotent provisioning, per-seat Team quotes, payment
+verification, webhook reconciliation, active Moyasar token/payment binding,
+payment methods, refunds, and renewal task behavior. It also covers suspended
+owner recovery, safe Moyasar provider-health statuses, and the paginated/search
+filters used by the billing and organization APIs. Renewal retries stop at the
+configured grace boundary, administrator subscription cancellation is exposed,
+and account-kind checkout prices, historical receipts, and organization action
+confirmations are covered by the frontend tests. The focused frontend run
+passes 15 tests across six files, and strict repository locale parity reports
+3,787/3,787 keys.
+
+The organization UI now previews workspace outsiders before binding, supports
+pending-owner reassignment, and exposes the guarded Team-to-Individual
+transition. Billing administration lists external payments and supports
+provider refunds with a refundable-balance confirmation. Organization settings
+can be renamed with an audit record; bindings require explicit outsider
+confirmation for general administrators and support ADMIN, MEMBER, and
+read-only VIEWER assignments, including per-member unassignment without
+removing the organization membership.
+
+Organization, member, invitation, workspace, audit, and administrator list APIs
+now support the standard pagination envelope and `search` filtering. Customer
+and administrator organization pages expose search and **Load more** controls,
+including organization audit history and billing payment/provider history.
+The billing administrator page exposes a safe Moyasar configuration and
+reachability check without returning credentials or provider payloads.
+Organization snapshots expose payment renewal state separately from effective
+access. Refund records retain an operation UUID, attempt count, processing lease,
+provider status reconciliation, and a single safe retry path.
+
+The Billing checkout capability response now hides Team prices when the
+Organizations provisioner is absent, and the Organizations Nuxt module declares
+Billing as a required frontend dependency. Managed workspace import, application
+copy, Airtable import, and legacy invitation/membership mutation entry points are
+covered by the organization permission adapter. Revocations schedule the existing
+Jadawel websocket disconnect task after commit, so stale realtime sessions cannot
+continue using managed workspace pages.
+
+Additional checks completed during implementation include scoped Ruff checks,
+Django system checks, Nuxt `prepare`, standalone locale parity, and Prettier
+checks for changed frontend files. The final local UI pass verified the English
+and Arabic general-admin organization panels, including the free-organization
+flow, visible RTL alignment and Jadawl's shared form/button styling. Mixed
+direction account IDs, member emails and provider error codes use `dir="auto"`
+or an LTR field boundary. The invalid nested markup in the billing account
+selector was removed after the browser console surfaced it. The production
+Nuxt build was rerun with both plugin modules after this cleanup and completed
+successfully.
+Provider HTTP calls for saved payment methods are outside the database write
+transaction.
+
+Saved-card consent is now sent to Moyasar as `source.save_card`. For immediate
+and 3-D Secure payments, the callback remembers only the opt-in flag and asks
+the server to derive and validate the token from the verified paid payment;
+usable provider tokens are never stored in browser storage or accepted from a
+callback URL.
+
+The organization tests also cover pending-owner acceptance, reserved owner
+capacity, concurrent last-seat acceptance on PostgreSQL, idempotent organization
+creation retries, restricted workspace creation, queued-job rechecks after
+revocation, and the public-workspace policy. External payment references are
+idempotent only when their immutable details match, and scheduled subscription
+changes reject archived or unavailable price versions.
+
+## Local run
+
+The local services used for verification are:
+
+- Frontend: [http://localhost:3003/billing](http://localhost:3003/billing)
+- Organization member panel: [http://localhost:3003/organizations](http://localhost:3003/organizations)
+- General-admin organization panel: [http://localhost:3003/admin/organizations](http://localhost:3003/admin/organizations)
+- Backend: `http://localhost:8003`
+
+Use `localhost` for the browser host. Jadawl's public-host routing intentionally
+treats `127.0.0.1` as a public-page host and returns the public-page 404 for
+authenticated routes.
+
+The local process is configured with both plugin modules and no live Moyasar
+credentials. Administrator-created complimentary organizations work without
+provider keys. The administrator manual includes screenshots captured from this
+stack with synthetic fixture identities. A real sandbox payment and 3-D Secure
+flow still require valid test credentials and a browser-authenticated fixture.
+
+## Remaining release gates
+
+Before enabling production billing, obtain and verify the merchant's actual
+prices, tax/invoice treatment, refund policy, recurring-payment eligibility,
+grace policy, and Moyasar webhook configuration. Run the disposable-image fresh
+install/upgrade checks and a browser-authenticated Arabic/English pass with
+Moyasar sandbox credentials. The local suite now exercises the public-share
+policy, post-commit websocket disconnect scheduling, and a queued-job permission
+recheck. Do not mark provider-dependent checks as passed from the local no-key
+run.

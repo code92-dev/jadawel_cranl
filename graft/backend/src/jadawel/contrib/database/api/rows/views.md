@@ -1,0 +1,23 @@
+# backend/src/jadawel/contrib/database/api/rows/views.py
+
+- build_response_with_metadata · function · L165-L194 — def build_response_with_metadata( rows, request, model, serializer_class, updated_field_ids: list | None = None, cascade_update: CascadeUpdatedRows | None = None, ) -> Response
+- RowsView · class · L197-L641 — class RowsView(APIView)
+- get · method · L381-L479 — def get(self, request, table_id, query_params)
+- post · method · L579-L641 — def post(self, request: Request, table_id: int, query_params) -> Response
+- RowNamesView · class · L644-L750 — class RowNamesView(APIView)
+- get · method · L690-L750 — def get(self, request)
+- RowView · class · L753-L1131 — class RowView(APIView)
+- get · method · L840-L881 — def get(self, request, table_id, row_id, metadata, query_params: dict)
+- patch · method · L976-L1043 — def patch( self, request: Request, table_id: int, row_id: int, query_params ) -> Response
+- delete · method · L1109-L1131 — def delete(self, request, table_id, row_id, query_params)
+- RowMoveView · class · L1134-L1250 — class RowMoveView(APIView)
+- patch · method · L1216-L1250 — def patch(self, request, table_id, row_id, query_params)
+- BatchRowsView · class · L1253-L1584 — class BatchRowsView(APIView)
+- post · method · L1358-L1423 — def post(self, request: Request, table_id: int, query_params) -> Response
+- patch · method · L1521-L1584 — def patch(self, request, table_id, query_params)
+- BatchDeleteRowsView · class · L1587-L1686 — class BatchDeleteRowsView(APIView)
+- post · method · L1662-L1686 — def post( self, request: Request, table_id: int, data: Dict[str, Any], query_params ) -> Response
+- RowAdjacentView · class · L1689-L1833 — class RowAdjacentView(APIView)
+- get · method · L1779-L1833 — def get( self, request: Request, table_id: int, row_id: int, query_params: Dict[str, Any] ) -> Response
+- RowHistoryView · class · L1836-L1919 — class RowHistoryView(APIView)
+- get · method · L1892-L1919 — def get(self, request: Request, table_id: int, row_id: int) -> Response

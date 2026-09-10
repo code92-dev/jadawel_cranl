@@ -1,0 +1,15 @@
+# backend/tests/jadawel/core/import_export/test_import_manifest.py
+
+- make_zip · function · L29-L37 — def make_zip(files)
+- test_validate_manifest_rejects_zip_bomb_before_json_decode · function · L42-L62 — def test_validate_manifest_rejects_zip_bomb_before_json_decode()
+- test_validate_manifest_rejects_aggregate_uncompressed_size · function · L70-L84 — def test_validate_manifest_rejects_aggregate_uncompressed_size()
+- test_validate_manifest_rejects_oversized_application_json · function · L92-L128 — def test_validate_manifest_rejects_oversized_application_json()
+- test_validate_archive_rejects_too_many_files · function · L132-L142 — def test_validate_archive_rejects_too_many_files()
+- test_validate_archive_rejects_duplicate_names · function · L146-L158 — def test_validate_archive_rejects_duplicate_names()
+- test_validate_archive_rejects_encrypted_entries · function · L162-L168 — def test_validate_archive_rejects_encrypted_entries()
+- test_validate_archive_rejects_oversized_signature · function · L172-L184 — def test_validate_archive_rejects_oversized_signature()
+- test_validate_manifest_rejects_missing_application_schema_file · function · L189-L220 — def test_validate_manifest_rejects_missing_application_schema_file()
+- test_import_without_signature_and_check_enabled · function · L225-L256 — def test_import_without_signature_and_check_enabled( data_fixture, use_tmp_media_root, tmp_path )
+- test_import_without_signature_and_check_disabled · function · L261-L295 — def test_import_without_signature_and_check_disabled( data_fixture, use_tmp_media_root, tmp_path )
+- test_import_without_signature_data · function · L300-L337 — def test_import_without_signature_data(data_fixture, use_tmp_media_root, tmp_path)
+- test_import_no_trusted_source · function · L342-L355 — def test_import_no_trusted_source(data_fixture, use_tmp_media_root, tmp_path)

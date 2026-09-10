@@ -1,0 +1,16 @@
+# web-frontend/modules/database/components/view/grid/SimpleGrid.vue
+
+- data · method · L265-L272 — data()
+- fieldTypes · method · L274-L276 — fieldTypes()
+- orderedFixedFields · method · L277-L280 — orderedFixedFields()
+- visibleOrderedFields · method · L281-L285 — visibleOrderedFields()
+- GRID_VIEW_MIN_FIELD_WIDTH · method · L286-L288 — GRID_VIEW_MIN_FIELD_WIDTH()
+- mounted · method · L290-L320 — mounted()
+- beforeUnmount · method · L321-L325 — beforeUnmount()
+- getHorizontalScrollbarElement · method · L327-L329 — getHorizontalScrollbarElement()
+- scroll · method · L334-L339 — scroll(pixelY, pixelX)
+- horizontalScroll · method · L340-L342 — horizontalScroll(left)
+- handleUpAndDownArrowPress · method · L343-L359 — handleUpAndDownArrowPress(event)
+- getFieldWidth · method · L360-L366 — getFieldWidth(field)
+- moveFieldWidth · method · L367-L370 — moveFieldWidth(field, width)
+- updateFieldWidth · method · L371-L374 — updateFieldWidth(field, { width, oldWidth })

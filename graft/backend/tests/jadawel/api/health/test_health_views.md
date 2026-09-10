@@ -1,0 +1,18 @@
+# backend/tests/jadawel/api/health/test_health_views.py
+
+- AlwaysFailingHealthCheck · class · L21-L23 — class AlwaysFailingHealthCheck(BaseHealthCheckBackend)
+- check_status · method · L22-L23 — def check_status(self)
+- reset_health_checks_to_expected · function · L27-L29 — def reset_health_checks_to_expected()
+- test_anonymous_user_cant_get_full_health_checks · function · L33-L38 — def test_anonymous_user_cant_get_full_health_checks(data_fixture, api_client)
+- test_non_staff_user_cant_get_full_health_checks · function · L42-L50 — def test_non_staff_user_cant_get_full_health_checks(data_fixture, api_client)
+- test_staff_user_can_get_full_health_checks · function · L55-L63 — def test_staff_user_can_get_full_health_checks(mock_get_size, data_fixture, api_client)
+- test_full_health_check_endpoint_returns_dict_of_checks_vs_status_with_200_status · function · L68-L87 — def test_full_health_check_endpoint_returns_dict_of_checks_vs_status_with_200_status( mock_get_size, data_fixture, api_client )
+- test_passing_is_false_when_one_critical_service_fails · function · L92-L114 — def test_passing_is_false_when_one_critical_service_fails( mock_get_size, data_fixture, api_client )
+- test_celery_queue_size_exceed_within_limits · function · L120-L128 — def test_celery_queue_size_exceed_within_limits( mock_get_size, data_fixture, api_client )
+- test_celery_queue_size_exceed_outside_limits · function · L134-L143 — def test_celery_queue_size_exceed_outside_limits( mock_get_size, data_fixture, api_client )
+- test_celery_queue_size_exceed_queue_name · function · L149-L155 — def test_celery_queue_size_exceed_queue_name(mock_get_size, data_fixture, api_client)
+- test_celery_queue_size_exceed_export_queue_name · function · L161-L169 — def test_celery_queue_size_exceed_export_queue_name( mock_get_size, data_fixture, api_client )
+- test_celery_queue_size_exceed_export_one_of_the_queues · function · L175-L191 — def test_celery_queue_size_exceed_export_one_of_the_queues( mock_get_size, data_fixture, api_client )
+- get_queue_size_side_effect · function · L178-L182 — def get_queue_size_side_effect(arg1)
+- test_celery_queue_size_exceed_queue_not_found · function · L197-L206 — def test_celery_queue_size_exceed_queue_not_found( mock_get_size, data_fixture, api_client )
+- test_celery_queue_size_exceed_no_queue_provided · function · L212-L220 — def test_celery_queue_size_exceed_no_queue_provided( mock_get_size, data_fixture, api_client )

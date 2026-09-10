@@ -1,0 +1,35 @@
+# backend/src/jadawel/contrib/integrations/local_jadawel/mixins.py
+
+- LocalJadawelTableServiceFilterableMixin · class · L52-L409 — class LocalJadawelTableServiceFilterableMixin
+- SerializedDict · class · L64-L66 — class SerializedDict(ServiceDict)
+- enhance_queryset · method · L68-L80 — def enhance_queryset(self, queryset)
+- serialize_filters · method · L82-L98 — def serialize_filters(self, service: ServiceSubClass)
+- serialize_property · method · L100-L121 — def serialize_property( self, service: ServiceSubClass, prop_name: str, files_zip=None, storage=None, cache=None, )
+- deserialize_filters · method · L123-L161 — def deserialize_filters(self, value, id_mapping)
+- create_instance_from_serialized · method · L163-L205 — def create_instance_from_serialized( self, serialized_values, id_mapping, files_zip=None, storage=None, cache=None, **kwargs, ) -> ServiceSubClass
+- get_used_field_names · method · L207-L226 — def get_used_field_names( self, service: "LocalJadawelTableService", dispatch_context: DispatchContext, )
+- get_dispatch_filters · method · L228-L298 — def get_dispatch_filters( self, service: "ServiceSubClass", queryset: QuerySet, model: Type["GeneratedTableModel"], dispatch_context: DispatchContext, ) -> QuerySet
+- formula_generator · method · L300-L323 — def formula_generator( self, service: "LocalJadawelTableServiceFilterableMixin" ) -> Generator[str | Instance, str, None]
+- get_table_queryset · method · L325-L363 — def get_table_queryset( self, service: ServiceSubClass, table: "Table", dispatch_context: DispatchContext, model: Type["GeneratedTableModel"], ) -> QuerySet
+- update_service_filters · method · L365-L379 — def update_service_filters( self, service: Union[LocalJadawelGetRow, LocalJadawelListRows], service_filters: Optional[List[ServiceFilterDictSubClass]] = None, )
+- after_update · method · L381-L409 — def after_update( self, instance: ServiceSubClass, values: Dict, changes: Dict[str, Tuple], ) -> None
+- LocalJadawelTableServiceSortableMixin · class · L412-L684 — class LocalJadawelTableServiceSortableMixin
+- SerializedDict · class · L422-L423 — class SerializedDict(ServiceDict)
+- enhance_queryset · method · L425-L437 — def enhance_queryset(self, queryset)
+- serialize_sortings · method · L439-L453 — def serialize_sortings(self, service: ServiceSubClass)
+- serialize_property · method · L455-L476 — def serialize_property( self, service: ServiceSubClass, prop_name: str, files_zip=None, storage=None, cache=None, )
+- deserialize_sorts · method · L478-L498 — def deserialize_sorts(self, value, id_mapping)
+- create_instance_from_serialized · method · L500-L542 — def create_instance_from_serialized( self, serialized_values, id_mapping, files_zip=None, storage=None, cache=None, **kwargs, ) -> ServiceSubClass
+- get_used_field_names · method · L544-L563 — def get_used_field_names( self, service: "LocalJadawelTableService", dispatch_context: DispatchContext, )
+- get_dispatch_sorts · method · L565-L604 — def get_dispatch_sorts( self, service: "ServiceSubClass", queryset: QuerySet, model: Type["GeneratedTableModel"], ) -> Tuple[List[OrderBy], QuerySet]
+- get_table_queryset · method · L606-L638 — def get_table_queryset( self, service: ServiceSubClass, table: "Table", dispatch_context: DispatchContext, model: Type["GeneratedTableModel"], ) -> QuerySet
+- update_service_sortings · method · L640-L654 — def update_service_sortings( self, service: Union[LocalJadawelGetRow, LocalJadawelListRows], service_sorts: Optional[List[ServiceSortDictSubClass]] = None, )
+- after_update · method · L656-L684 — def after_update( self, instance: ServiceSubClass, values: Dict, changes: Dict[str, Tuple], ) -> None
+- LocalJadawelTableServiceSearchableMixin · class · L687-L799 — class LocalJadawelTableServiceSearchableMixin
+- SerializedDict · class · L703-L704 — class SerializedDict(ServiceDict)
+- get_used_field_names · method · L706-L726 — def get_used_field_names( self, service: "LocalJadawelTableService", dispatch_context: DispatchContext, )
+- get_dispatch_search · method · L728-L751 — def get_dispatch_search( self, service: "ServiceSubClass", dispatch_context: DispatchContext ) -> str
+- get_table_queryset · method · L753-L799 — def get_table_queryset( self, service: ServiceSubClass, table: "Table", dispatch_context: DispatchContext, model: Type["GeneratedTableModel"], )
+- LocalJadawelTableServiceSpecificRowMixin · class · L802-L828 — class LocalJadawelTableServiceSpecificRowMixin
+- SerializedDict · class · L812-L813 — class SerializedDict(ServiceDict)
+- formulas_to_resolve · method · L815-L828 — def formulas_to_resolve(self, service: ServiceSubClass) -> list[FormulaToResolve]

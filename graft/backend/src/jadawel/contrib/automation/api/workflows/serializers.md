@@ -1,0 +1,26 @@
+# backend/src/jadawel/contrib/automation/api/workflows/serializers.py
+
+- AutomationWorkflowSerializer · class · L19-L61 — class AutomationWorkflowSerializer(serializers.ModelSerializer)
+- Meta · class · L24-L43 — class Meta
+- get_published_on · method · L46-L48 — def get_published_on(self, obj)
+- get_state · method · L51-L53 — def get_state(self, obj)
+- get_notification_recipient_ids · method · L56-L61 — def get_notification_recipient_ids(self, obj)
+- CreateAutomationWorkflowSerializer · class · L64-L67 — class CreateAutomationWorkflowSerializer(serializers.ModelSerializer)
+- Meta · class · L65-L67 — class Meta
+- UpdateAutomationWorkflowSerializer · class · L70-L97 — class UpdateAutomationWorkflowSerializer(serializers.ModelSerializer)
+- Meta · class · L87-L97 — class Meta
+- OrderAutomationWorkflowsSerializer · class · L100-L106 — class OrderAutomationWorkflowsSerializer(serializers.Serializer)
+- AutomationHistorySerializer · class · L109-L118 — class AutomationHistorySerializer(serializers.ModelSerializer)
+- Meta · class · L110-L118 — class Meta
+- AutomationNodeHistorySerializer · class · L121-L172 — class AutomationNodeHistorySerializer(AutomationHistorySerializer)
+- Meta · class · L128-L138 — class Meta
+- _get_first_node_result · method · L140-L142 — def _get_first_node_result(self, obj)
+- get_node_type · method · L145-L146 — def get_node_type(self, obj)
+- get_node_label · method · L149-L150 — def get_node_label(self, obj)
+- get_parent_node_id · method · L153-L157 — def get_parent_node_id(self, obj)
+- get_iteration · method · L160-L168 — def get_iteration(self, obj)
+- get_result · method · L170-L172 — def get_result(self, obj)
+- AutomationWorkflowHistorySerializer · class · L175-L185 — class AutomationWorkflowHistorySerializer(AutomationHistorySerializer)
+- Meta · class · L178-L185 — class Meta
+- AutomationWorkflowHistoryPagination · class · L188-L193 — class AutomationWorkflowHistoryPagination(PageNumberPagination)
+- get_paginated_response · method · L189-L193 — def get_paginated_response(self, data, *, success_count: int, fail_count: int)

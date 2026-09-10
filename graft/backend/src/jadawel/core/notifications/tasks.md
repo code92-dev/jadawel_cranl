@@ -1,0 +1,15 @@
+# backend/src/jadawel/core/notifications/tasks.py
+
+- send_queued_notifications_to_users · function · L26-L93 — def send_queued_notifications_to_users(self)
+- broadcast_unread_notifications_to_user · function · L51-L62 — def broadcast_unread_notifications_to_user(user_id, notifications)
+- broadcast_only_unread_notifications_count_to_user · function · L64-L77 — def broadcast_only_unread_notifications_count_to_user(user_id)
+- broadcast_all_notifications_at_once_to_user · function · L82-L89 — def broadcast_all_notifications_at_once_to_user( notification_batch_limit=20, )
+- beat_send_instant_notifications_summary_by_email · function · L101-L115 — def beat_send_instant_notifications_summary_by_email(self)
+- singleton_send_instant_notifications_summary_by_email · function · L127-L128 — def singleton_send_instant_notifications_summary_by_email(self)
+- send_instant_notifications_email_to_users · function · L131-L142 — def send_instant_notifications_email_to_users()
+- filter_timezones_matching_hour_and_day · function · L145-L166 — def filter_timezones_matching_hour_and_day(now, hour_of_day, day_of_week=None)
+- is_matching_time · function · L152-L156 — def is_matching_time(now, tz)
+- send_daily_notifications_email_to_users · function · L169-L196 — def send_daily_notifications_email_to_users(now: Optional[datetime] = None)
+- send_weekly_notifications_email_to_users · function · L199-L228 — def send_weekly_notifications_email_to_users(now: Optional[datetime] = None)
+- send_daily_and_weekly_notifications_summary_by_email · function · L237-L266 — def send_daily_and_weekly_notifications_summary_by_email(self, now=None)
+- setup_periodic_action_tasks · function · L270-L278 — def setup_periodic_action_tasks(sender, **kwargs)

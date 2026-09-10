@@ -1,0 +1,15 @@
+# backend/tests/jadawel/core/import_export/test_import_applications.py
+
+- test_import_with_missing_files · function · L28-L61 — def test_import_with_missing_files(data_fixture, use_tmp_media_root, tmp_path)
+- test_import_with_modified_files · function · L66-L100 — def test_import_with_modified_files(data_fixture, use_tmp_media_root, tmp_path)
+- test_import_with_unexpected_files · function · L105-L136 — def test_import_with_unexpected_files(data_fixture, use_tmp_media_root, tmp_path)
+- test_import_workspace_applications_calls_signals · function · L143-L195 — def test_import_workspace_applications_calls_signals( mock_application_imported, mock_application_created, data_fixture, )
+- test_validate_safe_path_allows_normal_paths · function · L199-L205 — def test_validate_safe_path_allows_normal_paths()
+- test_validate_safe_path_rejects_traversal · function · L209-L219 — def test_validate_safe_path_rejects_traversal()
+- test_import_rejects_zipslip_traversal · function · L224-L252 — def test_import_rejects_zipslip_traversal(data_fixture, use_tmp_media_root, tmp_path)
+- test_extract_files_rejects_files_not_in_manifest · function · L257-L270 — def test_extract_files_rejects_files_not_in_manifest(tmp_path, use_tmp_media_root)
+- test_extract_files_streams_allowed_file · function · L275-L304 — def test_extract_files_streams_allowed_file(tmp_path, use_tmp_media_root)
+- tracked_read · function · L288-L290 — def tracked_read(zip_entry, size=-1)
+- test_build_allowed_files_includes_checksums_and_meta · function · L308-L316 — def test_build_allowed_files_includes_checksums_and_meta()
+- test_validate_checksums_rejects_traversal · function · L321-L326 — def test_validate_checksums_rejects_traversal(tmp_path)
+- test_import_cleans_up_on_checksum_failure · function · L331-L369 — def test_import_cleans_up_on_checksum_failure( data_fixture, use_tmp_media_root, tmp_path )

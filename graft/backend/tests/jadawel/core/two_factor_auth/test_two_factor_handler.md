@@ -1,0 +1,16 @@
+# backend/tests/jadawel/core/two_factor_auth/test_two_factor_handler.py
+
+- test_get_provider_doesnt_exist · function · L19-L24 — def test_get_provider_doesnt_exist(data_fixture)
+- test_get_provider · function · L28-L36 — def test_get_provider(data_fixture)
+- test_get_provider_partially_configured · function · L40-L48 — def test_get_provider_partially_configured(data_fixture)
+- test_get_provider_for_update_doesnt_exist · function · L52-L56 — def test_get_provider_for_update_doesnt_exist(data_fixture)
+- test_get_provider_for_update · function · L60-L75 — def test_get_provider_for_update(data_fixture)
+- test_configure_provider_not_allowed · function · L79-L85 — def test_configure_provider_not_allowed(data_fixture)
+- test_configure_provider_type_doesnt_exist · function · L89-L93 — def test_configure_provider_type_doesnt_exist(data_fixture)
+- test_configure_provider_totp · function · L97-L105 — def test_configure_provider_totp(data_fixture)
+- test_disable_wrong_password · function · L109-L113 — def test_disable_wrong_password(data_fixture)
+- test_disable_not_configured · function · L117-L121 — def test_disable_not_configured(data_fixture)
+- test_disable · function · L125-L131 — def test_disable(data_fixture)
+- test_verify_type_doesnt_exist · function · L135-L137 — def test_verify_type_doesnt_exist(data_fixture)
+- test_verify_no_provider · function · L141-L143 — def test_verify_no_provider(data_fixture)
+- test_verify · function · L147-L157 — def test_verify(data_fixture)

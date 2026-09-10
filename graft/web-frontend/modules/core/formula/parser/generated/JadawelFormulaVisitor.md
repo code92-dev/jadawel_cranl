@@ -1,0 +1,20 @@
+# web-frontend/modules/core/formula/parser/generated/JadawelFormulaVisitor.js
+
+- JadawelFormulaVisitor · class · L7-L112 — class JadawelFormulaVisitor extends antlr4.tree.ParseTreeVisitor
+- visitRoot · method · L10-L12 — visitRoot(ctx)
+- visitFieldReference · method · L16-L18 — visitFieldReference(ctx)
+- visitStringLiteral · method · L22-L24 — visitStringLiteral(ctx)
+- visitBrackets · method · L28-L30 — visitBrackets(ctx)
+- visitBooleanLiteral · method · L34-L36 — visitBooleanLiteral(ctx)
+- visitRightWhitespaceOrComments · method · L40-L42 — visitRightWhitespaceOrComments(ctx)
+- visitDecimalLiteral · method · L46-L48 — visitDecimalLiteral(ctx)
+- visitLeftWhitespaceOrComments · method · L52-L54 — visitLeftWhitespaceOrComments(ctx)
+- visitFunctionCall · method · L58-L60 — visitFunctionCall(ctx)
+- visitFieldByIdReference · method · L64-L66 — visitFieldByIdReference(ctx)
+- visitLookupFieldReference · method · L70-L72 — visitLookupFieldReference(ctx)
+- visitIntegerLiteral · method · L76-L78 — visitIntegerLiteral(ctx)
+- visitBinaryOp · method · L82-L84 — visitBinaryOp(ctx)
+- visitWs_or_comment · method · L88-L90 — visitWs_or_comment(ctx)
+- visitFunc_name · method · L94-L96 — visitFunc_name(ctx)
+- visitField_reference · method · L100-L102 — visitField_reference(ctx)
+- visitIdentifier · method · L106-L108 — visitIdentifier(ctx)

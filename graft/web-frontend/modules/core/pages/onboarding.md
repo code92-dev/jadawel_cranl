@@ -1,0 +1,18 @@
+# web-frontend/modules/core/pages/onboarding.vue
+
+- setup · method · L116-L137 — setup()
+- data · method · L138-L149 — data()
+- steps · method · L151-L158 — steps()
+- step · method · L159-L161 — step()
+- progressPercentage · method · L162-L164 — progressPercentage()
+- canSkip · method · L165-L167 — canSkip()
+- next · method · L175-L184 — async next()
+- skip · method · L189-L194 — async skip()
+- complete · method · L202-L263 — async complete()
+- completeCallback · function · L207-L210 — completeCallback = (message = null, component = null)
+- markAsComplete · method · L268-L277 — async markAsComplete()
+- cancel · method · L282-L302 — async cancel()
+- updateData · method · L303-L305 — updateData(data)
+- isValid · method · L306-L323 — isValid()
+- refresh · method · L324-L327 — refresh()
+- startAndWaitForJob · method · L328-L342 — startAndWaitForJob(job)

@@ -1,0 +1,48 @@
+# web-frontend/modules/core/settingsTypes.js
+
+- SettingsType · class · L13-L74 — class SettingsType extends Registerable
+- getIconClass · method · L20-L22 — getIconClass()
+- getName · method · L28-L30 — getName()
+- getComponent · method · L36-L38 — getComponent()
+- isEnabled · method · L40-L42 — isEnabled()
+- constructor · method · L44-L58 — constructor(...args)
+- serialize · method · L63-L69 — serialize()
+- getOrder · method · L71-L73 — getOrder()
+- AccountSettingsType · class · L76-L93 — class AccountSettingsType extends SettingsType
+- getType · method · L77-L79 — static getType()
+- getIconClass · method · L81-L83 — getIconClass()
+- getName · method · L85-L88 — getName()
+- getComponent · method · L90-L92 — getComponent()
+- PasswordSettingsType · class · L95-L119 — class PasswordSettingsType extends SettingsType
+- getType · method · L96-L98 — static getType()
+- getIconClass · method · L100-L102 — getIconClass()
+- getName · method · L104-L107 — getName()
+- isEnabled · method · L109-L114 — isEnabled()
+- getComponent · method · L116-L118 — getComponent()
+- EmailSettingsType · class · L121-L142 — class EmailSettingsType extends SettingsType
+- getType · method · L122-L124 — static getType()
+- getIconClass · method · L126-L128 — getIconClass()
+- getName · method · L130-L133 — getName()
+- isEnabled · method · L135-L137 — isEnabled()
+- getComponent · method · L139-L141 — getComponent()
+- EmailNotificationsSettingsType · class · L144-L161 — class EmailNotificationsSettingsType extends SettingsType
+- getType · method · L145-L147 — static getType()
+- getIconClass · method · L149-L151 — getIconClass()
+- getName · method · L153-L156 — getName()
+- getComponent · method · L158-L160 — getComponent()
+- TwoFactorAuthSettingsType · class · L163-L180 — class TwoFactorAuthSettingsType extends SettingsType
+- getType · method · L164-L166 — static getType()
+- getIconClass · method · L168-L170 — getIconClass()
+- getName · method · L172-L175 — getName()
+- getComponent · method · L177-L179 — getComponent()
+- MCPEndpointSettingsType · class · L182-L199 — class MCPEndpointSettingsType extends SettingsType
+- getType · method · L183-L185 — static getType()
+- getIconClass · method · L187-L189 — getIconClass()
+- getName · method · L191-L194 — getName()
+- getComponent · method · L196-L198 — getComponent()
+- DeleteAccountSettingsType · class · L201-L222 — class DeleteAccountSettingsType extends SettingsType
+- getType · method · L202-L204 — static getType()
+- getIconClass · method · L206-L208 — getIconClass()
+- getName · method · L210-L213 — getName()
+- getComponent · method · L215-L217 — getComponent()
+- getOrder · method · L219-L221 — getOrder()

@@ -1,0 +1,68 @@
+# backend/src/advocate/test_advocate.py
+
+- _WrapperSubclass · class · L50-L52 — class _WrapperSubclass(global_wrapper.Session)
+- good_method · method · L51-L52 — def good_method(self)
+- canonname_supported · function · L55-L63 — def canonname_supported()
+- permissive_validator · function · L66-L79 — def permissive_validator(**kwargs)
+- TestWrapperTests · class · L84-L88 — class TestWrapperTests(unittest.TestCase)
+- test_unsafe_connect_raises · method · L85-L88 — def test_unsafe_connect_raises(self)
+- ValidateIPTests · class · L91-L228 — class ValidateIPTests(unittest.TestCase)
+- _test_ip_kind_blocked · method · L92-L94 — def _test_ip_kind_blocked(self, ip, **kwargs)
+- test_manual_ip_blacklist · method · L96-L111 — def test_manual_ip_blacklist(self)
+- test_ip_whitelist · method · L113-L118 — def test_ip_whitelist(self)
+- test_ip_whitelist_blacklist_conflict · method · L120-L126 — def test_ip_whitelist_blacklist_conflict(self)
+- test_safecurl_blacklist · method · L129-L164 — def test_safecurl_blacklist(self)
+- test_ipv4_mapped · method · L168-L169 — def test_ipv4_mapped(self)
+- test_teredo · method · L171-L178 — def test_teredo(self): # 192.168.2.1 as the client address
+- test_ipv6 · method · L180-L181 — def test_ipv6(self)
+- test_sixtofour · method · L183-L186 — def test_sixtofour(self): # 192.168.XXX.XXX
+- test_dns64 · method · L188-L193 — def test_dns64(self): # XXX: Don't even know if this is an issue, TBH. Seems to be related # to DNS64/NAT64, but not a lot of easy-to-understand info: # https://tools.ietf.org/html/rfc6052
+- test_link_local · method · L195-L197 — def test_link_local(self): # 169.254.XXX.XXX, AWS uses these for autoconfiguration
+- test_site_local · method · L199-L200 — def test_site_local(self)
+- test_loopback · method · L202-L204 — def test_loopback(self)
+- test_multicast · method · L206-L207 — def test_multicast(self)
+- test_private · method · L209-L214 — def test_private(self)
+- test_reserved · method · L216-L220 — def test_reserved(self)
+- test_unspecified · method · L222-L223 — def test_unspecified(self)
+- test_parsed · method · L225-L228 — def test_parsed(self)
+- AddrInfoTests · class · L231-L317 — class AddrInfoTests(unittest.TestCase)
+- _is_addrinfo_allowed · method · L232-L238 — def _is_addrinfo_allowed(self, host, port, **kwargs)
+- test_simple · method · L240-L241 — def test_simple(self)
+- test_malformed_addrinfo · method · L243-L248 — def test_malformed_addrinfo(self): # Alright, the addrinfo format is probably never going to change, # but *what if it did?*
+- test_unexpected_proto · method · L250-L255 — def test_unexpected_proto(self): # What if addrinfo returns info about a protocol we don't understand?
+- test_default_port_whitelist · method · L257-L260 — def test_default_port_whitelist(self)
+- test_port_whitelist · method · L262-L266 — def test_port_whitelist(self)
+- test_port_blacklist · method · L268-L272 — def test_port_blacklist(self)
+- test_local_address_handling · method · L275-L294 — def test_local_address_handling(self, mock_determine_local_addresses)
+- test_netifaces_presence_optional · method · L296-L317 — def test_netifaces_presence_optional(self): # Advocate should still work without netifaces, but only if you've specifically # said you don't care about checking against local interface addresses.
+- HostnameTests · class · L324-L410 — class HostnameTests(unittest.TestCase)
+- setUp · method · L325-L326 — def setUp(self)
+- _is_hostname_allowed · method · L328-L339 — def _is_hostname_allowed(self, host, fake_lookup=False, **kwargs)
+- test_no_blacklist · method · L341-L342 — def test_no_blacklist(self)
+- test_idn · method · L344-L385 — def test_idn(self): # test some basic globs
+- test_missing_canonname · method · L387-L401 — def test_missing_canonname(self)
+- test_embedded_null · method · L403-L410 — def test_embedded_null(self)
+- ConnectionPoolingTests · class · L413-L431 — class ConnectionPoolingTests(unittest.TestCase)
+- test_connection_reuse · method · L415-L431 — def test_connection_reuse(self, mock_new_conn): # Just because you can use an existing connection doesn't mean you # should. The disadvantage of us working at the socket level means that # we get bitten if a connection pool is shared between regular requests # and advocate. # This can never happen with requests, but let's set a good example :)
+- AdvocateWrapperTests · class · L434-L617 — class AdvocateWrapperTests(unittest.TestCase)
+- test_get · method · L435-L437 — def test_get(self)
+- test_validator · method · L439-L448 — def test_validator(self)
+- test_blacklist_hostname · method · L454-L460 — def test_blacklist_hostname(self)
+- test_redirect · method · L464-L470 — def test_redirect(self): # Make sure httpbin even works
+- test_mount_disabled · method · L472-L479 — def test_mount_disabled(self)
+- test_advocate_requests_api_wrapper · method · L481-L507 — def test_advocate_requests_api_wrapper(self)
+- test_advocate_default_validator_replaceable · method · L509-L513 — def test_advocate_default_validator_replaceable(self)
+- test_wrapper_session_pickle · method · L515-L527 — def test_wrapper_session_pickle(self): # Make sure the validator still works after a pickle round-trip
+- test_wrapper_session_subclass · method · L529-L548 — def test_wrapper_session_subclass(self): # Make sure pickle doesn't explode if we try to pickle a subclass # of `global_wrapper.Session`
+- _check_instance · function · L532-L543 — def _check_instance(instance)
+- test_advocate_requests_api_wrapper_hostnames · method · L554-L564 — def test_advocate_requests_api_wrapper_hostnames(self)
+- test_advocate_requests_api_wrapper_req_methods · method · L567-L583 — def test_advocate_requests_api_wrapper_req_methods(self): # Make sure all the convenience methods make requests with the correct # methods
+- test_wrapper_getattr_fallback · method · L585-L588 — def test_wrapper_getattr_fallback(self): # Make sure wrappers include everything in Advocate's `__init__.py`
+- test_proxy_attempt_throws · method · L590-L601 — def test_proxy_attempt_throws(self): # Advocate can't do anything useful when you use a proxy, the proxy # is the one that ultimately makes the connection
+- test_connect_without_local_addresses · method · L604-L617 — def test_connect_without_local_addresses(self, mock_determine_local_addresses)
+- AdvocateFuturesTest · class · L620-L684 — class AdvocateFuturesTest(unittest.TestCase)
+- test_get · method · L621-L623 — def test_get(self)
+- test_custom_validator · method · L625-L631 — def test_custom_validator(self)
+- test_many_workers · method · L633-L638 — def test_many_workers(self)
+- test_passing_session · method · L640-L654 — def test_passing_session(self)
+- test_advocate_wrapper_futures · method · L656-L684 — def test_advocate_wrapper_futures(self)

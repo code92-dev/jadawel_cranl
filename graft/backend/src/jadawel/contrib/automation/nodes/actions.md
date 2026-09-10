@@ -1,0 +1,38 @@
+# backend/src/jadawel/contrib/automation/nodes/actions.py
+
+- CreateAutomationNodeActionType · class · L22-L84 — class CreateAutomationNodeActionType(UndoableActionType)
+- Params · class · L31-L35 — class Params
+- do · method · L38-L58 — def do( cls, user: AbstractUser, node_type: AutomationNodeType, workflow: AutomationWorkflow, data: dict, ) -> AutomationNode
+- scope · method · L61-L62 — def scope(cls, workflow_id)
+- undo · method · L65-L71 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L74-L84 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- UpdateAutomationNodeActionType · class · L87-L153 — class UpdateAutomationNodeActionType(UndoableActionType)
+- Params · class · L96-L102 — class Params
+- do · method · L105-L127 — def do( cls, user: AbstractUser, node_id: int, new_data: dict, ) -> AutomationNode
+- scope · method · L130-L131 — def scope(cls, workflow_id)
+- undo · method · L134-L142 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L145-L153 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- DeleteAutomationNodeActionType · class · L156-L211 — class DeleteAutomationNodeActionType(UndoableActionType)
+- Params · class · L165-L169 — class Params
+- do · method · L172-L185 — def do(cls, user: AbstractUser, node_id: int) -> None
+- scope · method · L188-L189 — def scope(cls, workflow_id)
+- undo · method · L192-L202 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L205-L211 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- DuplicateAutomationNodeActionType · class · L214-L283 — class DuplicateAutomationNodeActionType(UndoableActionType)
+- Params · class · L223-L229 — class Params
+- do · method · L232-L253 — def do( cls, user: AbstractUser, source_node_id: int, ) -> AutomationNode
+- scope · method · L256-L257 — def scope(cls, workflow_id)
+- undo · method · L260-L269 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, ): # Trash the duplicated node.
+- redo · method · L272-L283 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, ): # Restore the duplicated node again.
+- ReplaceAutomationNodeActionType · class · L286-L371 — class ReplaceAutomationNodeActionType(UndoableActionType)
+- Params · class · L298-L305 — class Params
+- do · method · L308-L331 — def do( cls, user: AbstractUser, node_id: int, new_node_type: str, ) -> AutomationNode
+- scope · method · L334-L335 — def scope(cls, workflow_id)
+- undo · method · L338-L353 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, ): # Restore the node to its original type.
+- redo · method · L356-L371 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, ): # Restore the node to its new type again.
+- MoveAutomationNodeActionType · class · L374-L466 — class MoveAutomationNodeActionType(UndoableActionType)
+- Params · class · L383-L394 — class Params
+- do · method · L397-L432 — def do( cls, user: AbstractUser, node_id: int, reference_node_id: int | None, position: NodePositionType, output: str, ) -> AutomationActionNode
+- scope · method · L435-L436 — def scope(cls, workflow_id)
+- undo · method · L439-L451 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L454-L466 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )

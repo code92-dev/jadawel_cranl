@@ -1,0 +1,22 @@
+# web-frontend/modules/database/searchTypes.js
+
+- DatabaseSearchType · class · L7-L31 — class DatabaseSearchType extends ApplicationSearchType
+- constructor · method · L8-L14 — constructor(context = {})
+- _getApplicationId · method · L16-L19 — _getApplicationId(result)
+- _getApplicationChildren · method · L21-L23 — _getApplicationChildren(application)
+- _getApplicationPath · method · L25-L30 — _getApplicationPath(application, children)
+- DatabaseTableSearchType · class · L33-L68 — class DatabaseTableSearchType extends BaseSearchType
+- constructor · method · L34-L40 — constructor(context = {})
+- _hasRequiredMetadata · method · L42-L48 — _hasRequiredMetadata(result)
+- buildUrl · method · L50-L63 — buildUrl(result, context = null)
+- isNavigable · method · L65-L67 — isNavigable(result, context = null)
+- DatabaseFieldSearchType · class · L70-L105 — class DatabaseFieldSearchType extends BaseSearchType
+- constructor · method · L71-L77 — constructor(context = {})
+- _hasRequiredMetadata · method · L79-L85 — _hasRequiredMetadata(result)
+- buildUrl · method · L87-L100 — buildUrl(result, context = null)
+- isNavigable · method · L102-L104 — isNavigable(result, context = null)
+- DatabaseRowSearchType · class · L107-L140 — class DatabaseRowSearchType extends BaseSearchType
+- constructor · method · L108-L114 — constructor(context = {})
+- _hasRequiredMetadata · method · L116-L123 — _hasRequiredMetadata(result)
+- buildUrl · method · L125-L135 — buildUrl(result, context = null)
+- isNavigable · method · L137-L139 — isNavigable(result, context = null)

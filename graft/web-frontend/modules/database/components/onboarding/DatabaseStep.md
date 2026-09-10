@@ -1,0 +1,16 @@
+# web-frontend/modules/database/components/onboarding/DatabaseStep.vue
+
+- setup · method · L59-L61 — setup()
+- data · method · L62-L70 — data()
+- allStepTypes · method · L72-L74 — allStepTypes()
+- visibleTypes · method · L75-L82 — visibleTypes()
+- types · method · L83-L85 — types()
+- selectedType · method · L86-L88 — selectedType()
+- selectedStepType · method · L89-L93 — selectedStepType()
+- hasName · method · L94-L96 — hasName()
+- handler · method · L101-L110 — handler(newValue)
+- mounted · method · L113-L115 — mounted()
+- isValid · method · L117-L119 — isValid()
+- updateValue · method · L120-L128 — updateValue(params = {})
+- selectedTemplate · method · L129-L136 — selectedTemplate(template)
+- validations · method · L138-L146 — validations()

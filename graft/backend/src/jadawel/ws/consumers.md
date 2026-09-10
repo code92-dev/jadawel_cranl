@@ -1,0 +1,27 @@
+# backend/src/jadawel/ws/consumers.py
+
+- PageContext · class · L15-L25 — class PageContext
+- PageScope · class · L29-L39 — class PageScope
+- SubscribedPages · class · L42-L127 — class SubscribedPages
+- __init__ · method · L47-L48 — def __init__(self)
+- add · method · L50-L58 — def add(self, page_scope: PageScope)
+- remove · method · L60-L70 — def remove(self, page_scope: PageScope)
+- is_page_in_permission_group · method · L72-L95 — def is_page_in_permission_group( self, page_scope: PageScope, group_name_to_check: str ) -> bool
+- has_pages_with_permission_group · method · L97-L116 — def has_pages_with_permission_group(self, group_name_to_check: str) -> bool
+- copy · method · L118-L121 — def copy(self)
+- __len__ · method · L123-L124 — def __len__(self)
+- __iter__ · method · L126-L127 — def __iter__(self)
+- CoreConsumer · class · L130-L442 — class CoreConsumer(AsyncJsonWebsocketConsumer)
+- connect · method · L131-L150 — async def connect(self)
+- disconnect · method · L152-L154 — async def disconnect(self, message)
+- receive_json · method · L156-L164 — async def receive_json(self, content, **parameters)
+- _get_page_context · method · L166-L201 — async def _get_page_context( self, content: dict, page_name_attr: str ) -> Optional[PageContext]
+- _add_page_scope · method · L203-L244 — async def _add_page_scope(self, content: dict)
+- _remove_page_scope · method · L246-L291 — async def _remove_page_scope(self, content: dict, send_confirmation=True)
+- _remove_all_page_scopes · method · L293-L308 — async def _remove_all_page_scopes(self, send_confirmation=True)
+- _remove_page_scopes_associated_with_perm_group · method · L310-L331 — async def _remove_page_scopes_associated_with_perm_group( self, permission_group_name: str )
+- force_disconnect_users · method · L335-L356 — async def force_disconnect_users(self, event)
+- broadcast_to_users · method · L358-L381 — async def broadcast_to_users(self, event)
+- broadcast_to_users_individual_payloads · method · L383-L403 — async def broadcast_to_users_individual_payloads(self, event)
+- broadcast_to_group · method · L405-L424 — async def broadcast_to_group(self, event)
+- users_removed_from_permission_group · method · L426-L442 — async def users_removed_from_permission_group(self, event)

@@ -1,0 +1,16 @@
+# web-frontend/modules/core/components/editor/RichTextEditorBubbleMenu.vue
+
+- data · method · L162-L168 — data()
+- menuOptions · method · L170-L180 — menuOptions()
+- visible · method · L183-L187 — visible(value)
+- mounted · method · L189-L200 — mounted()
+- beforeUnmount · method · L201-L205 — beforeUnmount()
+- shouldShowMenu · method · L207-L226 — shouldShowMenu({ editor, view, element })
+- toggleMark · method · L227-L250 — toggleMark(type)
+- isEventTargetInside · method · L251-L259 — isEventTargetInside(event)
+- shouldShowLink · method · L260-L265 — shouldShowLink()
+- unselectLink · method · L266-L272 — unselectLink()
+- showEditLinkInput · method · L273-L280 — showEditLinkInput()
+- prependDefaultProtocolIfNeeded · method · L281-L298 — prependDefaultProtocolIfNeeded(href)
+- setLink · method · L299-L308 — setLink()
+- deleteLink · method · L309-L312 — deleteLink()

@@ -1,0 +1,81 @@
+# backend/src/jadawel/contrib/integrations/core/service_types.py
+
+- CoreServiceType · class · L79-L83 — class CoreServiceType(ServiceType)
+- CoreHTTPRequestServiceType · class · L86-L615 — class CoreHTTPRequestServiceType(CoreServiceType)
+- SerializedDict · class · L121-L129 — class SerializedDict(ServiceDict)
+- serializer_field_names · method · L134-L135 — def serializer_field_names(self)
+- serializer_field_overrides · method · L138-L192 — def serializer_field_overrides(self)
+- after_create · method · L194-L247 — def after_create( self, instance: CoreHTTPRequestService, values: Dict, )
+- after_update · method · L249-L255 — def after_update( self, instance, values, changes: Dict[str, Tuple], )
+- formula_generator · method · L257-L283 — def formula_generator( self, service: ServiceType ) -> Generator[str | Instance, str, None]
+- extract_properties · method · L285-L293 — def extract_properties( self, service: Service, path: List[str], **kwargs ) -> List[str]
+- serialize_property · method · L295-L336 — def serialize_property( self, service: CoreHTTPRequestService, prop_name: str, files_zip=None, storage=None, cache=None, )
+- create_instance_from_serialized · method · L338-L394 — def create_instance_from_serialized( self, serialized_values, id_mapping, files_zip=None, storage=None, cache=None, **kwargs, )
+- enhance_queryset · method · L396-L401 — def enhance_queryset(self, queryset)
+- get_schema_name · method · L403-L404 — def get_schema_name(self, service: CoreHTTPRequestService) -> str
+- generate_schema · method · L406-L489 — def generate_schema( self, service: CoreHTTPRequestService, allowed_fields: Optional[List[str]] = None, ) -> Optional[Dict[str, Any]]
+- formulas_to_resolve · method · L491-L534 — def formulas_to_resolve( self, service: CoreHTTPRequestService ) -> list[FormulaToResolve]
+- dispatch_data · method · L536-L609 — def dispatch_data( self, service: CoreHTTPRequestService, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Any
+- dispatch_transform · method · L611-L615 — def dispatch_transform( self, data: Any, ) -> DispatchResult
+- CoreSMTPEmailServiceType · class · L618-L927 — class CoreSMTPEmailServiceType(CoreServiceType)
+- SerializedDict · class · L651-L660 — class SerializedDict(ServiceDict)
+- serializer_field_overrides · method · L673-L722 — def serializer_field_overrides(self)
+- _instance_smtp_is_available · method · L724-L728 — def _instance_smtp_is_available(self) -> bool
+- _should_use_instance_smtp · method · L730-L733 — def _should_use_instance_smtp(self, service: CoreSMTPEmailService) -> bool
+- requires_integration · method · L735-L736 — def requires_integration(self, service: CoreSMTPEmailService) -> bool
+- prepare_values · method · L738-L755 — def prepare_values(self, values, user: AbstractUser, instance=None)
+- get_schema_name · method · L757-L758 — def get_schema_name(self, service: CoreSMTPEmailService) -> str
+- generate_schema · method · L760-L782 — def generate_schema( self, service: CoreSMTPEmailService, allowed_fields: Optional[List[str]] = None, ) -> Optional[Dict[str, Any]]
+- formulas_to_resolve · method · L784-L815 — def formulas_to_resolve( self, service: CoreSMTPEmailService ) -> list[FormulaToResolve]
+- dispatch_data · method · L817-L910 — def dispatch_data( self, service: CoreSMTPEmailService, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Any
+- dispatch_transform · method · L912-L916 — def dispatch_transform( self, data: Any, ) -> DispatchResult
+- export_prepared_values · method · L918-L927 — def export_prepared_values(self, instance: Service) -> dict[str, Any]
+- CoreRouterServiceType · class · L930-L1222 — class CoreRouterServiceType(CoreServiceType)
+- SerializedDict · class · L937-L939 — class SerializedDict(ServiceDict)
+- enhance_queryset · method · L941-L942 — def enhance_queryset(self, queryset)
+- serializer_field_overrides · method · L945-L957 — def serializer_field_overrides(self)
+- import_serialized · method · L959-L981 — def import_serialized( self, parent: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[str, str]], **kwargs, )
+- create_instance_from_serialized · method · L983-L1016 — def create_instance_from_serialized( self, serialized_values, id_mapping, files_zip=None, storage=None, cache=None, **kwargs, )
+- serialize_property · method · L1018-L1048 — def serialize_property( self, service: CoreRouterService, prop_name: str, files_zip=None, storage=None, cache=None, )
+- formulas_to_resolve · method · L1050-L1063 — def formulas_to_resolve(self, service: CoreRouterService) -> list[FormulaToResolve]
+- formula_generator · method · L1065-L1074 — def formula_generator( self, service: CoreRouterService ) -> Generator[str | Instance, str, None]
+- after_update · method · L1076-L1100 — def after_update( self, instance: CoreRouterService, values: Dict, changes: Dict[str, Tuple], ) -> None
+- get_schema_name · method · L1102-L1103 — def get_schema_name(self, service: CoreRouterService) -> str
+- export_prepared_values · method · L1105-L1115 — def export_prepared_values(self, instance: Service) -> dict[str, Any]
+- generate_schema · method · L1117-L1155 — def generate_schema( self, service: CoreRouterService, allowed_fields: Optional[List[str]] = None, ) -> Dict[str, Any]
+- dispatch_data · method · L1157-L1187 — def dispatch_data( self, service: CoreRouterService, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Dict[str, Dict[str, Any]]
+- dispatch_transform · method · L1189-L1193 — def dispatch_transform( self, data: Any, ) -> DispatchResult
+- get_sample_data · method · L1195-L1217 — def get_sample_data(self, service, dispatch_context)
+- get_edges · method · L1219-L1222 — def get_edges(self, service)
+- CorePeriodicServiceType · class · L1225-L1518 — class CorePeriodicServiceType(TriggerServiceTypeMixin, CoreServiceType)
+- __init__ · method · L1281-L1283 — def __init__(self)
+- SerializedDict · class · L1285-L1291 — class SerializedDict(ServiceDict)
+- prepare_values · method · L1293-L1318 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: Optional[CorePeriodicService] = None, ) -> Dict[str, Any]
+- can_immediately_be_tested · method · L1320-L1321 — def can_immediately_be_tested(self, service)
+- _setup_periodic_task · method · L1323-L1342 — def _setup_periodic_task(self, sender, **kwargs)
+- start_listening · method · L1344-L1346 — def start_listening(self, on_event: Callable)
+- stop_listening · method · L1348-L1350 — def stop_listening(self)
+- _get_dispatch_payload · method · L1352-L1356 — def _get_dispatch_payload(self, service: CorePeriodicService) -> Dict[str, str]
+- _get_simulation_payload · method · L1358-L1371 — def _get_simulation_payload(self, service: CorePeriodicService) -> Dict[str, str]
+- dispatch_data · method · L1373-L1392 — def dispatch_data( self, service: CorePeriodicService, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Dict[str, str]
+- get_periodic_services_that_are_due · method · L1394-L1421 — def get_periodic_services_that_are_due( self, current: datetime = None ) -> QuerySet[CorePeriodicService]
+- call_periodic_services_that_are_due · method · L1423-L1495 — def call_periodic_services_that_are_due(self)
+- _get_service_payload · function · L1446-L1485 — def _get_service_payload( dispatched_service: CorePeriodicService, ) -> Dict[str, str]
+- get_schema_name · method · L1497-L1498 — def get_schema_name(self, service: CorePeriodicService) -> str
+- generate_schema · method · L1500-L1518 — def generate_schema( self, service: CorePeriodicService, allowed_fields: Optional[List[str]] = None, ) -> Optional[Dict[str, Any]]
+- CoreHTTPTriggerServiceType · class · L1521-L1725 — class CoreHTTPTriggerServiceType(TriggerServiceTypeMixin, ServiceType)
+- SerializedDict · class · L1529-L1532 — class SerializedDict(ServiceDict)
+- get_api_urls · method · L1534-L1541 — def get_api_urls(self) -> List[path]
+- serialize_property · method · L1543-L1566 — def serialize_property( self, service: CoreHTTPTriggerService, prop_name: str, files_zip=None, storage=None, cache=None, )
+- process_webhook_request · method · L1568-L1603 — def process_webhook_request( self, webhook_uid: uuid.uuid4, request_data: Dict[str, Any], simulate: bool ) -> None
+- generate_schema · method · L1605-L1688 — def generate_schema( self, service: CoreHTTPTriggerService, allowed_fields: Optional[List[str]] = None, ) -> Optional[Dict[str, Any]]
+- import_serialized · method · L1690-L1716 — def import_serialized( self, parent: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[str, str]], import_export_config: Optional[ImportExportConfig] = None, **kwargs, )
+- export_prepared_values · method · L1718-L1725 — def export_prepared_values( self, instance: CoreHTTPTriggerService ) -> dict[str, Any]
+- CoreIteratorServiceType · class · L1728-L1811 — class CoreIteratorServiceType(ListServiceTypeMixin, ServiceType)
+- SerializedDict · class · L1741-L1742 — class SerializedDict(ServiceDict)
+- serializer_field_overrides · method · L1749-L1757 — def serializer_field_overrides(self)
+- get_schema_name · method · L1759-L1760 — def get_schema_name(self, service: CoreSMTPEmailService) -> str
+- generate_schema · method · L1762-L1783 — def generate_schema( self, service: CoreIteratorService, allowed_fields: Optional[List[str]] = None, ) -> Optional[Dict[str, Any]]
+- formulas_to_resolve · method · L1785-L1797 — def formulas_to_resolve(self, service: CoreRouterService) -> list[FormulaToResolve]
+- dispatch_data · method · L1799-L1805 — def dispatch_data( self, service: CoreSMTPEmailService, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Any
+- dispatch_transform · method · L1807-L1811 — def dispatch_transform( self, data: Any, ) -> DispatchResult

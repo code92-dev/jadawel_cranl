@@ -1,0 +1,15 @@
+# backend/tests/jadawel/contrib/builder/pages/test_page_service.py
+
+- test_page_created_signal_sent · function · L13-L20 — def test_page_created_signal_sent(page_created_mock, data_fixture)
+- test_create_page_user_not_in_workspace · function · L24-L29 — def test_create_page_user_not_in_workspace(data_fixture)
+- test_page_deleted_signal_sent · function · L34-L45 — def test_page_deleted_signal_sent(page_deleted_mock, data_fixture)
+- test_delete_page_user_not_in_workspace · function · L49-L61 — def test_delete_page_user_not_in_workspace(data_fixture)
+- test_get_page_user_not_in_workspace · function · L65-L71 — def test_get_page_user_not_in_workspace(data_fixture)
+- test_page_updated_signal_sent · function · L76-L84 — def test_page_updated_signal_sent(page_updated_mock, data_fixture)
+- test_update_page_user_not_in_workspace · function · L88-L94 — def test_update_page_user_not_in_workspace(data_fixture)
+- test_update_page_invalid_values · function · L98-L105 — def test_update_page_invalid_values(data_fixture)
+- test_pages_reordered_signal_sent · function · L110-L121 — def test_pages_reordered_signal_sent(pages_reordered_mock, data_fixture)
+- test_order_pages_user_not_in_workspace · function · L125-L132 — def test_order_pages_user_not_in_workspace(data_fixture)
+- test_order_pages_page_not_in_builder · function · L136-L143 — def test_order_pages_page_not_in_builder(data_fixture)
+- test_duplicate_page · function · L147-L156 — def test_duplicate_page(data_fixture)
+- test_duplicate_page_user_not_in_workspace · function · L160-L165 — def test_duplicate_page_user_not_in_workspace(data_fixture)

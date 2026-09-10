@@ -1,0 +1,34 @@
+# backend/src/jadawel/contrib/database/search/handler.py
+
+- SearchMode · class · L70-L79 — class SearchMode(str, Enum): # Use this mode to search rows using LIKE operators against each # `FieldType`, and return an accurate `count` in the response. # This method is slow after a few thousand rows and dozens of fields.
+- _workspace_search_table_exists · function · L86-L106 — def _workspace_search_table_exists(workspace_id: int) -> bool
+- _generate_search_table_model · function · L110-L173 — def _generate_search_table_model( workspace_id: int, managed=False ) -> "AbstractSearchValue"
+- __str__ · function · L152-L153 — def __str__(self)
+- SearchDatabaseSchemaEditor · class · L176-L177 — class SearchDatabaseSchemaEditor(BaseDatabaseSchemaEditor)
+- SearchHandler · class · L180-L934 — class SearchHandler( metaclass=jadawel_trace_methods( tracer, exclude=["full_text_enabled", "search_config"] ) )
+- get_workspace_search_table_name · method · L186-L195 — def get_workspace_search_table_name(cls, workspace_id: int) -> str
+- get_workspace_search_table_model · method · L198-L212 — def get_workspace_search_table_model( cls, workspace_id: int, managed: bool = False ) -> "AbstractSearchValue"
+- full_text_search_in_table · method · L215-L268 — def full_text_search_in_table( cls, queryset: QuerySet, input_search: str, fields: List["Field"], ) -> QuerySet
+- add_exact_id_search · method · L271-L279 — def add_exact_id_search(cls, filter_builder, input_search)
+- can_use_full_text_search · method · L282-L295 — def can_use_full_text_search(cls, table: "Table") -> bool
+- workspace_search_table_exists · method · L298-L309 — def workspace_search_table_exists(cls, workspace_id: int) -> bool
+- create_workspace_search_table_if_not_exists · method · L312-L353 — def create_workspace_search_table_if_not_exists(cls, workspace_id: int)
+- delete_workspace_search_table_if_exists · method · L356-L369 — def delete_workspace_search_table_if_exists(cls, workspace_id: int)
+- special_char_tokenizer · method · L372-L412 — def special_char_tokenizer(cls, expression: Expression) -> Func
+- full_text_enabled · method · L415-L416 — def full_text_enabled(cls) -> bool
+- search_config · method · L419-L420 — def search_config(cls) -> str
+- get_default_search_mode_for_table · method · L423-L428 — def get_default_search_mode_for_table(cls, table: "Table") -> str
+- escape_query · method · L431-L455 — def escape_query(cls, text: str) -> str
+- escape_postgres_query · method · L458-L480 — def escape_postgres_query(cls, text, per_token_wildcard: bool = False) -> str
+- all_fields_values_changed_or_created · method · L483-L500 — def all_fields_values_changed_or_created(cls, fields: Iterable["Field"])
+- schedule_update_search_data · method · L503-L531 — def schedule_update_search_data( cls, table: "Table", fields: list["Field"] | None = None, row_ids: list[int] | None = None, )
+- mark_search_data_for_deletion · method · L534-L590 — def mark_search_data_for_deletion( cls, table: "Table", field_ids: Iterable[int] | None = None, row_ids: Iterable[int] | None = None, )
+- mark_for_deletion · function · L566-L588 — def mark_for_deletion()
+- queue_pending_search_update · method · L593-L635 — def queue_pending_search_update( cls, table: "Table", field_ids: List[int] | None = None, row_ids: List[int] | None = None, )
+- initialize_missing_search_data · method · L638-L668 — def initialize_missing_search_data(cls, table: "Table")
+- _delete_workspace_data_marked_for_deletion · method · L671-L718 — def _delete_workspace_data_marked_for_deletion(cls, workspace_id: int)
+- process_search_data_marked_for_deletion · method · L721-L745 — def process_search_data_marked_for_deletion(cls)
+- update_search_data · method · L748-L837 — def update_search_data( cls, table: "Table", field_ids: Iterable[int] | None = None, row_ids: Iterable[int] | None = None, )
+- delete_pending_updates · method · L840-L859 — def delete_pending_updates(cls, q: Q, manager: str = "objects")
+- process_search_data_updates · method · L862-L934 — def process_search_data_updates(cls, table: "Table")
+- _fetch_next_batch · function · L907-L910 — def _fetch_next_batch() -> QuerySet[PendingSearchValueUpdate]

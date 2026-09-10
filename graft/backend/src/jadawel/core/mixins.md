@@ -1,0 +1,37 @@
+# backend/src/jadawel/core/mixins.py
+
+- OrderableMixin · class · L25-L106 — class OrderableMixin
+- get_highest_order_of_queryset · method · L31-L42 — def get_highest_order_of_queryset( cls, queryset: QuerySet, field: str = "order" ) -> int
+- order_objects · method · L45-L106 — def order_objects( cls, queryset: QuerySet, new_order: List[int], field: str = "order" ) -> List[int]
+- FractionOrderableMixin · class · L109-L178 — class FractionOrderableMixin(OrderableMixin)
+- get_highest_order_of_queryset · method · L117-L129 — def get_highest_order_of_queryset( cls, queryset: QuerySet, amount: int = 1, field: str = "order" ) -> List[Decimal]
+- get_unique_orders_before_item · method · L132-L155 — def get_unique_orders_before_item( cls, before: Optional[models.Model], queryset: QuerySet, amount: int = 1, field: str = "order", ) -> List[Decimal]
+- recalculate_full_orders · method · L158-L178 — def recalculate_full_orders( cls, field="order", queryset: Optional[QuerySet] = None, )
+- PolymorphicContentTypeMixin · class · L181-L341 — class PolymorphicContentTypeMixin
+- __init__ · method · L196-L212 — def __init__(self, *args, **kwargs)
+- save · method · L214-L216 — def save(self, *args, **kwargs)
+- _ensure_content_type_is_set · method · L218-L221 — def _ensure_content_type_is_set(self)
+- specific · method · L224-L227 — def specific(self)
+- get_specific · method · L229-L250 — def get_specific(self, enhance_queryset: Callable = None)
+- specific_class · method · L253-L261 — def specific_class(self)
+- parent_ptrs · method · L263-L266 — def parent_ptrs(self)
+- all_parents_and_self · method · L268-L281 — def all_parents_and_self(self)
+- change_polymorphic_type_to · method · L283-L341 — def change_polymorphic_type_to(self, new_model_class)
+- get_field_name · function · L313-L316 — def get_field_name(field)
+- WithRegistry · class · L347-L360 — class WithRegistry(Generic[T])
+- get_type_registry · method · L354-L355 — def get_type_registry() -> ModelRegistryMixin
+- get_type · method · L357-L360 — def get_type(self) -> T
+- BigAutoFieldMixin · class · L363-L374 — class BigAutoFieldMixin(models.Model)
+- Meta · class · L373-L374 — class Meta
+- CreatedAndUpdatedOnMixin · class · L377-L387 — class CreatedAndUpdatedOnMixin(models.Model)
+- Meta · class · L386-L387 — class Meta
+- AbstractModelMeta · class · L390-L391 — class AbstractModelMeta(abc.ABCMeta, type(models.Model))
+- HierarchicalModelMixin · class · L394-L417 — class HierarchicalModelMixin(models.Model, metaclass=AbstractModelMeta)
+- get_parent · method · L401-L404 — def get_parent(self)
+- get_root · method · L406-L414 — def get_root(self)
+- Meta · class · L416-L417 — class Meta
+- make_trashable_mixin · function · L420-L441 — def make_trashable_mixin(parent)
+- TrashableMixin · class · L433-L439 — class TrashableMixin(models.Model)
+- Meta · class · L438-L439 — class Meta
+- TrashableModelMixin · class · L447-L460 — class TrashableModelMixin(models.Model)
+- Meta · class · L459-L460 — class Meta

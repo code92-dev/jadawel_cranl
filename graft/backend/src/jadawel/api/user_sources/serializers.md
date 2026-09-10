@@ -1,0 +1,26 @@
+# backend/src/jadawel/api/user_sources/serializers.py
+
+- UserSourceRolesSerializer · class · L27-L36 — class UserSourceRolesSerializer(serializers.ModelSerializer)
+- Meta · class · L30-L32 — class Meta
+- get_roles · method · L35-L36 — def get_roles(self, user_source)
+- UserSourceSerializer · class · L39-L97 — class UserSourceSerializer(serializers.ModelSerializer)
+- get_type · method · L53-L54 — def get_type(self, instance)
+- get_user_count · method · L57-L59 — def get_user_count(self, instance)
+- get_user_count_updated_at · method · L62-L64 — def get_user_count_updated_at(self, instance)
+- Meta · class · L72-L97 — class Meta
+- PolymorphicUserSourceSerializer · class · L100-L107 — class PolymorphicUserSourceSerializer(PolymorphicSerializer)
+- CreateUserSourceSerializer · class · L110-L143 — class CreateUserSourceSerializer(serializers.ModelSerializer)
+- Meta · class · L138-L143 — class Meta
+- UpdateUserSourceSerializer · class · L146-L169 — class UpdateUserSourceSerializer(serializers.ModelSerializer)
+- Meta · class · L163-L169 — class Meta
+- MoveUserSourceSerializer · class · L172-L184 — class MoveUserSourceSerializer(serializers.Serializer)
+- UserSourceUserSerializer · class · L187-L196 — class UserSourceUserSerializer(serializers.Serializer)
+- UsersPerUserSourceSerializer · class · L199-L209 — class UsersPerUserSourceSerializer(serializers.Serializer)
+- UserSourceTokenObtainSerializer · class · L212-L253 — class UserSourceTokenObtainSerializer(TokenObtainPairSerializer)
+- __init__ · method · L220-L222 — def __init__(self, user_source: UserSource, *args, **kwargs) -> None
+- validate · method · L224-L253 — def validate(self, attrs: Dict[str, Any]) -> Dict[Any, Any]
+- UserSourceForceTokenObtainSerializer · class · L256-L284 — class UserSourceForceTokenObtainSerializer(serializers.Serializer)
+- __init__ · method · L265-L267 — def __init__(self, user_source, *args, **kwargs) -> None
+- validate · method · L269-L284 — def validate(self, attrs: Dict[str, Any]) -> Dict[Any, Any]
+- TokenRefreshSerializer · class · L287-L338 — class TokenRefreshSerializer(serializers.Serializer)
+- validate · method · L297-L338 — def validate(self, attrs: Dict[str, Any]) -> Dict[str, str]

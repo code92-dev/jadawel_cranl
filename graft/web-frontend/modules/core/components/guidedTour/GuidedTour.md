@@ -1,0 +1,15 @@
+# web-frontend/modules/core/components/guidedTour/GuidedTour.vue
+
+- data · method · L39-L43 — data()
+- activeGuidedTours · method · L45-L55 — activeGuidedTours()
+- started · method · L56-L58 — started()
+- allSteps · method · L59-L61 — allSteps()
+- currentStep · method · L62-L64 — currentStep()
+- started · method · L71-L75 — started(value)
+- activeGuidedTours · method · L76-L80 — activeGuidedTours(value)
+- mounted · method · L82-L86 — mounted()
+- getParent · method · L88-L90 — getParent()
+- next · method · L91-L97 — async next()
+- goto · method · L98-L104 — async goto(index)
+- show · method · L105-L111 — async show()
+- finish · method · L112-L134 — async finish()

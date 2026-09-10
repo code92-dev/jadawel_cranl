@@ -1,0 +1,17 @@
+# backend/tests/jadawel/contrib/database/field/test_rollup_field_type.py
+
+- test_create_rollup_through_field_with_invalid_link_row_field · function · L31-L57 — def test_create_rollup_through_field_with_invalid_link_row_field( data_fixture, api_client, django_assert_num_queries )
+- test_create_rollup_through_field_with_invalid_target_field · function · L61-L85 — def test_create_rollup_through_field_with_invalid_target_field( data_fixture, api_client, django_assert_num_queries )
+- test_create_rollup_through_field_with_invalid_rollup_function · function · L89-L115 — def test_create_rollup_through_field_with_invalid_rollup_function( data_fixture, api_client, django_assert_num_queries )
+- test_create_rollup_through_field_with_invalid_incompatible_rollup_function · function · L119-L147 — def test_create_rollup_through_field_with_invalid_incompatible_rollup_function( data_fixture, api_client, django_assert_num_queries )
+- test_create_rollup_through_field_with_invalid_incompatible_rollup_function_via_api · function · L151-L184 — def test_create_rollup_through_field_with_invalid_incompatible_rollup_function_via_api( data_fixture, api_client, django_assert_num_queries )
+- test_create_rollup_through_field_name · function · L188-L213 — def test_create_rollup_through_field_name( data_fixture, api_client, django_assert_num_queries )
+- test_update_rollup_through_field_name · function · L217-L254 — def test_update_rollup_through_field_name( data_fixture, api_client, django_assert_num_queries )
+- test_create_rollup_target_field_name · function · L258-L283 — def test_create_rollup_target_field_name( data_fixture, api_client, django_assert_num_queries )
+- test_update_rollup_target_field_name · function · L287-L318 — def test_update_rollup_target_field_name( data_fixture, api_client, django_assert_num_queries )
+- test_can_update_rollup_field_value · function · L322-L415 — def test_can_update_rollup_field_value(data_fixture, api_client)
+- test_can_create_rollup_field_value · function · L419-L477 — def test_can_create_rollup_field_value(data_fixture, api_client)
+- test_can_create_rollup_field_with_formula_properties · function · L481-L540 — def test_can_create_rollup_field_with_formula_properties(data_fixture, api_client)
+- test_import_export_tables_with_rollup_fields · function · L544-L635 — def test_import_export_tables_with_rollup_fields( data_fixture, django_assert_num_queries )
+- test_convert_rollup_to_text_field_via_api · function · L639-L669 — def test_convert_rollup_to_text_field_via_api(data_fixture, api_client)
+- test_remove_dependent_count_rollup_field_through_field · function · L687-L738 — def test_remove_dependent_count_rollup_field_through_field( data_fixture, api_client, field_type, field_kwargs )

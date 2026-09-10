@@ -1,0 +1,31 @@
+# backend/src/jadawel/contrib/builder/elements/collection_field_types.py
+
+- BooleanCollectionFieldType · class · L17-L33 — class BooleanCollectionFieldType(CollectionFieldType)
+- SerializedDict · class · L23-L24 — class SerializedDict(TypedDict)
+- serializer_field_overrides · method · L27-L33 — def serializer_field_overrides(self)
+- RatingCollectionFieldType · class · L36-L73 — class RatingCollectionFieldType(CollectionFieldType)
+- SerializedDict · class · L42-L46 — class SerializedDict(TypedDict)
+- serializer_field_overrides · method · L49-L73 — def serializer_field_overrides(self)
+- TextCollectionFieldType · class · L76-L92 — class TextCollectionFieldType(CollectionFieldType)
+- SerializedDict · class · L82-L83 — class SerializedDict(TypedDict)
+- serializer_field_overrides · method · L86-L92 — def serializer_field_overrides(self)
+- LinkCollectionFieldType · class · L95-L224 — class LinkCollectionFieldType(CollectionFieldType)
+- after_register · method · L101-L114 — def after_register(self)
+- before_unregister · method · L116-L128 — def before_unregister(self)
+- serializer_field_names · method · L131-L139 — def serializer_field_names(self)
+- allowed_fields · method · L142-L150 — def allowed_fields(self)
+- SerializedDict · class · L152-L154 — class SerializedDict(NavigationElementManager.SerializedDict)
+- serializer_field_overrides · method · L157-L173 — def serializer_field_overrides(self)
+- formula_generator · method · L175-L206 — def formula_generator( self, collection_field: CollectionField ) -> Generator[str | Instance, str, None]
+- deserialize_property · method · L208-L224 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], serialized_values: Dict[str, Any], **kwargs, ) -> Any
+- TagsCollectionFieldType · class · L227-L284 — class TagsCollectionFieldType(CollectionFieldType)
+- SerializedDict · class · L233-L236 — class SerializedDict(TypedDict)
+- serializer_field_overrides · method · L239-L259 — def serializer_field_overrides(self)
+- formula_generator · method · L261-L284 — def formula_generator( self, collection_field: CollectionField ) -> Generator[str | Instance, str, None]
+- ButtonCollectionFieldType · class · L287-L307 — class ButtonCollectionFieldType(CollectionFieldType)
+- SerializedDict · class · L293-L294 — class SerializedDict(TypedDict)
+- serializer_field_overrides · method · L297-L303 — def serializer_field_overrides(self)
+- before_delete · method · L305-L307 — def before_delete(self, instance: CollectionField): # We delete the related workflow actions
+- ImageCollectionFieldType · class · L310-L331 — class ImageCollectionFieldType(CollectionFieldType)
+- SerializedDict · class · L316-L318 — class SerializedDict(TypedDict)
+- serializer_field_overrides · method · L321-L331 — def serializer_field_overrides(self)

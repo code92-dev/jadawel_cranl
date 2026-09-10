@@ -1,0 +1,15 @@
+# web-frontend/modules/database/components/field/FieldFormulaSubForm.vue
+
+- setup · method · L61-L63 — setup()
+- data · method · L64-L77 — data()
+- localOrServerFormulaType · method · L79-L84 — localOrServerFormulaType()
+- fieldsUsableInFormula · method · L85-L93 — fieldsUsableInFormula()
+- formulaError · method · L94-L109 — formulaError()
+- handler · method · L114-L116 — handler(newValue)
+- handler · method · L120-L122 — handler(newValue)
+- parseFormula · method · L126-L145 — parseFormula(value)
+- toHumanReadableErrorMessage · method · L146-L162 — toHumanReadableErrorMessage(error)
+- handleErrorByForm · method · L163-L177 — handleErrorByForm(error)
+- reset · method · L178-L183 — reset()
+- refreshFormulaType · method · L184-L207 — async refreshFormulaType()
+- validations · method · L209-L218 — validations()

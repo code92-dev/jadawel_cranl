@@ -1,0 +1,150 @@
+# backend/src/jadawel/contrib/database/views/actions.py
+
+- CreateViewFilterActionType · class · L56-L160 — class CreateViewFilterActionType(UndoableActionType)
+- Params · class · L74-L86 — class Params
+- do · method · L89-L134 — def do( cls, user: AbstractUser, view: View, field: Field, filter_type: str, filter_value: str, filter_group_id: Optional[int] = None, ) -> ViewFilter
+- scope · method · L137-L138 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L141-L144 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L147-L160 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- UpdateViewFilterActionType · class · L166-L295 — class UpdateViewFilterActionType(UndoableActionType)
+- Params · class · L185-L200 — class Params
+- do · method · L203-L261 — def do( cls, user: AbstractUser, view_filter: ViewFilter, field: Optional[Field] = None, filter_type: Optional[str] = None, filter_value: Optional[str] = None, ) -> ViewFilter
+- scope · method · L264-L265 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L268-L280 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L283-L295 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- DeleteViewFilterActionType · class · L298-L405 — class DeleteViewFilterActionType(UndoableActionType)
+- Params · class · L316-L328 — class Params
+- do · method · L331-L379 — def do( cls, user: AbstractUser, view_filter: ViewFilter, )
+- scope · method · L382-L383 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L386-L399 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L402-L405 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- CreateViewFilterGroupActionType · class · L408-L499 — class CreateViewFilterGroupActionType(UndoableActionType)
+- Params · class · L425-L434 — class Params
+- do · method · L437-L474 — def do( cls, user: AbstractUser, view: View, filter_type: Optional[str] = None, parent_group: Optional[int] = None, ) -> ViewFilterGroup
+- scope · method · L477-L478 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L481-L486 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L489-L499 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- UpdateViewFilterGroupActionType · class · L502-L600 — class UpdateViewFilterGroupActionType(UndoableActionType)
+- Params · class · L519-L528 — class Params
+- do · method · L531-L576 — def do( cls, user: AbstractUser, view_filter_group: ViewFilterGroup, filter_type: Optional[str] = None, ) -> ViewFilterGroup
+- scope · method · L579-L580 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L583-L591 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L594-L600 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- DeleteViewFilterGroupActionType · class · L603-L755 — class DeleteViewFilterGroupActionType(UndoableActionType)
+- Params · class · L619-L630 — class Params
+- do · method · L633-L704 — def do( cls, user: AbstractUser, view_filter_group: ViewFilterGroup, )
+- append_filters · function · L657-L667 — def append_filters(filter_group)
+- append_filter_groups · function · L669-L679 — def append_filter_groups(filter_group)
+- scope · method · L707-L708 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L711-L747 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L750-L755 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- CreateViewSortActionType · class · L758-L857 — class CreateViewSortActionType(UndoableActionType)
+- Params · class · L776-L787 — class Params
+- do · method · L790-L832 — def do( cls, user: AbstractUser, view: View, field: Field, sort_order: str, sort_type: Optional[str] = None, ) -> ViewSort
+- scope · method · L835-L836 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L839-L842 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L845-L857 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- UpdateViewSortActionType · class · L860-L986 — class UpdateViewSortActionType(UndoableActionType)
+- Params · class · L881-L896 — class Params
+- do · method · L899-L956 — def do( cls, user: AbstractUser, view_sort: ViewSort, field: Optional[Field] = None, order: Optional[str] = None, sort_type: Optional[str] = None, ) -> ViewSort
+- scope · method · L959-L960 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L963-L975 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L978-L986 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- DeleteViewSortActionType · class · L989-L1081 — class DeleteViewSortActionType(UndoableActionType)
+- Params · class · L1007-L1018 — class Params
+- do · method · L1021-L1057 — def do(cls, user: AbstractUser, view_sort: ViewSort)
+- scope · method · L1060-L1061 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L1064-L1076 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1079-L1081 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- OrderViewsActionType · class · L1084-L1152 — class OrderViewsActionType(UndoableActionType)
+- Params · class · L1095-L1101 — class Params
+- do · method · L1104-L1138 — def do( cls, user: AbstractUser, table: Table, order: List[int], )
+- scope · method · L1141-L1142 — def scope(cls, table_id: int) -> ActionScopeStr
+- undo · method · L1145-L1147 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1150-L1152 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- UpdateViewFieldOptionsActionType · class · L1155-L1255 — class UpdateViewFieldOptionsActionType(UndoableActionType)
+- Params · class · L1171-L1179 — class Params
+- do · method · L1182-L1235 — def do( cls, user: AbstractUser, view: View, field_options: FieldOptionsDict, )
+- scope · method · L1238-L1239 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L1242-L1247 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1250-L1255 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- RotateViewSlugActionType · class · L1258-L1329 — class RotateViewSlugActionType(UndoableActionType)
+- Params · class · L1272-L1280 — class Params
+- do · method · L1283-L1313 — def do(cls, user: AbstractUser, view: View) -> View
+- scope · method · L1316-L1317 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L1320-L1323 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1326-L1329 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- UpdateViewActionType · class · L1332-L1411 — class UpdateViewActionType(UndoableActionType)
+- Params · class · L1347-L1356 — class Params
+- do · method · L1359-L1395 — def do( cls, user: AbstractUser, view: View, **data, ) -> View
+- scope · method · L1398-L1399 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L1402-L1405 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1408-L1411 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- CreateViewActionType · class · L1414-L1486 — class CreateViewActionType(UndoableActionType)
+- Params · class · L1429-L1436 — class Params
+- do · method · L1439-L1474 — def do(cls, user: AbstractUser, table: Table, type_name: str, **kwargs) -> View
+- scope · method · L1477-L1478 — def scope(cls, table_id: int) -> ActionScopeStr
+- undo · method · L1481-L1482 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1485-L1486 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- DuplicateViewActionType · class · L1489-L1562 — class DuplicateViewActionType(UndoableActionType)
+- Params · class · L1507-L1515 — class Params
+- do · method · L1518-L1550 — def do(cls, user: AbstractUser, original_view: View) -> View
+- scope · method · L1553-L1554 — def scope(cls, table_id: int) -> ActionScopeStr
+- undo · method · L1557-L1558 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1561-L1562 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- DeleteViewActionType · class · L1565-L1625 — class DeleteViewActionType(UndoableActionType)
+- Params · class · L1579-L1585 — class Params
+- do · method · L1588-L1613 — def do(cls, user: AbstractUser, view: View)
+- scope · method · L1616-L1617 — def scope(cls, table_id: int) -> ActionScopeStr
+- undo · method · L1620-L1621 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1624-L1625 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- CreateDecorationActionType · class · L1628-L1730 — class CreateDecorationActionType(UndoableActionType)
+- Params · class · L1646-L1656 — class Params
+- do · method · L1659-L1709 — def do( cls, view: View, decorator_type_name: str, value_provider_type_name: str, value_provider_conf: Dict[str, Any], user: AbstractUser, ) -> ViewDecoration
+- scope · method · L1712-L1713 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L1716-L1718 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L1721-L1730 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- UpdateDecorationActionType · class · L1733-L1868 — class UpdateDecorationActionType(UndoableActionType)
+- Params · class · L1755-L1770 — class Params
+- do · method · L1773-L1840 — def do( cls, view_decoration: ViewDecoration, user: AbstractUser, decorator_type_name: str = None, value_provider_type_name: str = None, value_provider_conf: Dict[str, Any] = None, order: int = None, ) -> ViewDecoration
+- scope · method · L1843-L1844 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L1847-L1856 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L1859-L1868 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DeleteDecorationActionType · class · L1871-L1965 — class DeleteDecorationActionType(UndoableActionType)
+- Params · class · L1891-L1903 — class Params
+- do · method · L1906-L1941 — def do(cls, view_decoration: ViewDecoration, user: AbstractUser)
+- scope · method · L1944-L1945 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L1948-L1958 — def undo(cls, user: AbstractUser, params: Any, action_being_undone: Action)
+- redo · method · L1961-L1965 — def redo(cls, user: AbstractUser, params: Any, action_being_redone: Action)
+- CreateViewGroupByActionType · class · L1968-L2071 — class CreateViewGroupByActionType(UndoableActionType)
+- Params · class · L1986-L1998 — class Params
+- do · method · L2001-L2045 — def do( cls, user: AbstractUser, view: View, field: Field, group_by_order: str, group_by_width: int, group_by_type: str, ) -> ViewGroupBy
+- scope · method · L2048-L2049 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L2052-L2055 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L2058-L2071 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- UpdateViewGroupByActionType · class · L2074-L2221 — class UpdateViewGroupByActionType(UndoableActionType)
+- Params · class · L2098-L2115 — class Params
+- do · method · L2118-L2185 — def do( cls, user: AbstractUser, view_group_by: ViewGroupBy, field: Optional[Field] = None, order: Optional[str] = None, width: Optional[int] = None, sort_type: Optional[str] = None, ) -> ViewGroupBy
+- scope · method · L2188-L2189 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L2192-L2205 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L2208-L2221 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- DeleteViewGroupByActionType · class · L2224-L2320 — class DeleteViewGroupByActionType(UndoableActionType)
+- Params · class · L2242-L2254 — class Params
+- do · method · L2257-L2295 — def do(cls, user: AbstractUser, view_group_by: ViewGroupBy)
+- scope · method · L2298-L2299 — def scope(cls, view_id: int) -> ActionScopeStr
+- undo · method · L2302-L2315 — def undo(cls, user: AbstractUser, params: Params, action_to_undo: Action)
+- redo · method · L2318-L2320 — def redo(cls, user: AbstractUser, params: Params, action_to_redo: Action)
+- SubmitFormActionType · class · L2323-L2478 — class SubmitFormActionType(ActionType)
+- Params · class · L2338-L2347 — class Params
+- do · method · L2350-L2398 — def do( cls, user: AbstractUser, form: FormView, values: Dict[str, Any], model: Optional[Type[GeneratedTableModel]] = None, field_options: Dict[str, Any] | None = None, ) -> GeneratedTableModel
+- scope · method · L2401-L2402 — def scope(cls, view_id: int) -> ActionScopeStr
+- get_row_change_history · method · L2405-L2478 — def get_row_change_history(cls, user, action: "ActionData") -> list[RowHistory]
+- are_equal_on_create · function · L2421-L2426 — def are_equal_on_create(field_identifier, before_value, after_value) -> bool: # both fields are empty, but they may # be empty in a different way ('' vs None)
+- EditFormRowActionType · class · L2481-L2558 — class EditFormRowActionType(ActionType)
+- Params · class · L2496-L2505 — class Params
+- do · method · L2508-L2554 — def do( cls, user: AbstractUser, form: FormView, row_id: int, values: Dict[str, Any], model: Optional[Type[GeneratedTableModel]] = None, field_options: Dict[str, Any] | None = None, ) -> GeneratedTableModel
+- scope · method · L2557-L2558 — def scope(cls, view_id: int) -> ActionScopeStr
+- UpdateViewDefaultValuesActionType · class · L2561-L2625 — class UpdateViewDefaultValuesActionType(ActionType)
+- Params · class · L2575-L2582 — class Params
+- do · method · L2585-L2621 — def do(cls, user: AbstractUser, view: View, items: List[Dict[str, Any]])
+- scope · method · L2624-L2625 — def scope(cls, view_id: int) -> ActionScopeStr

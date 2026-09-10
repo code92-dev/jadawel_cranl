@@ -1,0 +1,16 @@
+# web-frontend/modules/database/utils/duration.js
+
+- totalSecs · function · L25-L32 — function totalSecs({ secs = null, mins = null, hours = null, days = null })
+- toString · method · L158-L160 — toString(d, h, m, s)
+- toString · method · L169-L173 — toString(d, h, m, s)
+- toString · method · L182-L186 — toString(d, h, m, s)
+- toString · method · L195-L199 — toString(d, h, m, s)
+- toString · method · L208-L212 — toString(d, h, m, s)
+- toString · method · L221-L223 — toString(d, h, m, s)
+- toString · method · L232-L234 — toString(d, h, m, s)
+- toString · method · L243-L247 — toString(d, h, m, s)
+- toString · method · L256-L258 — toString(d, h, m, s)
+- toString · method · L268-L272 — toString(d, h, m, s)
+- roundDurationValueToFormat · function · L278-L288 — roundDurationValueToFormat = (value, format)
+- parseDurationValue · function · L295-L335 — parseDurationValue = ( inputValue, format = MOST_ACCURATE_DURATION_FORMAT )
+- formatDurationValue · function · L340-L356 — formatDurationValue = (value, format)

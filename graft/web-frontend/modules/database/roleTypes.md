@@ -1,0 +1,23 @@
+# web-frontend/modules/database/roleTypes.js
+
+- RoleType · class · L3-L50 — class RoleType extends Registerable
+- getUid · method · L4-L6 — getUid()
+- getName · method · L8-L10 — getName()
+- getDescription · method · L12-L14 — getDescription()
+- showIsBillable · method · L17-L19 — showIsBillable(workspaceId)
+- getIsBillable · method · L22-L24 — getIsBillable()
+- isVisible · method · L27-L29 — isVisible(workspaceId)
+- isDeactivated · method · L32-L34 — isDeactivated(workspaceId)
+- getDeactivatedClickModal · method · L37-L39 — getDeactivatedClickModal(workspaceId)
+- allowedScopeTypes · method · L42-L44 — get allowedScopeTypes()
+- allowedSubjectTypes · method · L47-L49 — get allowedSubjectTypes()
+- AdminRoleType · class · L52-L70 — class AdminRoleType extends RoleType
+- getType · method · L53-L55 — static getType()
+- getUid · method · L57-L59 — getUid()
+- getName · method · L61-L64 — getName()
+- getDescription · method · L66-L69 — getDescription()
+- MemberRoleType · class · L72-L90 — class MemberRoleType extends RoleType
+- getType · method · L73-L75 — static getType()
+- getUid · method · L77-L79 — getUid()
+- getName · method · L81-L84 — getName()
+- getDescription · method · L86-L89 — getDescription()

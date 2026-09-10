@@ -1,0 +1,78 @@
+# backend/src/jadawel/contrib/database/rows/handler.py
+
+- serialize_errors_recursive · function · L146-L158 — def serialize_errors_recursive(error)
+- prepare_field_errors · function · L161-L172 — def prepare_field_errors(field_errors)
+- RowM2MChangeTracker · class · L175-L235 — class RowM2MChangeTracker
+- __init__ · method · L176-L182 — def __init__(self)
+- track_m2m_update_for_field_and_row · method · L184-L201 — def track_m2m_update_for_field_and_row( self, field: "DjangoField", field_name: str, row: GeneratedTableModel, new_values: Iterable[int], )
+- track_m2m_created_for_new_row · method · L203-L213 — def track_m2m_created_for_new_row( self, row: GeneratedTableModel, field: "DjangoField", new_values: Iterable[Union[int, Model]], )
+- get_deleted_m2m_rels_per_field_id_for_type · method · L215-L218 — def get_deleted_m2m_rels_per_field_id_for_type( self, field_type: str ) -> Dict[int, Set[int]]
+- get_created_m2m_rels_per_field_for_type · method · L220-L223 — def get_created_m2m_rels_per_field_for_type( self, field_type ) -> Dict["DjangoField", Dict[GeneratedTableModel, Set[int]]]
+- get_deleted_link_row_rels_for_update_collector · method · L225-L235 — def get_deleted_link_row_rels_for_update_collector( self, ) -> Dict[int, Set[int]]
+- RowHandler · class · L238-L3205 — class RowHandler(metaclass=jadawel_trace_methods(tracer))
+- prepare_values · method · L239-L261 — def prepare_values(self, fields, values)
+- prepare_values_with_defaults · method · L263-L287 — def prepare_values_with_defaults( self, field_objects: Dict[int, FieldObject], rows_values: List[Dict[str, Any]] ) -> List[Dict[str, Any]]
+- prepare_rows_in_bulk · method · L289-L352 — def prepare_rows_in_bulk( self, field_objects: Dict[int, FieldObject], rows_values: List[Dict[str, Any]], generate_error_report: bool = False, ) -> Tuple[List[Dict[str, Any]], Dict[int, Dict[str, Any]]]
+- extract_field_ids_from_keys · method · L354-L364 — def extract_field_ids_from_keys(self, keys: List[str]) -> List[int]
+- extract_field_ids_from_dict · method · L366-L375 — def extract_field_ids_from_dict(self, values: Dict[str, Any]) -> List[int]
+- get_internal_values_for_fields · method · L377-L399 — def get_internal_values_for_fields( self, row: GeneratedTableModel, updated_field_ids: Set[int], ) -> Dict[str, Any]
+- extract_manytomany_values · method · L401-L427 — def extract_manytomany_values( self, values: Dict[str, Any], model: "GeneratedTableModel" ) -> Tuple[Dict[str, Any], Dict[str, Any]]
+- get_unique_orders_before_row · method · L429-L474 — def get_unique_orders_before_row( self, before_row: Optional[GeneratedTableModel], model: Type[GeneratedTableModel], amount: int = 1, ) -> List[Decimal]
+- get_row · method · L476-L521 — def get_row( self, user: AbstractUser, table: Table, row_id: int, model: Optional[Type[GeneratedTableModel]] = None, base_queryset: Optional[QuerySet] = None, view: Optional["View"] = None, ) -> GeneratedTableModel
+- get_adjacent_row · method · L523-L562 — def get_adjacent_row( self, table_model, row_id, previous=False, view=None, search=None, search_mode=None, )
+- get_adjacent_row_in_queryset · method · L564-L603 — def get_adjacent_row_in_queryset(self, queryset, row_id, previous=False)
+- get_row_for_update · method · L605-L642 — def get_row_for_update( self, user: AbstractUser, table: Table, row_id: int, enhance_by_fields: bool = False, model: Optional[Type[GeneratedTableModel]] = None, ) -> GeneratedTableModelForUpdate
+- get_row_names · method · L644-L667 — def get_row_names( self, table: "Table", row_ids: List[int], model: "GeneratedTableModel" = None ) -> Dict[str, str]
+- has_row · method · L670-L710 — def has_row(self, user, table, row_id, raise_error=False, model=None, view=None)
+- _check_permissions_with_view_fallback · method · L712-L747 — def _check_permissions_with_view_fallback( self, table_operation: OperationType, view_operation: OperationType, user: AbstractUser, table: Table, view: Optional["View"], row_ids: Optional[List[int]] = None, )
+- create_row · method · L749-L831 — def create_row( self, user: AbstractUser, table: Table, values: Optional[Dict[str, Any]] = None, model: Optional[Type[GeneratedTableModel]] = None, before_row: Optional[GeneratedTableModel] = None, view: Optional["View"] = None, user_field_names: bool = False, values_already_prepared: bool = False, send_webhook_events: bool = True, ) -> GeneratedTableModel
+- force_create_row · method · L833-L998 — def force_create_row( self, user: AbstractUser, table: Table, values: Optional[Dict[str, Any]] = None, model: Optional[Type[GeneratedTableModel]] = None, before: Optional[GeneratedTableModel] = None, user_field_names: bool = False, values_already_prepared: bool = False, send_webhook_events: bool = True, )
+- safe_save_instance · function · L912-L921 — def safe_save_instance()
+- map_user_field_name_dict_to_internal · method · L1001-L1027 — def map_user_field_name_dict_to_internal( self, field_objects, values, )
+- update_row_by_id · method · L1029-L1072 — def update_row_by_id( self, user: AbstractUser, table: Table, row_id: int, values: Dict[str, Any], model: Optional[Type[GeneratedTableModel]] = None, view: Optional["View"] = None, values_already_prepared: bool = False, ) -> GeneratedTableModelForUpdate
+- update_row · method · L1074-L1226 — def update_row( self, user: AbstractUser, table: Table, row: GeneratedTableModelForUpdate, values: Dict[str, Any], model: Optional[Type[GeneratedTableModel]] = None, view: Optional["View"] = None, values_already_prepared: bool = False, ) -> GeneratedTableModelForUpdate
+- safe_save_row · function · L1172-L1180 — def safe_save_row()
+- update_dependencies_of_rows_updated · method · L1228-L1294 — def update_dependencies_of_rows_updated( self, table: Table, updated_rows: List[GeneratedTableModel], model: Type[GeneratedTableModel], updated_field_ids: Set[int], m2m_change_tracker: Optional[RowM2MChangeTracker] = None, skip_search_updates: bool = False, ) -> List["DjangoField"]
+- force_create_rows · method · L1296-L1514 — def force_create_rows( self, user: AbstractUser, table: Table, rows_values: List[Dict[str, Any]], before_row: Optional[GeneratedTableModel] = None, model: Optional[Type[GeneratedTableModel]] = None, send_realtime_update: bool = True, send_webhook_events: bool = True, generate_error_report: bool = False, skip_search_update: bool = False, signal_params: Optional[Dict] = None, ) -> CreatedRowsData
+- safe_bulk_create · function · L1396-L1413 — def safe_bulk_create()
+- create_rows · method · L1516-L1595 — def create_rows( self, user: AbstractUser, table: Table, rows_values: List[Dict[str, Any]], before_row: Optional[GeneratedTableModel] = None, view: Optional["View"] = None, model: Optional[Type[GeneratedTableModel]] = None, send_realtime_update: bool = True, send_webhook_events: bool = True, generate_error_report: bool = False, skip_search_update: bool = False, signal_params: Optional[Dict] = None, ) -> CreatedRowsData
+- update_dependencies_of_rows_created · method · L1597-L1661 — def update_dependencies_of_rows_created( self, model: Type[GeneratedTableModel], created_rows: List[GeneratedTableModel], ) -> List["DjangoField"]
+- _prepare_m2m_field_related_objects · method · L1663-L1715 — def _prepare_m2m_field_related_objects( self, row: GeneratedTableModel, field_name: str, value: List[Any] ) -> Tuple[List[Type[Model]], Tuple[str, str]]
+- validate_rows · method · L1717-L1760 — def validate_rows( self, table: Table, rows: List[Dict[str, Any]], progress: Optional[Progress] = None, ) -> Dict[str, Dict[str, Any]]
+- force_create_rows_by_batch · method · L1762-L1829 — def force_create_rows_by_batch( self, user: AbstractUser, table: Table, rows_values: List[Dict[str, Any]], progress: Optional[Progress] = None, model: Optional[Type[GeneratedTableModel]] = None, signal_params: Optional[Dict] = None, ) -> Tuple[List[GeneratedTableModel], Dict[str, Dict[str, Any]]]
+- force_update_rows_by_batch · method · L1831-L1897 — def force_update_rows_by_batch( self, user: AbstractUser, table: Table, rows_values: List[Dict[str, Any]], progress: Progress, model: Optional[Type[GeneratedTableModel]] = None, signal_params: Optional[Dict] = None, ) -> Tuple[List[Dict[str, Any] | None], Dict[str, Dict[str, Any]]]
+- import_rows · method · L1899-L2098 — def import_rows( self, user: AbstractUser, table: Table, data: list[list[Any]], configuration: FileImportConfiguration | None = None, validate: bool = True, progress: Optional[Progress] = None, send_realtime_update: bool = True, ) -> Tuple[List[GeneratedTableModel], Dict[str, Dict[str, Any]]]
+- get_fields_metadata_for_row_history · method · L2100-L2120 — def get_fields_metadata_for_row_history( self, row: GeneratedTableModelForUpdate, updated_fields: List["DjangoField"], metadata, ) -> FieldsMetadata
+- get_fields_metadata_for_rows · method · L2122-L2149 — def get_fields_metadata_for_rows( self, rows: List[GeneratedTableModelForUpdate], updated_fields: List["DjangoField"], fields_metadata_by_row_id=None, ) -> Dict[RowId, FieldsMetadata]
+- _check_write_fields_values_permissions · method · L2151-L2194 — def _check_write_fields_values_permissions( self, user: AbstractUser, model: GeneratedTableModel, rows_values: List[Dict[str, Any]], raise_if_not_permitted: bool = True, ) -> List["Field"]
+- _raise_if_values_contain_hidden_fields · method · L2196-L2222 — def _raise_if_values_contain_hidden_fields( self, user: AbstractUser, view: Optional["View"], rows_values: List[Dict[str, Any]], ) -> None
+- force_update_rows · method · L2224-L2609 — def force_update_rows( self, user: AbstractUser, table: Table, rows_values: List[Dict[str, Any]], model: Optional[Type[GeneratedTableModel]] = None, rows_to_update: Optional[RowsForUpdate] = None, send_realtime_update: bool = True, send_webhook_events: bool = True, skip_search_update: bool = False, generate_error_report: bool = False, signal_params: Optional[Dict] = None, ) -> UpdatedRowsData
+- safe_bulk_update · function · L2478-L2503 — def safe_bulk_update()
+- update_rows · method · L2611-L2681 — def update_rows( self, user: AbstractUser, table: Table, rows_values: List[Dict[str, Any]], model: Optional[Type[GeneratedTableModel]] = None, view: Optional["View"] = None, rows_to_update: Optional[RowsForUpdate] = None, send_realtime_update: bool = True, send_webhook_events: bool = True, skip_search_update: bool = False, generate_error_report: bool = False, signal_params: Optional[Dict] = None, ) -> UpdatedRowsData
+- _extract_field_ids_from_row_values · method · L2683-L2704 — def _extract_field_ids_from_row_values( self, rows_values: List[Dict[str, Any]], model: GeneratedTableModel ) -> Set[int]
+- get_rows · method · L2706-L2717 — def get_rows( self, model: GeneratedTableModel, row_ids: List[int] ) -> QuerySet[GeneratedTableModel]
+- get_rows_for_update · method · L2719-L2732 — def get_rows_for_update( self, model: GeneratedTableModel, row_ids: List[int], ) -> RowsForUpdate
+- move_row_by_id · method · L2734-L2759 — def move_row_by_id( self, user: AbstractUser, table: Table, row_id: int, before_row: Optional[GeneratedTableModel] = None, model: Optional[Type[GeneratedTableModel]] = None, ) -> GeneratedTableModelForUpdate
+- move_row · method · L2761-L2838 — def move_row( self, user: AbstractUser, table: Table, row: GeneratedTableModelForUpdate, before_row: Optional[GeneratedTableModel] = None, model: Optional[Type[GeneratedTableModel]] = None, send_webhook_events: bool = True, ) -> GeneratedTableModelForUpdate
+- delete_row_by_id · method · L2840-L2880 — def delete_row_by_id( self, user: AbstractUser, table: Table, row_id: int, model: Optional[Type[GeneratedTableModel]] = None, view: Optional["View"] = None, send_realtime_update: bool = True, send_webhook_events: bool = True, ) -> GeneratedTableModel
+- delete_row · method · L2882-L2950 — def delete_row( self, user: AbstractUser, table: Table, row: GeneratedTableModelForUpdate, model: Optional[Type[GeneratedTableModel]] = None, view: Optional["View"] = None, send_realtime_update: bool = True, send_webhook_events: bool = True, ) -> GeneratedTableModelForUpdate
+- update_dependencies_of_rows_deleted · method · L2952-L2999 — def update_dependencies_of_rows_deleted(self, table, row, model)
+- delete_rows · method · L3001-L3049 — def delete_rows( self, user: AbstractUser, table: Table, row_ids: List[int], model: Optional[Type[GeneratedTableModel]] = None, view: Optional["View"] = None, send_realtime_update: bool = True, send_webhook_events: bool = True, permanently_delete: bool = False, signal_params: Optional[Dict] = None, ) -> TrashedRows
+- force_delete_rows · method · L3051-L3181 — def force_delete_rows( self, user: AbstractUser, table: Table, row_ids: List[int], model: Optional[Type[GeneratedTableModel]] = None, send_realtime_update: bool = True, send_webhook_events: bool = True, permanently_delete: bool = False, signal_params: Optional[Dict] = None, ) -> TrashedRows
+- recalculate_row_orders · method · L3183-L3205 — def recalculate_row_orders(self, table: Table, model: GeneratedTableModel = None)
+- merge_values_expression · function · L3208-L3230 — def merge_values_expression( row: list[str | int | float | None], field_handlers: "list[UpsertFieldHandler]", query_params: list, ) -> sql.Composable
+- UpsertFieldHandler · class · L3233-L3270 — class UpsertFieldHandler
+- __init__ · method · L3238-L3257 — def __init__(self, table: Table, field_id: id)
+- prepare_value · method · L3259-L3260 — def prepare_value(self, value: str) -> Any
+- get_field_concat_expression · method · L3262-L3266 — def get_field_concat_expression(self) -> sql.Composable
+- get_column_type · method · L3268-L3270 — def get_column_type(self) -> str | None
+- UpsertRowsMappingHandler · class · L3273-L3431 — class UpsertRowsMappingHandler
+- __init__ · method · L3300-L3306 — def __init__( self, table: Table, upsert_fields: list[int], upsert_values: list[list[Any]] )
+- validate · method · L3308-L3317 — def validate(self)
+- process_map · method · L3320-L3350 — def process_map(self) -> dict[int, int]
+- connection · method · L3353-L3354 — def connection(self)
+- cursor · method · L3357-L3358 — def cursor(self)
+- execute · method · L3360-L3362 — def execute(self, query, *args, **kwargs) -> "CursorWrapper"
+- insert_table_values · method · L3364-L3388 — def insert_table_values(self)
+- insert_imported_values · method · L3390-L3413 — def insert_imported_values(self)
+- calculate_map · method · L3415-L3431 — def calculate_map(self) -> list[tuple[int, int]]

@@ -6,6 +6,10 @@
 **/.cache
 web-frontend/reports/
 
+# Repository documentation/cache artifacts are not part of any runtime image.
+graft/
+.scratch/
+
 **/.venv/
 **/.ruff_cache
 **/.pytest_cache

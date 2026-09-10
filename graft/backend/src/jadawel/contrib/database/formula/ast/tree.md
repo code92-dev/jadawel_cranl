@@ -1,0 +1,64 @@
+# backend/src/jadawel/contrib/database/formula/ast/tree.py
+
+- JadawelExpression · class · L33-L155 — class JadawelExpression(abc.ABC, Generic[A])
+- __init__ · method · L106-L116 — def __init__( self, expression_type: A, aggregate=False, many=False, requires_aggregate_wrapper=False, )
+- is_wrapper · method · L119-L127 — def is_wrapper(self) -> bool
+- accept · method · L130-L131 — def accept(self, visitor: "visitors.JadawelFormulaASTVisitor[A, T]") -> T
+- with_type · method · L133-L135 — def with_type(self, expression_type: "R") -> "JadawelExpression[R]"
+- with_valid_type · method · L137-L144 — def with_valid_type( self, expression_type: "formula_type.JadawelFormulaValidType", nullable: Optional[bool] = None, ) -> "JadawelExpression[formula_type.JadawelFormulaValidType]"
+- with_nullable · method · L146-L150 — def with_nullable( self, expression_type: "formula_type.JadawelFormulaValidType", nullable: bool ) -> "JadawelExpression[formula_type.JadawelFormulaValidType]"
+- with_invalid_type · method · L152-L155 — def with_invalid_type( self, error: str ) -> "JadawelExpression[formula_type.JadawelFormulaInvalidType]"
+- JadawelStringLiteral · class · L158-L176 — class JadawelStringLiteral(JadawelExpression[A])
+- __init__ · method · L163-L170 — def __init__(self, literal: str, expression_type: A)
+- accept · method · L172-L173 — def accept(self, visitor: "visitors.JadawelFormulaASTVisitor[A, T]") -> T
+- __str__ · method · L175-L176 — def __str__(self)
+- JadawelIntegerLiteral · class · L179-L195 — class JadawelIntegerLiteral(JadawelExpression[A])
+- __init__ · method · L184-L189 — def __init__(self, literal: int, expression_type: A)
+- accept · method · L191-L192 — def accept(self, visitor: "visitors.JadawelFormulaASTVisitor[A, T]") -> T
+- __str__ · method · L194-L195 — def __str__(self)
+- JadawelDecimalLiteral · class · L198-L214 — class JadawelDecimalLiteral(JadawelExpression[A])
+- __init__ · method · L203-L205 — def __init__(self, literal: Decimal, expression_type: A)
+- num_decimal_places · method · L207-L208 — def num_decimal_places(self)
+- accept · method · L210-L211 — def accept(self, visitor: "visitors.JadawelFormulaASTVisitor[A, T]") -> T
+- __str__ · method · L213-L214 — def __str__(self)
+- JadawelBooleanLiteral · class · L217-L230 — class JadawelBooleanLiteral(JadawelExpression[A])
+- __init__ · method · L222-L224 — def __init__(self, literal: bool, expression_type: A)
+- accept · method · L226-L227 — def accept(self, visitor: "visitors.JadawelFormulaASTVisitor[A, T]") -> T
+- __str__ · method · L229-L230 — def __str__(self)
+- JadawelFieldReference · class · L233-L270 — class JadawelFieldReference(JadawelExpression[A])
+- __init__ · method · L238-L252 — def __init__( self, referenced_field_name: str, target_field: Optional[str], expression_type: A, )
+- accept · method · L254-L255 — def accept(self, visitor: "visitors.JadawelFormulaASTVisitor[A, T]") -> T
+- is_lookup · method · L257-L258 — def is_lookup(self)
+- __str__ · method · L260-L270 — def __str__(self)
+- ArgCountSpecifier · class · L273-L302 — class ArgCountSpecifier(abc.ABC)
+- __init__ · method · L279-L280 — def __init__(self, count)
+- test · method · L283-L293 — def test(self, num_args: int)
+- __str__ · method · L296-L302 — def __str__(self)
+- JadawelExpressionContext · class · L305-L324 — class JadawelExpressionContext
+- __init__ · method · L306-L315 — def __init__(self, model: Type[Model], model_instance: Optional[Model])
+- get_utc_now · method · L317-L324 — def get_utc_now(self): # Inside a workspace, we want to use the workspace value to keep all the # formulas in sync. If the workspace is not set as during a snapshot, we can use # just the current time to ensure rows have a value.
+- JadawelFunctionCall · class · L327-L405 — class JadawelFunctionCall(JadawelExpression[A])
+- __init__ · method · L332-L354 — def __init__( self, function_def: "JadawelFunctionDefinition", args: List[JadawelExpression[A]], expression_type: A, requires_aggregate_wrapper=False, )
+- is_wrapper · method · L357-L358 — def is_wrapper(self) -> bool
+- accept · method · L360-L361 — def accept(self, visitor: "visitors.JadawelFormulaASTVisitor[A, T]") -> T
+- type_function_given_typed_args · method · L363-L369 — def type_function_given_typed_args( self, args: "List[JadawelExpression[formula_type.JadawelFormulaType]]", ) -> "JadawelExpression[formula_type.JadawelFormulaType]"
+- type_function_given_valid_args · method · L371-L377 — def type_function_given_valid_args( self, args: "List[JadawelExpression[formula_type.JadawelFormulaValidType]]", ) -> "JadawelExpression[formula_type.JadawelFormulaType]"
+- to_django_expression_given_args · method · L379-L384 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- check_arg_type_valid · method · L386-L392 — def check_arg_type_valid( self, i: int, typed_arg: "JadawelExpression[formula_type.JadawelFormulaType]", all_typed_args: "List[JadawelExpression[formula_type.JadawelFormulaType]]", ) -> "JadawelExpression[formula_type.JadawelFormulaType]"
+- with_args · method · L394-L401 — def with_args(self, new_args) -> "JadawelFunctionCall[A]"
+- __str__ · method · L403-L405 — def __str__(self)
+- JadawelFunctionDefinition · class · L408-L644 — class JadawelFunctionDefinition(Instance, abc.ABC)
+- type · method · L424-L430 — def type(self) -> str
+- aggregate · method · L433-L439 — def aggregate(self) -> bool
+- operator · method · L442-L448 — def operator(self) -> Optional[str]
+- num_args · method · L452-L458 — def num_args(self) -> ArgCountSpecifier
+- arg_types · method · L462-L468 — def arg_types(self) -> "formula_type.JadawelArgumentTypeChecker"
+- requires_refresh_after_insert · method · L471-L477 — def requires_refresh_after_insert(self) -> bool
+- type_function_given_valid_args · method · L480-L497 — def type_function_given_valid_args( self, args: "List[JadawelExpression[formula_type.JadawelFormulaValidType]]", expression: "JadawelFunctionCall[formula_type.UnTyped]", ) -> "JadawelExpression[formula_type.JadawelFormulaType]"
+- to_django_expression_given_args · method · L500-L519 — def to_django_expression_given_args( self, args: List["WrappedExpressionWithMetadata"], context: JadawelExpressionContext, ) -> "WrappedExpressionWithMetadata"
+- type_function_given_typed_args · method · L521-L566 — def type_function_given_typed_args( self, typed_args: "List[JadawelExpression[formula_type.JadawelFormulaType]]", expression: "JadawelFunctionCall[formula_type.UnTyped]", ) -> "JadawelExpression[formula_type.JadawelFormulaType]"
+- call_and_type_with_args · method · L568-L573 — def call_and_type_with_args( self, args: "List[JadawelExpression[formula_type.JadawelFormulaType]]", ) -> "JadawelFunctionCall[formula_type.JadawelFormulaType]"
+- check_arg_type_valid · method · L575-L629 — def check_arg_type_valid( self, arg_index: int, typed_arg: "JadawelExpression[formula_type.JadawelFormulaType]", all_typed_args: "List[JadawelExpression[formula_type.JadawelFormulaType]]", ) -> "JadawelExpression[formula_type.JadawelFormulaType]"
+- __str__ · method · L631-L635 — def __str__(self)
+- __eq__ · method · L637-L641 — def __eq__(self, other)
+- __hash__ · method · L643-L644 — def __hash__(self)

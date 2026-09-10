@@ -1,0 +1,28 @@
+# backend/src/jadawel/core/action/registries.py
+
+- ActionScopeType · class · L35-L94 — class ActionScopeType(abc.ABC, Instance)
+- type · method · L47-L52 — def type(self) -> str
+- value · method · L56-L70 — def value(cls, *args, **kwargs) -> ActionScopeStr
+- get_request_serializer_field · method · L73-L81 — def get_request_serializer_field(self) -> serializers.Field
+- valid_serializer_value_to_scope_str · method · L84-L94 — def valid_serializer_value_to_scope_str( self, value: Any ) -> Optional[ActionScopeStr]
+- ActionScopeRegistry · class · L97-L98 — class ActionScopeRegistry(Registry[ActionScopeType])
+- ActionTypeDescription · class · L102-L112 — class ActionTypeDescription
+- render_action_type_description · function · L115-L148 — def render_action_type_description( description: ActionTypeDescription, params_dict: Dict[str, Any] ) -> str
+- ActionType · class · L151-L292 — class ActionType( Instance, metaclass=jadawel_trace_methods(tracer, only=["do", "undo", "redo"], abc=True), )
+- Params · class · L160-L169 — class Params
+- do · method · L173-L181 — def do(cls, *args, **kwargs) -> Any
+- params_to_serializable · method · L184-L190 — def params_to_serializable(cls, params: Any) -> Any
+- serialized_to_params · method · L193-L199 — def serialized_to_params(cls, serialized_params: Any) -> Any
+- scope · method · L203-L210 — def scope(cls, *args, **kwargs) -> ActionScopeStr
+- get_long_description · method · L213-L218 — def get_long_description(cls, params_dict: Dict[str, Any], *args, **kwargs) -> str
+- get_short_description · method · L221-L227 — def get_short_description(cls, *args, **kwargs) -> str
+- send_action_done_signal · method · L230-L270 — def send_action_done_signal( cls, user: AbstractUser, params: Dict[str, Any], scope: ActionScopeStr, workspace: Optional[Workspace] = None, timestamp: Optional[datetime] = None, action_command_type: ActionCommandType = ActionCommandType.DO, )
+- register_action · method · L273-L292 — def register_action( cls, user: AbstractUser, params: Any, scope: ActionScopeStr, workspace: Optional[Workspace] = None, ) -> Optional[Action]
+- UndoableActionTypeMixin · class · L295-L366 — class UndoableActionTypeMixin
+- undo · method · L298-L309 — def undo(cls, user: AbstractUser, params: Any, action_being_undone: Action)
+- redo · method · L313-L324 — def redo(cls, user: AbstractUser, params: Any, action_being_redone: Action)
+- register_action · method · L327-L366 — def register_action( cls, user: AbstractUser, params: Any, scope: ActionScopeStr, workspace: Optional[Workspace] = None, ) -> Optional[Action]
+- UndoableActionCustomCleanupMixin · class · L369-L383 — class UndoableActionCustomCleanupMixin(abc.ABC)
+- clean_up_any_extra_action_data · method · L372-L383 — def clean_up_any_extra_action_data(cls, action_being_cleaned_up: Action)
+- UndoableActionType · class · L386-L390 — class UndoableActionType( UndoableActionTypeMixin, ActionType, )
+- ActionTypeRegistry · class · L393-L394 — class ActionTypeRegistry(Registry[ActionType])

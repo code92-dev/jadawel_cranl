@@ -1121,6 +1121,13 @@ class CoreHandler(metaclass=jadawel_trace_methods(tracer, exclude="clear_context
             context=workspace,
         )
 
+        # Optional plugins may own membership for a managed workspace.  Keep this
+        # callback additive so unmanaged workspaces retain the core behavior.
+        for plugin in plugin_registry.registry.values():
+            callback = getattr(plugin, "validate_workspace_membership_mutation", None)
+            if callback:
+                callback(user, workspace, "create_invitation")
+
         email = normalize_email_address(email)
 
         if WorkspaceUser.objects.filter(
@@ -1291,6 +1298,16 @@ class CoreHandler(metaclass=jadawel_trace_methods(tracer, exclude="clear_context
                 "The email address of the invitation does not match the one of the "
                 "user."
             )
+
+        # Organization workspaces must accept users through the organization
+        # invitation flow so seat locking, role authority and audit records cannot be
+        # bypassed by the legacy core invitation endpoint.
+        for plugin in plugin_registry.registry.values():
+            callback = getattr(plugin, "validate_workspace_membership_mutation", None)
+            if callback:
+                callback(
+                    user, invitation.workspace, "accept_invitation", target_user=user
+                )
 
         workspace_user = self.add_user_to_workspace(
             invitation.workspace, user, permissions=invitation.permissions

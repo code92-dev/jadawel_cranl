@@ -1,0 +1,15 @@
+# backend/tests/jadawel/api/user_sources/test_user_source_authentication_backend.py
+
+- test_user_source_auth_get_header · function · L16-L35 — def test_user_source_auth_get_header(data_fixture, api_request_factory)
+- test_user_source_authenticate · function · L39-L76 — def test_user_source_authenticate( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_dont_authenticate_with_unpublished_user_source · function · L80-L108 — def test_user_source_dont_authenticate_with_unpublished_user_source( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_authentication_handles_deleted_application · function · L119-L167 — def test_user_source_authentication_handles_deleted_application( data_fixture, api_request_factory, stub_user_source_registry, use_user_source_auth_header, )
+- test_user_source_authenticate_with_custom_header · function · L171-L205 — def test_user_source_authenticate_with_custom_header( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_dont_authenticate_with_custom_header_if_no_permission · function · L209-L273 — def test_user_source_dont_authenticate_with_custom_header_if_no_permission( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_dont_authenticate_with_refresh_token · function · L277-L305 — def test_user_source_dont_authenticate_with_refresh_token( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_dont_authenticate_with_invalid_token · function · L309-L334 — def test_user_source_dont_authenticate_with_invalid_token( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_dont_authenticate_with_invalid_user_source_uid · function · L338-L369 — def test_user_source_dont_authenticate_with_invalid_user_source_uid( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_dont_authenticate_with_main_auth_token · function · L373-L399 — def test_user_source_dont_authenticate_with_main_auth_token( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_dont_authenticate_missing_user · function · L403-L428 — def test_user_source_dont_authenticate_missing_user( data_fixture, api_request_factory, stub_user_source_registry )
+- test_user_source_authenticate_missing_user · function · L432-L467 — def test_user_source_authenticate_missing_user( data_fixture, api_request_factory, stub_user_source_registry )
+- get_user_raise_user_not_found · function · L460-L461 — def get_user_raise_user_not_found(*args, **kwargs)

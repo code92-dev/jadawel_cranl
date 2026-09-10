@@ -1,0 +1,17 @@
+# web-frontend/modules/database/components/view/grid/fields/GridViewFieldRichText.vue
+
+- data · method · L58-L63 — data()
+- formattedValue · method · L65-L71 — formattedValue()
+- workspace · method · L72-L74 — workspace()
+- handler · method · L78-L80 — handler(value)
+- editing · method · L83-L87 — editing(editing)
+- getMenuContainer · method · L90-L92 — getMenuContainer()
+- isModalOpen · method · L93-L95 — isModalOpen()
+- scrollHeight · method · L96-L101 — scrollHeight()
+- cancel · method · L102-L104 — cancel()
+- beforeSave · method · L105-L108 — beforeSave()
+- afterEdit · method · L109-L113 — afterEdit()
+- onExpandedModalHidden · method · L114-L117 — onExpandedModalHidden()
+- canSaveByPressingEnter · method · L118-L120 — canSaveByPressingEnter()
+- resetCellSize · method · L121-L125 — resetCellSize()
+- canUnselectByClickingOutside · method · L126-L140 — canUnselectByClickingOutside(event)

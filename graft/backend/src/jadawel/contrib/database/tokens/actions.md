@@ -1,0 +1,22 @@
+# backend/src/jadawel/contrib/database/tokens/actions.py
+
+- CreateDbTokenActionType · class · L18-L52 — class CreateDbTokenActionType(ActionType)
+- Params · class · L33-L37 — class Params
+- do · method · L40-L48 — def do(cls, user: AbstractUser, workspace: Workspace, name: str)
+- scope · method · L51-L52 — def scope(cls, workspace_id: int)
+- UpdateDbTokenNameActionType · class · L55-L96 — class UpdateDbTokenNameActionType(ActionType)
+- Params · class · L70-L75 — class Params
+- do · method · L78-L92 — def do(cls, user: AbstractUser, token: Token, name: str)
+- scope · method · L95-L96 — def scope(cls, workspace_id: int)
+- UpdateDbTokenPermissionsActionType · class · L99-L157 — class UpdateDbTokenPermissionsActionType(ActionType)
+- Params · class · L116-L122 — class Params
+- do · method · L125-L153 — def do( cls, user: AbstractUser, token: Token, **permissions: Dict[str, Union[bool, List[Tuple[str, int]]]], )
+- scope · method · L156-L157 — def scope(cls, workspace_id: int)
+- RotateDbTokenKeyActionType · class · L160-L194 — class RotateDbTokenKeyActionType(ActionType)
+- Params · class · L173-L177 — class Params
+- do · method · L180-L190 — def do(cls, user: AbstractUser, token: Token)
+- scope · method · L193-L194 — def scope(cls, workspace_id: int)
+- DeleteDbTokenActionType · class · L197-L234 — class DeleteDbTokenActionType(ActionType)
+- Params · class · L210-L214 — class Params
+- do · method · L217-L230 — def do( cls, user: AbstractUser, token: Token, )
+- scope · method · L233-L234 — def scope(cls, workspace_id: int)

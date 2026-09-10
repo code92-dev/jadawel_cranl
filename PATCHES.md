@@ -14,6 +14,14 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Rich-text floating menu RTL placement (2026-09-09)
+
+| File | Change | Reason | Merge risk |
+|------|--------|--------|------------|
+| `web-frontend/modules/core/components/editor/RichTextEditorFloatingMenu.vue` | Derive the floating block menu placement and virtual anchor edge from `<html dir>`, then recreate its Tiptap plugin when the locale direction changes | Keep the block-format tool beside the editor's inline-start edge: physical left in LTR and physical right in RTL | low |
+
+**Test:** `web-frontend/test/unit/core/components/richTextEditorFloatingMenu.spec.js`.
+
 ---
 
 ## Row coloring on publicly shared views (2026-09-05)**Context:** Issue #28 story 13 asks for colors on read-only shared views. Core's`PublicViewSerializer` exposes sortings and group_bys but nothing about decorations,so the shared grid/gallery rendered without colors. Exposing decorationconfigurations to anonymous visitors is security-sensitive: a conditional rule'sfilter values can describe hidden data.| File | Change | Reason | Merge risk ||------|--------|--------|------------|| `backend/src/jadawel/contrib/database/views/registries.py` | Added `DecoratorValueProviderType.prepare_value_provider_conf_for_public(view_decoration, public_field_ids)` hook, defaulting to `None` | Opt-in seam: a provider that does not implement it is never exposed publicly; arabase's two providers own their own sanitization | low || `backend/src/jadawel/contrib/database/api/views/serializers.py` | `PublicViewSerializer` gained a `decorations` `SerializerMethodField` that drops unknown types and providers returning `None`, and delegates conf sanitization to the new hook | Anonymous visitors of a shared view now receive the same coloring the members see, minus everything referencing hidden fields | low || `backend/tests/jadawel/contrib/database/api/views/test_view_views.py`, `.../gallery/test_gallery_view_views.py`, `.../grid/test_grid_view_views.py` | Added `"decorations": []` to the exact-response public info assertions | The new serializer key appears in every public view info response | low || `web-frontend/test/unit/database/components/view/viewDecoratorContext.spec.js`, `web-frontend/test/unit/database/table.spec.js`, `web-frontend/test/unit/database/publicView.spec.js` | `beforeEach` calls the fork-owned `scopeOutArabaseRowColoring` helper (`web-frontend/test/helpers/arabaseDecorators.js`) to unregister the fork's two decorator and two value provider types for the duration of each spec | These specs' snapshots enumerate the whole toolbar/decorator registry and the tooltip tests hover the first list item; scoping the fork types out keeps the upstream snapshots valid while the feature stays registered in production. Fork coverage lives in `test/unit/arabase/rowColoring.spec.js` | low |**Tests:**`backend/tests/arabase/test_row_coloring.py` (public sanitization, hidden-fielddropping, default-deny for providers without the hook) and`web-frontend/test/unit/arabase/rowColoring.spec.js` (OR-rule stale-field preflight).## Row coloring field-change query budget (2026-09-05)**Context:** The row-coloring value providers register field lifecycle hooks(`after_field_delete`, `after_fields_type_change`) so stale configurations aredropped when a referenced field is deleted or changes type. Core calls thesehooks once per registered provider, and the original per-field loop addedqueries that scale with field count, breaking two upstream query-budget testson the field change path.| File | Change | Reason | Merge risk ||------|--------|--------|------------|| `backend/tests/jadawel/contrib/database/view/test_view_handler.py` | Raised the budget of `test_field_type_single_field_num_queries` and `test_field_type_changed_two_fields_num_queries` from 9 to 11 (`exact=False`) with comments | The arabase providers add a constant +2 (one batched DELETE for single-select conf, one candidate SELECT for conditional conf); the batched cleanup keeps the cost independent of field count | low |**Test:**`backend/tests/arabase/test_row_coloring.py` (366 passed in `tests/arabase`) and the two bumped tests themselves.
@@ -1325,3 +1333,21 @@ updater then read.
 | `web-frontend/modules/database/onboardingTypes.js` | `highlightDataName: 'applications-database'` → `'applications'` | The flat sidebar still tags its applications section with `data-highlight="applications"`; upstream's per-type group element no longer exists in this fork | low — reverts to upstream's pre-grouping value |
 | `web-frontend/modules/core/components/Highlight.vue` | Guard `update()` when no elements match; fall back to a centered box | Port of upstream's own fix — a stale selector crashed the whole preview instead of degrading | low — matches upstream develop verbatim |
 | `web-frontend/test/unit/core/components/highlight.spec.js` and `web-frontend/test/unit/database/components/onboarding/databaseAppLayoutPreview.spec.js` | Cover the no-match fallback and pin the highlight target to an element the preview's sidebar renders | Both went red on the original crash; keeps the selector and the sidebar in lock-step | low |
+
+## Security maintenance (2026-09-07)
+
+| File | Change | Reason | Risk |
+| --- | --- | --- | --- |
+| `backend/src/jadawel/config/settings/base.py` | Parse `JADAWEL_INTEGRATIONS_ALLOW_PRIVATE_ADDRESS` with `str_to_bool` | The strings `false`, `off`, and `0` previously enabled private-network requests and bypassed Advocate address validation | Low; intentional private access must use an explicit true value |
+
+## Phase — Gate public links for suspended organization workspaces (2026-09-08)
+
+| File | Change | Reason | Risk |
+| --- | --- | --- | --- |
+| `backend/src/jadawel/contrib/database/views/handler.py`, `backend/src/arabase/dashboard/share/handler.py` | Call the optional organization public-workspace policy before resolving a public view or dashboard share | Organization suspension must disable existing public links without deleting their share configuration; unmanaged workspaces keep the upstream path | Low; optional imports are guarded by installed-app detection |
+
+## Phase — Reject legacy membership mutations for managed workspaces (2026-09-08)
+
+| File | Change | Reason | Risk |
+| --- | --- | --- | --- |
+| `backend/src/jadawel/core/handler.py` | Invoke an optional plugin callback before creating or accepting a legacy workspace invitation | Bound organization workspaces must use organization invitations so seat locking, roles and audit records cannot be bypassed; unmanaged workspaces retain the core flow | Low; callback is optional and only installed plugins implement it |

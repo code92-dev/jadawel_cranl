@@ -1,0 +1,15 @@
+# backend/tests/arabase/test_html_page_mcp.py
+
+- workspace_table · function · L29-L35 — def workspace_table(data_fixture)
+- test_create_then_read_a_page · function · L39-L56 — def test_create_then_read_a_page(workspace_table)
+- test_the_sample_shows_the_real_row_shape · function · L60-L69 — def test_the_sample_shows_the_real_row_shape(workspace_table, data_fixture)
+- test_listing_only_returns_page_views · function · L73-L81 — def test_listing_only_returns_page_views(workspace_table, data_fixture)
+- test_updating_keeps_the_previous_version · function · L85-L102 — def test_updating_keeps_the_previous_version(workspace_table)
+- test_a_rename_does_not_burn_a_revision · function · L106-L112 — def test_a_rename_does_not_burn_a_revision(workspace_table)
+- test_the_history_is_bounded · function · L116-L129 — def test_the_history_is_bounded(workspace_table)
+- test_restoring_an_unrelated_revision_is_refused · function · L133-L142 — def test_restoring_an_unrelated_revision_is_refused(workspace_table)
+- test_row_limit_is_clamped_through_the_tool · function · L146-L152 — def test_row_limit_is_clamped_through_the_tool(workspace_table)
+- test_an_endpoint_cannot_reach_another_workspace · function · L156-L168 — def test_an_endpoint_cannot_reach_another_workspace(workspace_table, data_fixture)
+- test_someone_outside_the_workspace_cannot_rewrite_a_page · function · L172-L185 — def test_someone_outside_the_workspace_cannot_rewrite_a_page( workspace_table, data_fixture )
+- test_tools_are_registered · function · L189-L200 — def test_tools_are_registered()
+- _new_page · function · L203-L209 — def _new_page(user, workspace, table, name="Report")

@@ -1,0 +1,80 @@
+# backend/src/jadawel/contrib/database/formula/types/formula_type.py
+
+- JadawelFormulaTypeHasEmptyJadawelExpression · class · L29-L63 — class JadawelFormulaTypeHasEmptyJadawelExpression(abc.ABC)
+- placeholder_empty_jadawel_expression · method · L31-L38 — def placeholder_empty_jadawel_expression(self) -> Expression
+- is_blank · method · L40-L55 — def is_blank( self, func_call: "tree.JadawelFunctionCall[UnTyped]", arg: "tree.JadawelExpression[JadawelFormulaValidType]", ) -> "tree.JadawelExpression[JadawelFormulaBooleanType]"
+- try_coerce_to_not_null · method · L57-L63 — def try_coerce_to_not_null( self, expr: "tree.JadawelExpression[JadawelFormulaValidType]" )
+- JadawelFormulaType · class · L66-L567 — class JadawelFormulaType(abc.ABC)
+- type · method · L70-L75 — def type(cls) -> str
+- jadawel_field_type · method · L79-L85 — def jadawel_field_type(self) -> str
+- user_overridable_formatting_option_fields · method · L88-L95 — def user_overridable_formatting_option_fields(cls) -> List[str]
+- nullable_option_fields · method · L98-L104 — def nullable_option_fields(cls) -> List[str]
+- internal_fields · method · L107-L113 — def internal_fields(cls) -> List[str]
+- get_internal_fields · method · L116-L122 — def get_internal_fields(cls) -> List[str]
+- all_fields · method · L125-L131 — def all_fields(cls) -> List[str]
+- get_request_serializer_field_names · method · L134-L135 — def get_request_serializer_field_names(cls) -> List[str]
+- get_serializer_field_names · method · L138-L139 — def get_serializer_field_names(cls) -> List[str]
+- get_serializer_field_overrides · method · L142-L143 — def get_serializer_field_overrides(cls) -> dict[str, any]
+- comparable_types · method · L147-L152 — def comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- addable_types · method · L155-L161 — def addable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- subtractable_types · method · L164-L169 — def subtractable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- multipliable_types · method · L172-L173 — def multipliable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- dividable_types · method · L176-L177 — def dividable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- limit_comparable_types · method · L181-L187 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- can_order_by · method · L191-L196 — def can_order_by(self) -> bool
+- can_group_by · method · L200-L205 — def can_group_by(self) -> bool
+- _get_order_field_expression · method · L207-L218 — def _get_order_field_expression(self, field_name: str) -> Expression | F
+- get_order · method · L220-L235 — def get_order( self, field, field_name, order_direction, table_model=None ) -> OptionallyAnnotatedOrderBy
+- get_value_for_filter · method · L237-L249 — def get_value_for_filter(self, row, field) -> any
+- can_order_by_in_array · method · L252-L259 — def can_order_by_in_array(self) -> bool
+- get_order_by_in_array_expr · method · L261-L267 — def get_order_by_in_array_expr(self, field, field_name, order_direction)
+- can_represent_date · method · L270-L271 — def can_represent_date(self) -> bool
+- can_represent_files · method · L274-L275 — def can_represent_files(self) -> bool
+- can_represent_select_options · method · L278-L279 — def can_represent_select_options(self) -> bool
+- can_represent_collaborators · method · L282-L283 — def can_represent_collaborators(self) -> bool
+- item_is_in_nested_value_object_when_in_array · method · L286-L287 — def item_is_in_nested_value_object_when_in_array(self) -> bool
+- array_index_mode · method · L290-L291 — def array_index_mode(self) -> str
+- array_index_sql · method · L294-L297 — def array_index_sql(self) -> str
+- can_have_db_index · method · L302-L303 — def can_have_db_index(self) -> bool
+- is_valid · method · L307-L308 — def is_valid(self) -> bool
+- is_invalid · method · L310-L311 — def is_invalid(self) -> bool
+- raise_if_invalid · method · L314-L315 — def raise_if_invalid(self)
+- construct_type_from_formula_field · method · L318-L328 — def construct_type_from_formula_field(cls: Type[T], formula_field) -> T
+- _has_user_defined_values · method · L330-L357 — def _has_user_defined_values(self, field: "FormulaField") -> bool
+- new_type_with_user_and_calculated_options_merged · method · L359-L379 — def new_type_with_user_and_calculated_options_merged(self: T, formula_field)
+- persist_onto_formula_field · method · L381-L408 — def persist_onto_formula_field(self, formula_field)
+- get_jadawel_field_instance_and_type · method · L410-L415 — def get_jadawel_field_instance_and_type(self) -> "tuple[Model, FieldType]"
+- should_recreate_when_old_type_was · method · L417-L424 — def should_recreate_when_old_type_was(self, old_type: "JadawelFormulaType") -> bool
+- wrap_at_field_level · method · L426-L436 — def wrap_at_field_level(self, expr: "tree.JadawelExpression[JadawelFormulaType]")
+- unwrap_at_field_level · method · L438-L448 — def unwrap_at_field_level(self, expr: "tree.JadawelExpression[JadawelFormulaType]")
+- collapse_many · method · L450-L460 — def collapse_many(self, expr: "tree.JadawelExpression[JadawelFormulaType]")
+- try_coerce_to_not_null · method · L462-L473 — def try_coerce_to_not_null( self, expr: "tree.JadawelExpression[JadawelFormulaValidType]" )
+- add · method · L475-L484 — def add( self, add_func_call: "tree.JadawelFunctionCall[UnTyped]", arg1: "tree.JadawelExpression[JadawelFormulaValidType]", arg2: "tree.JadawelExpression[JadawelFormulaValidType]", ) -> "tree.JadawelExpression[JadawelFormulaType]"
+- minus · method · L486-L495 — def minus( self, minus_func_call: "tree.JadawelFunctionCall[UnTyped]", arg1: "tree.JadawelExpression[JadawelFormulaValidType]", arg2: "tree.JadawelExpression[JadawelFormulaValidType]", ) -> "tree.JadawelExpression[JadawelFormulaType]"
+- multiply · method · L497-L506 — def multiply( self, multiply_func_call: "tree.JadawelFunctionCall[UnTyped]", arg1: "tree.JadawelExpression[JadawelFormulaValidType]", arg2: "tree.JadawelExpression[JadawelFormulaValidType]", ) -> "tree.JadawelExpression[JadawelFormulaType]"
+- divide · method · L508-L517 — def divide( self, divide_func_call: "tree.JadawelFunctionCall[UnTyped]", arg1: "tree.JadawelExpression[JadawelFormulaValidType]", arg2: "tree.JadawelExpression[JadawelFormulaValidType]", ) -> "tree.JadawelExpression[JadawelFormulaType]"
+- placeholder_empty_value · method · L519-L525 — def placeholder_empty_value(self) -> Expression
+- check_if_compatible_with · method · L527-L528 — def check_if_compatible_with(self, compatible_formula_types: List[str])
+- __str__ · method · L530-L531 — def __str__(self) -> str
+- __init__ · method · L533-L535 — def __init__(self, nullable=False, requires_refresh_after_insert=False)
+- get_search_expression · method · L537-L544 — def get_search_expression(self, field, queryset)
+- get_search_expression_in_array · method · L546-L547 — def get_search_expression_in_array(self, field, queryset) -> Expression
+- is_searchable · method · L549-L556 — def is_searchable(self, field)
+- parse_filter_value · method · L558-L567 — def parse_filter_value(self, field, model_field, value)
+- JadawelFormulaInvalidType · class · L570-L600 — class JadawelFormulaInvalidType(JadawelFormulaType)
+- raise_if_invalid · method · L583-L584 — def raise_if_invalid(self)
+- should_recreate_when_old_type_was · method · L586-L587 — def should_recreate_when_old_type_was(self, old_type: "JadawelFormulaType") -> bool
+- get_search_expression · method · L589-L590 — def get_search_expression(self, field, queryset) -> Expression
+- get_search_expression_in_array · method · L592-L593 — def get_search_expression_in_array(self, field, queryset) -> Expression
+- is_searchable · method · L595-L596 — def is_searchable(self, field) -> bool
+- __init__ · method · L598-L600 — def __init__(self, error: str, **kwargs)
+- JadawelFormulaValidType · class · L603-L713 — class JadawelFormulaValidType(JadawelFormulaType, abc.ABC)
+- limit_comparable_types · method · L609-L610 — def limit_comparable_types(self) -> List[Type["JadawelFormulaValidType"]]
+- collapse_many · method · L612-L621 — def collapse_many(self, expr: "tree.JadawelExpression[JadawelFormulaType]")
+- collapse_array_of_many · method · L623-L630 — def collapse_array_of_many( self, expr: "tree.JadawelExpression[JadawelFormulaType]" )
+- raise_if_invalid · method · L632-L633 — def raise_if_invalid(self)
+- is_blank · method · L635-L652 — def is_blank( self, func_call: "tree.JadawelFunctionCall[UnTyped]", arg: "tree.JadawelExpression[JadawelFormulaValidType]", ) -> "tree.JadawelExpression[JadawelFormulaBooleanType]"
+- cast_to_text · method · L654-L678 — def cast_to_text( self, to_text_func_call: "tree.JadawelFunctionCall[UnTyped]", arg: "tree.JadawelExpression[JadawelFormulaValidType]", ) -> "tree.JadawelExpression[JadawelFormulaType]"
+- wrap_at_field_level · method · L680-L685 — def wrap_at_field_level(self, expr: "tree.JadawelExpression[JadawelFormulaType]")
+- unwrap_at_field_level · method · L687-L688 — def unwrap_at_field_level(self, expr: "tree.JadawelExpression[JadawelFormulaType]")
+- count · method · L690-L713 — def count( self, to_text_func_call: "tree.JadawelFunctionCall[UnTyped]", arg: "tree.JadawelExpression[JadawelFormulaValidType]", ) -> "tree.JadawelExpression[JadawelFormulaType]"

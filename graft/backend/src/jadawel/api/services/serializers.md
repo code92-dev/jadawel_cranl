@@ -1,0 +1,22 @@
+# backend/src/jadawel/api/services/serializers.py
+
+- ServiceSerializer · class · L12-L61 — class ServiceSerializer(serializers.ModelSerializer)
+- get_context_data · method · L27-L28 — def get_context_data(self, instance)
+- get_context_data_schema · method · L31-L32 — def get_context_data_schema(self, instance)
+- get_type · method · L35-L36 — def get_type(self, instance)
+- get_schema · method · L39-L40 — def get_schema(self, instance)
+- Meta · class · L42-L61 — class Meta
+- PublicServiceSerializer · class · L64-L97 — class PublicServiceSerializer(serializers.ModelSerializer)
+- get_type · method · L74-L75 — def get_type(self, instance)
+- get_context_data · method · L78-L81 — def get_context_data(self, instance)
+- get_schema · method · L84-L87 — def get_schema(self, instance)
+- Meta · class · L89-L97 — class Meta
+- CreateServiceSerializer · class · L100-L114 — class CreateServiceSerializer(serializers.ModelSerializer)
+- Meta · class · L112-L114 — class Meta
+- UpdateServiceSerializer · class · L117-L126 — class UpdateServiceSerializer(serializers.ModelSerializer)
+- Meta · class · L124-L126 — class Meta
+- PolymorphicServiceSerializer · class · L129-L131 — class PolymorphicServiceSerializer(PolymorphicSerializer)
+- BasePolymorphicRequestSerializer · class · L134-L137 — class BasePolymorphicRequestSerializer(serializers.ModelSerializer)
+- Meta · class · L135-L137 — class Meta
+- PolymorphicServiceRequestSerializer · class · L140-L142 — class PolymorphicServiceRequestSerializer(PolymorphicRequestSerializer)
+- PublicPolymorphicServiceSerializer · class · L145-L146 — class PublicPolymorphicServiceSerializer(PolymorphicServiceSerializer)

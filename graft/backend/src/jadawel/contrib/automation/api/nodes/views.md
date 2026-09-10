@@ -1,0 +1,17 @@
+# backend/src/jadawel/contrib/automation/api/nodes/views.py
+
+- AutomationNodesView · class · L82-L191 — class AutomationNodesView(APIView)
+- get_permissions · method · L85-L89 — def get_permissions(self)
+- post · method · L134-L146 — def post(self, request, data: Dict, workflow_id: int)
+- get · method · L179-L191 — def get(self, request, workflow_id: int)
+- AutomationNodeView · class · L194-L297 — class AutomationNodeView(APIView)
+- patch · method · L237-L259 — def patch(self, request, node_id: int)
+- delete · method · L290-L297 — def delete(self, request, node_id: int)
+- DuplicateAutomationNodeView · class · L300-L345 — class DuplicateAutomationNodeView(APIView)
+- post · method · L337-L345 — def post(self, request, node_id: int)
+- ReplaceAutomationNodeView · class · L348-L392 — class ReplaceAutomationNodeView(APIView)
+- post · method · L383-L392 — def post(self, request, data: Dict, node_id: int)
+- SimulateDispatchAutomationNodeView · class · L395-L430 — class SimulateDispatchAutomationNodeView(APIView)
+- post · method · L426-L430 — def post(self, request, node_id: int)
+- MoveAutomationNodeView · class · L433-L473 — class MoveAutomationNodeView(APIView)
+- post · method · L471-L473 — def post(self, request, data: Dict, node_id: int)

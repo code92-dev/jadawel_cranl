@@ -1,0 +1,27 @@
+# backend/src/jadawel/contrib/database/formula/types/visitors.py
+
+- FunctionsUsedVisitor · class · L39-L72 — class FunctionsUsedVisitor( JadawelFormulaASTVisitor[Any, Set[JadawelFunctionDefinition]] )
+- visit_field_reference · method · L42-L43 — def visit_field_reference(self, field_reference: JadawelFieldReference)
+- visit_string_literal · method · L45-L48 — def visit_string_literal( self, string_literal: JadawelStringLiteral ) -> Set[JadawelFunctionDefinition]
+- visit_boolean_literal · method · L50-L53 — def visit_boolean_literal( self, boolean_literal: JadawelBooleanLiteral ) -> Set[JadawelFunctionDefinition]
+- visit_function_call · method · L55-L62 — def visit_function_call( self, function_call: JadawelFunctionCall ) -> Set[JadawelFunctionDefinition]
+- visit_int_literal · method · L64-L67 — def visit_int_literal( self, int_literal: JadawelIntegerLiteral ) -> Set[JadawelFunctionDefinition]
+- visit_decimal_literal · method · L69-L72 — def visit_decimal_literal( self, decimal_literal: JadawelDecimalLiteral ) -> Set[JadawelFunctionDefinition]
+- FieldDependencyExtractingVisitor · class · L75-L217 — class FieldDependencyExtractingVisitor( JadawelFormulaASTVisitor[UnTyped, FieldDependencies] )
+- __init__ · method · L82-L85 — def __init__(self, source_field, table, field_cache)
+- visit_field_reference · method · L87-L132 — def visit_field_reference( self, field_reference: JadawelFieldReference[UnTyped] ) -> FieldDependencies
+- _visit_field_reference_to_link_row_field · method · L134-L189 — def _visit_field_reference_to_link_row_field( self, field_cache: "FieldCache", referenced_field: "LinkRowField", source_field: "Field", target_field_name: typing.Optional[str], ): # We are referencing a link row field , which means we are either a lookup # or a field() reference of a link row field, which is the same as a # lookup of the primary field in the linked table.
+- visit_string_literal · method · L191-L194 — def visit_string_literal( self, string_literal: JadawelStringLiteral[UnTyped] ) -> FieldDependencies
+- visit_function_call · method · L196-L202 — def visit_function_call( self, function_call: JadawelFunctionCall[UnTyped] ) -> FieldDependencies
+- visit_int_literal · method · L204-L207 — def visit_int_literal( self, int_literal: JadawelIntegerLiteral[UnTyped] ) -> FieldDependencies
+- visit_decimal_literal · method · L209-L212 — def visit_decimal_literal( self, decimal_literal: JadawelDecimalLiteral[UnTyped] ) -> FieldDependencies
+- visit_boolean_literal · method · L214-L217 — def visit_boolean_literal( self, boolean_literal: JadawelBooleanLiteral[UnTyped] ) -> FieldDependencies
+- FormulaTypingVisitor · class · L220-L364 — class FormulaTypingVisitor( JadawelFormulaASTVisitor[UnTyped, JadawelExpression[JadawelFormulaType]] )
+- __init__ · method · L223-L225 — def __init__(self, field_being_typed, field_cache)
+- visit_field_reference · method · L227-L276 — def visit_field_reference( self, field_reference: JadawelFieldReference[UnTyped] ) -> JadawelExpression[JadawelFormulaType]
+- _create_lookup_reference · method · L278-L308 — def _create_lookup_reference(self, target_field, referenced_field, field_reference)
+- visit_string_literal · method · L310-L313 — def visit_string_literal( self, string_literal: JadawelStringLiteral[UnTyped] ) -> JadawelExpression[JadawelFormulaType]
+- visit_function_call · method · L315-L341 — def visit_function_call( self, function_call: JadawelFunctionCall[UnTyped] ) -> JadawelExpression[JadawelFormulaType]
+- visit_int_literal · method · L343-L350 — def visit_int_literal( self, int_literal: JadawelIntegerLiteral[UnTyped] ) -> JadawelExpression[JadawelFormulaType]
+- visit_decimal_literal · method · L352-L359 — def visit_decimal_literal( self, decimal_literal: JadawelDecimalLiteral[UnTyped] ) -> JadawelExpression[JadawelFormulaType]
+- visit_boolean_literal · method · L361-L364 — def visit_boolean_literal( self, boolean_literal: JadawelBooleanLiteral[UnTyped] ) -> JadawelExpression[JadawelFormulaType]

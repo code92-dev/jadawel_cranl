@@ -1,0 +1,24 @@
+# backend/src/jadawel/contrib/database/api/webhooks/serializers.py
+
+- TableWebhookEventsSerializer · class · L17-L20 — class TableWebhookEventsSerializer(serializers.ListField)
+- TableWebhookEventConfig · class · L23-L38 — class TableWebhookEventConfig(serializers.Serializer)
+- TableWebhookCreateRequestSerializer · class · L41-L75 — class TableWebhookCreateRequestSerializer(serializers.ModelSerializer)
+- Meta · class · L64-L75 — class Meta
+- TableWebhookUpdateRequestSerializer · class · L78-L120 — class TableWebhookUpdateRequestSerializer(serializers.ModelSerializer)
+- Meta · class · L102-L120 — class Meta
+- TableWebhookCallSerializer · class · L123-L153 — class TableWebhookCallSerializer(serializers.ModelSerializer)
+- Meta · class · L131-L143 — class Meta
+- get_request · method · L145-L148 — def get_request(self, obj)
+- get_response · method · L150-L153 — def get_response(self, obj)
+- TableWebhookSerializer · class · L156-L209 — class TableWebhookSerializer(serializers.ModelSerializer)
+- Meta · class · L171-L188 — class Meta
+- get_events · method · L191-L192 — def get_events(self, instance)
+- get_event_config · method · L195-L205 — def get_event_config(self, instance)
+- get_headers · method · L208-L209 — def get_headers(self, instance)
+- TableWebhookTestCallRequestSerializer · class · L212-L237 — class TableWebhookTestCallRequestSerializer(serializers.ModelSerializer)
+- Meta · class · L229-L237 — class Meta
+- TableWebhookTestCallResponseSerializer · class · L240-L278 — class TableWebhookTestCallResponseSerializer(serializers.Serializer)
+- get_request · method · L255-L260 — def get_request(self, instance)
+- get_response · method · L263-L267 — def get_response(self, instance)
+- get_status_code · method · L270-L274 — def get_status_code(self, instance)
+- get_is_unreachable · method · L277-L278 — def get_is_unreachable(self, instance)

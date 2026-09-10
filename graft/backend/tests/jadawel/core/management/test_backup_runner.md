@@ -1,0 +1,16 @@
+# backend/tests/jadawel/core/management/test_backup_runner.py
+
+- test_can_backup_and_restore_jadawel_reverting_changes · function · L19-L71 — def test_can_backup_and_restore_jadawel_reverting_changes( data_fixture, environ, temporary_database )
+- test_backup_jadawel_dumps_database_in_batches · function · L77-L142 — def test_backup_jadawel_dumps_database_in_batches( mock_check_output, mock_connect, mock_tempfile, fs, environ )
+- test_can_change_num_jobs_and_insert_extra_args_for_jadawel_backup · function · L148-L228 — def test_can_change_num_jobs_and_insert_extra_args_for_jadawel_backup( mock_check_output, mock_connect, mock_tempfile, fs, environ )
+- test_backup_jadawel_table_batches_includes_all_tables_when_final_batch_small · function · L234-L287 — def test_backup_jadawel_table_batches_includes_all_tables_when_final_batch_small( mock_check_output, mock_connect, mock_tempfile, fs, environ )
+- test_backup_jadawel_includes_all_tables_when_batch_size_matches_num_tables · function · L293-L338 — def test_backup_jadawel_includes_all_tables_when_batch_size_matches_num_tables( mock_check_output, mock_connect, mock_tempfile, fs, environ )
+- test_backup_jadawel_does_no_table_batches_when_no_user_tables_found · function · L344-L374 — def test_backup_jadawel_does_no_table_batches_when_no_user_tables_found( mock_check_output, mock_connect, mock_tempfile, fs, environ )
+- test_restore_jadawel_restores_contained_dumps_in_batches · function · L380-L437 — def test_restore_jadawel_restores_contained_dumps_in_batches( mock_tarfile_open, mock_check_output, mock_tempfile, fs, environ )
+- test_restore_jadawel_passes_extra_args_to_all_pg_restores_and_can_set_jobs · function · L443-L504 — def test_restore_jadawel_passes_extra_args_to_all_pg_restores_and_can_set_jobs( mock_tarfile_open, mock_check_output, mock_tempfile, fs, environ )
+- test_restore_jadawel_only_does_first_restore_if_no_user_tables · function · L510-L551 — def test_restore_jadawel_only_does_first_restore_if_no_user_tables( mock_tarfile_open, mock_check_output, mock_tempfile, fs, environ )
+- test_restore_jadawel_raises_exception_if_sub_folder_not_found_after_extract · function · L557-L579 — def test_restore_jadawel_raises_exception_if_sub_folder_not_found_after_extract( mock_tarfile_open, mock_check_output, mock_tempfile, fs, environ )
+- a_pg_dump_for_everything_else · function · L582-L605 — def a_pg_dump_for_everything_else()
+- a_pg_dump_table_batch · function · L608-L629 — def a_pg_dump_table_batch(tables, batch_num)
+- mock_tempdir_to_be · function · L632-L634 — def mock_tempdir_to_be(fs, mock_tempfile, dir_name)
+- mock_pyscopg2_call_to_return · function · L637-L640 — def mock_pyscopg2_call_to_return(mock_connect, results)

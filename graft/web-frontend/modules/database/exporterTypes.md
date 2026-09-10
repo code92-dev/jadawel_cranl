@@ -1,0 +1,21 @@
+# web-frontend/modules/database/exporterTypes.js
+
+- TableExporterType · class · L5-L92 — class TableExporterType extends Registerable
+- getIconClass · method · L10-L12 — getIconClass()
+- getName · method · L17-L19 — getName()
+- getFormComponent · method · L27-L29 — getFormComponent()
+- getCanExportTable · method · L34-L38 — getCanExportTable()
+- getFileExtension · method · L40-L42 — getFileExtension()
+- getSupportedViews · method · L47-L51 — getSupportedViews()
+- constructor · method · L53-L63 — constructor(...args)
+- serialize · method · L65-L72 — serialize()
+- getDeactivatedText · method · L77-L77 — getDeactivatedText()
+- getDeactivatedClickModal · method · L82-L84 — getDeactivatedClickModal()
+- isDeactivated · method · L89-L91 — isDeactivated(workspaceId)
+- CSVTableExporterType · class · L94-L119 — class CSVTableExporterType extends TableExporterType
+- getType · method · L95-L97 — static getType()
+- getIconClass · method · L99-L101 — getIconClass()
+- getName · method · L103-L106 — getName()
+- getFormComponent · method · L108-L110 — getFormComponent()
+- getCanExportTable · method · L112-L114 — getCanExportTable()
+- getSupportedViews · method · L116-L118 — getSupportedViews()

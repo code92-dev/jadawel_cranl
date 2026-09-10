@@ -1,0 +1,100 @@
+# backend/src/jadawel/test_utils/pytest_conftest.py
+
+- fake · function · L72-L73 — def fake()
+- async_event_loop · function · L80-L86 — def async_event_loop()
+- data_fixture · function · L90-L105 — def data_fixture(fake)
+- StreamingAPIClient · class · L108-L136 — class StreamingAPIClient(APIClient)
+- _consume_async_generator · method · L111-L116 — async def _consume_async_generator(self, async_gen: AsyncGenerator) -> List
+- request · method · L118-L136 — def request(self, **kwargs)
+- stream_chunks · function · L126-L132 — def stream_chunks() -> list[str]
+- api_client · function · L140-L141 — def api_client()
+- api_request_factory · function · L145-L150 — def api_request_factory()
+- clear_cache · function · L154-L171 — def clear_cache()
+- defer_heavy_signals · function · L175-L206 — def defer_heavy_signals(request)
+- reset_schema · function · L210-L213 — def reset_schema(django_db_blocker)
+- environ · function · L217-L221 — def environ()
+- temporary_database · function · L225-L256 — def temporary_database()
+- _connect_autocommit · function · L234-L246 — def _connect_autocommit()
+- print_sql · function · L260-L266 — def print_sql()
+- mutable_field_type_registry · function · L270-L277 — def mutable_field_type_registry()
+- mutable_action_registry · function · L281-L286 — def mutable_action_registry()
+- mutable_application_registry · function · L290-L297 — def mutable_application_registry()
+- mutable_trash_item_type_registry · function · L301-L308 — def mutable_trash_item_type_registry()
+- mutable_permission_manager_registry · function · L312-L317 — def mutable_permission_manager_registry()
+- mutable_notification_type_registry · function · L321-L326 — def mutable_notification_type_registry()
+- mutable_builder_data_provider_registry · function · L330-L337 — def mutable_builder_data_provider_registry()
+- mutable_user_source_registry · function · L341-L348 — def mutable_user_source_registry()
+- mutable_trash_operation_type_registry · function · L352-L359 — def mutable_trash_operation_type_registry()
+- mutable_builder_workflow_action_registry · function · L363-L372 — def mutable_builder_workflow_action_registry()
+- mutable_job_type_registry · function · L376-L380 — def mutable_job_type_registry()
+- mutable_webhook_event_type_registry · function · L384-L388 — def mutable_webhook_event_type_registry()
+- mutable_element_type_registry · function · L392-L397 — def mutable_element_type_registry()
+- stub_trash_operation_type · function · L401-L427 — def stub_trash_operation_type(data_fixture, mutable_trash_operation_type_registry)
+- stubbed · function · L403-L425 — def stubbed( type_managed=False, type_send_deleted_signal=True, type_send_created_signal=True, )
+- StubbedTrashOperationType · class · L413-L417 — class StubbedTrashOperationType(TrashOperationType)
+- stub_user_source_registry · function · L431-L517 — def stub_user_source_registry(data_fixture, mutable_user_source_registry, fake)
+- stubbed_user_source_registry_first_type · function · L435-L515 — def stubbed_user_source_registry_first_type( authenticate_return=None, get_user_return=None, list_users_return=None, gen_uid_return=None, get_user_count_return=None, update_user_count_return=None, properties_requiring_user_recount_return=None, )
+- StubbedUserSourceType · class · L457-L508 — class StubbedUserSourceType(UserSourceType)
+- get_user_count · method · L462-L466 — def get_user_count(self, user_source, force_recount=False)
+- update_user_count · method · L468-L472 — def update_user_count(self, user_source=None)
+- gen_uid · method · L474-L480 — def gen_uid(self, user_source)
+- list_users · method · L482-L488 — def list_users(self, user_source, count: int = 5, search: str = "")
+- get_user · method · L490-L495 — def get_user(self, user_source, **kwargs)
+- create_user · method · L497-L498 — def create_user(self, user_source, email, name)
+- authenticate · method · L500-L505 — def authenticate(self, user_source, **kwargs)
+- get_roles · method · L507-L508 — def get_roles(self)
+- patch_filefield_storage · function · L521-L566 — def patch_filefield_storage(tmpdir)
+- patch · function · L535-L564 — def patch(new_storage=None)
+- pytest_addoption · function · L572-L583 — def pytest_addoption(parser): # Unfortunately a simple decorator doesn't work here as pytest is doing some # exciting reflection of sorts over this function and crashes if it is wrapped.
+- pytest_configure · function · L586-L602 — def pytest_configure(config)
+- pytest_collection_modifyitems · function · L605-L619 — def pytest_collection_modifyitems(config, items)
+- profiler · function · L623-L666 — def profiler()
+- profile_this · function · L633-L664 — def profile_this( print_result: bool = True, html_report_name: str = "", output_text_params: Optional[Dict] = None, output_html_params: Optional[Dict] = None, )
+- BaseMaxLocksPerTransactionStub · class · L669-L678 — class BaseMaxLocksPerTransactionStub: # Determines whether we raise an `OperationalError` about # `max_locks_per_transaction` or something else.
+- get_message · method · L674-L678 — def get_message(self) -> str
+- MaxLocksPerTransactionExceededApplicationType · class · L681-L685 — class MaxLocksPerTransactionExceededApplicationType( DatabaseApplicationType, BaseMaxLocksPerTransactionStub )
+- export_serialized · method · L684-L685 — def export_serialized(self, *args, **kwargs)
+- MaxLocksPerTransactionExceededGroupTrashableItemType · class · L688-L692 — class MaxLocksPerTransactionExceededGroupTrashableItemType( WorkspaceTrashableItemType, BaseMaxLocksPerTransactionStub )
+- permanently_delete_item · method · L691-L692 — def permanently_delete_item(self, *args, **kwargs)
+- application_type_serialized_raising_operationalerror · function · L696-L716 — def application_type_serialized_raising_operationalerror( mutable_application_registry, ) -> callable
+- _perform_stub · function · L706-L714 — def _perform_stub(raise_transaction_exception: bool = True)
+- trash_item_type_perm_delete_item_raising_operationalerror · function · L720-L741 — def trash_item_type_perm_delete_item_raising_operationalerror( mutable_trash_item_type_registry, ) -> callable
+- _perform_stub · function · L731-L739 — def _perform_stub(raise_transaction_exception: bool = True)
+- StubbedCorePermissionManagerType · class · L744-L760 — class StubbedCorePermissionManagerType(CorePermissionManagerType)
+- __init__ · method · L749-L750 — def __init__(self, raise_permission_denied: bool = False)
+- check_multiple_permissions · method · L752-L760 — def check_multiple_permissions(self, checks, workspace=None, include_trash=False)
+- bypass_check_permissions · function · L764-L779 — def bypass_check_permissions( mutable_permission_manager_registry, ) -> CorePermissionManagerType
+- stub_check_permissions · function · L783-L807 — def stub_check_permissions() -> callable
+- _perform_stub · function · L791-L805 — def _perform_stub( raise_permission_denied: bool = False, ) -> CorePermissionManagerType
+- teardown_table_metadata · function · L811-L822 — def teardown_table_metadata()
+- TestMigrator · class · L825-L831 — class TestMigrator
+- migrate · method · L826-L831 — def migrate(self, target)
+- _set_suffix_to_test_databases · function · L834-L847 — def _set_suffix_to_test_databases(suffix: str) -> None
+- _remove_suffix_from_test_databases · function · L850-L854 — def _remove_suffix_from_test_databases(suffix: str) -> None
+- second_separate_database_for_migrations · function · L858-L910 — def second_separate_database_for_migrations( request, django_test_environment: None, django_db_blocker, ) -> None
+- teardown_database · function · L887-L904 — def teardown_database() -> None
+- migrator · function · L914-L915 — def migrator(second_separate_database_for_migrations, reset_schema)
+- disable_full_text_search · function · L919-L920 — def disable_full_text_search(settings)
+- mutable_generative_ai_model_type_registry · function · L924-L929 — def mutable_generative_ai_model_type_registry()
+- run_clear_current_workspace_id_after_test · function · L933-L937 — def run_clear_current_workspace_id_after_test()
+- fake_import_formula · function · L940-L941 — def fake_import_formula(formula, id_mapping)
+- FakeDispatchContext · class · L944-L1010 — class FakeDispatchContext(DispatchContext)
+- __init__ · method · L953-L962 — def __init__(self, **kwargs)
+- is_publicly_searchable · method · L965-L966 — def is_publicly_searchable(self)
+- search_query · method · L968-L969 — def search_query(self)
+- searchable_fields · method · L971-L972 — def searchable_fields(self)
+- is_publicly_filterable · method · L975-L976 — def is_publicly_filterable(self)
+- filters · method · L978-L979 — def filters(self)
+- is_publicly_sortable · method · L982-L983 — def is_publicly_sortable(self)
+- sortings · method · L985-L986 — def sortings(self)
+- range · method · L988-L989 — def range(self, service)
+- __getitem__ · method · L991-L1001 — def __getitem__(self, key: str) -> Any
+- public_allowed_properties · method · L1004-L1005 — def public_allowed_properties(self) -> Optional[Dict[str, Dict[int, List[str]]]]
+- validate_filter_search_sort_fields · method · L1007-L1010 — def validate_filter_search_sort_fields( self, fields: List[str], refinement: ServiceAdhocRefinements )
+- test_thread · function · L1014-L1082 — def test_thread()
+- wrapper · function · L1058-L1066 — def wrapper(c, *args, **kwargs)
+- run_callable · function · L1069-L1080 — def run_callable(callable, *args, **kwargs)
+- jadawel_db_setup · function · L1086-L1110 — def jadawel_db_setup(django_db_setup, django_db_blocker)
+- init_link_row_sequence · function · L1097-L1103 — def init_link_row_sequence()
+- use_tmp_media_root · function · L1114-L1115 — def use_tmp_media_root(tmpdir, settings)
+- create_postgresql_test_table · function · L1119-L1200 — def create_postgresql_test_table()

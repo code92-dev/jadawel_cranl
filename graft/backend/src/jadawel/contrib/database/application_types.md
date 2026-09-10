@@ -1,0 +1,28 @@
+# backend/src/jadawel/contrib/database/application_types.py
+
+- ImportedFields · class · L63-L67 — class ImportedFields
+- DatabaseApplicationType · class · L70-L1133 — class DatabaseApplicationType(ApplicationType)
+- pre_delete · method · L84-L98 — def pre_delete(self, database)
+- get_api_urls · method · L100-L105 — def get_api_urls(self)
+- export_safe_transaction_context · method · L107-L108 — def export_safe_transaction_context(self, application) -> Atomic
+- export_tables_serialized · method · L110-L225 — def export_tables_serialized( self, tables: List[Table], import_export_config: ImportExportConfig, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> List[Dict[str, Any]]
+- export_serialized · method · L227-L276 — def export_serialized( self, database: Database, import_export_config: ImportExportConfig, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Dict[str, Any]
+- _ops_count_for_import_tables_serialized · method · L278-L310 — def _ops_count_for_import_tables_serialized( self, serialized_tables: List[Dict[str, Any]], external_table_fields_to_import: List[Tuple[Table, Dict[str, Any]]] = None, ) -> int
+- init_application · method · L312-L326 — def init_application(self, user, application: Database) -> None
+- _import_table_fields · method · L328-L480 — def _import_table_fields( self, serialized_tables: List[Dict[str, Any]], id_mapping: Dict[str, Any], import_export_config: ImportExportConfig, external_table_fields_to_import: List[Tuple[Table, Dict[str, Any]]], deferred_fk_update_collector: DeferredForeignKeyUpdater, progress: Progress, ) -> ImportedFields
+- _import_field_serialized · function · L375-L398 — def _import_field_serialized(serialized_table, serialized_field)
+- import_tables_serialized · method · L482-L616 — def import_tables_serialized( self, database: Database, serialized_tables: List[Dict[str, Any]], id_mapping: Dict[str, Any], import_export_config: ImportExportConfig, files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, external_table_fields_to_import: List[Tuple[Table, Dict[str, Any]]] = None, ) -> List[Table]
+- _import_extra_metadata · method · L618-L631 — def _import_extra_metadata( self, serialized_tables, id_mapping, import_export_config )
+- _import_data_sync · method · L633-L642 — def _import_data_sync(self, serialized_tables, id_mapping, import_export_config)
+- _import_field_rules · method · L644-L670 — def _import_field_rules(self, serialized_tables, id_mapping, import_export_config)
+- _import_table_rows · method · L672-L789 — def _import_table_rows( self, serialized_tables: List[Dict[str, Any]], imported_fields: ImportedFields, user_email_mapping: Dict[str, Any], deferred_fk_update_collector: DeferredForeignKeyUpdater, id_mapping: Dict[str, Any], files_zip: ZipFile | None, storage: Storage | None, progress: Progress, )
+- _import_serialized_fields_values_to_row · method · L791-L827 — def _import_serialized_fields_values_to_row( self, row_instance: GeneratedTableModel, serialized_row: Dict[str, Any], serialized_table_fields: List[Dict[str, Any]], table_cache: Dict[str, Any], additional_objects_to_be_inserted: Dict[str, List[object]], m2m_fields_to_not_import_as_already_done: Set[str], id_mapping: Dict[str, Any], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, )
+- _prepare_base_row_fields · method · L829-L871 — def _prepare_base_row_fields( self, serialized_row: Dict[str, Any], now: datetime, user_email_mapping: Dict[str, Any], ) -> Tuple[datetime, datetime, Optional[AbstractUser], Optional[AbstractUser]]
+- _after_rows_imported · method · L873-L898 — def _after_rows_imported( self, imported_fields: ImportedFields, progress: Optional[ChildProgressBuilder] = None, )
+- _create_table_schema · method · L900-L943 — def _create_table_schema( self, serialized_table, already_created_through_table_names )
+- _import_table_views · method · L945-L998 — def _import_table_views( self, serialized_table: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], files_zip: Optional[ZipFile] = None, progress: Optional[ChildProgressBuilder] = None, ) -> None
+- _import_tables · method · L1000-L1036 — def _import_tables( self, database: Database, serialized_tables: List[Dict[str, Any]], id_mapping: Dict[str, Any], progress: Optional[ChildProgressBuilder] = None, ) -> List[Table]
+- import_serialized · method · L1038-L1079 — def import_serialized( self, workspace: Workspace, serialized_values: Dict[str, Any], import_export_config: ImportExportConfig, id_mapping: Dict[str, Any], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Application
+- enhance_queryset · method · L1081-L1086 — def enhance_queryset(self, queryset)
+- enhance_and_filter_queryset · method · L1088-L1108 — def enhance_and_filter_queryset( self, queryset: QuerySet[Database], user: AbstractUser, workspace: Workspace, ) -> QuerySet[Database]
+- fetch_tables_to_serialize · method · L1110-L1133 — def fetch_tables_to_serialize( self, database: Database, user: AbstractUser | None ) -> List[Table]

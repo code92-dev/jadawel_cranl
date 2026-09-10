@@ -1,0 +1,18 @@
+# web-frontend/modules/database/components/view/grid/fields/GridViewFieldFile.vue
+
+- data · method · L91-L100 — data()
+- onDrop · method · L106-L111 — async onDrop(event)
+- uploadFiles · method · L112-L162 — async uploadFiles(fileArray)
+- select · method · L163-L172 — select()
+- beforeUnSelect · method · L173-L175 — beforeUnSelect()
+- canUnselectByClickingOutside · method · L182-L188 — canUnselectByClickingOutside(event)
+- removeFile · method · L194-L197 — removeFile(event, index)
+- showUploadModal · method · L198-L205 — showUploadModal()
+- showFileModal · method · L206-L209 — showFileModal(index)
+- hideModal · method · L210-L212 — hideModal()
+- canSelectNext · method · L217-L219 — canSelectNext()
+- canKeyDown · method · L220-L222 — canKeyDown()
+- canKeyboardShortcut · method · L223-L225 — canKeyboardShortcut()
+- dragEnter · method · L226-L233 — dragEnter(event)
+- dragLeave · method · L234-L241 — dragLeave(event)
+- onPaste · method · L242-L258 — onPaste(event)

@@ -1,0 +1,34 @@
+# web-frontend/modules/core/runtimeFormulaArgumentTypes.js
+
+- JadawelRuntimeFormulaArgumentType · class · L11-L37 — class JadawelRuntimeFormulaArgumentType
+- constructor · method · L12-L14 — constructor({ optional = false } = {})
+- test · method · L21-L23 — test(value)
+- parse · method · L34-L36 — parse(value)
+- NumberJadawelRuntimeFormulaArgumentType · class · L39-L68 — class NumberJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- constructor · method · L40-L44 — constructor(options = {})
+- test · method · L46-L57 — test(value)
+- parse · method · L59-L67 — parse(value)
+- TextJadawelRuntimeFormulaArgumentType · class · L70-L78 — class TextJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- test · method · L71-L73 — test(value)
+- parse · method · L75-L77 — parse(value)
+- DateTimeJadawelRuntimeFormulaArgumentType · class · L80-L96 — class DateTimeJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- test · method · L81-L91 — test(value)
+- parse · method · L93-L95 — parse(value)
+- ObjectJadawelRuntimeFormulaArgumentType · class · L98-L115 — class ObjectJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- test · method · L99-L110 — test(value)
+- parse · method · L112-L114 — parse(value)
+- ArrayJadawelRuntimeFormulaArgumentType · class · L117-L130 — class ArrayJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- test · method · L118-L125 — test(value)
+- parse · method · L127-L129 — parse(value)
+- ArrayOfNumbersJadawelRuntimeFormulaArgumentType · class · L132-L151 — class ArrayOfNumbersJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- test · method · L133-L145 — test(value)
+- parse · method · L147-L150 — parse(value)
+- BooleanJadawelRuntimeFormulaArgumentType · class · L153-L166 — class BooleanJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- test · method · L154-L161 — test(value)
+- parse · method · L163-L165 — parse(value)
+- TimezoneJadawelRuntimeFormulaArgumentType · class · L168-L180 — class TimezoneJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- test · method · L169-L175 — test(value)
+- parse · method · L177-L179 — parse(value)
+- AnyJadawelRuntimeFormulaArgumentType · class · L182-L190 — class AnyJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType
+- test · method · L183-L185 — test(value)
+- parse · method · L187-L189 — parse(value)

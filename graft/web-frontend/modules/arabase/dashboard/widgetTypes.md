@@ -1,0 +1,36 @@
+# web-frontend/modules/arabase/dashboard/widgetTypes.js
+
+- loadingUntilDispatched · function · L49-L52 — loadingUntilDispatched = (widget, data)
+- ChartWidgetType · class · L62-L124 — class ChartWidgetType extends WidgetType
+- getType · method · L63-L65 — static getType()
+- name · method · L67-L69 — get name()
+- createWidgetImage · method · L71-L73 — get createWidgetImage()
+- component · method · L75-L77 — get component()
+- settingsComponent · method · L79-L81 — get settingsComponent()
+- variations · method · L83-L115 — get variations()
+- getOrder · method · L117-L119 — getOrder()
+- isLoading · method · L121-L123 — isLoading(widget, data)
+- RecordsListWidgetType · class · L126-L154 — class RecordsListWidgetType extends WidgetType
+- getType · method · L127-L129 — static getType()
+- name · method · L131-L133 — get name()
+- createWidgetImage · method · L135-L137 — get createWidgetImage()
+- component · method · L139-L141 — get component()
+- settingsComponent · method · L143-L145 — get settingsComponent()
+- getOrder · method · L147-L149 — getOrder()
+- isLoading · method · L151-L153 — isLoading(widget, data)
+- ProgressWidgetType · class · L156-L184 — class ProgressWidgetType extends WidgetType
+- getType · method · L157-L159 — static getType()
+- name · method · L161-L163 — get name()
+- createWidgetImage · method · L165-L167 — get createWidgetImage()
+- component · method · L169-L171 — get component()
+- settingsComponent · method · L173-L175 — get settingsComponent()
+- getOrder · method · L177-L179 — getOrder()
+- isLoading · method · L181-L183 — isLoading(widget, data)
+- UpcomingDatesWidgetType · class · L186-L214 — class UpcomingDatesWidgetType extends WidgetType
+- getType · method · L187-L189 — static getType()
+- name · method · L191-L193 — get name()
+- createWidgetImage · method · L195-L197 — get createWidgetImage()
+- component · method · L199-L201 — get component()
+- settingsComponent · method · L203-L205 — get settingsComponent()
+- getOrder · method · L207-L209 — getOrder()
+- isLoading · method · L211-L213 — isLoading(widget, data)

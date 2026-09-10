@@ -1,0 +1,6 @@
+# backend/tests/jadawel/core/test_staff_setting_permissions.py
+
+- test_staff_setting_permission_manager_staff_with_allow_global_workspace_creation_disabled · function · L11-L22 — def test_staff_setting_permission_manager_staff_with_allow_global_workspace_creation_disabled( data_fixture, ): # With workspace creation disabled, staff can still create workspaces.
+- test_staff_setting_permission_manager_staff_with_allow_global_workspace_creation_enabled · function · L26-L37 — def test_staff_setting_permission_manager_staff_with_allow_global_workspace_creation_enabled( data_fixture, ): # With workspace creation enabled, staff can still create workspaces.
+- test_staff_setting_permission_manager_non_staff_with_allow_global_workspace_creation_disabled · function · L41-L54 — def test_staff_setting_permission_manager_non_staff_with_allow_global_workspace_creation_disabled( data_fixture, ): # With workspace creation disabled, non-staff can't create workspaces.
+- test_staff_setting_permission_manager_non_staff_with_allow_global_workspace_creation_enabled · function · L58-L69 — def test_staff_setting_permission_manager_non_staff_with_allow_global_workspace_creation_enabled( data_fixture, ): # With workspace creation enabled, non-staff can create workspaces.

@@ -1,0 +1,18 @@
+# web-frontend/modules/arabase/views/components/HtmlPageView.vue
+
+- data · method · L69-L73 — data()
+- storeKey · method · L75-L77 — storeKey()
+- loading · method · L78-L83 — loading()
+- rows · method · L84-L86 — rows()
+- document · method · L87-L92 — document()
+- visibleFields · method · L93-L107 — visibleFields()
+- payload · method · L108-L131 — payload()
+- payload · method · L134-L136 — payload()
+- document · method · L137-L140 — document()
+- mounted · method · L142-L151 — mounted()
+- beforeUnmount · method · L152-L154 — beforeUnmount()
+- serializeRow · method · L161-L170 — serializeRow(row)
+- handshake · method · L171-L174 — handshake()
+- onMessage · method · L175-L194 — onMessage(event)
+- applyHeight · method · L195-L203 — applyHeight(height)
+- send · method · L204-L225 — send()

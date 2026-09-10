@@ -1,0 +1,43 @@
+# backend/src/jadawel/contrib/database/field_rules/handlers.py
+
+- FieldRuleHandler · class · L25-L621 — class FieldRuleHandler
+- __init__ · method · L33-L36 — def __init__(self, table: Table, user: AbstractUser | None = None)
+- emit_signal · method · L38-L44 — def emit_signal(self, signal: Signal, rule: FieldRule)
+- has_field_rules · method · L46-L53 — def has_field_rules(self) -> bool
+- get_type_handler · method · L55-L60 — def get_type_handler(self, rule_type_name: str) -> FieldRuleType
+- get_rule · method · L62-L71 — def get_rule(self, rule_id: int) -> FieldRule
+- _get_bare_rules_queryset · method · L73-L84 — def _get_bare_rules_queryset(self) -> models.QuerySet
+- _get_rules_queryset · method · L86-L92 — def _get_rules_queryset(self) -> models.QuerySet
+- get_rules · method · L94-L99 — def get_rules(self) -> list[FieldRule]
+- get_state_column · method · L102-L114 — def get_state_column() -> models.BooleanField
+- add_state_column · method · L116-L135 — def add_state_column(self) -> GeneratedTableModel
+- _set_rule_is_active · method · L137-L155 — def _set_rule_is_active(self, rule, to_value: bool)
+- enable_rule · method · L157-L162 — def enable_rule(self, rule)
+- disable_rule · method · L164-L169 — def disable_rule(self, rule)
+- registry · method · L172-L177 — def registry(self) -> FieldRulesTypeRegistry
+- create_rule · method · L179-L198 — def create_rule( self, rule_type_name: str, in_data: dict, primary_key_value: int | None = None ) -> FieldRule
+- force_create_rule · method · L200-L249 — def force_create_rule( self, rule_type_name: str, in_data: dict, primary_key_value: int | None = None ) -> FieldRule
+- _update_rule · method · L251-L287 — def _update_rule(self, rule: FieldRule, in_data: dict) -> FieldRule
+- update_rule · method · L289-L306 — def update_rule(self, rule: FieldRule, in_data: dict) -> FieldRule
+- on_table_change · method · L308-L329 — def on_table_change(self)
+- _delete_rule · method · L331-L338 — def _delete_rule(self, rule: FieldRule)
+- delete_rule · method · L340-L350 — def delete_rule(self, rule)
+- _get_active_field_rule_types_filter · method · L352-L364 — def _get_active_field_rule_types_filter(self) -> Q
+- applicable_rules_with_types · method · L367-L392 — def applicable_rules_with_types(self) -> list[tuple[FieldRule, FieldRuleType]]
+- per_content_type_queryset_hook · function · L385-L386 — def per_content_type_queryset_hook(rule, queryset)
+- _clear_cache · method · L394-L399 — def _clear_cache(self)
+- check_table_invalid_rows · method · L401-L409 — def check_table_invalid_rows(self)
+- _get_model · method · L411-L416 — def _get_model(self)
+- get_invalid_rows · method · L418-L426 — def get_invalid_rows(self) -> models.QuerySet
+- _get_invalid_rows_query · method · L428-L434 — def _get_invalid_rows_query(self) -> models.QuerySet
+- on_rows_create · method · L436-L444 — def on_rows_create(self, rows_data: list[dict]) -> list[RowRuleChanges]
+- on_row_create · method · L446-L459 — def on_row_create(self, row_data) -> list[RowRuleChanges]
+- _on_row_create · method · L461-L483 — def _on_row_create(self, model, row_data, rules, collector) -> list[RowRuleChanges]
+- on_rows_updated · method · L485-L499 — def on_rows_updated( self, rows: list[GeneratedTableModel], updated_values_by_id: dict[int, dict[str, Any]], ) -> list[RowRuleChanges]
+- _on_row_update · method · L501-L528 — def _on_row_update( self, row, updated_values, rules, collector ) -> list[RowRuleChanges]
+- on_row_update · method · L530-L544 — def on_row_update( self, row: GeneratedTableModel, updated_values: dict ) -> list[RowRuleChanges]
+- process_row_update · method · L546-L559 — def process_row_update( self, updated_values: dict, updated_field_ids: set[int], change: RowRuleChanges )
+- validate_row · method · L561-L584 — def validate_row(self, row: GeneratedTableModel) -> bool
+- validate_rows_for_rule · method · L586-L597 — def validate_rows_for_rule( self, rule: FieldRule, queryset: models.QuerySet | None = None )
+- export_rule · method · L599-L610 — def export_rule(self, rule: FieldRule)
+- import_rule · method · L612-L621 — def import_rule(self, rule_data: dict, id_mapping: dict) -> FieldRule

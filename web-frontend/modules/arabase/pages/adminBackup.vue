@@ -148,8 +148,6 @@ import { notifyIf } from '@jadawel/modules/core/utils/error'
 export default {
   name: 'AdminBackup',
   components: { AdminBackupRestoreModal },
-  layout: 'app',
-  middleware: 'staff',
   data() {
     return {
       loading: true,
@@ -277,4 +275,11 @@ export default {
     },
   },
 }
+</script>
+
+<script setup>
+definePageMeta({
+  layout: 'app',
+  middleware: 'staff',
+})
 </script>

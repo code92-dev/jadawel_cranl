@@ -1,0 +1,22 @@
+# web-frontend/modules/database/jobTypes.js
+
+- DuplicateTableJobType · class · L5-L62 — class DuplicateTableJobType extends JobType
+- getType · method · L6-L8 — static getType()
+- getName · method · L10-L13 — getName()
+- getSidebarText · method · L15-L18 — getSidebarText(job)
+- getSidebarComponent · method · L20-L22 — getSidebarComponent()
+- isJobPartOfApplication · method · L24-L26 — isJobPartOfApplication(job, application)
+- onJobFailed · method · L28-L40 — async onJobFailed(job)
+- onJobDone · method · L42-L61 — async onJobDone(job)
+- SyncDataSyncTableJobType · class · L64-L72 — class SyncDataSyncTableJobType extends JobType
+- getType · method · L65-L67 — static getType()
+- getName · method · L69-L71 — getName()
+- FileImportJobType · class · L74-L82 — class FileImportJobType extends JobType
+- getType · method · L75-L77 — static getType()
+- getName · method · L79-L81 — getName()
+- DuplicateFieldJobType · class · L84-L92 — class DuplicateFieldJobType extends JobType
+- getType · method · L85-L87 — static getType()
+- getName · method · L89-L91 — getName()
+- AirtableJobType · class · L94-L102 — class AirtableJobType extends JobType
+- getType · method · L95-L97 — static getType()
+- getName · method · L99-L101 — getName()

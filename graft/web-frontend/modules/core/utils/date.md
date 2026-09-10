@@ -1,0 +1,21 @@
+# web-frontend/modules/core/utils/date.js
+
+- getHumanPeriodAgoCount · function · L3-L52 — getHumanPeriodAgoCount = (dateTime)
+- getMonthName · function · L54-L56 — function getMonthName(dateTime)
+- getCapitalizedMonthName · function · L58-L61 — function getCapitalizedMonthName(dateTime)
+- weekDaysShort · function · L67-L71 — function weekDaysShort()
+- getDateInTimezone · function · L79-L92 — function getDateInTimezone({ year, month, day, timezone })
+- getMonthlyTimestamps · function · L101-L158 — function getMonthlyTimestamps(dateTime)
+- getUserTimeZone · function · L160-L166 — function getUserTimeZone()
+- DateOnly · class · L168-L226 — class DateOnly extends Date
+- constructor · method · L169-L182 — constructor(...args)
+- setHours · method · L185-L187 — setHours()
+- setMinutes · method · L189-L191 — setMinutes()
+- setSeconds · method · L193-L195 — setSeconds()
+- setMilliseconds · method · L197-L199 — setMilliseconds()
+- getHours · method · L201-L203 — getHours()
+- getMinutes · method · L205-L207 — getMinutes()
+- getSeconds · method · L209-L211 — getSeconds()
+- getMilliseconds · method · L213-L215 — getMilliseconds()
+- toString · method · L217-L221 — toString()
+- toJSON · method · L223-L225 — toJSON()

@@ -1,0 +1,57 @@
+# backend/tests/arabase/test_backup.py
+
+- _config · function · L12-L28 — def _config(**overrides)
+- TestConfig · class · L31-L83 — class TestConfig
+- test_reads_the_environment · method · L32-L41 — def test_reads_the_environment(self, monkeypatch)
+- test_is_disabled_by_default · method · L43-L46 — def test_is_disabled_by_default(self, monkeypatch)
+- test_normalises_a_prefix_without_a_trailing_slash · method · L48-L51 — def test_normalises_a_prefix_without_a_trailing_slash(self, monkeypatch)
+- test_falls_back_when_retention_is_not_a_number · method · L53-L56 — def test_falls_back_when_retention_is_not_a_number(self, monkeypatch)
+- test_reports_every_missing_credential · method · L58-L61 — def test_reports_every_missing_credential(self)
+- test_refuses_the_public_media_bucket_without_a_prefix · method · L63-L68 — def test_refuses_the_public_media_bucket_without_a_prefix(self, monkeypatch)
+- test_allows_the_media_bucket_under_its_own_prefix · method · L70-L73 — def test_allows_the_media_bucket_under_its_own_prefix(self, monkeypatch)
+- test_sends_no_acl_unless_one_is_configured · method · L75-L78 — def test_sends_no_acl_unless_one_is_configured(self, monkeypatch)
+- test_reads_an_explicit_acl · method · L80-L83 — def test_reads_an_explicit_acl(self, monkeypatch)
+- TestClientBinary · class · L86-L143 — class TestClientBinary
+- _bin_root · method · L96-L103 — def _bin_root(self, tmp_path, majors)
+- test_prefers_the_newest_installed_major · method · L105-L110 — def test_prefers_the_newest_installed_major(self, tmp_path, monkeypatch)
+- test_compares_majors_as_numbers_not_strings · method · L112-L119 — def test_compares_majors_as_numbers_not_strings(self, tmp_path, monkeypatch): # A plain string sort puts "9" above "18", which would pick a client # nine majors too old and fail every dump.
+- test_falls_back_to_path_when_nothing_is_installed · method · L121-L125 — def test_falls_back_to_path_when_nothing_is_installed(self, tmp_path, monkeypatch)
+- test_returns_none_when_there_is_nothing_anywhere · method · L127-L131 — def test_returns_none_when_there_is_nothing_anywhere(self, tmp_path, monkeypatch)
+- test_names_the_client_version_setting_when_too_old · method · L133-L143 — def test_names_the_client_version_setting_when_too_old(self, monkeypatch): # The message is the whole value of this check: it fires at 02:00 into a # log nobody is reading, so it has to say what to change.
+- TestUpload · class · L146-L182 — class TestUpload
+- _upload_extra_args · method · L156-L163 — def _upload_extra_args(self, config, tmp_path)
+- test_omits_the_acl_by_default · method · L165-L166 — def test_omits_the_acl_by_default(self, tmp_path)
+- test_sends_an_acl_when_one_is_configured · method · L168-L171 — def test_sends_an_acl_when_one_is_configured(self, tmp_path)
+- test_sends_encryption_only_when_configured · method · L173-L182 — def test_sends_encryption_only_when_configured(self, tmp_path)
+- TestDumpArgv · class · L186-L211 — class TestDumpArgv
+- test_never_puts_the_password_in_argv · method · L187-L200 — def test_never_puts_the_password_in_argv(self, _path)
+- test_uses_an_absolute_executable_path · method · L202-L205 — def test_uses_an_absolute_executable_path(self, _path)
+- test_omits_host_and_port_when_absent · method · L207-L211 — def test_omits_host_and_port_when_absent(self, _path)
+- TestVersionCheck · class · L214-L228 — class TestVersionCheck
+- test_refuses_an_older_client_than_server · method · L217-L219 — def test_refuses_an_older_client_than_server(self, _client, _server)
+- test_allows_a_newer_client · method · L227-L228 — def test_allows_a_newer_client(self, *_mocks)
+- TestRunBackup · class · L231-L284 — class TestRunBackup
+- test_refuses_to_run_unconfigured · method · L232-L234 — def test_refuses_to_run_unconfigured(self)
+- test_uploads_privately_under_the_prefix · method · L241-L248 — def test_uploads_privately_under_the_prefix( self, _dump, _client, upload, _prune, _versions )
+- test_does_not_upload_a_failed_dump · method · L256-L260 — def test_does_not_upload_a_failed_dump(self, _dump, client, _versions)
+- test_removes_the_temporary_file_even_when_upload_fails · method · L267-L284 — def test_removes_the_temporary_file_even_when_upload_fails( self, dump, _client, upload, _prune, _versions )
+- record · function · L272-L274 — def record(path)
+- TestPrefixSafety · class · L287-L297 — class TestPrefixSafety
+- test_an_empty_prefix_is_rejected · method · L288-L294 — def test_an_empty_prefix_is_rejected(self)
+- test_a_prefix_makes_the_config_usable · method · L296-L297 — def test_a_prefix_makes_the_config_usable(self)
+- TestPrune · class · L300-L360 — class TestPrune
+- _client_listing · method · L301-L306 — def _client_listing(self, objects)
+- test_deletes_only_objects_past_the_window · method · L308-L322 — def test_deletes_only_objects_past_the_window(self)
+- test_keeps_everything_inside_the_window · method · L324-L336 — def test_keeps_everything_inside_the_window(self)
+- test_never_deletes_an_object_it_did_not_write · method · L338-L360 — def test_never_deletes_an_object_it_did_not_write(self)
+- TestTask · class · L363-L396 — class TestTask: # Patched where it is used, not where it is defined: arabase.tasks binds # run_backup into its own namespace at import time.
+- test_does_nothing_when_disabled · method · L367-L372 — def test_does_nothing_when_disabled(self, run, monkeypatch)
+- test_runs_when_enabled · method · L379-L396 — def test_runs_when_enabled(self, run, monkeypatch)
+- TestMediaArchive · class · L399-L475 — class TestMediaArchive
+- test_uploads_user_files_beside_the_dump · method · L413-L423 — def test_uploads_user_files_beside_the_dump( self, _dump, _client, upload, _archive, _prune, _versions )
+- test_skips_user_files_when_disabled · method · L431-L438 — def test_skips_user_files_when_disabled( self, _dump, _client, upload, archive, _prune, _versions )
+- test_removes_the_temporary_archive · method · L445-L466 — def test_removes_the_temporary_archive( self, _dump, _client, _upload, _prune, _versions, tmp_path, settings )
+- record · function · L457-L459 — def record(path)
+- test_media_archive_reports_a_missing_root_as_a_backup_error · method · L468-L475 — def test_media_archive_reports_a_missing_root_as_a_backup_error( self, settings, tmp_path )
+- TestMediaRetention · class · L478-L499 — class TestMediaRetention
+- test_a_media_archive_is_pruned_like_a_dump · method · L479-L499 — def test_a_media_archive_is_pruned_like_a_dump(self)

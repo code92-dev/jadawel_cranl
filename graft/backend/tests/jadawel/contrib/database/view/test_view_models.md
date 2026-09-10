@@ -1,0 +1,20 @@
+# backend/tests/jadawel/contrib/database/view/test_view_models.py
+
+- test_view_get_field_options · function · L20-L66 — def test_view_get_field_options(data_fixture)
+- test_rotate_view_slug · function · L70-L74 — def test_rotate_view_slug(data_fixture)
+- test_view_filter_manager_view_trashed · function · L78-L87 — def test_view_filter_manager_view_trashed(data_fixture)
+- test_view_filter_manager_field_trashed · function · L91-L101 — def test_view_filter_manager_field_trashed(data_fixture)
+- test_view_sort_manager_view_trashed · function · L105-L114 — def test_view_sort_manager_view_trashed(data_fixture)
+- test_view_sort_manager_field_trashed · function · L118-L128 — def test_view_sort_manager_field_trashed(data_fixture)
+- test_grid_view_field_options_manager_view_trashed · function · L132-L142 — def test_grid_view_field_options_manager_view_trashed(data_fixture)
+- test_grid_view_field_options_manager_field_trashed · function · L146-L156 — def test_grid_view_field_options_manager_field_trashed(data_fixture)
+- test_gallery_view_field_options_manager_view_trashed · function · L160-L170 — def test_gallery_view_field_options_manager_view_trashed(data_fixture)
+- test_gallery_view_field_options_manager_field_trashed · function · L174-L184 — def test_gallery_view_field_options_manager_field_trashed(data_fixture)
+- test_form_view_field_options_manager_view_trashed · function · L188-L198 — def test_form_view_field_options_manager_view_trashed(data_fixture)
+- test_form_view_field_options_manager_field_trashed · function · L202-L212 — def test_form_view_field_options_manager_field_trashed(data_fixture)
+- test_view_decoration_manager_view_trashed · function · L216-L225 — def test_view_decoration_manager_view_trashed(data_fixture)
+- test_form_view_field_options_conditions_manager_field_trashed · function · L229-L247 — def test_form_view_field_options_conditions_manager_field_trashed(data_fixture)
+- test_public_view_password · function · L251-L267 — def test_public_view_password(data_fixture)
+- test_view_hierarchy · function · L271-L300 — def test_view_hierarchy(data_fixture)
+- test_migration_remove_duplicate_fieldoptions · function · L304-L373 — def test_migration_remove_duplicate_fieldoptions( data_fixture, migrator, teardown_table_metadata )
+- test_migration_remove_stale_fieldoptions · function · L378-L417 — def test_migration_remove_stale_fieldoptions( mocked_func, data_fixture, migrator, teardown_table_metadata ): # The correct behavior for after_field_moved_between_tables has been implemented in # the same MR when the migrations was added, so let's just mock it out to make sure # we create the data the migration expects to delete.

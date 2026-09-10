@@ -1,0 +1,27 @@
+# web-frontend/modules/core/authProviderTypes.js
+
+- BaseAuthProviderType · class · L7-L105 — class BaseAuthProviderType extends Registerable
+- getIcon · method · L11-L13 — getIcon()
+- getName · method · L18-L20 — getName()
+- getProviderName · method · L25-L27 — getProviderName(provider)
+- getAdminListComponent · method · L33-L35 — getAdminListComponent()
+- getAdminSettingsComponent · method · L43-L45 — getAdminSettingsComponent()
+- getLoginButtonComponent · method · L51-L53 — getLoginButtonComponent()
+- getLoginActionComponent · method · L60-L62 — getLoginActionComponent()
+- populateLoginOptions · method · L64-L70 — populateLoginOptions(authProviderOption)
+- populate · method · L72-L81 — populate(authProviderType)
+- canCreateNew · method · L88-L90 — canCreateNew(authProviders)
+- handleServerError · method · L98-L100 — handleServerError(vueComponentInstance, error)
+- getOrder · method · L102-L104 — getOrder()
+- AuthProviderType · class · L111-L139 — class AuthProviderType extends BaseAuthProviderType
+- constructor · method · L112-L126 — constructor(...args)
+- serialize · method · L131-L138 — serialize()
+- PasswordAuthProviderType · class · L141-L179 — class PasswordAuthProviderType extends AuthProviderType
+- getType · method · L142-L144 — static getType()
+- getIcon · method · L146-L148 — getIcon()
+- getName · method · L150-L152 — getName()
+- getProviderName · method · L154-L156 — getProviderName(provider)
+- getAdminListComponent · method · L158-L160 — getAdminListComponent()
+- getAdminSettingsFormComponent · method · L162-L164 — getAdminSettingsFormComponent()
+- canCreateNew · method · L169-L174 — canCreateNew(authProviders)
+- getOrder · method · L176-L178 — getOrder()

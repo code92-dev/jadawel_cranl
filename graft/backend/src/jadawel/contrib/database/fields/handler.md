@@ -1,0 +1,23 @@
+# backend/src/jadawel/contrib/database/fields/handler.py
+
+- _validate_field_name · function · L111-L158 — def _validate_field_name( field_values: Dict[str, Any], table: Table, existing_field: Optional[Field] = None, raise_if_name_missing: bool = True, )
+- FieldHandler · class · L164-L1636 — class FieldHandler(metaclass=jadawel_trace_methods(tracer))
+- get_field · method · L165-L202 — def get_field( self, field_id: int, field_model: Optional[Type[T]] = None, base_queryset: Optional[QuerySet] = None, ) -> T
+- get_base_fields_queryset · method · L204-L224 — def get_base_fields_queryset(self) -> QuerySet[Field]
+- get_fields · method · L226-L245 — def get_fields( self, table: Table, base_queryset: Optional[QuerySet] = None, specific: bool = True, ) -> Union[QuerySet[Field], Iterable[Field]]
+- get_specific_field_for_update · method · L247-L278 — def get_specific_field_for_update( self, field_id: int, field_model: Optional[Type[T]] = None, ) -> SpecificFieldForUpdate
+- create_field · method · L280-L462 — def create_field( self, user: AbstractUser, table: Table, type_name: str, primary: bool = False, skip_django_schema_editor_add_field: bool = True, return_updated_fields: bool = False, primary_key: bool = None, skip_search_updates: bool = False, description: Optional[str] = None, init_field_data: bool = False, **kwargs, ) -> Union[Field, Tuple[Field, List[Field]]]
+- _update_dependencies_of_field_created · method · L464-L501 — def _update_dependencies_of_field_created( self, field, update_collector, field_cache, skip_search_updates )
+- update_field · method · L503-L856 — def update_field( self, user: AbstractUser, field: SpecificFieldForUpdate, new_type_name: Optional[str] = None, return_updated_fields: bool = False, postfix_to_fix_name_collisions: Optional[str] = None, after_schema_change_callback: Optional[ Callable[[SpecificFieldForUpdate], None] ] = None, **kwargs, ) -> Union[SpecificFieldForUpdate, Tuple[SpecificFieldForUpdate, List[Field]]]
+- _update_dependencies_of_field_updated · method · L858-L894 — def _update_dependencies_of_field_updated( self, field, old_field, update_collector, field_cache )
+- duplicate_field · method · L896-L967 — def duplicate_field( self, user: AbstractUser, field: Field, duplicate_data: bool = False, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Tuple[Field, List[Field]]
+- delete_field · method · L969-L1093 — def delete_field( self, user: AbstractUser, field: Field, existing_trash_entry: Optional[TrashEntry] = None, update_collector: Optional[FieldUpdateCollector] = None, field_cache: Optional[FieldCache] = None, apply_and_send_updates: Optional[bool] = True, allow_deleting_primary: Optional[bool] = False, delete_strategy: DeleteFieldStrategyEnum = DeleteFieldStrategyEnum.TRASH, ) -> List[Field]
+- _update_dependencies_of_field_deleted · method · L1095-L1126 — def _update_dependencies_of_field_deleted( self, field, update_collector, field_cache, all_dependent_fields_grouped_by_depth, )
+- update_field_select_options · method · L1128-L1217 — def update_field_select_options(self, user, field, select_options)
+- find_next_unused_field_name · method · L1220-L1261 — def find_next_unused_field_name( self, table, field_names_to_try: List[str], field_ids_to_ignore: Optional[List[int]] = None, ) -> str
+- restore_field · method · L1263-L1334 — def restore_field( self, field: Field, update_collector: Optional[FieldUpdateCollector] = None, field_cache: Optional[FieldCache] = None, send_field_restored_signal: bool = True, )
+- _update_dependencies_of_field_restored · method · L1336-L1382 — def _update_dependencies_of_field_restored( self, field, update_collector, field_cache )
+- move_field_between_tables · method · L1384-L1411 — def move_field_between_tables(self, field_to_move, target_table)
+- get_unique_row_values · method · L1413-L1529 — def get_unique_row_values( self, field: Field, limit: int, split_comma_separated: bool = False ) -> List[str]
+- change_primary_field · method · L1531-L1609 — def change_primary_field( self, user: AbstractUser, table: Table, new_primary_field: Field ) -> Tuple[Field, Field]
+- _validate_name_and_optionally_rename_if_collision · method · L1611-L1636 — def _validate_name_and_optionally_rename_if_collision( self, field: Field, field_values: Dict[str, Any], postfix_for_name_collisions: Optional[str], )

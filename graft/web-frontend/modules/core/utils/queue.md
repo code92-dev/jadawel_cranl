@@ -1,0 +1,24 @@
+# web-frontend/modules/core/utils/queue.js
+
+- Task · class · L3-L25 — class Task
+- constructor · method · L4-L14 — constructor(uid, func)
+- run · method · L16-L24 — async run()
+- TaskQueue · class · L26-L101 — class TaskQueue
+- constructor · method · L27-L32 — constructor({ doneCallback = null })
+- add · method · L34-L38 — add(func)
+- waitFor · method · L40-L47 — async waitFor(taskId)
+- waitAll · method · L54-L59 — async waitAll()
+- start · method · L61-L67 — start()
+- run · method · L69-L78 — async run()
+- done · method · L80-L84 — done()
+- lock · method · L89-L91 — lock()
+- release · method · L97-L100 — release()
+- GroupTaskQueue · class · L103-L145 — class GroupTaskQueue
+- constructor · method · L104-L106 — constructor()
+- getOrCreateQueue · method · L108-L117 — getOrCreateQueue(groupId)
+- doneCallback · function · L111-L113 — doneCallback = ()
+- add · method · L130-L134 — async add(func, groupId = null)
+- lock · method · L136-L139 — lock(groupId = null)
+- release · method · L141-L144 — release(groupId = null)
+- waitFor · function · L150-L168 — function waitFor(checkFunction, interval = 5, timeout = 10000)
+- check · function · L154-L164 — check = ()

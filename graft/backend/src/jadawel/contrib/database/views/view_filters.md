@@ -1,0 +1,167 @@
+# backend/src/jadawel/contrib/database/views/view_filters.py
+
+- NotViewFilterTypeMixin · class · L82-L87 — class NotViewFilterTypeMixin
+- default_filter_on_exception · method · L83-L84 — def default_filter_on_exception(self)
+- get_filter · method · L86-L87 — def get_filter(self, *args, **kwargs)
+- EqualViewFilterType · class · L90-L132 — class EqualViewFilterType(ViewFilterType)
+- get_filter · method · L120-L132 — def get_filter(self, field_name, value, model_field, field): # Check if the model_field accepts the value.
+- NotEqualViewFilterType · class · L135-L136 — class NotEqualViewFilterType(NotViewFilterTypeMixin, EqualViewFilterType)
+- FilenameContainsViewFilterType · class · L139-L155 — class FilenameContainsViewFilterType(ViewFilterType)
+- get_filter · method · L154-L155 — def get_filter(self, *args)
+- HasFileTypeViewFilterType · class · L158-L192 — class HasFileTypeViewFilterType(ViewFilterType)
+- get_filter · method · L178-L192 — def get_filter(self, field_name, value, model_field, field)
+- FilesLowerThanViewFilterType · class · L195-L225 — class FilesLowerThanViewFilterType(ViewFilterType)
+- get_filter · method · L207-L225 — def get_filter(self, field_name, value, model_field, field)
+- ContainsViewFilterType · class · L228-L264 — class ContainsViewFilterType(ViewFilterType)
+- get_filter · method · L259-L264 — def get_filter(self, field_name, value, model_field, field) -> OptionallyAnnotatedQ
+- ContainsWordViewFilterType · class · L267-L297 — class ContainsWordViewFilterType(ViewFilterType)
+- get_filter · method · L291-L297 — def get_filter(self, field_name, value, model_field, field) -> OptionallyAnnotatedQ: # Check if the model_field accepts the value.
+- DoesntContainWordViewFilterType · class · L300-L303 — class DoesntContainWordViewFilterType( NotViewFilterTypeMixin, ContainsWordViewFilterType )
+- ContainsNotViewFilterType · class · L306-L307 — class ContainsNotViewFilterType(NotViewFilterTypeMixin, ContainsViewFilterType)
+- LengthIsLowerThanViewFilterType · class · L310-L338 — class LengthIsLowerThanViewFilterType(ViewFilterType)
+- get_filter · method · L328-L338 — def get_filter(self, field_name, value, model_field, field)
+- IsEvenAndWholeViewFilterType · class · L341-L362 — class IsEvenAndWholeViewFilterType(ViewFilterType)
+- get_filter · method · L358-L362 — def get_filter(self, field_name, value, model_field, field)
+- NumericComparisonViewFilterType · class · L365-L395 — class NumericComparisonViewFilterType(ViewFilterType)
+- get_filter · method · L383-L395 — def get_filter(self, field_name, value, model_field, field)
+- LowerThanViewFilterType · class · L398-L405 — class LowerThanViewFilterType(NumericComparisonViewFilterType)
+- LowerThanOrEqualViewFilterType · class · L408-L416 — class LowerThanOrEqualViewFilterType(NumericComparisonViewFilterType)
+- HigherThanViewFilterType · class · L419-L426 — class HigherThanViewFilterType(NumericComparisonViewFilterType)
+- HigherThanOrEqualViewFilterType · class · L429-L437 — class HigherThanOrEqualViewFilterType(NumericComparisonViewFilterType)
+- TimezoneAwareDateViewFilterType · class · L440-L597 — class TimezoneAwareDateViewFilterType(ViewFilterType)
+- time_sensitive · method · L442-L443 — def time_sensitive(self) -> bool
+- is_empty_filter · method · L452-L453 — def is_empty_filter(self, filter_value: str) -> bool
+- get_filter_date · method · L455-L478 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L480-L494 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[datetime, date], now: datetime ) -> Dict
+- _split_optional_timezone_and_filter_value · method · L496-L511 — def _split_optional_timezone_and_filter_value( self, field, filter_value, separator ) -> Tuple[Optional[str], Optional[str]]
+- split_timezone_and_filter_value · method · L513-L546 — def split_timezone_and_filter_value( self, field, filter_value, separator=DATE_FILTER_TIMEZONE_SEPARATOR ) -> Tuple[zoneinfo.ZoneInfo, str]
+- get_filter · method · L548-L597 — def get_filter( self, field_name: str, value: str, model_field, field: Field ) -> Union[Q, AnnotatedQ]
+- DateEqualViewFilterType · class · L600-L612 — class DateEqualViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_query_dict · method · L609-L612 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateBeforeViewFilterType · class · L615-L627 — class DateBeforeViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_query_dict · method · L624-L627 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict[str, Any]
+- DateBeforeOrEqualViewFilterType · class · L630-L641 — class DateBeforeOrEqualViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_query_dict · method · L638-L641 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict[str, Any]
+- DateAfterViewFilterType · class · L644-L656 — class DateAfterViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_query_dict · method · L653-L656 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict[str, Any]
+- DateAfterOrEqualViewFilterType · class · L659-L670 — class DateAfterOrEqualViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_query_dict · method · L667-L670 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict[str, Any]
+- DateEqualsDayOfMonthViewFilterType · class · L673-L705 — class DateEqualsDayOfMonthViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter · method · L681-L705 — def get_filter( self, field_name: str, value: str, model_field, field: Field ) -> Union[Q, AnnotatedQ]
+- EmptyFilterValueMixin · class · L708-L710 — class EmptyFilterValueMixin
+- is_empty_filter · method · L709-L710 — def is_empty_filter(self, filter_value: str) -> bool
+- DateEqualsTodayViewFilterType · class · L713-L730 — class DateEqualsTodayViewFilterType( EmptyFilterValueMixin, TimezoneAwareDateViewFilterType )
+- get_filter_date · method · L722-L725 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L727-L730 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateBeforeTodayViewFilterType · class · L733-L750 — class DateBeforeTodayViewFilterType( EmptyFilterValueMixin, TimezoneAwareDateViewFilterType )
+- get_filter_date · method · L742-L745 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L747-L750 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateAfterTodayViewFilterType · class · L753-L770 — class DateAfterTodayViewFilterType( EmptyFilterValueMixin, TimezoneAwareDateViewFilterType )
+- get_filter_date · method · L762-L765 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L767-L770 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateEqualsCurrentWeekViewFilterType · class · L773-L795 — class DateEqualsCurrentWeekViewFilterType( EmptyFilterValueMixin, TimezoneAwareDateViewFilterType )
+- get_filter_date · method · L783-L786 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L788-L795 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateEqualsCurrentMonthViewFilterType · class · L798-L819 — class DateEqualsCurrentMonthViewFilterType( EmptyFilterValueMixin, TimezoneAwareDateViewFilterType )
+- get_filter_date · method · L808-L811 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L813-L819 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateEqualsCurrentYearViewFilterType · class · L822-L840 — class DateEqualsCurrentYearViewFilterType( EmptyFilterValueMixin, TimezoneAwareDateViewFilterType )
+- get_filter_date · method · L832-L835 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L837-L840 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- get_is_within_filter_query_dict · function · L843-L858 — def get_is_within_filter_query_dict( field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateIsWithinXDaysViewFilterType · class · L861-L887 — class DateIsWithinXDaysViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_date · method · L872-L882 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L884-L887 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateIsWithinXWeeksViewFilterType · class · L890-L919 — class DateIsWithinXWeeksViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_date · method · L901-L914 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L916-L919 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateIsWithinXMonthsViewFilterType · class · L922-L953 — class DateIsWithinXMonthsViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_date · method · L933-L948 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L950-L953 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateEqualsDaysAgoViewFilterType · class · L956-L976 — class DateEqualsDaysAgoViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_date · method · L967-L971 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L973-L976 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateEqualsMonthsAgoViewFilterType · class · L979-L1004 — class DateEqualsMonthsAgoViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_date · method · L990-L996 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L998-L1004 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateEqualsYearsAgoViewFilterType · class · L1007-L1029 — class DateEqualsYearsAgoViewFilterType(TimezoneAwareDateViewFilterType)
+- get_filter_date · method · L1018-L1024 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]
+- get_filter_query_dict · method · L1026-L1029 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- DateNotEqualViewFilterType · class · L1032-L1033 — class DateNotEqualViewFilterType(NotViewFilterTypeMixin, DateEqualViewFilterType)
+- DateAfterDaysAgoViewFilterType · class · L1036-L1064 — class DateAfterDaysAgoViewFilterType(TimezoneAwareDateViewFilterType)
+- is_empty_filter · method · L1049-L1050 — def is_empty_filter(self, filter_value: str) -> bool
+- get_filter_date · method · L1052-L1057 — def get_filter_date( self, filter_value: str, timezone: datetime_module.tzinfo ) -> Union[datetime, date]: # Calculate and return the date `filter_value` days ago in the given timezone
+- get_filter_query_dict · method · L1059-L1064 — def get_filter_query_dict( self, field_name: str, aware_filter_date: Union[date, datetime], now: datetime ) -> Dict
+- SingleSelectEqualViewFilterType · class · L1067-L1116 — class SingleSelectEqualViewFilterType(ViewFilterType)
+- _get_filter · method · L1082-L1083 — def _get_filter(field_name, value: int, model_field, field)
+- _get_formula_filter · method · L1086-L1089 — def _get_formula_filter(field_name, value: int, model_field, field)
+- get_filter · method · L1098-L1109 — def get_filter(self, field_name, value, model_field, field)
+- set_import_serialized_value · method · L1111-L1116 — def set_import_serialized_value(self, value, id_mapping)
+- SingleSelectNotEqualViewFilterType · class · L1119-L1122 — class SingleSelectNotEqualViewFilterType( NotViewFilterTypeMixin, SingleSelectEqualViewFilterType )
+- SingleSelectIsAnyOfViewFilterType · class · L1125-L1171 — class SingleSelectIsAnyOfViewFilterType(ViewFilterType)
+- _get_filter · method · L1140-L1141 — def _get_filter(field_name, option_ids, model_field, field)
+- _get_formula_filter · method · L1143-L1146 — def _get_formula_filter(field_name, option_ids, model_field, field)
+- get_filter · method · L1155-L1166 — def get_filter(self, field_name, value: str, model_field, field)
+- set_import_serialized_value · method · L1168-L1171 — def set_import_serialized_value(self, value: str | None, id_mapping: dict) -> str
+- SingleSelectIsNoneOfViewFilterType · class · L1174-L1183 — class SingleSelectIsNoneOfViewFilterType( NotViewFilterTypeMixin, SingleSelectIsAnyOfViewFilterType )
+- BooleanViewFilterType · class · L1186-L1213 — class BooleanViewFilterType(ViewFilterType)
+- get_filter · method · L1202-L1213 — def get_filter(self, field_name, value, model_field, field)
+- ManyToManyHasBaseViewFilter · class · L1216-L1253 — class ManyToManyHasBaseViewFilter(ViewFilterType)
+- _get_filter · method · L1224-L1232 — def _get_filter(self, field_name, value, model_field, field)
+- _get_formula_filter · method · L1234-L1237 — def _get_formula_filter(field_name, value, model_field, field)
+- get_filter · method · L1241-L1253 — def get_filter(self, field_name, value: str, model_field, field)
+- LinkRowHasViewFilterType · class · L1256-L1304 — class LinkRowHasViewFilterType(ManyToManyHasBaseViewFilter)
+- get_filter · method · L1264-L1270 — def get_filter(self, field_name, value, model_field, field)
+- get_preload_values · method · L1272-L1304 — def get_preload_values(self, view_filter)
+- LinkRowHasNotViewFilterType · class · L1307-L1325 — class LinkRowHasNotViewFilterType(LinkRowHasViewFilterType)
+- default_filter_on_exception · method · L1317-L1318 — def default_filter_on_exception(self)
+- get_filter · method · L1320-L1325 — def get_filter(self, field_name, value, model_field, field)
+- LinkRowContainsViewFilterType · class · L1328-L1363 — class LinkRowContainsViewFilterType(ViewFilterType)
+- get_filter · method · L1332-L1363 — def get_filter(self, field_name, value, model_field, field) -> OptionallyAnnotatedQ
+- LinkRowNotContainsViewFilterType · class · L1366-L1375 — class LinkRowNotContainsViewFilterType( NotViewFilterTypeMixin, LinkRowContainsViewFilterType )
+- get_filter · method · L1371-L1375 — def get_filter(self, field_name, value, model_field, field) -> OptionallyAnnotatedQ
+- MultipleSelectHasViewFilterType · class · L1378-L1431 — class MultipleSelectHasViewFilterType(ManyToManyHasBaseViewFilter)
+- _get_filter · method · L1393-L1400 — def _get_filter(field_name, option_ids, model_field, field)
+- _get_formula_filter · method · L1403-L1406 — def _get_formula_filter(field_name, option_ids, model_field, field)
+- get_filter · method · L1415-L1426 — def get_filter(self, field_name, value: str, model_field, field)
+- set_import_serialized_value · method · L1428-L1431 — def set_import_serialized_value(self, value: str | None, id_mapping: dict) -> str
+- MultipleSelectHasNotViewFilterType · class · L1434-L1443 — class MultipleSelectHasNotViewFilterType( NotViewFilterTypeMixin, MultipleSelectHasViewFilterType )
+- MultipleCollaboratorsHasViewFilterType · class · L1446-L1497 — class MultipleCollaboratorsHasViewFilterType(ManyToManyHasBaseViewFilter)
+- get_export_serialized_value · method · L1462-L1481 — def get_export_serialized_value(self, value, id_mapping)
+- set_import_serialized_value · method · L1483-L1497 — def set_import_serialized_value(self, value, id_mapping)
+- MultipleCollaboratorsHasNotViewFilterType · class · L1500-L1508 — class MultipleCollaboratorsHasNotViewFilterType( NotViewFilterTypeMixin, MultipleCollaboratorsHasViewFilterType )
+- UserIsViewFilterType · class · L1511-L1566 — class UserIsViewFilterType(ViewFilterType)
+- get_filter · method · L1522-L1529 — def get_filter(self, field_name, value, model_field, field)
+- get_export_serialized_value · method · L1531-L1550 — def get_export_serialized_value(self, value, id_mapping)
+- set_import_serialized_value · method · L1552-L1566 — def set_import_serialized_value(self, value, id_mapping)
+- UserIsNotViewFilterType · class · L1569-L1575 — class UserIsNotViewFilterType(NotViewFilterTypeMixin, UserIsViewFilterType)
+- EmptyViewFilterType · class · L1578-L1632 — class EmptyViewFilterType(ViewFilterType)
+- get_filter · method · L1630-L1632 — def get_filter(self, field_name, value, model_field, field)
+- NotEmptyViewFilterType · class · L1635-L1636 — class NotEmptyViewFilterType(NotViewFilterTypeMixin, EmptyViewFilterType)
+- DateFilterOperators · class · L1639-L1660 — class DateFilterOperators(Enum)
+- DateFilterBounds · class · L1668-L1676 — class DateFilterBounds(NamedTuple)
+- BaseDateMultiStepViewFilterType · class · L1790-L1972 — class BaseDateMultiStepViewFilterType(ViewFilterType)
+- time_sensitive · method · L1794-L1795 — def time_sensitive(self) -> bool
+- get_filter_date · method · L1797-L1827 — def get_filter_date( self, operator: str, filter_value: str, timezone: datetime_module.tzinfo, ) -> date
+- _split_combined_value · method · L1829-L1848 — def _split_combined_value( self, field, filter_value, separator ) -> Tuple[Optional[str], Optional[str], Optional[str]]
+- get_available_operators · method · L1850-L1859 — def get_available_operators(self)
+- split_combined_value · method · L1861-L1898 — def split_combined_value( self, field, filter_value, separator=DATE_FILTER_TIMEZONE_SEPARATOR ) -> Tuple[zoneinfo.ZoneInfo, str, str]
+- is_empty_filter · method · L1900-L1903 — def is_empty_filter(self, operator: str, filter_value: str) -> bool
+- get_filter_expression · method · L1905-L1928 — def get_filter_expression( self, field_name: str, model_field, lower_bound: date | datetime, upper_bound: date | datetime, timezone: zoneinfo.ZoneInfo, ) -> OptionallyAnnotatedQ
+- get_filter · method · L1930-L1972 — def get_filter( self, field_name: str, value: str, model_field, field: Field ) -> Union[Q, AnnotatedQ]
+- DateMultiStepViewFilterType · class · L1975-L2024 — class DateMultiStepViewFilterType(BaseDateMultiStepViewFilterType)
+- get_filter_query_dict · method · L1983-L2000 — def get_filter_query_dict( self, operator: str, field_name: str, aware_filter_date: Union[datetime, date], **kwargs, ) -> Dict[str, Union[date, datetime]]
+- get_filter_expression · method · L2002-L2024 — def get_filter_expression( self, field_name: str, model_field, lower_bound: date | datetime, upper_bound: date | datetime, timezone: zoneinfo.ZoneInfo, ) -> OptionallyAnnotatedQ
+- DateIsEqualMultiStepFilterType · class · L2027-L2037 — class DateIsEqualMultiStepFilterType(DateMultiStepViewFilterType)
+- get_filter_query_dict · method · L2030-L2037 — def get_filter_query_dict( self, field_name: str, lower_bound: Union[date, datetime], upper_bound: Union[date, datetime], timezone: datetime_module.tzinfo, ) -> Dict[str, Union[date, datetime]]
+- DateIsNotEqualMultiStepFilterType · class · L2040-L2043 — class DateIsNotEqualMultiStepFilterType( NotViewFilterTypeMixin, DateIsEqualMultiStepFilterType )
+- DateIsBeforeMultiStepFilterType · class · L2046-L2056 — class DateIsBeforeMultiStepFilterType(DateMultiStepViewFilterType)
+- get_filter_query_dict · method · L2049-L2056 — def get_filter_query_dict( self, field_name: str, lower_bound: Union[date, datetime], upper_bound: Union[date, datetime], timezone: datetime_module.tzinfo, ) -> Dict[str, Union[date, datetime]]
+- DateIsOnOrBeforeMultiStepFilterType · class · L2059-L2069 — class DateIsOnOrBeforeMultiStepFilterType(DateMultiStepViewFilterType)
+- get_filter_query_dict · method · L2062-L2069 — def get_filter_query_dict( self, field_name: str, lower_bound: Union[date, datetime], upper_bound: Union[date, datetime], timezone: datetime_module.tzinfo, ) -> Dict[str, Union[date, datetime]]
+- DateIsAfterMultiStepFilterType · class · L2072-L2082 — class DateIsAfterMultiStepFilterType(DateMultiStepViewFilterType)
+- get_filter_query_dict · method · L2075-L2082 — def get_filter_query_dict( self, field_name: str, lower_bound: Union[date, datetime], upper_bound: Union[date, datetime], timezone: datetime_module.tzinfo, ) -> Dict[str, Union[date, datetime]]
+- DateIsOnOrAfterMultiStepFilterType · class · L2085-L2095 — class DateIsOnOrAfterMultiStepFilterType(DateMultiStepViewFilterType)
+- get_filter_query_dict · method · L2088-L2095 — def get_filter_query_dict( self, field_name: str, lower_bound: Union[date, datetime], upper_bound: Union[date, datetime], timezone: datetime_module.tzinfo, ) -> Dict[str, Union[date, datetime]]
+- DateIsWithinMultiStepFilterType · class · L2098-L2118 — class DateIsWithinMultiStepFilterType(DateMultiStepViewFilterType)
+- get_filter_query_dict · method · L2103-L2118 — def get_filter_query_dict( self, field_name: str, lower_bound: Union[date, datetime], upper_bound: Union[date, datetime], timezone: datetime_module.tzinfo, ) -> Dict[str, Union[date, datetime]]

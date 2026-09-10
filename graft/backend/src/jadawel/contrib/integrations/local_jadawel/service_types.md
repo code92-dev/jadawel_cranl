@@ -1,0 +1,121 @@
+# backend/src/jadawel/contrib/integrations/local_jadawel/service_types.py
+
+- LocalJadawelServiceType · class · L139-L169 — class LocalJadawelServiceType(ServiceType)
+- get_schema_for_return_type · method · L146-L169 — def get_schema_for_return_type( self, service: ServiceSubClass, properties: Dict[str, Any] ) -> Dict[str, Any]
+- LocalJadawelTableServiceType · class · L172-L750 — class LocalJadawelTableServiceType(LocalJadawelServiceType)
+- SerializedDict · class · L206-L207 — class SerializedDict(ServiceDict)
+- _convert_allowed_field_names · method · L209-L218 — def _convert_allowed_field_names(self, service, allowed_fields)
+- sanitize_result · method · L220-L229 — def sanitize_result(self, service, result, allowed_field_names)
+- prepare_value_path · method · L231-L244 — def prepare_value_path(self, service: Service, path: List[str])
+- _prepare_one_row · method · L246-L254 — def _prepare_one_row(self, mapping, row)
+- convert · function · L247-L252 — def convert(key, value)
+- _prepare_result · method · L256-L272 — def _prepare_result(self, table_model, dispatch_result)
+- build_queryset · method · L274-L298 — def build_queryset( self, service: LocalJadawelTableService, table: "Table", dispatch_context: DispatchContext, model: Optional[Type["GeneratedTableModel"]] = None, ) -> QuerySet
+- get_table_queryset · method · L300-L315 — def get_table_queryset( self, service: ServiceSubClass, table: "Table", dispatch_context: DispatchContext, model: Type["GeneratedTableModel"], )
+- enhance_queryset · method · L317-L325 — def enhance_queryset(self, queryset)
+- resolve_service_formulas · method · L327-L352 — def resolve_service_formulas( self, service: ServiceSubClass, dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- import_property_name · method · L354-L376 — def import_property_name( self, property_name: Union[str, int], id_mapping: Dict[str, Any] ) -> Optional[str]
+- extract_properties · method · L378-L423 — def extract_properties( self, service: Service, path: List[str], **kwargs ) -> List[str]
+- deserialize_property · method · L425-L450 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, )
+- prepare_values · method · L452-L475 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: Optional[ServiceSubClass] = None, ) -> Dict[str, Any]
+- export_prepared_values · method · L477-L485 — def export_prepared_values(self, instance: Service) -> dict[str, any]
+- generate_schema · method · L487-L523 — def generate_schema( self, service: ServiceSubClass, allowed_fields: Optional[List[str]] = None ) -> Optional[Dict[str, Any]]
+- _get_table_properties · method · L525-L570 — def _get_table_properties( self, service: ServiceSubClass ) -> Optional[Dict[str, Any]]
+- get_schema_name · method · L572-L580 — def get_schema_name(self, service: ServiceSubClass) -> str
+- get_used_field_names · method · L582-L600 — def get_used_field_names( self, service: LocalJadawelTableService, dispatch_context: DispatchContext ) -> Optional[List[str]]
+- get_table_model · method · L602-L612 — def get_table_model( self, service: LocalJadawelTableService ) -> Optional["GeneratedTableModel"]
+- get_table_field_objects · method · L614-L629 — def get_table_field_objects( self, service: LocalJadawelTableService ) -> List[Dict] | None
+- get_context_data · method · L631-L656 — def get_context_data( self, service: ServiceSubClass, allowed_fields: Optional[List[str]] = None ) -> Dict[str, Any]
+- _get_context_data · method · L658-L673 — def _get_context_data(self, service: ServiceSubClass) -> Dict[str, Any]
+- get_context_data_schema · method · L675-L703 — def get_context_data_schema( self, service: ServiceSubClass, allowed_fields: Optional[List[str]] = None ) -> Optional[Dict[str, Any]]
+- _get_context_data_properties · method · L705-L734 — def _get_context_data_properties( self, service: ServiceSubClass ) -> Optional[Dict[str, Any]]
+- get_json_type_from_response_serializer_field · method · L736-L750 — def get_json_type_from_response_serializer_field( self, field, field_type ) -> Dict[str, Any]
+- LocalJadawelViewServiceType · class · L753-L894 — class LocalJadawelViewServiceType(LocalJadawelTableServiceType)
+- allowed_fields · method · L759-L760 — def allowed_fields(self)
+- serializer_field_names · method · L763-L764 — def serializer_field_names(self)
+- serializer_field_overrides · method · L767-L775 — def serializer_field_overrides(self)
+- SerializedDict · class · L777-L778 — class SerializedDict(LocalJadawelTableServiceType.SerializedDict)
+- enhance_queryset · method · L780-L790 — def enhance_queryset(self, queryset)
+- deserialize_property · method · L792-L817 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, )
+- prepare_values · method · L819-L887 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: Optional[ServiceSubClass] = None, ) -> Dict[str, Any]
+- export_prepared_values · method · L889-L894 — def export_prepared_values(self, instance: Service) -> dict[str, any]
+- LocalJadawelListRowsUserServiceType · class · L897-L1181 — class LocalJadawelListRowsUserServiceType( ListServiceTypeMixin, LocalJadawelTableServiceSearchableMixin, LocalJadawelTableServiceFilterableMixin, LocalJadawelTableServiceSortableMixin, LocalJadawelViewServiceType, )
+- simple_formula_fields · method · L921-L925 — def simple_formula_fields(self)
+- allowed_fields · method · L928-L934 — def allowed_fields(self)
+- serializer_field_names · method · L937-L944 — def serializer_field_names(self)
+- serializer_field_overrides · method · L947-L953 — def serializer_field_overrides(self)
+- SerializedDict · class · L955-L961 — class SerializedDict( LocalJadawelViewServiceType.SerializedDict, LocalJadawelTableServiceSortableMixin.SerializedDict, LocalJadawelTableServiceSearchableMixin.SerializedDict, LocalJadawelTableServiceFilterableMixin.SerializedDict, )
+- get_max_result_limit · method · L963-L964 — def get_max_result_limit(self, service: Service)
+- get_default_result_limit · method · L966-L967 — def get_default_result_limit(self, service: Service)
+- get_name_property · method · L969-L978 — def get_name_property(self, service: ServiceSubClass) -> Optional[str]
+- import_path · method · L980-L1012 — def import_path(self, path, id_mapping)
+- import_context_path · method · L1014-L1036 — def import_context_path( self, path: List[str], id_mapping: Dict[int, int], **kwargs )
+- dispatch_data · method · L1038-L1104 — def dispatch_data( self, service: LocalJadawelListRows, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- dispatch_transform · method · L1106-L1144 — def dispatch_transform(self, dispatch_data: Dict[str, Any]) -> DispatchResult
+- get_record_names · method · L1146-L1181 — def get_record_names( self, service: LocalJadawelListRows, record_ids: List[int], dispatch_context: DispatchContext, ) -> Dict[str, str]
+- LocalJadawelAggregateRowsUserServiceType · class · L1184-L1560 — class LocalJadawelAggregateRowsUserServiceType( LocalJadawelTableServiceSearchableMixin, LocalJadawelTableServiceFilterableMixin, LocalJadawelViewServiceType, )
+- get_schema_name · method · L1205-L1214 — def get_schema_name(self, service: LocalJadawelAggregateRows) -> str
+- generate_schema · method · L1216-L1254 — def generate_schema( self, service: LocalJadawelAggregateRows, allowed_fields: Optional[List[str]] = None, ) -> Optional[Dict[str, Any]]
+- get_context_data · method · L1256-L1269 — def get_context_data( self, service: LocalJadawelAggregateRows, allowed_fields: Optional[List[str]] = None, ) -> dict
+- get_context_data_schema · method · L1271-L1274 — def get_context_data_schema( self, service: LocalJadawelAggregateRows ) -> dict | None
+- enhance_queryset · method · L1276-L1281 — def enhance_queryset(self, queryset)
+- simple_formula_fields · method · L1284-L1288 — def simple_formula_fields(self)
+- allowed_fields · method · L1291-L1297 — def allowed_fields(self)
+- serializer_field_names · method · L1300-L1305 — def serializer_field_names(self)
+- serializer_field_overrides · method · L1308-L1318 — def serializer_field_overrides(self)
+- SerializedDict · class · L1320-L1326 — class SerializedDict( LocalJadawelViewServiceType.SerializedDict, LocalJadawelTableServiceSearchableMixin.SerializedDict, LocalJadawelTableServiceFilterableMixin.SerializedDict, )
+- prepare_values · method · L1328-L1402 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: Optional[ServiceSubClass] = None, ) -> Dict[str, Any]
+- export_prepared_values · method · L1404-L1409 — def export_prepared_values(self, instance: Service) -> dict[str, any]
+- deserialize_property · method · L1411-L1441 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, )
+- resolve_service_formulas · method · L1443-L1473 — def resolve_service_formulas( self, service: LocalJadawelAggregateRows, dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- dispatch_data · method · L1475-L1523 — def dispatch_data( self, service: LocalJadawelAggregateRows, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- dispatch_transform · method · L1525-L1548 — def dispatch_transform( self, data: Dict[str, Any], ) -> DispatchResult
+- extract_properties · method · L1550-L1560 — def extract_properties( self, service: Service, path: List[str], **kwargs ) -> List[str]
+- LocalJadawelGetRowUserServiceType · class · L1563-L1746 — class LocalJadawelGetRowUserServiceType( LocalJadawelTableServiceSearchableMixin, LocalJadawelTableServiceFilterableMixin, LocalJadawelTableServiceSortableMixin, LocalJadawelTableServiceSpecificRowMixin, LocalJadawelViewServiceType, )
+- simple_formula_fields · method · L1587-L1592 — def simple_formula_fields(self)
+- allowed_fields · method · L1595-L1601 — def allowed_fields(self)
+- serializer_field_names · method · L1604-L1610 — def serializer_field_names(self)
+- serializer_field_overrides · method · L1613-L1619 — def serializer_field_overrides(self)
+- SerializedDict · class · L1621-L1627 — class SerializedDict( LocalJadawelViewServiceType.SerializedDict, LocalJadawelTableServiceSearchableMixin.SerializedDict, LocalJadawelTableServiceFilterableMixin.SerializedDict, LocalJadawelTableServiceSpecificRowMixin.SerializedDict, )
+- import_path · method · L1629-L1660 — def import_path(self, path, id_mapping)
+- import_context_path · method · L1662-L1669 — def import_context_path( self, path: List[str], id_mapping: Dict[int, int], **kwargs )
+- dispatch_data · method · L1671-L1718 — def dispatch_data( self, service: LocalJadawelGetRow, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- dispatch_transform · method · L1720-L1746 — def dispatch_transform(self, dispatch_data: Dict[str, Any]) -> DispatchResult
+- LocalJadawelUpsertRowServiceType · class · L1749-L2235 — class LocalJadawelUpsertRowServiceType( LocalJadawelTableServiceSpecificRowMixin, LocalJadawelTableServiceType )
+- allowed_fields · method · L1763-L1767 — def allowed_fields(self)
+- simple_formula_fields · method · L1770-L1774 — def simple_formula_fields(self)
+- serializer_field_names · method · L1777-L1782 — def serializer_field_names(self)
+- serializer_field_overrides · method · L1785-L1794 — def serializer_field_overrides(self)
+- SerializedDict · class · L1796-L1800 — class SerializedDict( LocalJadawelTableServiceType.SerializedDict, LocalJadawelTableServiceSpecificRowMixin.SerializedDict, )
+- after_update · method · L1802-L1848 — def after_update( self, instance: LocalJadawelUpsertRow, values: Dict, changes: Dict[str, Tuple], )
+- formula_generator · method · L1850-L1870 — def formula_generator( self, service: ServiceType ) -> Generator[str | Instance, str, None]
+- serialize_property · method · L1872-L1897 — def serialize_property( self, service: LocalJadawelUpsertRow, prop_name: str, files_zip=None, storage=None, cache=None, )
+- deserialize_property · method · L1899-L1941 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, )
+- create_instance_from_serialized · method · L1943-L1987 — def create_instance_from_serialized( self, serialized_values, id_mapping, files_zip=None, storage=None, cache=None, **kwargs, )
+- enhance_queryset · method · L1989-L1990 — def enhance_queryset(self, queryset)
+- formulas_to_resolve · method · L1992-L2015 — def formulas_to_resolve( self, service: LocalJadawelUpsertRow ) -> list[FormulaToResolve]
+- _get_validation_details · method · L2017-L2030 — def _get_validation_details(self, error)
+- dispatch_data · method · L2032-L2174 — def dispatch_data( self, service: LocalJadawelUpsertRow, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- dispatch_transform · method · L2176-L2202 — def dispatch_transform(self, dispatch_data: Dict[str, Any]) -> DispatchResult
+- import_path · method · L2204-L2226 — def import_path(self, path, id_mapping)
+- import_context_path · method · L2228-L2235 — def import_context_path( self, path: List[str], id_mapping: Dict[int, int], **kwargs )
+- LocalJadawelDeleteRowServiceType · class · L2238-L2326 — class LocalJadawelDeleteRowServiceType( LocalJadawelTableServiceSpecificRowMixin, LocalJadawelTableServiceType )
+- simple_formula_fields · method · L2246-L2250 — def simple_formula_fields(self)
+- allowed_fields · method · L2253-L2257 — def allowed_fields(self)
+- serializer_field_names · method · L2260-L2264 — def serializer_field_names(self)
+- serializer_field_overrides · method · L2267-L2271 — def serializer_field_overrides(self)
+- SerializedDict · class · L2273-L2277 — class SerializedDict( LocalJadawelTableServiceType.SerializedDict, LocalJadawelTableServiceSpecificRowMixin.SerializedDict, )
+- dispatch_data · method · L2279-L2314 — def dispatch_data( self, service: LocalJadawelDeleteRow, resolved_values: Dict[str, Any], dispatch_context: DispatchContext, ) -> Dict[str, Any]
+- dispatch_transform · method · L2316-L2326 — def dispatch_transform(self, dispatch_data: Dict[str, Any]) -> DispatchResult
+- LocalJadawelRowsSignalServiceType · class · L2329-L2419 — class LocalJadawelRowsSignalServiceType( TriggerServiceTypeMixin, LocalJadawelTableServiceType ): # The signal that this service type is called by.
+- start_listening · method · L2341-L2343 — def start_listening(self, on_event: Callable)
+- stop_listening · method · L2345-L2346 — def stop_listening(self)
+- _process_event · method · L2348-L2349 — def _process_event(self, *args, **kwargs)
+- _handle_signal · method · L2351-L2379 — def _handle_signal( self, sender, user: AbstractUser, rows: QuerySet["GeneratedTableModel"], table: "Table", model: "GeneratedTableModel", **kwargs, )
+- get_data · function · L2360-L2373 — def get_data(service: Service): # Make sure we have an up to date model
+- _signal_receiver · method · L2381-L2382 — def _signal_receiver(self, *args, **kwargs)
+- import_context_path · method · L2384-L2391 — def import_context_path( self, path: List[str], id_mapping: Dict[int, int], **kwargs )
+- import_path · method · L2393-L2419 — def import_path(self, path, id_mapping)
+- LocalJadawelRowsCreatedServiceType · class · L2422-L2425 — class LocalJadawelRowsCreatedServiceType(LocalJadawelRowsSignalServiceType)
+- LocalJadawelRowsUpdatedServiceType · class · L2428-L2431 — class LocalJadawelRowsUpdatedServiceType(LocalJadawelRowsSignalServiceType)
+- LocalJadawelRowsDeletedServiceType · class · L2434-L2437 — class LocalJadawelRowsDeletedServiceType(LocalJadawelRowsSignalServiceType)

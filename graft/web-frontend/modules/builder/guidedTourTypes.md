@@ -1,0 +1,37 @@
+# web-frontend/modules/builder/guidedTourTypes.js
+
+- ElementsGuidedTourStep · class · L6-L22 — class ElementsGuidedTourStep extends GuidedTourStep
+- title · method · L7-L9 — get title()
+- content · method · L11-L13 — get content()
+- selectors · method · L15-L17 — get selectors()
+- position · method · L19-L21 — get position()
+- DataGuidedTourStep · class · L24-L40 — class DataGuidedTourStep extends GuidedTourStep
+- title · method · L25-L27 — get title()
+- content · method · L29-L31 — get content()
+- selectors · method · L33-L35 — get selectors()
+- position · method · L37-L39 — get position()
+- PreviewGuidedTourStep · class · L42-L58 — class PreviewGuidedTourStep extends GuidedTourStep
+- title · method · L43-L45 — get title()
+- content · method · L47-L49 — get content()
+- selectors · method · L51-L53 — get selectors()
+- position · method · L55-L57 — get position()
+- DevicesGuidedTourStep · class · L60-L76 — class DevicesGuidedTourStep extends GuidedTourStep
+- title · method · L61-L63 — get title()
+- content · method · L65-L67 — get content()
+- selectors · method · L69-L71 — get selectors()
+- position · method · L73-L75 — get position()
+- SidePanelPublishGuidedTourStep · class · L78-L99 — class SidePanelPublishGuidedTourStep extends GuidedTourStep
+- title · method · L79-L81 — get title()
+- content · method · L83-L85 — get content()
+- selectors · method · L87-L94 — get selectors()
+- position · method · L96-L98 — get position()
+- PreviewPublishGuidedTourStep · class · L101-L120 — class PreviewPublishGuidedTourStep extends GuidedTourStep
+- title · method · L102-L104 — get title()
+- content · method · L106-L108 — get content()
+- selectors · method · L110-L115 — get selectors()
+- position · method · L117-L119 — get position()
+- BuilderGuidedTourType · class · L122-L150 — class BuilderGuidedTourType extends GuidedTourType
+- getType · method · L123-L125 — static getType()
+- steps · method · L127-L136 — get steps()
+- order · method · L138-L140 — get order()
+- isActive · method · L142-L149 — isActive()

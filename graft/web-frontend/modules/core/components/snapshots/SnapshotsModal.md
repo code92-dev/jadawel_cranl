@@ -1,0 +1,16 @@
+# web-frontend/modules/core/components/snapshots/SnapshotsModal.vue
+
+- data · method · L112-L121 — data()
+- applicationTypeName · method · L123-L128 — applicationTypeName()
+- maxSnapshots · method · L129-L131 — maxSnapshots()
+- snapshotModalAlertComponents · method · L132-L138 — snapshotModalAlertComponents()
+- show · method · L141-L145 — show(...args)
+- submitted · method · L146-L159 — async submitted(values)
+- onJobFinished · method · L160-L170 — onJobFinished()
+- onJobFailed · method · L171-L177 — onJobFailed()
+- onJobCancelled · method · L178-L180 — onJobCancelled()
+- loadSnapshots · method · L181-L195 — async loadSnapshots()
+- snapshotDeleted · method · L196-L200 — snapshotDeleted(deletedSnapshot)
+- loadRunningJob · method · L201-L214 — loadRunningJob()
+- reset · method · L215-L220 — reset()
+- getCustomHumanReadableJobState · method · L221-L226 — getCustomHumanReadableJobState(jobState)

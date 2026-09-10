@@ -1,0 +1,18 @@
+# web-frontend/modules/core/store/userSourceUser.js
+
+- state · function · L11-L15 — state = ()
+- checkApplication · function · L17-L29 — checkApplication = (application)
+- SET_TOKENS · method · L32-L42 — SET_TOKENS(state, { application, access, refresh, tokenUpdatedAt })
+- SET_USER_DATA · method · L43-L50 — SET_USER_DATA(state, { application, data })
+- CLEAR_USER_DATA · method · L51-L58 — CLEAR_USER_DATA(state, { application })
+- LOGOFF · method · L59-L72 — LOGOFF(state, { application })
+- SET_AUTHENTICATED · method · L73-L77 — SET_AUTHENTICATED(state, { application, authenticated })
+- SET_REFRESHING · method · L78-L81 — SET_REFRESHING(state, { application, refreshing })
+- SET_CURRENT_APPLICATION · method · L82-L84 — SET_CURRENT_APPLICATION(state, { application })
+- setCurrentApplication · method · L88-L90 — setCurrentApplication({ commit }, { application })
+- forceAuthenticate · method · L91-L106 — async forceAuthenticate({ dispatch }, { application, userSource, user })
+- authenticate · method · L107-L125 — async authenticate( { dispatch }, { application, userSource, credentials, setCookie } )
+- login · method · L126-L156 — async login( { commit, getters }, { application, access, refresh, tokenUpdatedAt, setCookie = true } )
+- logoff · method · L162-L183 — async logoff({ commit, getters }, { application, invalidateToken = true })
+- refreshAuth · method · L190-L219 — async refreshAuth( { getters, dispatch, commit }, { application, token = null } )
+- role · method · L241-L246 — role(state)

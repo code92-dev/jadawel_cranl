@@ -1,0 +1,141 @@
+# backend/src/jadawel/contrib/builder/elements/element_types.py
+
+- collection_element_types · function · L117-L129 — def collection_element_types()
+- ColumnElementType · class · L132-L218 — class ColumnElementType(ContainerElementTypeMixin, ElementType)
+- SerializedDict · class · L141-L144 — class SerializedDict(ContainerElementTypeMixin.SerializedDict)
+- serializer_field_names · method · L147-L152 — def serializer_field_names(self)
+- allowed_fields · method · L155-L160 — def allowed_fields(self)
+- get_pytest_params · method · L162-L167 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- get_new_place_in_container · method · L169-L177 — def get_new_place_in_container( self, container_element_before_update: ColumnElement, places_removed: List[str] ) -> int
+- get_places_in_container_removed · method · L179-L189 — def get_places_in_container_removed( self, values: Dict, instance: ColumnElement ) -> List[str]
+- apply_order_by_children · method · L191-L196 — def apply_order_by_children(self, queryset: QuerySet[Element]) -> QuerySet[Element]
+- validate_place_in_container · method · L198-L205 — def validate_place_in_container( self, place_in_container: str, instance: ColumnElement )
+- child_types_allowed · method · L208-L218 — def child_types_allowed(self) -> List[str]
+- FormContainerElementType · class · L221-L289 — class FormContainerElementType(ContainerElementTypeMixin, ElementType)
+- SerializedDict · class · L234-L236 — class SerializedDict(ContainerElementTypeMixin.SerializedDict)
+- get_pytest_params · method · L238-L246 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- serializer_field_overrides · method · L249-L276 — def serializer_field_overrides(self)
+- child_types_allowed · method · L279-L289 — def child_types_allowed(self) -> List[str]
+- SimpleContainerElementType · class · L292-L300 — class SimpleContainerElementType(ContainerElementTypeMixin, ElementType)
+- SerializedDict · class · L296-L297 — class SerializedDict(ContainerElementTypeMixin.SerializedDict)
+- get_pytest_params · method · L299-L300 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- TableElementType · class · L303-L362 — class TableElementType(CollectionElementWithFieldsTypeMixin, ElementType)
+- SerializedDict · class · L307-L308 — class SerializedDict(CollectionElementWithFieldsTypeMixin.SerializedDict)
+- allowed_fields · method · L311-L312 — def allowed_fields(self)
+- serializer_field_names · method · L315-L316 — def serializer_field_names(self)
+- serializer_field_overrides · method · L319-L348 — def serializer_field_overrides(self)
+- enhance_queryset · method · L350-L351 — def enhance_queryset(self, queryset)
+- get_pytest_params · method · L353-L362 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- RepeatElementType · class · L365-L429 — class RepeatElementType( CollectionElementTypeMixin, ContainerElementTypeMixin, ElementType )
+- allowed_fields · method · L372-L378 — def allowed_fields(self)
+- serializer_field_names · method · L381-L387 — def serializer_field_names(self)
+- SerializedDict · class · L389-L396 — class SerializedDict( CollectionElementTypeMixin.SerializedDict, ContainerElementTypeMixin.SerializedDict, )
+- serializer_field_overrides · method · L399-L418 — def serializer_field_overrides(self)
+- get_pytest_params · method · L420-L429 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- RecordSelectorElementType · class · L432-L676 — class RecordSelectorElementType( FormElementTypeMixin, CollectionElementTypeMixin, ElementType )
+- SerializedDict · class · L448-L454 — class SerializedDict(CollectionElementTypeMixin.SerializedDict)
+- serializer_field_overrides · method · L457-L497 — def serializer_field_overrides(self)
+- allowed_fields · method · L500-L512 — def allowed_fields(self): # RecordSelectorElement does not allow 'schema_property' as it always # relies on data sources that return lists.
+- serializer_field_names · method · L515-L527 — def serializer_field_names(self): # RecordSelectorElement does not allow 'schema_property' as it always # relies on data sources that return lists.
+- extract_properties · method · L529-L573 — def extract_properties(self, instance: Element, **kwargs) -> Dict[int, List[str]]
+- import_formulas · method · L575-L594 — def import_formulas( self, instance: Instance, id_mapping: Dict[str, Any], import_formula: Callable[[str, Dict[str, Any]], str], **kwargs: Dict[str, Any], ) -> Set[Instance]: # We need to import the option_name_suffix formula separately because # it uses a different import_context
+- get_pytest_params · method · L596-L621 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- is_valid · method · L623-L676 — def is_valid( self, element: RecordSelectorElement, value: Union[List, str], dispatch_context: DispatchContext, ) -> bool
+- HeadingElementType · class · L679-L732 — class HeadingElementType(ElementType)
+- SerializedDict · class · L690-L692 — class SerializedDict(ElementDict)
+- serializer_field_overrides · method · L695-L722 — def serializer_field_overrides(self)
+- get_pytest_params · method · L724-L732 — def get_pytest_params(self, pytest_data_fixture)
+- TextElementType · class · L735-L789 — class TextElementType(ElementType)
+- SerializedDict · class · L746-L748 — class SerializedDict(ElementDict)
+- get_pytest_params · method · L750-L762 — def get_pytest_params(self, pytest_data_fixture)
+- serializer_field_overrides · method · L765-L789 — def serializer_field_overrides(self)
+- NavigationElementManager · class · L792-L963 — class NavigationElementManager
+- __init__ · method · L797-L798 — def __init__(self, type=None)
+- SerializedDict · class · L818-L824 — class SerializedDict(TypedDict)
+- deserialize_property · method · L826-L836 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], **kwargs, ) -> Any
+- serializer_field_overrides · method · L839-L890 — def serializer_field_overrides(self)
+- get_serializer_field_overrides · method · L893-L894 — def get_serializer_field_overrides(cls)
+- get_pytest_params · method · L896-L908 — def get_pytest_params(self, pytest_data_fixture)
+- validate_place · method · L910-L918 — def validate_place( self, page: Page, parent_element: Optional[Element], place_in_container: str, )
+- prepare_value_for_db · method · L920-L942 — def prepare_value_for_db( self, values: Dict, instance: Optional[LinkElement] = None )
+- _raise_if_path_params_are_invalid · method · L944-L963 — def _raise_if_path_params_are_invalid(self, path_params: List, page: Page) -> None
+- LinkElementType · class · L966-L1099 — class LinkElementType(ElementType)
+- serializer_field_names · method · L976-L984 — def serializer_field_names(self)
+- allowed_fields · method · L987-L995 — def allowed_fields(self)
+- SerializedDict · class · L997-L999 — class SerializedDict(ElementDict, NavigationElementManager.SerializedDict)
+- formula_generator · method · L1001-L1023 — def formula_generator( self, element: Element ) -> Generator[str | Instance, str, None]
+- deserialize_property · method · L1025-L1045 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- serializer_field_overrides · method · L1048-L1082 — def serializer_field_overrides(self)
+- get_pytest_params · method · L1084-L1092 — def get_pytest_params(self, pytest_data_fixture)
+- prepare_value_for_db · method · L1094-L1099 — def prepare_value_for_db( self, values: Dict, instance: Optional[LinkElement] = None )
+- ImageElementType · class · L1102-L1263 — class ImageElementType(ElementType)
+- SerializedDict · class · L1130-L1134 — class SerializedDict(ElementDict)
+- get_pytest_params · method · L1136-L1150 — def get_pytest_params(self, pytest_data_fixture)
+- serializer_field_overrides · method · L1153-L1180 — def serializer_field_overrides(self)
+- request_serializer_field_overrides · method · L1183-L1218 — def request_serializer_field_overrides(self)
+- serialize_property · method · L1220-L1235 — def serialize_property( self, element: Element, prop_name: JadawelFormula, files_zip=None, storage=None, cache=None, )
+- deserialize_property · method · L1237-L1263 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- InputElementType · class · L1266-L1267 — class InputElementType(FormElementTypeMixin, ElementType, abc.ABC)
+- RatingElementType · class · L1270-L1313 — class RatingElementType(ElementType)
+- SerializedDict · class · L1287-L1291 — class SerializedDict(ElementDict)
+- get_pytest_params · method · L1293-L1303 — def get_pytest_params(self, pytest_data_fixture)
+- serializer_field_overrides · method · L1306-L1313 — def serializer_field_overrides(self)
+- RatingInputElementType · class · L1316-L1398 — class RatingInputElementType(InputElementType)
+- SerializedDict · class · L1337-L1343 — class SerializedDict(ElementDict)
+- get_pytest_params · method · L1345-L1361 — def get_pytest_params(self, pytest_data_fixture)
+- serializer_field_overrides · method · L1364-L1379 — def serializer_field_overrides(self)
+- is_valid · method · L1381-L1398 — def is_valid( self, element: Type[RatingInputElement], value: Any, dispatch_context: DispatchContext, ) -> bool
+- InputTextElementType · class · L1401-L1537 — class InputTextElementType(InputElementType)
+- SerializedDict · class · L1426-L1434 — class SerializedDict(ElementDict)
+- serializer_field_overrides · method · L1437-L1487 — def serializer_field_overrides(self)
+- get_pytest_params · method · L1489-L1510 — def get_pytest_params(self, pytest_data_fixture)
+- is_valid · method · L1512-L1537 — def is_valid( self, element: InputTextElement, value: Any, dispatch_context: DispatchContext ) -> Any
+- ButtonElementType · class · L1540-L1581 — class ButtonElementType(ElementType)
+- SerializedDict · class · L1547-L1548 — class SerializedDict(ElementDict)
+- serializer_field_overrides · method · L1551-L1572 — def serializer_field_overrides(self)
+- get_pytest_params · method · L1574-L1581 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- CheckboxElementType · class · L1584-L1654 — class CheckboxElementType(InputElementType)
+- SerializedDict · class · L1591-L1594 — class SerializedDict(ElementDict)
+- serializer_field_overrides · method · L1597-L1626 — def serializer_field_overrides(self)
+- is_valid · method · L1628-L1639 — def is_valid( self, element: CheckboxElement, value: Any, dispatch_context: DispatchContext ) -> bool
+- get_pytest_params · method · L1641-L1654 — def get_pytest_params(self, pytest_data_fixture)
+- ChoiceElementType · class · L1657-L1966 — class ChoiceElementType(FormElementTypeMixin, ElementType)
+- SerializedDict · class · L1703-L1713 — class SerializedDict(ElementDict)
+- serializer_field_overrides · method · L1716-L1773 — def serializer_field_overrides(self)
+- request_serializer_field_overrides · method · L1776-L1780 — def request_serializer_field_overrides(self)
+- serialize_property · method · L1782-L1798 — def serialize_property( self, element: ChoiceElement, prop_name: str, files_zip=None, storage=None, cache=None, )
+- import_serialized · method · L1800-L1828 — def import_serialized( self, parent: Any, serialized_values: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], files_zip=None, storage=None, cache=None, **kwargs, ) -> T
+- create_instance_from_serialized · method · L1830-L1847 — def create_instance_from_serialized( self, serialized_values: Dict[str, Any], id_mapping, files_zip=None, storage=None, cache=None, **kwargs, ) -> T
+- serialize_option · method · L1849-L1854 — def serialize_option(self, option: ChoiceElementOption) -> Dict
+- deserialize_option · method · L1856-L1857 — def deserialize_option(self, value: Dict)
+- get_pytest_params · method · L1859-L1890 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- after_create · method · L1892-L1897 — def after_create(self, instance: ChoiceElement, values: Dict)
+- after_update · method · L1899-L1908 — def after_update( self, instance: ChoiceElement, values: Dict, changes: Dict[str, Tuple] )
+- is_valid · method · L1910-L1966 — def is_valid( self, element: ChoiceElement, value: Union[List, str], dispatch_context: DispatchContext, ) -> str | List[str]
+- IFrameElementType · class · L1969-L2024 — class IFrameElementType(ElementType)
+- SerializedDict · class · L1976-L1980 — class SerializedDict(ElementDict)
+- serializer_field_overrides · method · L1983-L2008 — def serializer_field_overrides(self)
+- get_pytest_params · method · L2010-L2024 — def get_pytest_params(self, pytest_data_fixture)
+- DateTimePickerElementType · class · L2027-L2150 — class DateTimePickerElementType(FormElementTypeMixin, ElementType)
+- SerializedDict · class · L2051-L2057 — class SerializedDict(ElementDict)
+- serializer_field_overrides · method · L2060-L2099 — def serializer_field_overrides(self)
+- is_valid · method · L2101-L2132 — def is_valid( self, element: DateTimePickerElement, value: Any, dispatch_context: DispatchContext, ) -> FormattedDate | FormattedDateTime | None
+- get_pytest_params · method · L2134-L2150 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- MultiPageContainerElementType · class · L2153-L2163 — class MultiPageContainerElementType( ContainerElementTypeMixin, MultiPageElementTypeMixin, ElementType )
+- SerializedDict · class · L2160-L2163 — class SerializedDict( MultiPageElementTypeMixin.SerializedDict, ContainerElementTypeMixin.SerializedDict, )
+- HeaderElementType · class · L2166-L2172 — class HeaderElementType(MultiPageContainerElementType)
+- FooterElementType · class · L2175-L2181 — class FooterElementType(MultiPageContainerElementType)
+- MenuElementType · class · L2184-L2520 — class MenuElementType(ElementType)
+- SerializedDict · class · L2197-L2200 — class SerializedDict(ElementDict)
+- serializer_field_overrides · method · L2203-L2223 — def serializer_field_overrides(self) -> Dict[str, Any]
+- request_serializer_field_overrides · method · L2226-L2230 — def request_serializer_field_overrides(self) -> Dict[str, Any]
+- enhance_queryset · method · L2232-L2235 — def enhance_queryset( self, queryset: QuerySet[MenuItemElement] ) -> QuerySet[MenuItemElement]
+- before_delete · method · L2237-L2246 — def before_delete(self, instance: MenuElement) -> None
+- after_create · method · L2248-L2262 — def after_create(self, instance: MenuItemElement, values: Dict[str, Any]) -> None
+- delete_workflow_actions · method · L2264-L2300 — def delete_workflow_actions( self, instance: MenuElement, menu_item_uids_to_keep: Optional[List[str]] = None ) -> None
+- after_update · method · L2302-L2349 — def after_update(self, instance: MenuElement, values, changes: Dict[str, Tuple])
+- get_pytest_params · method · L2351-L2355 — def get_pytest_params(self, pytest_data_fixture)
+- deserialize_property · method · L2357-L2395 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- serialize_property · method · L2397-L2419 — def serialize_property( self, element: MenuElement, prop_name: str, files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- create_instance_from_serialized · method · L2421-L2480 — def create_instance_from_serialized( self, serialized_values: Dict[str, Any], id_mapping, files_zip=None, storage=None, cache=None, **kwargs, ) -> MenuElement
+- formula_generator · method · L2482-L2520 — def formula_generator( self, element: Element ) -> Generator[str | Instance, str, None]

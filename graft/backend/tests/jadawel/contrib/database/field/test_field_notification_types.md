@@ -1,0 +1,14 @@
+# backend/tests/jadawel/contrib/database/field/test_field_notification_types.py
+
+- test_notification_creation_on_adding_users_on_collaborator_fields · function · L42-L238 — def test_notification_creation_on_adding_users_on_collaborator_fields( mocked_broadcast_to_users, api_client, data_fixture )
+- test_notifications_are_grouped_when_user_is_added_to_multiple_rows · function · L243-L388 — def test_notifications_are_grouped_when_user_is_added_to_multiple_rows( mocked_broadcast_to_users, api_client, data_fixture )
+- test_notifications_are_not_created_if_the_field_parameter_is_false · function · L393-L437 — def test_notifications_are_not_created_if_the_field_parameter_is_false( mocked_broadcast_to_users, api_client, data_fixture )
+- test_email_notifications_are_created_correctly_for_collaborators_added · function · L442-L513 — def test_email_notifications_are_created_correctly_for_collaborators_added( mock_get_mail_connection, data_fixture, api_client, )
+- test_notification_creation_when_mentioning_users_in_a_rich_text_field_on_row_create · function · L518-L595 — def test_notification_creation_when_mentioning_users_in_a_rich_text_field_on_row_create( mocked_broadcast_to_users, api_client, data_fixture )
+- test_notification_creation_when_mentioning_users_in_a_rich_text_field_on_row_update · function · L600-L690 — def test_notification_creation_when_mentioning_users_in_a_rich_text_field_on_row_update( mocked_broadcast_to_users, api_client, data_fixture )
+- test_notifications_are_not_sent_twice_on_undo_redo_row_create · function · L695-L828 — def test_notifications_are_not_sent_twice_on_undo_redo_row_create( mocked_broadcast_to_users, api_client, data_fixture )
+- test_notifications_are_not_sent_twice_on_undo_redo_row_update · function · L833-L966 — def test_notifications_are_not_sent_twice_on_undo_redo_row_update( mocked_broadcast_to_users, api_client, data_fixture )
+- test_notification_are_not_sent_to_users_outside_workspace · function · L971-L1012 — def test_notification_are_not_sent_to_users_outside_workspace( mocked_broadcast_to_users, api_client, data_fixture )
+- test_email_notifications_are_created_correctly_for_mentions_in_rich_text_field · function · L1017-L1082 — def test_email_notifications_are_created_correctly_for_mentions_in_rich_text_field( mock_get_mail_connection, data_fixture )
+- test_anonymous_user_can_send_collaborator_notification_via_public_form · function · L1087-L1170 — def test_anonymous_user_can_send_collaborator_notification_via_public_form( mocked_broadcast_to_users, api_client, data_fixture )
+- test_email_notifications_show_unknown_user_for_anonymous_form_submissions · function · L1175-L1248 — def test_email_notifications_show_unknown_user_for_anonymous_form_submissions( mock_get_mail_connection, api_client, data_fixture )

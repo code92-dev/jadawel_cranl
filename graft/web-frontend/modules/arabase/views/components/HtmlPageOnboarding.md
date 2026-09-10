@@ -1,0 +1,17 @@
+# web-frontend/modules/arabase/views/components/HtmlPageOnboarding.vue
+
+- data · method · L183-L192 — data()
+- workspaceId · method · L194-L196 — workspaceId()
+- endpoint · method · L201-L203 — endpoint()
+- endpointUrl · method · L204-L206 — endpointUrl()
+- displayedUrl · method · L207-L211 — displayedUrl()
+- clientConfig · method · L212-L214 — clientConfig()
+- realClientConfig · method · L215-L217 — realClientConfig()
+- prompt · method · L218-L223 — prompt()
+- mounted · method · L225-L227 — async mounted()
+- buildUrl · method · L229-L235 — buildUrl(key)
+- buildConfig · method · L236-L245 — buildConfig(url)
+- fetchEndpoints · method · L246-L259 — async fetchEndpoints()
+- createEndpoint · method · L260-L265 — async createEndpoint()
+- openSettings · method · L266-L270 — async openSettings()
+- copy · method · L271-L278 — copy(value, ref)

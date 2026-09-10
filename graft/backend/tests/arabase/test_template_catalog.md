@@ -1,0 +1,15 @@
+# backend/tests/arabase/test_template_catalog.py
+
+- create_template · function · L22-L27 — def create_template(data_fixture, slug, category, export_hash=None)
+- test_reconcile_local_template_catalog_imports_then_prunes · function · L32-L61 — def test_reconcile_local_template_catalog_imports_then_prunes( sync_templates, data_fixture )
+- install_missing_templates · function · L39-L42 — def install_missing_templates(*args, **kwargs)
+- test_reconcile_local_template_catalog_does_not_prune_when_import_is_incomplete · function · L66-L75 — def test_reconcile_local_template_catalog_does_not_prune_when_import_is_incomplete( sync_templates, data_fixture )
+- test_reconcile_local_template_catalog_is_noop_when_current · function · L80-L99 — def test_reconcile_local_template_catalog_is_noop_when_current( sync_templates, data_fixture )
+- test_reconcile_local_template_catalog_refreshes_changed_template · function · L104-L137 — def test_reconcile_local_template_catalog_refreshes_changed_template( sync_templates, data_fixture )
+- refresh_changed_template · function · L124-L127 — def refresh_changed_template(*args, **kwargs)
+- test_local_catalog_disables_core_broad_template_sync · function · L140-L142 — def test_local_catalog_disables_core_broad_template_sync()
+- test_local_catalog_contains_the_default_application_template · function · L145-L147 — def test_local_catalog_contains_the_default_application_template()
+- test_reconcile_local_template_catalog_after_migrate_runs_synchronously · function · L152-L158 — def test_reconcile_local_template_catalog_after_migrate_runs_synchronously(reconcile)
+- test_reconcile_local_template_catalog_after_migrate_skips_tests · function · L163-L166 — def test_reconcile_local_template_catalog_after_migrate_skips_tests(reconcile)
+- test_reconcile_local_template_catalog_prunes_a_full_legacy_catalog · function · L171-L190 — def test_reconcile_local_template_catalog_prunes_a_full_legacy_catalog( sync_templates, data_fixture )
+- install_local_templates · function · L178-L180 — def install_local_templates(*args, **kwargs)

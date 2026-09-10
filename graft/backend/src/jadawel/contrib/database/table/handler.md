@@ -1,0 +1,30 @@
+# backend/src/jadawel/contrib/database/table/handler.py
+
+- TableUsageHandler · class · L76-L243 — class TableUsageHandler
+- calculate_table_storage_usage · method · L78-L81 — def calculate_table_storage_usage(cls, table_id)
+- mark_table_for_usage_update · method · L84-L110 — def mark_table_for_usage_update( cls, table_id: int, row_count: int = 0 ) -> Optional[TableUsageUpdate]
+- create_tables_usage_for_new_database · method · L113-L129 — def create_tables_usage_for_new_database(cls, database_id: int)
+- update_tables_usage · method · L132-L157 — def update_tables_usage(cls) -> int
+- _bulk_create_or_update · method · L160-L190 — def _bulk_create_or_update(cls, table_ids: List[int]) -> List[TableUsage]
+- _create_missing_tables_usage · method · L193-L215 — def _create_missing_tables_usage( cls, table_qs: QuerySet[Table], chunk_size=10 ) -> int
+- _update_existing_tables_usage · method · L218-L243 — def _update_existing_tables_usage( cls, usage_update_qs: QuerySet[TableUsageUpdate], chunk_size=10 ) -> int
+- TableHandler · class · L246-L912 — class TableHandler(metaclass=jadawel_trace_methods(tracer))
+- get_tables · method · L248-L266 — def get_tables( cls, base_queryset: Optional[QuerySet[Table]] = None ) -> QuerySet[Table]
+- list_workspace_tables · method · L268-L296 — def list_workspace_tables( self, user: AbstractUser, workspace, include_trashed=False, base_queryset=None ) -> QuerySet[Table]
+- get_table · method · L298-L324 — def get_table( self, table_id: int, base_queryset: Optional[QuerySet] = None ) -> Table
+- get_table_for_update · method · L326-L353 — def get_table_for_update( self, table_id: int, nowait: bool = False ) -> TableForUpdate
+- get_tables_order · method · L355-L363 — def get_tables_order(self, database: Database) -> List[int]
+- create_table · method · L365-L431 — def create_table( self, user: AbstractUser, database: Database, name: str, data: Optional[List[List[Any]]] = None, first_row_header: bool = True, fill_example: bool = False, progress: Optional[Progress] = None, )
+- create_table_and_fields · method · L433-L496 — def create_table_and_fields( self, user: AbstractUser, database: Database, name: str, fields: List[Tuple[str, str, Dict[str, Any]]], **table_kwargs, ) -> Table
+- normalize_initial_table_data · method · L498-L566 — def normalize_initial_table_data( self, data: List[List[Any]], first_row_header: bool ) -> Tuple[List, List]
+- get_example_table_field_and_data · method · L568-L579 — def get_example_table_field_and_data(self)
+- get_minimal_table_field_and_data · method · L581-L590 — def get_minimal_table_field_and_data(self)
+- update_table_by_id · method · L592-L604 — def update_table_by_id(self, user: AbstractUser, table_id: int, name: str) -> Table
+- update_table · method · L606-L632 — def update_table(self, user: AbstractUser, table: Table, name: str) -> Table
+- order_tables · method · L634-L669 — def order_tables(self, user: AbstractUser, database: Database, order: List[int])
+- find_unused_table_name · method · L671-L681 — def find_unused_table_name(self, database: Database, proposed_name: str) -> str
+- _create_related_link_fields_in_existing_tables_to_import · method · L683-L731 — def _create_related_link_fields_in_existing_tables_to_import( self, serialized_table: Dict[str, Any], id_mapping: Dict[str, Any] ) -> List[Tuple[Table, Dict[str, Any]]]
+- duplicate_table · method · L733-L840 — def duplicate_table( self, user: AbstractUser, table: Table, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Table
+- delete_table_by_id · method · L842-L854 — def delete_table_by_id(self, user: AbstractUser, table_id: int)
+- delete_table · method · L856-L879 — def delete_table(self, user: AbstractUser, table: Table)
+- create_created_by_and_last_modified_by_fields · method · L881-L912 — def create_created_by_and_last_modified_by_fields(self, table: "Table") -> None

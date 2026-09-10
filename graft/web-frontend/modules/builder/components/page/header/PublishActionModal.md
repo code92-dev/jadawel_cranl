@@ -1,0 +1,16 @@
+# web-frontend/modules/builder/components/page/header/PublishActionModal.vue
+
+- data · method · L122-L124 — data()
+- selectedDomain · method · L127-L129 — selectedDomain()
+- selectedDomainId · method · L132-L135 — selectedDomainId()
+- domains · method · L136-L140 — domains()
+- beforeUnmount · method · L142-L144 — beforeUnmount()
+- onShow · method · L150-L165 — async onShow()
+- publishSite · method · L166-L182 — async publishSite()
+- onJobFailed · method · L183-L189 — onJobFailed()
+- onJobDone · method · L190-L196 — onJobDone()
+- onJobPollingError · method · L197-L200 — onJobPollingError(error)
+- getDomainUrl · method · L201-L206 — getDomainUrl(domain)
+- copyDomainUrl · method · L207-L209 — copyDomainUrl(domain)
+- getCustomHumanReadableJobState · method · L210-L215 — getCustomHumanReadableJobState(state)
+- openDomainSettings · method · L216-L224 — openDomainSettings()

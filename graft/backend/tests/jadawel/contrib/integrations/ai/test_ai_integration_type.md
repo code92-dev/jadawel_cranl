@@ -1,0 +1,17 @@
+# backend/tests/jadawel/contrib/integrations/ai/test_ai_integration_type.py
+
+- test_ai_integration_creation · function · L14-L28 — def test_ai_integration_creation(data_fixture)
+- test_ai_integration_creation_with_settings · function · L32-L54 — def test_ai_integration_creation_with_settings(data_fixture)
+- test_ai_integration_update · function · L58-L83 — def test_ai_integration_update(data_fixture)
+- test_ai_integration_partial_update · function · L87-L115 — def test_ai_integration_partial_update(data_fixture)
+- test_ai_integration_serializer_field_names · function · L119-L125 — def test_ai_integration_serializer_field_names(data_fixture)
+- test_ai_integration_serialized_dict_type · function · L129-L135 — def test_ai_integration_serialized_dict_type(data_fixture)
+- test_ai_integration_export_serialized · function · L139-L174 — def test_ai_integration_export_serialized(data_fixture)
+- test_ai_integration_export_serialized_exclude_sensitive · function · L178-L217 — def test_ai_integration_export_serialized_exclude_sensitive(data_fixture)
+- test_ai_integration_import_serialized · function · L221-L255 — def test_ai_integration_import_serialized(data_fixture)
+- test_ai_integration_deletion · function · L259-L277 — def test_ai_integration_deletion(data_fixture)
+- test_ai_integration_get_provider_settings_from_workspace · function · L281-L304 — def test_ai_integration_get_provider_settings_from_workspace(data_fixture, settings)
+- test_ai_integration_get_provider_settings_empty · function · L308-L325 — def test_ai_integration_get_provider_settings_empty(data_fixture, settings)
+- test_ai_integration_get_provider_settings · function · L329-L353 — def test_ai_integration_get_provider_settings(data_fixture)
+- test_ai_integration_is_provider_overridden · function · L357-L371 — def test_ai_integration_is_provider_overridden(data_fixture)
+- test_ai_integration_settings_hierarchy · function · L375-L410 — def test_ai_integration_settings_hierarchy(data_fixture, settings)

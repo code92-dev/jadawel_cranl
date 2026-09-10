@@ -1,0 +1,31 @@
+# backend/tests/arabase/test_contact.py
+
+- _clear_throttle_history · function · L26-L37 — def _clear_throttle_history()
+- TestContactForm · class · L41-L100 — class TestContactForm
+- _url · method · L42-L43 — def _url(self)
+- test_sends_the_message · method · L45-L50 — def test_sends_the_message(self, api_client)
+- test_puts_the_reference_in_the_subject · method · L52-L57 — def test_puts_the_reference_in_the_subject(self, api_client)
+- test_replies_go_to_the_visitor_not_the_from_address · method · L59-L68 — def test_replies_go_to_the_visitor_not_the_from_address(self, api_client, settings)
+- test_delivers_to_the_configured_recipient · method · L70-L75 — def test_delivers_to_the_configured_recipient(self, api_client, monkeypatch)
+- test_body_carries_the_sender_and_the_message · method · L77-L82 — def test_body_carries_the_sender_and_the_message(self, api_client)
+- test_includes_the_detail_entries · method · L84-L94 — def test_includes_the_detail_entries(self, api_client)
+- test_needs_no_authentication · method · L96-L100 — def test_needs_no_authentication(self, api_client): # No credentials are set on the client at all.
+- TestValidation · class · L104-L156 — class TestValidation
+- _url · method · L105-L106 — def _url(self)
+- test_rejects_a_malformed_address · method · L108-L114 — def test_rejects_a_malformed_address(self, api_client)
+- test_rejects_a_missing_message · method · L116-L121 — def test_rejects_a_missing_message(self, api_client)
+- test_rejects_an_oversized_message · method · L123-L128 — def test_rejects_an_oversized_message(self, api_client)
+- test_rejects_too_many_detail_entries · method · L130-L137 — def test_rejects_too_many_detail_entries(self, api_client)
+- test_collapses_a_newline_in_the_subject · method · L139-L145 — def test_collapses_a_newline_in_the_subject(self)
+- test_a_header_injection_attempt_sends_one_message · method · L147-L156 — def test_a_header_injection_attempt_sends_one_message(self, api_client)
+- TestAbuseControls · class · L160-L189 — class TestAbuseControls
+- _url · method · L161-L162 — def _url(self)
+- test_honeypot_reports_success_but_sends_nothing · method · L164-L172 — def test_honeypot_reports_success_but_sends_nothing(self, api_client)
+- test_an_empty_honeypot_is_a_normal_submission · method · L174-L178 — def test_an_empty_honeypot_is_a_normal_submission(self, api_client)
+- test_rate_limits_a_repeated_sender · method · L180-L189 — def test_rate_limits_a_repeated_sender(self, api_client)
+- TestFailure · class · L193-L205 — class TestFailure
+- _url · method · L194-L195 — def _url(self)
+- test_reports_a_queue_failure_instead_of_confirming · method · L201-L205 — def test_reports_a_queue_failure_instead_of_confirming(self, _send, api_client)
+- TestRecipients · class · L208-L218 — class TestRecipients
+- test_splits_a_comma_separated_list · method · L209-L212 — def test_splits_a_comma_separated_list(self, monkeypatch)
+- test_falls_back_to_the_from_address · method · L214-L218 — def test_falls_back_to_the_from_address(self, monkeypatch, settings)

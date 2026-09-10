@@ -1,0 +1,15 @@
+# backend/tests/jadawel/core/integrations/test_integration_handler.py
+
+- pytest_generate_tests · function · L19-L24 — def pytest_generate_tests(metafunc)
+- test_create_integration · function · L28-L41 — def test_create_integration(data_fixture, integration_type: IntegrationType)
+- test_create_integration_bad_application · function · L45-L56 — def test_create_integration_bad_application(data_fixture)
+- test_get_integration · function · L60-L62 — def test_get_integration(data_fixture)
+- test_get_integration_does_not_exist · function · L66-L68 — def test_get_integration_does_not_exist(data_fixture)
+- test_get_integrations · function · L72-L86 — def test_get_integrations(data_fixture)
+- test_delete_integration · function · L90-L95 — def test_delete_integration(data_fixture)
+- test_update_integration · function · L99-L110 — def test_update_integration(data_fixture)
+- test_update_integration_invalid_values · function · L114-L123 — def test_update_integration_invalid_values(data_fixture)
+- test_move_integration_end_of_application · function · L127-L138 — def test_move_integration_end_of_application(data_fixture)
+- test_move_integration_before · function · L142-L154 — def test_move_integration_before(data_fixture)
+- test_move_integration_before_fails · function · L158-L171 — def test_move_integration_before_fails(data_fixture)
+- test_recalculate_full_orders · function · L175-L244 — def test_recalculate_full_orders(data_fixture)

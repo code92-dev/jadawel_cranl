@@ -1,0 +1,25 @@
+# web-frontend/modules/database/viewOwnershipTypes.js
+
+- ViewOwnershipType · class · L3-L160 — class ViewOwnershipType extends Registerable
+- getName · method · L7-L9 — getName()
+- getDescription · method · L15-L17 — getDescription()
+- getFeatureName · method · L22-L24 — getFeatureName()
+- getIconClass · method · L28-L30 — getIconClass()
+- isDeactivated · method · L35-L37 — isDeactivated(workspaceId)
+- getDeactivatedText · method · L42-L44 — getDeactivatedText()
+- getDeactivatedModal · method · L49-L51 — getDeactivatedModal()
+- isCompatibleWithViewType · method · L59-L61 — isCompatibleWithViewType(viewType)
+- getListViewTypeSort · method · L67-L69 — getListViewTypeSort()
+- serialize · method · L74-L79 — serialize()
+- getChangeOwnershipTypeMenuItemComponent · method · L86-L88 — getChangeOwnershipTypeMenuItemComponent()
+- userCanTryCreate · method · L90-L96 — userCanTryCreate(table, workspaceId)
+- enhanceRealtimePagePayload · method · L103-L105 — enhanceRealtimePagePayload(database, table, view, realtimePage)
+- fetchingFieldsRequiresViewId · method · L112-L114 — fetchingFieldsRequiresViewId(database, table, view)
+- getSortContextWarning · method · L127-L129 — getSortContextWarning(view, fields, visibleFields, database)
+- getGroupByContextWarning · method · L142-L144 — getGroupByContextWarning(view, fields, visibleFields, database)
+- getDecoratorContextWarning · method · L157-L159 — getDecoratorContextWarning(view, fields, visibleFields, database)
+- CollaborativeViewOwnershipType · class · L162-L180 — class CollaborativeViewOwnershipType extends ViewOwnershipType
+- getType · method · L163-L165 — static getType()
+- getName · method · L167-L170 — getName()
+- getDescription · method · L172-L175 — getDescription()
+- getIconClass · method · L177-L179 — getIconClass()

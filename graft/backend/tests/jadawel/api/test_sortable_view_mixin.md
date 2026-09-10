@@ -1,0 +1,7 @@
+# backend/tests/jadawel/api/test_sortable_view_mixin.py
+
+- test_sortable_view_mixin_apply_sorts_or_default_sort_default · function · L11-L26 — def test_sortable_view_mixin_apply_sorts_or_default_sort_default(data_fixture)
+- test_sortable_view_mixin_apply_sorts_or_default_sort_key_ascending · function · L30-L51 — def test_sortable_view_mixin_apply_sorts_or_default_sort_key_ascending(data_fixture)
+- test_sortable_view_mixin_apply_sorts_or_default_sort_key_descending · function · L55-L76 — def test_sortable_view_mixin_apply_sorts_or_default_sort_key_descending(data_fixture)
+- test_sortable_view_mixin_apply_sorts_or_default_sort_invalid_attribute · function · L80-L95 — def test_sortable_view_mixin_apply_sorts_or_default_sort_invalid_attribute( data_fixture, )
+- test_sortable_view_mixin_apply_sorts_or_default_sort_invalid_sort_direction · function · L99-L111 — def test_sortable_view_mixin_apply_sorts_or_default_sort_invalid_sort_direction( data_fixture, )

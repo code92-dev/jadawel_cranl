@@ -1,0 +1,35 @@
+# backend/src/arabase/mcp/protection/artifact_boundary.py
+
+- ArtifactExposureBlocked · class · L60-L68 — class ArtifactExposureBlocked(APIException)
+- ArtifactRuntimeAccess · class · L72-L77 — class ArtifactRuntimeAccess
+- _sha256 · function · L80-L81 — def _sha256(value: str) -> str
+- _canonical_digest · function · L84-L87 — def _canonical_digest(value: Any) -> str
+- validate_artifact_html · function · L90-L101 — def validate_artifact_html(html: str) -> None
+- _view_configuration · function · L104-L162 — def _view_configuration(view: HtmlPageView, overrides: dict[str, Any] | None = None)
+- configuration_fingerprint · function · L165-L168 — def configuration_fingerprint( view: HtmlPageView, overrides: dict[str, Any] | None = None ) -> str
+- _audience_fingerprint · function · L171-L191 — def _audience_fingerprint(view: HtmlPageView, audience: str) -> str
+- _policy_for_endpoint · function · L194-L200 — def _policy_for_endpoint(endpoint: MCPEndpoint)
+- protected_output_for_view · function · L203-L217 — def protected_output_for_view( view: HtmlPageView, endpoint: MCPEndpoint ) -> tuple[Any, ...]
+- view_query_uses_protected_fields · function · L220-L232 — def view_query_uses_protected_fields(view: HtmlPageView, endpoint: MCPEndpoint) -> bool
+- _manifest_fingerprint · function · L235-L243 — def _manifest_fingerprint( manifest: Iterable[tuple[int, str]], ) -> str
+- _manifest_for_draft · function · L246-L247 — def _manifest_for_draft(draft: ArtifactDraft) -> list[ArtifactManifestField]
+- _audit · function · L250-L272 — def _audit( *, event_type: str, actor, endpoint: MCPEndpoint | None, view: HtmlPageView | None, draft: ArtifactDraft | None = None, approval: ArtifactApproval | None = None, audience: str = "", metadata: dict[str, Any] | None = None, ) -> None: # Keep this helper deliberately restrictive: callers pass only ids/counts # and hashes, never the candidate HTML or row payload.
+- _ensure_endpoint_owner_can_approve · function · L275-L307 — def _ensure_endpoint_owner_can_approve(user, draft: ArtifactDraft) -> None
+- _validate_manifest_against_view · function · L310-L339 — def _validate_manifest_against_view( draft: ArtifactDraft, output_fields: tuple[Any, ...] ) -> list[ArtifactManifestField]
+- _get_or_create_state · function · L342-L344 — def _get_or_create_state(view: HtmlPageView) -> HtmlPageArtifactState
+- _active_approval_for_audience · function · L347-L363 — def _active_approval_for_audience( view_id: int, audience: str ) -> ArtifactApproval | None
+- _safe_update_view · function · L366-L378 — def _safe_update_view(view: HtmlPageView, values: dict[str, Any], user) -> None
+- submit_mcp_page_change · function · L382-L552 — def submit_mcp_page_change( *, user, endpoint: MCPEndpoint, view: HtmlPageView, html: str, protected_field_ids: list[int], audience: str = ArtifactAudience.AUTHENTICATED, pending_view_values: dict[str, Any] | None = None, ) -> dict[str, Any]
+- approve_artifact_draft · function · L556-L650 — def approve_artifact_draft(*, user, draft_id: int) -> dict[str, Any]
+- revoke_artifact · function · L654-L708 — def revoke_artifact( *, user, view_id: int, reason: str = "manual_revocation" ) -> dict[str, Any]
+- _page_artifact_summary · function · L711-L801 — def _page_artifact_summary( view: HtmlPageView, state: HtmlPageArtifactState ) -> dict[str, Any]
+- _validated_active_approval · function · L804-L866 — def _validated_active_approval( *, view: HtmlPageView, state: HtmlPageArtifactState, audience: str, user=None ) -> ArtifactRuntimeAccess
+- page_runtime_access · function · L869-L922 — def page_runtime_access( view: HtmlPageView, *, audience: str = ArtifactAudience.AUTHENTICATED, user=None, ) -> ArtifactRuntimeAccess
+- page_feed_field_ids · function · L925-L961 — def page_feed_field_ids( view: HtmlPageView, *, audience: str = ArtifactAudience.AUTHENTICATED, user=None, ) -> set[int] | None
+- artifact_status_for_view · function · L964-L982 — def artifact_status_for_view(view: HtmlPageView) -> dict[str, Any]
+- human_page_update_as_artifact · function · L985-L1028 — def human_page_update_as_artifact( *, user, view: HtmlPageView, values: dict[str, Any] ) -> dict[str, Any] | None
+- invalidate_artifact_for_view · function · L1032-L1080 — def invalidate_artifact_for_view( view: HtmlPageView, *, actor=None, reason: str ) -> None
+- connect_artifact_lifecycle · function · L1083-L1123 — def connect_artifact_lifecycle() -> None
+- updated · function · L1086-L1088 — def updated(sender, view, user=None, **kwargs)
+- child_changed · function · L1090-L1101 — def child_changed( sender, view_filter=None, view_sort=None, view=None, user=None, **kwargs )
+- options_changed · function · L1103-L1107 — def options_changed(sender, view, user=None, **kwargs)

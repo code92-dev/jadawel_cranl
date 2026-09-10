@@ -1,0 +1,24 @@
+# backend/src/jadawel/ws/signals.py
+
+- user_updated · function · L41-L52 — def user_updated(sender, performed_by, user, **kwargs)
+- user_deleted · function · L56-L66 — def user_deleted(sender, performed_by, user, **kwargs)
+- user_restored · function · L70-L80 — def user_restored(sender, performed_by, user, **kwargs)
+- user_permanently_deleted · function · L84-L89 — def user_permanently_deleted(sender, user_id, workspace_ids, **kwargs)
+- workspace_created · function · L93-L103 — def workspace_created(sender, workspace, user, **kwargs)
+- workspace_updated · function · L107-L118 — def workspace_updated(sender, workspace, user, **kwargs)
+- workspace_deleted · function · L122-L134 — def workspace_deleted( sender, workspace_id, workspace, workspace_users, user=None, **kwargs )
+- workspace_user_added · function · L138-L150 — def workspace_user_added(sender, workspace_user, user, **kwargs)
+- workspace_user_updated · function · L154-L166 — def workspace_user_updated(sender, workspace_user, user, **kwargs)
+- workspace_user_deleted · function · L170-L189 — def workspace_user_deleted(sender, workspace_user_id, workspace_user, user, **kwargs)
+- broadcast_to_workspace_and_removed_user · function · L171-L187 — def broadcast_to_workspace_and_removed_user()
+- workspace_restored · function · L193-L228 — def workspace_restored(sender, workspace_user, user, **kwargs)
+- workspaces_reordered · function · L232-L242 — def workspaces_reordered(sender, workspace_ids, user, **kwargs)
+- application_created · function · L246-L251 — def application_created(sender, application, user, **kwargs)
+- application_updated · function · L255-L273 — def application_updated(sender, application: Application, user: AbstractUser, **kwargs)
+- application_deleted · function · L277-L289 — def application_deleted(sender, application_id, application, user, **kwargs)
+- applications_reordered · function · L293-L307 — def applications_reordered(sender, workspace, order, user, **kwargs): # Hashing all values here to not expose real ids of applications a user might not # have access to
+- notify_workspace_invitation_created · function · L311-L324 — def notify_workspace_invitation_created( sender, invitation, invited_user=None, **kwargs )
+- notify_workspace_invitation_accepted · function · L328-L339 — def notify_workspace_invitation_accepted(sender, invitation, user, **kwargs): # invitation will be deleted on commit, so serialize it now to have the id
+- notify_workspace_invitation_rejected · function · L343-L354 — def notify_workspace_invitation_rejected(sender, invitation, user, **kwargs): # invitation will be deleted on commit, so serialize it now to have the id
+- user_password_changed · function · L358-L364 — def user_password_changed(sender, user, ignore_web_socket_id=None, **kwargs)
+- user_job_started · function · L368-L380 — def user_job_started(sender, job, user, **kwargs)

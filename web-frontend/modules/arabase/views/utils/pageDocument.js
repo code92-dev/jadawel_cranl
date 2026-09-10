@@ -8,12 +8,11 @@
  *
  * The iframe itself is rendered with sandbox="allow-scripts" and deliberately
  * without allow-same-origin, so the document has an opaque origin: no cookies,
- * no localStorage, no reach into the parent. The CSP below is the second layer,
- * and its job is to stop the page sending the rows it was handed anywhere.
+ * no localStorage, no reach into the parent. CSP restricts resource requests,
+ * but does not prevent the frame navigating itself. Authors must still be
+ * trusted with the rows supplied to their scripts.
  */
 
-const HEAD_OPEN = /<head\b[^>]*>/i
-const HTML_OPEN = /<html\b[^>]*>/i
 const DOCTYPE = /^\s*<!doctype\b[^>]*>/i
 
 /**
@@ -50,8 +49,8 @@ export const BOOTSTRAP_SCRIPT = `
   }
 
   function post(message) {
-    // The parent is the only thing this document can talk to at all: the
-    // sandbox has no same-origin access and the CSP blocks every network API.
+    // The sandbox denies same-origin access to the embedding page, so use
+    // messages for the runtime protocol rather than reading its DOM.
     if (window.parent && window.parent !== window) {
       window.parent.postMessage(message, '*')
     }
@@ -152,30 +151,27 @@ function escapeAttribute(value) {
  * @returns {string} A complete document suitable for an iframe's srcdoc.
  */
 export function buildPageDocument(html, contentSecurityPolicy) {
-  const head = injectedHead(contentSecurityPolicy)
+  if (
+    typeof contentSecurityPolicy !== 'string' ||
+    !contentSecurityPolicy.trim()
+  ) {
+    // Never render author code if the API did not supply its security policy.
+    return '<!doctype html><html><head><meta http-equiv="Content-Security-Policy" content="default-src &#39;none&#39;"></head><body></body></html>'
+  }
   const source = typeof html === 'string' ? html : ''
-
-  const headMatch = source.match(HEAD_OPEN)
-  if (headMatch) {
-    const at = headMatch.index + headMatch[0].length
-    return source.slice(0, at) + head + source.slice(at)
-  }
-
-  const htmlMatch = source.match(HTML_OPEN)
-  if (htmlMatch) {
-    const at = htmlMatch.index + htmlMatch[0].length
-    return `${source.slice(0, at)}<head>${head}</head>${source.slice(at)}`
-  }
-
-  // A fragment, or a document written without <html>/<head>. Keep the author's
-  // doctype if they wrote one so we do not end up with two.
   const doctypeMatch = source.match(DOCTYPE)
   const body = doctypeMatch ? source.slice(doctypeMatch[0].length) : source
 
+  // Parse the trusted head before *any* author markup. Looking for a head tag
+  // in the source can match comments, script strings or quoted attributes and
+  // leave the policy inert. The HTML parser handles the author's full document
+  // or fragment after this prefix, including merging html/body attributes.
+  // Leave the head open so authored titles, styles and metadata still belong
+  // to it until the parser encounters the author's body content.
   return `<!doctype html><html><head>${injectedHead(
     contentSecurityPolicy,
     true
-  )}</head><body>${body}</body></html>`
+  )}${body}</html>`
 }
 
 export default buildPageDocument

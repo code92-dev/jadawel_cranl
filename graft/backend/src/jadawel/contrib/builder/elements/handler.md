@@ -1,0 +1,25 @@
+# backend/src/jadawel/contrib/builder/elements/handler.py
+
+- ElementHandler · class · L47-L779 — class ElementHandler
+- get_element · method · L116-L139 — def get_element( self, element_id: int, base_queryset: Optional[QuerySet] = None ) -> Element
+- get_element_property_options · method · L141-L157 — def get_element_property_options( self, element: Element ) -> Dict[str, Dict[str, bool]]
+- get_ancestors · method · L159-L190 — def get_ancestors( self, element_id: int, page: Page, use_element_cache: bool = True, predicate: Optional[Callable[[Element], bool]] = None, ) -> List[Element]
+- get_first_ancestor_of_type · method · L192-L211 — def get_first_ancestor_of_type( self, element_id: int, target_type: Type[ElementTypeSubClass], ) -> Optional[Element]
+- get_element_for_update · method · L213-L232 — def get_element_for_update( self, element_id: int, base_queryset: Optional[QuerySet] = None ) -> ElementForUpdate
+- _query_elements · method · L234-L256 — def _query_elements(self, base_queryset: QuerySet, specific=True)
+- get_elements · method · L258-L299 — def get_elements( self, page: Page, base_queryset: Optional[QuerySet] = None, specific: bool = True, use_cache: bool = True, ) -> Union[QuerySet[Element], Iterable[Element]]
+- get_builder_elements · method · L301-L323 — def get_builder_elements( self, builder: List[Page], base_queryset: Optional[QuerySet] = None, specific: bool = True, ) -> Union[QuerySet[Element], Iterable[Element]]
+- create_element · method · L325-L373 — def create_element( self, element_type: ElementType, page: Page, before: Optional[Element] = None, **kwargs, ) -> Element
+- delete_element · method · L375-L384 — def delete_element(self, element: Element)
+- update_element · method · L386-L419 — def update_element(self, element: ElementForUpdate, **kwargs) -> Element
+- move_element · method · L421-L469 — def move_element( self, target_page: Page, element: ElementForUpdate, parent_element: Optional[Element], place_in_container: str, before: Optional[Element] = None, ) -> Element
+- order_elements · method · L471-L491 — def order_elements(self, page: Page, order: List[int], base_qs=None) -> List[int]
+- before_places_in_container_removed · method · L493-L543 — def before_places_in_container_removed( self, container_element: ContainerElement, places: List[str] ) -> List[Element]
+- recalculate_full_orders · method · L545-L553 — def recalculate_full_orders( self, page: Page, )
+- get_element_workflow_actions · method · L555-L564 — def get_element_workflow_actions( self, element: Element ) -> Iterable[BuilderWorkflowAction]
+- duplicate_element · method · L566-L579 — def duplicate_element(self, element: Element) -> ElementsAndWorkflowActions
+- _duplicate_element_recursive · method · L581-L648 — def _duplicate_element_recursive( self, element: Element, id_mapping ) -> ElementsAndWorkflowActions
+- _duplicate_workflow_actions_of_element · method · L650-L678 — def _duplicate_workflow_actions_of_element( self, element: Element, id_mapping: Dict[str, Dict[int, int]], ) -> List[BuilderWorkflowAction]
+- export_element · method · L680-L698 — def export_element( self, element: Element, files_zip: Optional[ExportZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict] = None, )
+- get_import_context_addition · method · L700-L731 — def get_import_context_addition( self, element_id: int, element_map: Dict[int, Element] = None, ) -> Dict[str, Any]
+- import_element · method · L733-L779 — def import_element( self, page: Page, serialized_element: Dict[str, Any], id_mapping: Dict[str, Dict[int, int]], files_zip: Optional[ZipFile] = None, storage: Optional[Storage] = None, cache: Optional[Dict] = None, **kwargs, ) -> Element

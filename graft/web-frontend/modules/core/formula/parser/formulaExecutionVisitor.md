@@ -1,0 +1,21 @@
+# web-frontend/modules/core/formula/parser/formulaExecutionVisitor.js
+
+- FunctionCollection · class · L4-L12 — class FunctionCollection
+- get · method · L5-L7 — get(name)
+- getAll · method · L9-L11 — getAll()
+- JadawelFormulaExecutionVisitor · class · L14-L126 — class JadawelFormulaExecutionVisitor extends JadawelFormulaVisitor
+- constructor · method · L15-L19 — constructor(functions, formulaContext = {})
+- visitRoot · method · L21-L23 — visitRoot(ctx)
+- visitStringLiteral · method · L25-L27 — visitStringLiteral(ctx)
+- visitDecimalLiteral · method · L29-L31 — visitDecimalLiteral(ctx)
+- visitBooleanLiteral · method · L33-L35 — visitBooleanLiteral(ctx)
+- visitBrackets · method · L37-L39 — visitBrackets(ctx)
+- processString · method · L41-L50 — processString(ctx)
+- visitFunctionCall · method · L52-L55 — visitFunctionCall(ctx)
+- doFunc · method · L57-L71 — doFunc(ctx, functionName)
+- visitBinaryOp · method · L73-L105 — visitBinaryOp(ctx)
+- visitFuncName · method · L107-L109 — visitFuncName(ctx)
+- visitIdentifier · method · L111-L113 — visitIdentifier(ctx)
+- visitIntegerLiteral · method · L115-L117 — visitIntegerLiteral(ctx)
+- visitLeftWhitespaceOrComments · method · L119-L121 — visitLeftWhitespaceOrComments(ctx)
+- visitRightWhitespaceOrComments · method · L123-L125 — visitRightWhitespaceOrComments(ctx)

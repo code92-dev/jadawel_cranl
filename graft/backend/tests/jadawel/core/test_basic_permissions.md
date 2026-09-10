@@ -1,0 +1,16 @@
+# backend/tests/jadawel/core/test_basic_permissions.py
+
+- test_check_permissions · function · L66-L173 — def test_check_permissions(data_fixture)
+- test_workspace_member_permission_manager · function · L177-L258 — def test_workspace_member_permission_manager(data_fixture, django_assert_num_queries)
+- test_check_multiple_permissions · function · L262-L459 — def test_check_multiple_permissions(data_fixture)
+- test_get_permissions · function · L463-L921 — def test_get_permissions(data_fixture)
+- test_allow_if_template_permission_manager · function · L937-L1050 — def test_allow_if_template_permission_manager(data_fixture)
+- test_allow_if_template_permission_manager_filter_queryset · function · L1066-L1153 — def test_allow_if_template_permission_manager_filter_queryset(data_fixture)
+- test_allow_if_template_permission_manager_query_count · function · L1168-L1203 — def test_allow_if_template_permission_manager_query_count(data_fixture)
+- test_all_operations_are_registered · function · L1207-L1231 — def test_all_operations_are_registered()
+- get_all_subclasses · function · L1208-L1216 — def get_all_subclasses(cls)
+- test_all_scope_types_are_registered · function · L1235-L1257 — def test_all_scope_types_are_registered()
+- get_all_subclasses · function · L1236-L1244 — def get_all_subclasses(cls)
+- test_all_scope_types_referenced_by_operations_are_registered · function · L1261-L1283 — def test_all_scope_types_referenced_by_operations_are_registered()
+- get_all_subclasses · function · L1262-L1270 — def get_all_subclasses(cls)
+- test_all_scope_types_query_methods · function · L1287-L1298 — def test_all_scope_types_query_methods()

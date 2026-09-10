@@ -1,0 +1,16 @@
+# backend/tests/jadawel/contrib/database/table/test_table_actions.py
+
+- test_can_undo_create_table · function · L24-L37 — def test_can_undo_create_table(data_fixture)
+- test_can_undo_redo_create_table · function · L42-L61 — def test_can_undo_redo_create_table(data_fixture)
+- test_can_undo_delete_table · function · L66-L79 — def test_can_undo_delete_table(data_fixture)
+- test_can_undo_redo_delete_table · function · L84-L102 — def test_can_undo_redo_delete_table(data_fixture)
+- test_can_undo_order_tables · function · L107-L132 — def test_can_undo_order_tables(data_fixture)
+- get_tables_order · function · L115-L116 — def get_tables_order()
+- test_can_undo_redo_order_tables · function · L137-L167 — def test_can_undo_redo_order_tables(data_fixture)
+- get_tables_order · function · L145-L146 — def get_tables_order()
+- test_can_undo_update_table · function · L172-L192 — def test_can_undo_update_table(data_fixture)
+- test_can_undo_redo_update_table · function · L197-L224 — def test_can_undo_redo_update_table(data_fixture)
+- test_can_undo_duplicate_simple_table · function · L229-L250 — def test_can_undo_duplicate_simple_table(data_fixture)
+- test_can_undo_redo_duplicate_simple_table · function · L255-L281 — def test_can_undo_redo_duplicate_simple_table(data_fixture)
+- test_can_undo_duplicate_interesting_table · function · L286-L310 — def test_can_undo_duplicate_interesting_table(data_fixture)
+- test_can_undo_redo_duplicate_interesting_table · function · L315-L344 — def test_can_undo_redo_duplicate_interesting_table(data_fixture)

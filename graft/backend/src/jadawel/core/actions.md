@@ -1,0 +1,98 @@
+# backend/src/jadawel/core/actions.py
+
+- DeleteWorkspaceActionType · class · L34-L95 — class DeleteWorkspaceActionType(UndoableActionType)
+- Params · class · L45-L47 — class Params
+- do · method · L50-L69 — def do(cls, user: AbstractUser, workspace: WorkspaceForUpdate)
+- scope · method · L72-L73 — def scope(cls) -> ActionScopeStr
+- undo · method · L76-L86 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L89-L95 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- CreateWorkspaceActionType · class · L98-L157 — class CreateWorkspaceActionType(UndoableActionType)
+- Params · class · L109-L111 — class Params
+- do · method · L114-L133 — def do(cls, user: AbstractUser, workspace_name: str) -> WorkspaceUser
+- scope · method · L136-L137 — def scope(cls) -> ActionScopeStr
+- undo · method · L140-L146 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L149-L157 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- UpdateWorkspaceActionType · class · L160-L241 — class UpdateWorkspaceActionType(UndoableActionType)
+- Params · class · L174-L177 — class Params
+- do · method · L180-L209 — def do( cls, user: AbstractUser, workspace: WorkspaceForUpdate, new_workspace_name: str ) -> WorkspaceForUpdate
+- scope · method · L212-L213 — def scope(cls) -> ActionScopeStr
+- undo · method · L216-L227 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L230-L241 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- OrderWorkspacesActionType · class · L244-L301 — class OrderWorkspacesActionType(UndoableActionType)
+- Params · class · L252-L254 — class Params
+- do · method · L257-L279 — def do(cls, user: AbstractUser, workspace_ids_in_order: List[int]) -> None
+- scope · method · L282-L283 — def scope(cls) -> ActionScopeStr
+- undo · method · L286-L292 — def undo( cls, user: AbstractUser, params: Params, action_to_undo: Action, )
+- redo · method · L295-L301 — def redo( cls, user: AbstractUser, params: Params, action_to_redo: Action, )
+- OrderApplicationsActionType · class · L304-L367 — class OrderApplicationsActionType(UndoableActionType)
+- Params · class · L314-L318 — class Params
+- do · method · L321-L351 — def do( cls, user: AbstractUser, workspace: Workspace, application_ids_in_order: List[int], ) -> Any
+- scope · method · L354-L355 — def scope(cls, workspace_id: int) -> ActionScopeStr
+- undo · method · L358-L362 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L365-L367 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- CreateApplicationActionType · class · L370-L449 — class CreateApplicationActionType(UndoableActionType)
+- Params · class · L385-L391 — class Params
+- do · method · L394-L434 — def do( cls, user: AbstractUser, workspace: Workspace, application_type: str, **kwargs ) -> Any
+- scope · method · L437-L438 — def scope(cls, workspace_id: int) -> ActionScopeStr
+- undo · method · L441-L443 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L446-L449 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DeleteApplicationActionType · class · L452-L518 — class DeleteApplicationActionType(UndoableActionType)
+- Params · class · L469-L474 — class Params
+- do · method · L477-L503 — def do(cls, user: AbstractUser, application: Application) -> None
+- scope · method · L506-L507 — def scope(cls, workspace_id: int) -> ActionScopeStr
+- undo · method · L510-L513 — def undo(cls, user, params: Params, action_being_undone: Action)
+- redo · method · L516-L518 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- UpdateApplicationActionType · class · L521-L618 — class UpdateApplicationActionType(UndoableActionType)
+- Params · class · L538-L546 — class Params
+- do · method · L549-L597 — def do(cls, user: AbstractUser, application: Application, **kwargs) -> Application
+- scope · method · L600-L601 — def scope(cls, workspace_id: int) -> ActionScopeStr
+- undo · method · L604-L611 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L614-L618 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- DuplicateApplicationActionType · class · L621-L703 — class DuplicateApplicationActionType(UndoableActionType)
+- Params · class · L639-L646 — class Params
+- do · method · L649-L688 — def do( cls, user: AbstractUser, application: Application, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Application
+- scope · method · L691-L692 — def scope(cls, workspace_id: int) -> ActionScopeStr
+- undo · method · L695-L697 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L700-L703 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- InstallTemplateActionType · class · L706-L788 — class InstallTemplateActionType(UndoableActionType)
+- Params · class · L723-L728 — class Params
+- do · method · L731-L770 — def do( cls, user: AbstractUser, workspace: Workspace, template: Template, progress_builder: Optional[ChildProgressBuilder] = None, ) -> List[Application]
+- scope · method · L773-L774 — def scope(cls, workspace_id: int) -> ActionScopeStr
+- undo · method · L777-L781 — def undo(cls, user: AbstractUser, params: Params, action_being_undone: Action)
+- redo · method · L784-L788 — def redo(cls, user: AbstractUser, params: Params, action_being_redone: Action)
+- CreateWorkspaceInvitationActionType · class · L791-L844 — class CreateWorkspaceInvitationActionType(ActionType)
+- Params · class · L806-L810 — class Params
+- do · method · L813-L840 — def do( cls, user: AbstractUser, workspace: Workspace, email: str, permissions: str, base_url: str, ) -> WorkspaceInvitation
+- scope · method · L843-L844 — def scope(cls) -> ActionScopeStr
+- DeleteWorkspaceInvitationActionType · class · L847-L904 — class DeleteWorkspaceInvitationActionType(ActionType)
+- Params · class · L863-L868 — class Params
+- do · method · L871-L900 — def do( cls, user: AbstractUser, workspace_invitation: WorkspaceInvitation, )
+- scope · method · L903-L904 — def scope(cls) -> ActionScopeStr
+- AcceptWorkspaceInvitationActionType · class · L907-L964 — class AcceptWorkspaceInvitationActionType(ActionType)
+- Params · class · L923-L928 — class Params
+- do · method · L931-L960 — def do( cls, user: AbstractUser, workspace_invitation: WorkspaceInvitation, ) -> WorkspaceUser
+- scope · method · L963-L964 — def scope(cls) -> ActionScopeStr
+- RejectWorkspaceInvitationActionType · class · L967-L1024 — class RejectWorkspaceInvitationActionType(ActionType)
+- Params · class · L983-L988 — class Params
+- do · method · L991-L1020 — def do( cls, user: AbstractUser, workspace_invitation: WorkspaceInvitation, ) -> WorkspaceUser
+- scope · method · L1023-L1024 — def scope(cls) -> ActionScopeStr
+- UpdateWorkspaceInvitationActionType · class · L1027-L1089 — class UpdateWorkspaceInvitationActionType(ActionType)
+- Params · class · L1045-L1051 — class Params
+- do · method · L1054-L1085 — def do( cls, user: AbstractUser, workspace_invitation: WorkspaceInvitation, permissions: str, ) -> WorkspaceInvitation
+- scope · method · L1088-L1089 — def scope(cls) -> ActionScopeStr
+- LeaveWorkspaceActionType · class · L1092-L1125 — class LeaveWorkspaceActionType(ActionType)
+- Params · class · L1103-L1105 — class Params
+- do · method · L1108-L1121 — def do(cls, user: AbstractUser, workspace: Workspace)
+- scope · method · L1124-L1125 — def scope(cls) -> ActionScopeStr
+- CreateInitialWorkspaceActionType · class · L1128-L1154 — class CreateInitialWorkspaceActionType(ActionType)
+- Params · class · L1137-L1138 — class Params
+- do · method · L1141-L1150 — def do(cls, user: AbstractUser) -> WorkspaceUser
+- scope · method · L1153-L1154 — def scope(cls) -> ActionScopeStr
+- ExportApplicationsActionType · class · L1157-L1228 — class ExportApplicationsActionType(ActionType)
+- Params · class · L1171-L1177 — class Params
+- do · method · L1180-L1224 — def do( cls, user: AbstractUser, workspace: Workspace, applications: List[Application], only_structure: bool = False, progress_builder: Optional[ChildProgressBuilder] = None, ) -> ImportExportResource
+- scope · method · L1227-L1228 — def scope(cls, workspace_id: int) -> ActionScopeStr
+- ImportApplicationsActionType · class · L1231-L1303 — class ImportApplicationsActionType(ActionType)
+- Params · class · L1245-L1251 — class Params
+- do · method · L1254-L1299 — def do( cls, user: AbstractUser, workspace: Workspace, resource: ImportExportResource, application_ids: Optional[List[int]] = None, progress_builder: Optional[ChildProgressBuilder] = None, ) -> List[Application]
+- scope · method · L1302-L1303 — def scope(cls, workspace_id: int) -> ActionScopeStr

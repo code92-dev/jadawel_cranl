@@ -1,0 +1,28 @@
+# backend/src/arabase/mcp/protection/lifecycle.py
+
+- create_empty_mcp_protection_policy · function · L32-L36 — def create_empty_mcp_protection_policy( sender, instance: MCPEndpoint, created: bool, **kwargs ) -> None
+- record_mcp_protection_lifecycle_transition · function · L39-L63 — def record_mcp_protection_lifecycle_transition( *, policy: MCPProtectionPolicy, from_lifecycle_status: str, to_lifecycle_status: str, reason_code: str = "", event_type: str = "lifecycle_transition", actor=None, metadata: dict | None = None, ) -> None
+- record_policy_became_nonempty · function · L66-L79 — def record_policy_became_nonempty(*, policy: MCPProtectionPolicy, actor=None) -> None
+- delete_ownerless_suspended_endpoint · function · L83-L152 — def delete_ownerless_suspended_endpoint(*, user, endpoint_id: int) -> None
+- _bump_policies · function · L155-L201 — def _bump_policies(endpoint_ids, *, reason=None, lifecycle_status=None)
+- _suspend_workspace_policies · function · L204-L243 — def _suspend_workspace_policies(workspace_id: int, suspended: bool) -> None: # ``MCPEndpoint.objects`` inherits the parent-workspace trash filter and # therefore returns no endpoints after the workspace has just been marked # trashed. Lifecycle suspension must still reach those endpoints, so use # the all-rows manager while the parent is transitioning.
+- _set_hierarchy_protection_state · function · L246-L302 — def _set_hierarchy_protection_state( *, table_ids=None, database_ids=None, trashed: bool )
+- _capture_field_state · function · L305-L334 — def _capture_field_state(sender, instance: Field, **kwargs)
+- _capture_field_delete_state · function · L337-L365 — def _capture_field_delete_state(sender, instance: Field, **kwargs)
+- _supported_protected_field_conversion · function · L386-L401 — def _supported_protected_field_conversion( previous_type: str | None, current_type: str | None ) -> bool
+- _safe_current_field_type · function · L404-L408 — def _safe_current_field_type(instance: Field) -> str | None
+- _field_changed · function · L411-L496 — def _field_changed(sender, instance: Field, created: bool, **kwargs)
+- _reject_unsupported_protected_field_conversion · function · L499-L532 — def _reject_unsupported_protected_field_conversion( sender, instance: Field, **kwargs ) -> None
+- _workspace_changed · function · L536-L539 — def _workspace_changed(sender, instance: Workspace, created: bool, **kwargs)
+- _capture_workspace_state · function · L542-L550 — def _capture_workspace_state(sender, instance: Workspace, **kwargs)
+- _capture_hierarchy_state · function · L553-L561 — def _capture_hierarchy_state(sender, instance, **kwargs)
+- _table_changed · function · L565-L570 — def _table_changed(sender, instance: Table, created: bool, **kwargs)
+- _database_changed · function · L574-L579 — def _database_changed(sender, instance: Database, created: bool, **kwargs)
+- _workspace_user_changed · function · L583-L596 — def _workspace_user_changed(sender, instance: WorkspaceUser, **kwargs)
+- _workspace_user_deleted · function · L600-L601 — def _workspace_user_deleted(sender, instance: WorkspaceUser, **kwargs)
+- _user_changed · function · L605-L622 — def _user_changed(sender, instance, **kwargs)
+- _user_profile_changed · function · L626-L635 — def _user_profile_changed(sender, instance: UserProfile, **kwargs)
+- _capture_user_state · function · L638-L646 — def _capture_user_state(sender, instance, **kwargs)
+- _capture_endpoint_state · function · L649-L657 — def _capture_endpoint_state(sender, instance: MCPEndpoint, **kwargs)
+- _endpoint_changed · function · L661-L675 — def _endpoint_changed(sender, instance: MCPEndpoint, created: bool, **kwargs)
+- connect_mcp_protection_lifecycle · function · L678-L768 — def connect_mcp_protection_lifecycle() -> None

@@ -1,0 +1,17 @@
+# web-frontend/modules/database/components/view/ViewFilterTypeMultiStepDate.vue
+
+- setup · method · L90-L95 — setup(...args)
+- data · method · L96-L103 — data()
+- selectedOperator · method · L105-L109 — selectedOperator()
+- selectedOperatorLabel · method · L110-L113 — selectedOperatorLabel()
+- isInputValid · method · L116-L118 — isInputValid()
+- operatorLabel · method · L119-L121 — operatorLabel(operator)
+- setDateObject · method · L122-L131 — setDateObject(date)
+- setCopy · method · L132-L162 — setCopy(combinedValue, sender)
+- setOperator · method · L163-L166 — setOperator(operator)
+- setValue · method · L167-L170 — setValue(value)
+- chooseDate · method · L171-L181 — chooseDate(value)
+- setCopyFromDateString · method · L182-L202 — setCopyFromDateString(value, sender)
+- getDatePlaceholder · method · L203-L207 — getDatePlaceholder(field)
+- acceptOnlyNumber · method · L208-L214 — acceptOnlyNumber($event)
+- focus · method · L215-L219 — focus()

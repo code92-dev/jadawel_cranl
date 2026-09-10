@@ -1,0 +1,58 @@
+# backend/src/jadawel/core/generative_ai/generative_ai_model_types.py
+
+- EmbedOnlyFileHandler · class · L20-L25 — class EmbedOnlyFileHandler(FileHandler)
+- OpenAIFileHandler · class · L28-L117 — class OpenAIFileHandler(FileHandler)
+- __init__ · method · L51-L52 — def __init__(self, model_type: OpenAIGenerativeAIModelType)
+- _get_max_upload_bytes · method · L54-L63 — def _get_max_upload_bytes(self) -> int
+- _can_upload_file · method · L65-L68 — def _can_upload_file(self, ext: str, size: int) -> bool
+- _get_upload_client · method · L70-L89 — def _get_upload_client( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- _upload · method · L91-L108 — def _upload( self, ai_file: "AIFile", workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- delete_file · method · L110-L117 — def delete_file( self, ai_file: "AIFile", workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- AnthropicFileHandler · class · L120-L180 — class AnthropicFileHandler(FileHandler)
+- __init__ · method · L133-L134 — def __init__(self, model_type: AnthropicGenerativeAIModelType)
+- _get_sync_client · method · L136-L152 — def _get_sync_client( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- _upload · method · L154-L171 — def _upload( self, ai_file: "AIFile", workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- delete_file · method · L173-L180 — def delete_file( self, ai_file: "AIFile", workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- BaseOpenAIGenerativeAIModelType · class · L188-L249 — class BaseOpenAIGenerativeAIModelType(GenerativeAIModelType)
+- get_api_key · method · L189-L197 — def get_api_key( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- get_enabled_models · method · L199-L207 — def get_enabled_models( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> list[str]
+- get_organization · method · L209-L217 — def get_organization( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- get_base_url · method · L219-L224 — def get_base_url( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- get_ai_model · method · L226-L244 — def get_ai_model( self, model_name: str, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- get_settings_serializer · method · L246-L249 — def get_settings_serializer(self) -> type
+- OpenAIGenerativeAIModelType · class · L252-L272 — class OpenAIGenerativeAIModelType(BaseOpenAIGenerativeAIModelType)
+- file_handler · method · L256-L257 — def file_handler(self) -> OpenAIFileHandler
+- get_settings_serializer · method · L259-L262 — def get_settings_serializer(self) -> type
+- get_base_url · method · L264-L272 — def get_base_url( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- AnthropicGenerativeAIModelType · class · L275-L329 — class AnthropicGenerativeAIModelType(GenerativeAIModelType)
+- file_handler · method · L281-L282 — def file_handler(self) -> AnthropicFileHandler
+- get_api_key · method · L284-L292 — def get_api_key( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- get_enabled_models · method · L294-L302 — def get_enabled_models( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> list[str]
+- get_ai_model · method · L304-L314 — def get_ai_model( self, model_name: str, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- _prepare_model_settings · method · L316-L324 — def _prepare_model_settings( self, temperature: Optional[float] = None ) -> dict[str, Any]
+- get_settings_serializer · method · L326-L329 — def get_settings_serializer(self) -> type
+- MistralGenerativeAIModelType · class · L332-L383 — class MistralGenerativeAIModelType(GenerativeAIModelType): # https://docs.mistral.ai/capabilities/vision/
+- file_handler · method · L337-L338 — def file_handler(self) -> EmbedOnlyFileHandler
+- get_api_key · method · L340-L348 — def get_api_key( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- get_enabled_models · method · L350-L358 — def get_enabled_models( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> list[str]
+- get_ai_model · method · L360-L370 — def get_ai_model( self, model_name: str, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- _prepare_model_settings · method · L372-L378 — def _prepare_model_settings( self, temperature: Optional[float] = None ) -> dict[str, Any]
+- get_settings_serializer · method · L380-L383 — def get_settings_serializer(self) -> type
+- OllamaGenerativeAIModelType · class · L386-L462 — class OllamaGenerativeAIModelType(BaseOpenAIGenerativeAIModelType)
+- file_handler · method · L390-L391 — def file_handler(self) -> EmbedOnlyFileHandler
+- get_host · method · L393-L401 — def get_host( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- get_api_key · method · L403-L408 — def get_api_key( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> str
+- get_organization · method · L410-L415 — def get_organization( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> None
+- get_base_url · method · L417-L423 — def get_base_url( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> str
+- get_enabled_models · method · L425-L433 — def get_enabled_models( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> list[str]
+- is_enabled · method · L435-L443 — def is_enabled( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> bool
+- get_ai_model · method · L445-L457 — def get_ai_model( self, model_name: str, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- get_settings_serializer · method · L459-L462 — def get_settings_serializer(self) -> type
+- OpenRouterGenerativeAIModelType · class · L465-L537 — class OpenRouterGenerativeAIModelType(BaseOpenAIGenerativeAIModelType)
+- file_handler · method · L473-L474 — def file_handler(self) -> EmbedOnlyFileHandler
+- get_api_key · method · L476-L484 — def get_api_key( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- get_enabled_models · method · L486-L494 — def get_enabled_models( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> list[str]
+- get_organization · method · L496-L504 — def get_organization( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Optional[str]
+- get_base_url · method · L506-L511 — def get_base_url( self, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> str
+- get_ai_model · method · L513-L532 — def get_ai_model( self, model_name: str, workspace: Optional[Workspace] = None, settings_override: Optional[dict[str, Any]] = None, ) -> Any
+- get_settings_serializer · method · L534-L537 — def get_settings_serializer(self) -> type

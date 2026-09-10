@@ -1,0 +1,15 @@
+# web-frontend/modules/database/components/row/RowEditFieldFile.vue
+
+- data · method · L102-L108 — data()
+- files · method · L110-L112 — files()
+- uploadFileFunction · method · L113-L115 — uploadFileFunction()
+- showModal · method · L118-L120 — showModal()
+- filesAdded · method · L121-L182 — async filesAdded(event)
+- progress · function · L140-L142 — progress = (event)
+- forceUpdateFile · method · L183-L189 — forceUpdateFile(id, values)
+- forceRemoveFile · method · L190-L195 — forceRemoveFile(index)
+- forceAddFile · method · L196-L209 — forceAddFile(file, additionalData = {})
+- removeFile · method · L210-L213 — removeFile(...args)
+- addFiles · method · L214-L217 — addFiles(...args)
+- renameFile · method · L218-L231 — renameFile(value, index, newName)
+- getFileInProgressIndex · method · L232-L234 — getFileInProgressIndex(id)

@@ -109,6 +109,20 @@ class DashboardShareHandler:
         if dashboard.trashed or dashboard.workspace.trashed:
             raise DashboardShareDoesNotExist("The public dashboard does not exist.")
 
+        # Keep dashboard share records for audit and reactivation, but stop
+        # serving them while a managed organization is suspended or restricted.
+        from django.apps import apps as django_apps
+
+        if django_apps.is_installed("jadawel_organizations"):
+            try:
+                from jadawel_organizations.policy import public_workspace_allowed
+            except ImportError:
+                public_workspace_allowed = None
+            if public_workspace_allowed and not public_workspace_allowed(
+                dashboard.workspace
+            ):
+                raise DashboardShareDoesNotExist("The public dashboard does not exist.")
+
         return share
 
     def get_public_share_by_slug(

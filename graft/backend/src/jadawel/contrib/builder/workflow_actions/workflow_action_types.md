@@ -1,0 +1,47 @@
+# backend/src/jadawel/contrib/builder/workflow_actions/workflow_action_types.py
+
+- NotificationWorkflowActionType · class · L60-L96 — class NotificationWorkflowActionType(BuilderWorkflowActionType)
+- SerializedDict · class · L76-L78 — class SerializedDict(BuilderWorkflowActionDict)
+- allowed_fields · method · L81-L82 — def allowed_fields(self)
+- get_pytest_params · method · L84-L96 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, JadawelFormulaObject]
+- OpenPageWorkflowActionType · class · L99-L178 — class OpenPageWorkflowActionType(BuilderWorkflowActionType)
+- serializer_field_names · method · L105-L109 — def serializer_field_names(self)
+- allowed_fields · method · L112-L113 — def allowed_fields(self)
+- serializer_field_overrides · method · L116-L120 — def serializer_field_overrides(self)
+- SerializedDict · class · L122-L125 — class SerializedDict( BuilderWorkflowActionDict, NavigationElementManager.SerializedDict, )
+- get_pytest_params · method · L127-L128 — def get_pytest_params(self, pytest_data_fixture)
+- formula_generator · method · L130-L156 — def formula_generator( self, workflow_action: WorkflowAction ) -> Generator[str | Instance, str, None]
+- deserialize_property · method · L158-L178 — def deserialize_property( self, prop_name, value, id_mapping: Dict, files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- LogoutWorkflowActionType · class · L181-L188 — class LogoutWorkflowActionType(BuilderWorkflowActionType)
+- SerializedDict · class · L185-L185 — class SerializedDict(BuilderWorkflowActionDict)
+- get_pytest_params · method · L187-L188 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- RefreshDataSourceWorkflowActionType · class · L191-L236 — class RefreshDataSourceWorkflowActionType(BuilderWorkflowActionType)
+- SerializedDict · class · L204-L205 — class SerializedDict(BuilderWorkflowActionDict)
+- get_pytest_params · method · L207-L208 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, Any]
+- allowed_fields · method · L211-L212 — def allowed_fields(self)
+- deserialize_property · method · L214-L236 — def deserialize_property( self, prop_name, value, id_mapping: Dict, files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- BuilderWorkflowServiceActionType · class · L239-L433 — class BuilderWorkflowServiceActionType(BuilderWorkflowActionType)
+- SerializedDict · class · L263-L264 — class SerializedDict(BuilderWorkflowActionDict)
+- allowed_fields · method · L267-L268 — def allowed_fields(self)
+- get_pytest_params_serialized · method · L270-L274 — def get_pytest_params_serialized( self, pytest_params: Dict[str, Any] ) -> Dict[str, Any]
+- serialize_property · method · L276-L301 — def serialize_property( self, workflow_action: WorkflowAction, prop_name: str, files_zip=None, storage=None, cache=None, )
+- deserialize_property · method · L303-L351 — def deserialize_property( self, prop_name: str, value: Any, id_mapping: Dict[str, Any], files_zip=None, storage=None, cache=None, **kwargs, ) -> Any
+- prepare_values · method · L353-L393 — def prepare_values( self, values: Dict[str, Any], user: AbstractUser, instance: Union[ LocalJadawelCreateRowWorkflowAction, LocalJadawelUpdateRowWorkflowAction ] = None, )
+- formula_generator · method · L395-L406 — def formula_generator( self, workflow_action: WorkflowAction ) -> Generator[str | Instance, str, None]
+- enhance_queryset · method · L408-L426 — def enhance_queryset(self, queryset)
+- dispatch · method · L428-L433 — def dispatch( self, workflow_action: WorkflowAction, dispatch_context: BuilderDispatchContext ) -> DispatchResult
+- LocalJadawelWorkflowActionType · class · L436-L437 — class LocalJadawelWorkflowActionType(BuilderWorkflowServiceActionType)
+- UpsertRowWorkflowActionType · class · L440-L446 — class UpsertRowWorkflowActionType(LocalJadawelWorkflowActionType)
+- get_pytest_params · method · L444-L446 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, int]
+- CreateRowWorkflowActionType · class · L449-L451 — class CreateRowWorkflowActionType(UpsertRowWorkflowActionType)
+- UpdateRowWorkflowActionType · class · L454-L456 — class UpdateRowWorkflowActionType(UpsertRowWorkflowActionType)
+- DeleteRowWorkflowActionType · class · L459-L466 — class DeleteRowWorkflowActionType(LocalJadawelWorkflowActionType)
+- get_pytest_params · method · L464-L466 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, int]
+- CoreHttpRequestActionType · class · L469-L476 — class CoreHttpRequestActionType(BuilderWorkflowServiceActionType)
+- get_pytest_params · method · L474-L476 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, int]
+- CoreSMTPEmailActionType · class · L479-L486 — class CoreSMTPEmailActionType(BuilderWorkflowServiceActionType)
+- get_pytest_params · method · L484-L486 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, int]
+- AIAgentWorkflowActionType · class · L489-L496 — class AIAgentWorkflowActionType(BuilderWorkflowServiceActionType)
+- get_pytest_params · method · L494-L496 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, int]
+- SlackWriteMessageWorkflowActionType · class · L499-L506 — class SlackWriteMessageWorkflowActionType(BuilderWorkflowServiceActionType)
+- get_pytest_params · method · L504-L506 — def get_pytest_params(self, pytest_data_fixture) -> Dict[str, int]

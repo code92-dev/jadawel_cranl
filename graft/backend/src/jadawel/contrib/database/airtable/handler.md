@@ -1,0 +1,23 @@
+# backend/src/jadawel/contrib/database/airtable/handler.py
+
+- download_airtable_file · function · L86-L163 — def download_airtable_file( name: str, download_file: DownloadFile, init_data: dict, request_id: str, cookies: dict, headers: dict = None, ) -> Response
+- AirtableFileImport · class · L166-L211 — class AirtableFileImport
+- __init__ · method · L174-L179 — def __init__(self, init_data, request_id, cookies, headers=BASE_HEADERS)
+- add_files · method · L181-L182 — def add_files(self, files_to_download)
+- open · method · L185-L208 — def open(self, name)
+- close · method · L210-L211 — def close(self)
+- AirtableHandler · class · L214-L1282 — class AirtableHandler
+- fetch_publicly_shared_base · method · L216-L263 — def fetch_publicly_shared_base( share_id: str, config: AirtableImportConfig ) -> Tuple[str, dict, dict]
+- make_airtable_request · method · L266-L307 — def make_airtable_request( init_data: dict, request_id: str, headers=None, **kwargs ) -> Response
+- fetch_table_data · method · L310-L364 — def fetch_table_data( table_id: str, init_data: dict, request_id: str, cookies: dict, fetch_application_structure: bool, stream=True, ) -> Response
+- fetch_view_data · method · L367-L399 — def fetch_view_data( view_id: str, init_data: dict, request_id: str, cookies: dict, stream=True, ) -> Response
+- fetch_attachment · method · L402-L447 — def fetch_attachment( row_id: str, column_id: str, attachment_id: str, init_data: dict, request_id: str, cookies: dict, stream=True, headers=None, ) -> Response
+- extract_schema · method · L450-L475 — def extract_schema(exports: List[dict]) -> Tuple[dict, dict]
+- to_jadawel_field · method · L478-L528 — def to_jadawel_field( table: dict, column: dict, config: AirtableImportConfig, import_report: AirtableImportReport, ) -> Union[Tuple[None, None, None], Tuple[Field, FieldType, AirtableColumnType]]
+- to_jadawel_row_export · method · L531-L618 — def to_jadawel_row_export( table: dict, row_id_mapping: Dict[str, Dict[str, int]], column_mapping: Dict[str, dict], row: dict, index: int, files_to_download: Dict[str, DownloadFile], config: AirtableImportConfig, import_report: AirtableImportReport, ) -> dict
+- prepare_downloadable_files · method · L621-L721 — def prepare_downloadable_files( files_to_download: Dict[str, DownloadFile], init_data: dict, request_id: str, cookies: dict, config: AirtableImportConfig, progress_builder: Optional[ChildProgressBuilder] = None, files_buffer: Union[None, IOBase] = None, import_report: AirtableImportReport = None, field_mapping_per_table: dict = None, exported_tables: list = None, row_id_mapping: Dict[str, Dict[str, int]] = None, ) -> BytesIO
+- _parse_table_fields · method · L724-L846 — def _parse_table_fields( cls, schema: dict, converting_progress: Progress, config: AirtableImportConfig, import_report: AirtableImportReport, )
+- _parse_rows_and_views · method · L849-L969 — def _parse_rows_and_views( cls, schema: dict, tables: list, converting_progress: Progress, row_id_mapping: Dict[str, int], field_mapping_per_table: dict, config: AirtableImportConfig, import_report: AirtableImportReport, ): # A list containing all the exported table in Jadawel format.
+- to_jadawel_database_export · method · L972-L1114 — def to_jadawel_database_export( cls, init_data: dict, request_id: str, cookies: dict, schema: dict, tables: list, config: AirtableImportConfig, progress_builder: Optional[ChildProgressBuilder] = None, download_files_buffer: Union[None, IOBase] = None, ) -> Tuple[dict, IOBase]
+- fetch_and_combine_airtable_data · method · L1117-L1208 — def fetch_and_combine_airtable_data( cls, share_id: str, config: AirtableImportConfig, progress_builder: Optional[ChildProgressBuilder] = None, ) -> Union[dict, dict, list]
+- import_from_airtable_to_workspace · method · L1211-L1282 — def import_from_airtable_to_workspace( cls, workspace: Workspace, share_id: str, storage: Optional[Storage] = None, progress_builder: Optional[ChildProgressBuilder] = None, download_files_buffer: Optional[IOBase] = None, config: Optional[AirtableImportConfig] = None, ) -> Database

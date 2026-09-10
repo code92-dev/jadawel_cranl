@@ -1,0 +1,39 @@
+# web-frontend/modules/core/guidedTourTypes.js
+
+- GuidedTourType · class · L3-L32 — class GuidedTourType extends Registerable
+- order · method · L8-L10 — get order()
+- saveCompleted · method · L17-L19 — get saveCompleted()
+- isActive · method · L29-L31 — isActive(route)
+- GuidedTourStep · class · L34-L116 — class GuidedTourStep
+- constructor · method · L35-L49 — constructor( app, title = null, content = null, selector = null, position = 'right-top', highlightPadding = 2 )
+- title · method · L54-L56 — get title()
+- content · method · L61-L66 — get content()
+- selector · method · L72-L74 — get selector()
+- position · method · L81-L83 — get position()
+- buttonText · method · L88-L90 — get buttonText()
+- skipIfNotFirst · method · L97-L99 — get skipIfNotFirst()
+- highlightPadding · method · L101-L103 — get highlightPadding()
+- beforeShow · method · L109-L109 — beforeShow()
+- afterShow · method · L115-L115 — afterShow()
+- WelcomeGuidedTourStep · class · L118-L145 — class WelcomeGuidedTourStep extends GuidedTourStep
+- title · method · L119-L122 — get title()
+- content · method · L124-L127 — get content()
+- selectors · method · L129-L131 — get selectors()
+- position · method · L133-L135 — get position()
+- buttonText · method · L137-L140 — get buttonText()
+- skipIfNotFirst · method · L142-L144 — get skipIfNotFirst()
+- ControlCenterGuidedTourStep · class · L147-L165 — class ControlCenterGuidedTourStep extends GuidedTourStep
+- title · method · L148-L151 — get title()
+- content · method · L153-L156 — get content()
+- selectors · method · L158-L160 — get selectors()
+- position · method · L162-L164 — get position()
+- CreateNewGuidedTourStep · class · L167-L185 — class CreateNewGuidedTourStep extends GuidedTourStep
+- title · method · L168-L171 — get title()
+- content · method · L173-L176 — get content()
+- selectors · method · L178-L180 — get selectors()
+- position · method · L182-L184 — get position()
+- SidebarGuidedTourType · class · L187-L207 — class SidebarGuidedTourType extends GuidedTourType
+- getType · method · L188-L190 — static getType()
+- steps · method · L192-L198 — get steps()
+- order · method · L200-L202 — get order()
+- isActive · method · L204-L206 — isActive()

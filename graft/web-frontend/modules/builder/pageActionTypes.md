@@ -1,0 +1,27 @@
+# web-frontend/modules/builder/pageActionTypes.js
+
+- PageActionType · class · L7-L47 — class PageActionType extends Registerable
+- label · method · L8-L10 — get label()
+- icon · method · L12-L14 — get icon()
+- component · method · L20-L22 — get component()
+- getOrder · method · L24-L26 — getOrder()
+- isActive · method · L28-L30 — isActive()
+- onClick · method · L36-L38 — onClick({ component, button })
+- buttonProps · method · L44-L46 — get buttonProps()
+- PublishPageActionType · class · L49-L81 — class PublishPageActionType extends PageActionType
+- getType · method · L50-L52 — static getType()
+- label · method · L54-L56 — get label()
+- icon · method · L58-L60 — get icon()
+- component · method · L62-L64 — get component()
+- onClick · method · L66-L68 — onClick({ component })
+- isActive · method · L70-L72 — isActive({ workspace, page })
+- getOrder · method · L74-L76 — getOrder()
+- buttonProps · method · L78-L80 — get buttonProps()
+- PreviewPageActionType · class · L83-L141 — class PreviewPageActionType extends PageActionType
+- getType · method · L84-L86 — static getType()
+- label · method · L88-L90 — get label()
+- generatePreviewUrl · method · L92-L123 — generatePreviewUrl(builderId, page)
+- isActive · method · L125-L127 — isActive({ workspace, page })
+- onClick · method · L129-L132 — onClick({ builder, page })
+- getOrder · method · L134-L136 — getOrder()
+- buttonProps · method · L138-L140 — get buttonProps()

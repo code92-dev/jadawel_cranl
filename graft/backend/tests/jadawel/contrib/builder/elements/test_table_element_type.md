@@ -1,0 +1,16 @@
+# backend/tests/jadawel/contrib/builder/elements/test_table_element_type.py
+
+- test_create_table_element_without_fields · function · L24-L40 — def test_create_table_element_without_fields(data_fixture)
+- test_create_table_element_with_fields · function · L44-L71 — def test_create_table_element_with_fields(data_fixture)
+- test_update_table_element_without_fields · function · L75-L99 — def test_update_table_element_without_fields(data_fixture)
+- test_update_table_element_with_fields · function · L103-L159 — def test_update_table_element_with_fields(data_fixture)
+- test_delete_table_element_remove_fields · function · L163-L173 — def test_delete_table_element_remove_fields(data_fixture)
+- test_duplicate_table_element_with_current_record_formulas · function · L177-L249 — def test_duplicate_table_element_with_current_record_formulas(data_fixture)
+- test_import_table_element_with_current_record_formulas_with_update · function · L253-L360 — def test_import_table_element_with_current_record_formulas_with_update(data_fixture)
+- test_delete_table_element_removes_associated_workflow_actions · function · L364-L390 — def test_delete_table_element_removes_associated_workflow_actions(data_fixture)
+- test_delete_table_field_removes_associated_workflow_actions · function · L394-L420 — def test_delete_table_field_removes_associated_workflow_actions(data_fixture)
+- test_table_element_import_export · function · L424-L460 — def test_table_element_import_export(data_fixture)
+- test_table_element_import_fields_with_no_uid · function · L464-L492 — def test_table_element_import_fields_with_no_uid(data_fixture)
+- test_table_element_import_field_with_formula_with_current_record · function · L496-L541 — def test_table_element_import_field_with_formula_with_current_record(data_fixture)
+- test_import_context_addition_returns_data_source_id · function · L545-L560 — def test_import_context_addition_returns_data_source_id(data_fixture)
+- test_table_element_duplication_regenerates_collection_field_uids · function · L564-L597 — def test_table_element_duplication_regenerates_collection_field_uids(data_fixture)

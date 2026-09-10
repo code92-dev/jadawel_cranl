@@ -1,0 +1,17 @@
+# web-frontend/modules/core/utils/dom.js
+
+- isElement · function · L9-L11 — isElement = (element, target)
+- isDomElement · function · L18-L29 — isDomElement = (obj)
+- focusEnd · function · L36-L44 — focusEnd = (element)
+- getParentMatchingPredicate · function · L53-L61 — getParentMatchingPredicate = (element, predicate)
+- findScrollableParent · function · L66-L73 — findScrollableParent = (element)
+- onClickOutside · function · L83-L128 — onClickOutside = (el, callback)
+- clickOutsideClickEvent · function · L94-L96 — clickOutsideClickEvent = (event)
+- clickOutsideMouseDownEvent · function · L99-L101 — clickOutsideMouseDownEvent = (event)
+- clickOutsideEvent · function · L104-L120 — clickOutsideEvent = (event)
+- doesAncestorMatchPredicate · function · L139-L150 — doesAncestorMatchPredicate = (node, predicate, stop)
+- checkIntermediateElements · function · L173-L180 — checkIntermediateElements = (ancestor, descendant, predicate)
+- getCombinedBoundingClientRect · function · L186-L204 — getCombinedBoundingClientRect = (elements)
+- hasRealNodes · function · L210-L228 — hasRealNodes = (nodes)
+- isRtlElement · function · L233-L235 — isRtlElement = (element)
+- getElementFromRef · function · L241-L249 — getElementFromRef = (ref)

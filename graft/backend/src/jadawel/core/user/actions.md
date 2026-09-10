@@ -1,0 +1,51 @@
+# backend/src/jadawel/core/user/actions.py
+
+- CreateUserActionType · class · L22-L113 — class CreateUserActionType(ActionType)
+- Params · class · L40-L48 — class Params
+- do · method · L51-L109 — def do( cls, name: str, email: str, password: str, language: str, workspace_invitation_token: Optional[str] = None, template: Optional[Template] = None, auth_provider: Optional[AuthProviderModel] = None, ) -> AbstractUser
+- scope · method · L112-L113 — def scope(cls) -> ActionScopeStr
+- UpdateUserActionType · class · L116-L178 — class UpdateUserActionType(ActionType)
+- Params · class · L128-L132 — class Params
+- do · method · L135-L174 — def do( cls, user: AbstractUser, first_name: Optional[str] = None, language: Optional[str] = None, email_notification_frequency: Optional[str] = None, completed_onboarding: Optional[bool] = None, completed_guided_tours: Optional[str] = None, **kwargs: Any, ) -> AbstractUser
+- scope · method · L177-L178 — def scope(cls) -> ActionScopeStr
+- ScheduleUserDeletionActionType · class · L181-L214 — class ScheduleUserDeletionActionType(ActionType)
+- Params · class · L194-L196 — class Params
+- do · method · L199-L210 — def do(cls, user: AbstractUser) -> AbstractUser
+- scope · method · L213-L214 — def scope(cls) -> ActionScopeStr
+- CancelUserDeletionActionType · class · L217-L250 — class CancelUserDeletionActionType(ActionType)
+- Params · class · L230-L232 — class Params
+- do · method · L235-L246 — def do(cls, user: AbstractUser) -> AbstractUser
+- scope · method · L249-L250 — def scope(cls) -> ActionScopeStr
+- SignInUserActionType · class · L253-L321 — class SignInUserActionType(ActionType)
+- Params · class · L269-L273 — class Params
+- do · method · L276-L317 — def do( cls, user: AbstractUser, auth_provider: Optional[AuthProviderModel] = None, )
+- log_signin_action · function · L303-L311 — def log_signin_action()
+- scope · method · L320-L321 — def scope(cls) -> ActionScopeStr
+- SendResetUserPasswordActionType · class · L324-L355 — class SendResetUserPasswordActionType(ActionType)
+- Params · class · L335-L337 — class Params
+- do · method · L340-L351 — def do(cls, user: AbstractUser, base_url: str)
+- scope · method · L354-L355 — def scope(cls) -> ActionScopeStr
+- ChangeUserPasswordActionType · class · L358-L395 — class ChangeUserPasswordActionType(ActionType)
+- Params · class · L369-L371 — class Params
+- do · method · L374-L391 — def do( cls, user: AbstractUser, old_password: str, new_password: str ) -> AbstractUser
+- scope · method · L394-L395 — def scope(cls) -> ActionScopeStr
+- ResetUserPasswordActionType · class · L398-L432 — class ResetUserPasswordActionType(ActionType)
+- Params · class · L409-L411 — class Params
+- do · method · L414-L428 — def do(cls, token: str, password: str) -> AbstractUser
+- scope · method · L431-L432 — def scope(cls) -> ActionScopeStr
+- SendVerifyEmailAddressActionType · class · L435-L466 — class SendVerifyEmailAddressActionType(ActionType)
+- Params · class · L446-L448 — class Params
+- do · method · L451-L462 — def do(cls, user: User)
+- scope · method · L465-L466 — def scope(cls) -> ActionScopeStr
+- VerifyEmailAddressActionType · class · L469-L504 — class VerifyEmailAddressActionType(ActionType)
+- Params · class · L480-L482 — class Params
+- do · method · L485-L500 — def do(cls, verification_token: str)
+- scope · method · L503-L504 — def scope(cls) -> ActionScopeStr
+- SendChangeEmailConfirmationActionType · class · L507-L552 — class SendChangeEmailConfirmationActionType(ActionType)
+- Params · class · L521-L524 — class Params
+- do · method · L527-L548 — def do( cls, user: AbstractUser, new_email: str, password: str, base_url: str ) -> AbstractUser
+- scope · method · L551-L552 — def scope(cls) -> ActionScopeStr
+- ChangeEmailActionType · class · L555-L595 — class ChangeEmailActionType(ActionType)
+- Params · class · L569-L572 — class Params
+- do · method · L575-L591 — def do(cls, token: str) -> AbstractUser
+- scope · method · L594-L595 — def scope(cls) -> ActionScopeStr

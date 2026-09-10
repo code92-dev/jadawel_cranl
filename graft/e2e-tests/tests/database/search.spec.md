@@ -1,0 +1,25 @@
+# e2e-tests/tests/database/search.spec.ts
+
+- SharedTestData · class · L55-L63 — class SharedTestData
+- constructor · method · L56-L62 — constructor( public workspace: Workspace, public database: Database, public tableA: Table, public tableB: Table, public tableC: Table )
+- setupTestTablesAndUser · function · L65-L97 — async function setupTestTablesAndUser(workspacePage): Promise<SharedTestData>
+- TestCase · class · L99-L132 — class TestCase
+- constructor · method · L102-L112 — constructor( public fieldType: FieldType, public subFieldSetup: SubFieldSetup, public cellValue: string, public searchTerms: string[], public expectsCellToMatch: boolean, public matchRowIdColumn: boolean, public last: boolean )
+- doSetup · method · L114-L131 — async doSetup(tablePage: TablePage)
+- SubFieldSetup · class · L134-L253 — class SubFieldSetup
+- constructor · method · L140-L164 — constructor( public name: string, public fieldType: FieldType, public fieldSettings: () => any, public otherFieldsToMakeOrUpdate: () => any[], public setCellFunc: Function | null, public testCaseInputs: TestCaseInput[] )
+- doSetup · method · L166-L215 — async doSetup(tablePage: TablePage)
+- _getPrimary · method · L217-L220 — private async _getPrimary(otherField)
+- expectedNumFields · method · L222-L230 — private expectedNumFields()
+- tearDown · method · L232-L252 — async tearDown(tablePage: TablePage)
+- TestCaseInput · type · L255-L260 — type TestCaseInput = { whenCellIs; andSearchTermsAre: string[]; expectCellMatches: boolean; matchRowIdColumn: boolean; };
+- FieldInput · type · L262-L267 — type FieldInput = { type: string; name: string; settings?: Record<string, any>; table: Table; };
+- SubFieldSetupInput · type · L269-L275 — type SubFieldSetupInput = { name?: string; testCases?: TestCaseInput[]; fieldSettings?: Record<string, any>; otherFieldsToMakeOrUpdate?: () => FieldInput[]; setCellValueFunc?: (TablePage, any) => void; };
+- FieldType · class · L277-L314 — class FieldType
+- constructor · method · L280-L313 — constructor( public type: string, public subFieldSetupInputs: SubFieldSetupInput[], public defaultSubFieldSetupValue: SubFieldSetupInput )
+- matchesWithoutSelf · function · L316-L323 — function matchesWithoutSelf(cell, ...searches): TestCaseInput
+- matches · function · L325-L332 — function matches(cell, ...searches): TestCaseInput
+- doesNotMatch · function · L334-L341 — function doesNotMatch(cell: any, ...searches: string[]): TestCaseInput
+- matchesRowId · function · L343-L350 — function matchesRowId(...searches): TestCaseInput
+- doesNotMatchRowId · function · L352-L359 — function doesNotMatchRowId(...searches: string[]): TestCaseInput
+- setTargetFieldAndLinkCellValuesFunc · function · L361-L388 — setTargetFieldAndLinkCellValuesFunc = (targetName)

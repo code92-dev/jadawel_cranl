@@ -1,0 +1,18 @@
+# backend/src/jadawel/contrib/automation/nodes/exceptions.py
+
+- AutomationNodeError · class · L4-L5 — class AutomationNodeError(AutomationError)
+- AutomationNodeNotInWorkflow · class · L8-L17 — class AutomationNodeNotInWorkflow(AutomationNodeError)
+- __init__ · method · L11-L17 — def __init__(self, node_id=None, *args, **kwargs)
+- AutomationNodeDoesNotExist · class · L20-L29 — class AutomationNodeDoesNotExist(AutomationNodeError)
+- __init__ · method · L23-L29 — def __init__(self, node_id=None, *args, **kwargs)
+- AutomationNodeNotFoundInGraph · class · L32-L35 — class AutomationNodeNotFoundInGraph(AutomationNodeError)
+- AutomationNodeReferenceNodeInvalid · class · L38-L41 — class AutomationNodeReferenceNodeInvalid(AutomationNodeError)
+- AutomationNodeTriggerAlreadyExists · class · L44-L45 — class AutomationNodeTriggerAlreadyExists(AutomationNodeError)
+- AutomationNodeFirstNodeMustBeTrigger · class · L48-L49 — class AutomationNodeFirstNodeMustBeTrigger(AutomationNodeError)
+- AutomationNodeTriggerMustBeFirstNode · class · L52-L53 — class AutomationNodeTriggerMustBeFirstNode(AutomationNodeError)
+- AutomationNodeMisconfiguredService · class · L56-L57 — class AutomationNodeMisconfiguredService(AutomationNodeError)
+- AutomationNodeNotDeletable · class · L60-L64 — class AutomationNodeNotDeletable(AutomationNodeError)
+- AutomationNodeNotReplaceable · class · L67-L72 — class AutomationNodeNotReplaceable(AutomationNodeError)
+- AutomationNodeSimulateDispatchError · class · L75-L76 — class AutomationNodeSimulateDispatchError(AutomationNodeError)
+- AutomationNodeNotMovable · class · L79-L83 — class AutomationNodeNotMovable(AutomationNodeError)
+- AutomationNodeMissingOutput · class · L86-L89 — class AutomationNodeMissingOutput(AutomationNodeError)

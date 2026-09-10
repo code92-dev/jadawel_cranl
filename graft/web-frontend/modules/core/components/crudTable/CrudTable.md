@@ -1,0 +1,17 @@
+# web-frontend/modules/core/components/crudTable/CrudTable.vue
+
+- data · method · L232-L241 — data()
+- hasEmptySlot · method · L243-L245 — hasEmptySlot()
+- rows · method · L248-L250 — rows()
+- filters · method · L251-L253 — filters()
+- mounted · method · L255-L257 — async mounted()
+- toggleSort · method · L263-L282 — toggleSort(column)
+- sortIcon · method · L283-L288 — sortIcon(column)
+- sorted · method · L289-L291 — sorted(column)
+- sortIndex · method · L292-L294 — sortIndex(column)
+- doSearch · method · L295-L299 — async doSearch(searchQuery)
+- fetch · method · L303-L330 — async fetch(page = null)
+- updateRow · method · L331-L336 — updateRow(updatedRow)
+- upsertRow · method · L337-L346 — upsertRow(row)
+- deleteRow · method · L347-L350 — deleteRow(rowId)
+- refresh · method · L351-L353 — refresh()
