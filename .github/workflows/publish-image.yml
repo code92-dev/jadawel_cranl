@@ -132,6 +132,20 @@ jobs:
             -t "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}" \
             -t "${{ steps.meta.outputs.image }}:latest" \
             .
+          # Fail before publishing if the standalone release plugins were omitted.
+          docker run --rm --entrypoint python \
+            -e SECRET_KEY=release-packaging-check \
+            "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}" -c '
+          import django
+          django.setup()
+          from django.urls import resolve
+          from django.db.migrations.loader import MigrationLoader
+          for route in ("/api/billing/admin/plans/", "/api/organizations/admin/"):
+              print(route, resolve(route).view_name)
+          migrations = MigrationLoader(None).disk_migrations
+          for app in ("jadawel_billing", "jadawel_organizations"):
+              assert any(label == app for label, name in migrations), app
+          '
           docker push "${{ steps.meta.outputs.image }}:${{ steps.meta.outputs.tag }}"
           docker push "${{ steps.meta.outputs.image }}:latest"
 

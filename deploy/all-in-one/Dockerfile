@@ -113,6 +113,15 @@ COPY --chown=$UID:$GID deploy/all-in-one/supervisor/ /jadawel/supervisor
 COPY --chown=$UID:$GID deploy/all-in-one/jadawel.sh /jadawel.sh
 COPY --chown=$UID:$GID deploy/plugins/*.sh /jadawel/plugins/
 
+# Backend discovery needs plugin folders as well as the installed Python packages.
+# Frontend modules are compiled in the frontend image on the GitHub build runner.
+COPY --chown=$UID:$GID plugins/jadawel_billing/backend /jadawel/data/plugins/jadawel_billing/backend
+COPY --chown=$UID:$GID plugins/jadawel_organizations/backend /jadawel/data/plugins/jadawel_organizations/backend
+RUN mkdir -p /jadawel/container_markers && \
+    touch /jadawel/container_markers/jadawel_billing.backend-built \
+          /jadawel/container_markers/jadawel_organizations.backend-built && \
+    chown -R $UID:$GID /jadawel/container_markers
+
 HEALTHCHECK --interval=60s CMD ["/bin/bash", "/jadawel/backend/docker/docker-entrypoint.sh", "backend-healthcheck"]
 ENTRYPOINT ["/jadawel.sh"]
 CMD ["start"]

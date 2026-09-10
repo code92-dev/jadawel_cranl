@@ -156,6 +156,14 @@ RUN --mount=type=cache,target=$UV_CACHE_DIR,sharing=locked,uid=$UID,gid=$GID \
         -not -path "*/botocore/*" -not -path "*/boto3/*" -prune -exec rm -rf {} \; || true)
 
 
+# Install the standalone release plugins into the production virtual environment.
+# Their folders are also carried into the all-in-one image for Django discovery.
+COPY --chown=$UID:$GID plugins/jadawel_billing/backend /tmp/release-plugins/jadawel_billing/backend
+COPY --chown=$UID:$GID plugins/jadawel_organizations/backend /tmp/release-plugins/jadawel_organizations/backend
+RUN uv pip install --python /jadawel/venv/bin/python --no-deps \
+    /tmp/release-plugins/jadawel_billing/backend \
+    /tmp/release-plugins/jadawel_organizations/backend
+
 # =============================================================================
 # CI Target - lightweight image for pytest and E2E tests
 # =============================================================================

@@ -69,6 +69,9 @@ RUN mkdir -p /jadawel/web-frontend && \
 
 # Copy source code
 COPY --chown=$UID:$GID ./web-frontend /jadawel/web-frontend/
+COPY --chown=$UID:$GID plugins/jadawel_billing/web-frontend /jadawel/web-frontend/bundled-plugins/jadawel_billing/
+COPY --chown=$UID:$GID plugins/jadawel_organizations/web-frontend /jadawel/web-frontend/bundled-plugins/jadawel_organizations/
+ENV ADDITIONAL_MODULES=/jadawel/web-frontend/bundled-plugins/jadawel_billing/modules/jadawel-billing/module.js,/jadawel/web-frontend/bundled-plugins/jadawel_organizations/modules/jadawel-organizations/module.js
 
 # Copy all dependencies so we can build the production files
 COPY --chown=$UID:$GID --from=builder-ci /jadawel/web-frontend/node_modules /jadawel/web-frontend/node_modules

@@ -1,5 +1,29 @@
 # Deploying Jadawel to CranL
 
+## Current production target (September 2026)
+
+Production is `https://app.jadawl.site`, mapped in CranL to **jadawel-org**
+(`8ff2d656-4fde-4513-adf3-6b9c20434867`, Saudi-5), whose default domain is
+`jadawel-org-sudtap.cranl.net`. The older **jadawel** / `jadawel-img0kf.cranl.net`
+app is not this production target. The root `jadawl.site` is the marketing site.
+Deploy from `code92-dev/jadawel_cranl`, branch `main`.
+
+Billing and Organizations are standalone plugins under `plugins/`. Their Python
+packages must be installed in the backend production image, their Nuxt modules
+compiled in the frontend image, and their backend discovery folders included in
+the all-in-one-lite image. Committing the plugin sources alone does not install
+them. The publish workflow checks their API routes and migrations before pushing.
+Build them on GitHub; runtime frontend compilation exceeds the CranL memory budget.
+
+After deploying the digest pin, use Actions → Reload and verify production health
+plus `/api/billing/admin/plans/` and `/api/organizations/admin/`. Anonymous calls
+to these administrator endpoints must require authentication, rather than return
+`URL_NOT_FOUND`. Verify the admin pages with an authenticated administrator too.
+Moyasar credentials and live-payment activation remain separate environment settings.
+
+The older setup notes below describe the original deployment and retain historical
+hostnames and repository ownership; use the current target above for releases.
+
 ## Which repository is this?
 
 `Azizahmed/jadawel_cranl` — a deployment copy, originally branched from
