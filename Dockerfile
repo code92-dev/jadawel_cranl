@@ -17,9 +17,14 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-06 from commit 0ac3513, tag 2.3.4-kanban-grouping-dropdown.
-# Keeps the kanban board's grouping-field dropdown at a full 240px width in
-# the empty state instead of collapsing to icon width.
+# Published 2026-09-10 from merge commit 51f5ee1, tag 2.3.5-billing-orgs.
+# Carries the billing and organization/team feature set, including the
+# administrator billing and organization APIs and their Arabic-first UI.
+# Previous deployment pin (2.3.4-kanban-grouping-dropdown):
+# sha256:b17643feb1d24daa98921b7de1dc1cc35c6d01cb77b62558f8f16a73b5a5089d.
+#
+# The 2.3.4 deployment kept the kanban board's grouping-field dropdown at a
+# full 240px width in the empty state instead of collapsing to icon width.
 # Previous deployment pin (2.3.3-refresh-performance):
 # sha256:6e95488e08c9fd2cfe47aa401468e0ea63a28cfd3cfc4693724fe5db8da2b725.
 #
@@ -199,7 +204,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:b17643feb1d24daa98921b7de1dc1cc35c6d01cb77b62558f8f16a73b5a5089d
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:8e865d52238db1e1f1abbb794e26f6dd0023b5e848653e035da10775a9194d53
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
