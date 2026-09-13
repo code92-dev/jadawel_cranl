@@ -14,6 +14,30 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Upstream 2.3 port — runtime, cache and row-move semantics (2026-09-13)
+
+**Context:** Phase 1 of `docs/NEW_FEATURES_PLAN.md` ports three upstream Baserow 2.3
+OSS changes into the fork. Two are one-line semantic changes, so they are recorded
+here rather than in an `arabase/` module; the Python image bumps are deploy files.
+
+| File | Change | Reason | Merge risk |
+|------|--------|--------|------------|
+| `backend/Dockerfile`, `deploy/all-in-one/Dockerfile`, `embeddings/Dockerfile` | `python:3.14.3-slim-trixie` → `python:3.14.6-slim-trixie` | Upstream 2.3 fixed a backend memory leak by moving to 3.14.6 | none (image tag only) |
+| `backend/src/jadawel/config/settings/base.py` | `JADAWEL_CACHE_TTL_SECONDS` default `0` → `120` | Match upstream 2.3, which enables the general object cache by default. `0` remains the documented opt-out | low |
+| `backend/src/jadawel/contrib/database/rows/handler.py` | `move_row` persists `order` only, no longer `order` and `updated_on` | Upstream 2.3 breaking change: moving a row must not make Last Modified fields appear changed | medium |
+| `backend/src/jadawel/contrib/database/fields/field_types.py` | `CreatedOnLastModifiedBaseFieldType.include_in_row_move_updated_fields = False` | Without it a row move recomputes `created_on`/`last_modified` columns, re-introducing the false modification | low |
+
+`move_row` still recalculates every field that can be order-dependent: the loop over
+`model._field_objects` and `update_dependencies_of_rows_updated` are untouched, so
+lookup and link-row values still refresh while the timestamp columns stay. Permission
+checks, `before_rows_update`/`rows_updated` signals, webhooks and realtime propagation
+are unchanged.
+
+**Tests:** `backend/tests/jadawel/contrib/database/rows/test_rows_handler.py::test_move_row_does_not_update_last_modified`,
+`backend/tests/jadawel/core/test_settings_cache.py`.
+
+---
+
 ## Rich-text floating menu RTL placement (2026-09-09)
 
 | File | Change | Reason | Merge risk |

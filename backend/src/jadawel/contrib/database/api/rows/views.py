@@ -1188,7 +1188,9 @@ class RowMoveView(APIView):
         "position. It is only possible to move the row before another existing row or "
         "to the end. If the `before_id` is provided then the row related to "
         "the `row_id` parameter is moved before that row. If the `before_id` "
-        "parameter is not provided, then the row will be moved to the end.",
+        "parameter is not provided, then the row will be moved to the end. Moving a "
+        "row changes its order only; the row's `updated_on` value, its Last Modified "
+        "fields and any formula derived from them are left unchanged.",
         request=None,
         responses={
             200: get_example_row_serializer_class(

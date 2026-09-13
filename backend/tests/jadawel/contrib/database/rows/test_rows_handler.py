@@ -1183,6 +1183,42 @@ def test_move_row(before_send_mock, send_mock, data_fixture):
 
 
 @pytest.mark.django_db
+def test_move_row_does_not_update_last_modified(data_fixture):
+    user = data_fixture.create_user()
+    table = data_fixture.create_database_table(name="Car", user=user)
+    last_modified_field = data_fixture.create_last_modified_field(table=table)
+    created_on_field = data_fixture.create_created_on_field(table=table)
+
+    handler = RowHandler()
+
+    with freeze_time("2020-01-01 12:00"):
+        row_1 = handler.create_row(user=user, table=table)
+        row_2 = handler.create_row(user=user, table=table)
+        handler.create_row(user=user, table=table)
+
+    created_on_before = row_1.created_on
+    updated_on_before = row_1.updated_on
+    last_modified_before = getattr(row_1, last_modified_field.db_column)
+    created_on_field_before = getattr(row_1, created_on_field.db_column)
+
+    with freeze_time("2020-06-01 12:00"):
+        returned_row = handler.move_row_by_id(
+            user=user, table=table, row_id=row_1.id, before_row=row_2
+        )
+
+    assert returned_row.updated_on == updated_on_before
+    assert returned_row.created_on == created_on_before
+    assert getattr(returned_row, last_modified_field.db_column) == last_modified_before
+
+    row_1.refresh_from_db()
+
+    assert row_1.created_on == created_on_before
+    assert row_1.updated_on == updated_on_before
+    assert getattr(row_1, last_modified_field.db_column) == last_modified_before
+    assert getattr(row_1, created_on_field.db_column) == created_on_field_before
+
+
+@pytest.mark.django_db
 @patch("jadawel.contrib.database.rows.signals.rows_deleted.send")
 @patch("jadawel.contrib.database.rows.signals.before_rows_delete.send")
 def test_delete_row(before_send_mock, send_mock, data_fixture):
