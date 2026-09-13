@@ -1205,5 +1205,10 @@
   },
   "importerType": {
     "excel": "Excel"
+  },
+  "tableSpreadsheetExporter": {
+    "includeHeader": "تضمين أسماء الحقول كعنوان",
+    "includeRowId": "تضمين معرّف الصف",
+    "includePrimaryField": "تضمين الحقل الأساسي"
   }
 }

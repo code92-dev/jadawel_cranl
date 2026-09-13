@@ -175,7 +175,11 @@ import {
 
 import { APITokenSettingsType } from '@jadawel/modules/database/settingsTypes'
 
-import { CSVTableExporterType } from '@jadawel/modules/database/exporterTypes'
+import {
+  CSVTableExporterType,
+  OdsTableExporterType,
+  XlsxTableExporterType,
+} from '@jadawel/modules/database/exporterTypes'
 import {
   JadawelAdd,
   JadawelAnd,
@@ -721,6 +725,8 @@ export default defineNuxtPlugin({
     $registry.register('dataSync', new PostgreSQLDataSyncType(context))
     $registry.register('settings', new APITokenSettingsType(context))
     $registry.register('exporter', new CSVTableExporterType(context))
+    $registry.register('exporter', new XlsxTableExporterType(context))
+    $registry.register('exporter', new OdsTableExporterType(context))
     $registry.register('webhookEvent', new RowsCreatedWebhookEventType(context))
     $registry.register('webhookEvent', new RowsUpdatedWebhookEventType(context))
     $registry.register('webhookEvent', new RowsDeletedWebhookEventType(context))

@@ -228,7 +228,9 @@
     "apiDocs": "قائمة كافة الجداول"
   },
   "exporterType": {
-    "csv": "تصدير إلى CSV"
+    "csv": "تصدير إلى CSV",
+    "xlsx": "تصدير إلى XLSX",
+    "ods": "تصدير إلى ODS"
   },
   "previewType": {
     "imageBrowser": "فتح في المتصفح",

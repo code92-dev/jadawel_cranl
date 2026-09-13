@@ -1205,5 +1205,10 @@
   },
   "importerType": {
     "excel": "Excel"
+  },
+  "tableSpreadsheetExporter": {
+    "includeHeader": "Include field names as header",
+    "includeRowId": "Include row ID",
+    "includePrimaryField": "Include primary field"
   }
 }

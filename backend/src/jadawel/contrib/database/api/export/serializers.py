@@ -146,6 +146,14 @@ class BaseExporterOptionsSerializer(serializers.Serializer):
         child=serializers.IntegerField(),
         help_text="List of field IDs that must be included in the export, in the desired order.",
     )
+    include_row_id = serializers.BooleanField(
+        default=True,
+        help_text="Whether or not to include the row id column in the export.",
+    )
+    include_primary_field = serializers.BooleanField(
+        default=True,
+        help_text="Whether or not to include the primary field column in the export.",
+    )
 
 
 class CsvExporterOptionsSerializer(BaseExporterOptionsSerializer):
@@ -161,4 +169,20 @@ class CsvExporterOptionsSerializer(BaseExporterOptionsSerializer):
     csv_include_header = fields.BooleanField(
         default=True,
         help_text="Whether or not to generate a header row at the top of the csv file.",
+    )
+
+
+class ExcelExporterOptionsSerializer(BaseExporterOptionsSerializer):
+    excel_include_header = fields.BooleanField(
+        default=True,
+        help_text="Whether or not to generate the field names as a header row at the "
+        "top of the workbook.",
+    )
+
+
+class OdsExporterOptionsSerializer(BaseExporterOptionsSerializer):
+    excel_include_header = fields.BooleanField(
+        default=True,
+        help_text="Whether or not to generate the field names as a header row at the "
+        "top of the workbook.",
     )

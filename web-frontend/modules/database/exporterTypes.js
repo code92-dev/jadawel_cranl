@@ -1,6 +1,7 @@
 import { Registerable } from '@jadawel/modules/core/registry'
 import { GridViewType } from '@jadawel/modules/database/viewTypes'
 import TableCSVExporter from '@jadawel/modules/database/components/export/TableCSVExporter'
+import TableSpreadsheetExporter from '@jadawel/modules/database/components/export/TableSpreadsheetExporter'
 
 export class TableExporterType extends Registerable {
   /**
@@ -107,6 +108,60 @@ export class CSVTableExporterType extends TableExporterType {
 
   getFormComponent() {
     return TableCSVExporter
+  }
+
+  getCanExportTable() {
+    return true
+  }
+
+  getSupportedViews() {
+    return [GridViewType.getType()]
+  }
+}
+
+export class XlsxTableExporterType extends TableExporterType {
+  static getType() {
+    return 'xlsx'
+  }
+
+  getIconClass() {
+    return 'jadawel-icon-file-excel'
+  }
+
+  getName() {
+    const { $i18n: i18n } = this.app
+    return i18n.t('exporterType.xlsx')
+  }
+
+  getFormComponent() {
+    return TableSpreadsheetExporter
+  }
+
+  getCanExportTable() {
+    return true
+  }
+
+  getSupportedViews() {
+    return [GridViewType.getType()]
+  }
+}
+
+export class OdsTableExporterType extends TableExporterType {
+  static getType() {
+    return 'ods'
+  }
+
+  getIconClass() {
+    return 'jadawel-icon-file-excel'
+  }
+
+  getName() {
+    const { $i18n: i18n } = this.app
+    return i18n.t('exporterType.ods')
+  }
+
+  getFormComponent() {
+    return TableSpreadsheetExporter
   }
 
   getCanExportTable() {

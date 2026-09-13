@@ -519,7 +519,9 @@
     "apiDocs": "List all tables"
   },
   "exporterType": {
-    "csv": "Export to CSV"
+    "csv": "Export to CSV",
+    "xlsx": "Export to XLSX",
+    "ods": "Export to ODS"
   },
   "previewType": {
     "imageBrowser": "Open in browser",
