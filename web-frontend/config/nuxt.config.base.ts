@@ -43,7 +43,12 @@ function jadawelModuleConfig() {
 const jadawel = jadawelModuleConfig()
 
 export default defineNuxtConfig({
-  compatibilityDate: '2025-07-15',
+  // Nuxt 4. Bump this deliberately: it opts the app into Nuxt/Nitro behaviour
+  // changes up to that date.
+  compatibilityDate: '2025-11-15',
+  // Nuxt 4 defaults to a srcDir of "app/". This project keeps the v3 layout, with
+  // app.vue, pages and modules at the frontend root, so pin srcDir back to it.
+  srcDir: '.',
   // Routes are contributed by the core and optional plugin modules. There is
   // intentionally no root pages/ directory, so keep Nuxt's pages subsystem
   // enabled for module-provided routes.

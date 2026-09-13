@@ -414,7 +414,7 @@ export default {
 
           // 140 is ~ the size of 1 item + optional footer
           const minHeight = 140
-          let offset = 0
+          let offset
 
           if (
             // If the target is two low on the page

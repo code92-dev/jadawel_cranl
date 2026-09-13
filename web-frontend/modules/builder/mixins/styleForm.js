@@ -103,7 +103,7 @@ export default {
         ? this.$registry.get('element', this.parentElement?.type)
         : null
 
-      let styles = elementType.styles
+      let styles
 
       if (parentElementType) {
         styles = _.difference(elementType.styles, [

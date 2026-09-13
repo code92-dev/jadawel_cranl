@@ -526,7 +526,8 @@ export class ElementType extends Registerable {
    * that can be used to move the element.
    */
   getNextPlaces({ builder, page, element }) {
-    let placeInContainer = element.place_in_container
+    let placeInContainer
+
     const parentElementId = element.parent_element_id
       ? element.parent_element_id
       : null

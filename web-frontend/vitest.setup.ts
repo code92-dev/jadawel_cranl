@@ -60,6 +60,13 @@ const uuidMockState = vi.hoisted(() => {
   }
 })
 
+// Nuxt 4 renders some overlays through <Teleport>; stub it so component tests do not
+// need a real teleport target in the happy-dom environment.
+config.global.stubs = {
+  ...config.global.stubs,
+  Teleport: true,
+}
+
 vi.mock('@jadawel/modules/core/utils/string', async () => {
   const actual = await vi.importActual<any>(
     '@jadawel/modules/core/utils/string'

@@ -248,7 +248,7 @@ export const buildFormulaFunctionNodes = (app) => {
         const instance = func.instance
 
         // Get function signature information
-        let signature = null
+        let signature
 
         // Check if function is variadic
         // A function is variadic if:
@@ -443,12 +443,9 @@ export const buildFormulaFunctionNodes = (app) => {
         }
 
         // Get description and examples
-        let description = null
-        let example = null
-
-        description = instance.getDescription()
+        const description = instance.getDescription()
         const examples = instance.getExamples()
-        example = examples && examples.length > 0 ? examples[0] : null
+        const example = examples && examples.length > 0 ? examples[0] : null
 
         categoryNodes.push({
           name: op.name,

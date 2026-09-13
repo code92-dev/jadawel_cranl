@@ -38,9 +38,6 @@ export default defineNuxtModule({
   meta: {
     name: '@jadawel/dashboard',
     configKey: 'dashboard',
-    compatibility: {
-      nuxt: '^3.0.0',
-    },
   },
   async setup(options, nuxt) {
     const { resolve } = createResolver(import.meta.url)

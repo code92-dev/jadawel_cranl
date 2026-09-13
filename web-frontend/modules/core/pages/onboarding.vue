@@ -113,28 +113,6 @@ import jobProgress from '@jadawel/modules/core/mixins/jobProgress'
 export default {
   components: { Toasts, CircleProgressBar },
   mixins: [error, jobProgress],
-  setup() {
-    const { t } = useI18n()
-    useHead({
-      title: t('onboarding.title'),
-    })
-
-    definePageMeta({
-      middleware: [
-        'settings',
-        'authenticated',
-        () => {
-          const { $store } = useNuxtApp()
-          // If the user has completed the onboarding, then redirect to the dashboard
-          // page so that the user can create their first one.
-          const user = $store.getters['auth/getUserObject']
-          if (user.completed_onboarding) {
-            return navigateTo({ name: 'dashboard' })
-          }
-        },
-      ],
-    })
-  },
   data() {
     return {
       stepIndex: 0,
@@ -342,4 +320,30 @@ export default {
     },
   },
 }
+</script>
+
+<script setup>
+// Nuxt 4 extracts `definePageMeta` at build time, so it must be a top-level
+// statement in `<script setup>` — a call inside `setup()` is ignored with a
+// compiler warning. `useHead` stays top-level here for the same reason.
+const { t } = useI18n()
+useHead({
+  title: t('onboarding.title'),
+})
+
+definePageMeta({
+  middleware: [
+    'settings',
+    'authenticated',
+    () => {
+      const { $store } = useNuxtApp()
+      // If the user has completed the onboarding, then redirect to the dashboard
+      // page so that the user can create their first one.
+      const user = $store.getters['auth/getUserObject']
+      if (user.completed_onboarding) {
+        return navigateTo({ name: 'dashboard' })
+      }
+    },
+  ],
+})
 </script>
