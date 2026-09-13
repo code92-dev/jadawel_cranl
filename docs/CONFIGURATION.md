@@ -91,6 +91,25 @@ only after measuring both steady-state memory and p95 document latency.
 | `JADAWEL_IMPORT_ARCHIVE_MAX_UNCOMPRESSED_SIZE_MB` | Maximum combined expanded size of every entry in a workspace import ZIP. Archives over this limit are rejected before any entry is parsed or extracted. Raise it only when the storage and worker limits can safely handle larger exports. | `1024` |
 | `JADAWEL_IMPORT_ARCHIVE_MAX_JSON_SIZE_MB` | Maximum expanded size of an application-data JSON entry. The manifest has a stricter built-in 8 MiB ceiling. | `64` |
 
+### General object cache
+
+`JADAWEL_CACHE_TTL_SECONDS` bounds the Redis-backed cache of `Settings`, `User` and
+database-token objects. It defaults to `120`, matching upstream 2.3, so a default
+deployment answers repeated reads without a query. Mutation paths — saving settings,
+changing a user or its profile, and rotating or deleting a token — invalidate the
+entry through the receiving signals, so the next read repopulates it.
+
+Set it to `0` to disable the cache entirely; the accessors short-circuit before
+touching Redis, which is the behaviour every test run uses. Set a negative value only
+to disable and make the intent explicit. If several backend processes share one Redis
+the entries are invalidated for all of them; a local-memory cache backend would not
+give that guarantee, which is why the invalidation paths are signal-driven rather than
+in-process.
+
+| Variable | Description | Default |
+|---|---|---|
+| `JADAWEL_CACHE_TTL_SECONDS` | Lifetime in seconds of cached `Settings`, `User` and database-token objects. `0` disables the cache. | `120` |
+
 ### Development profiling
 
 `JADAWEL_ENABLE_SILK` defaults to `false`, including in the development

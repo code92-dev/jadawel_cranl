@@ -495,7 +495,7 @@ if JADAWEL_MAX_CONCURRENT_USER_REQUESTS > 0:
         "jadawel.throttling.middleware.ConcurrentUserRequestsMiddleware",
     ]
 
-JADAWEL_CACHE_TTL_SECONDS = int(os.getenv("JADAWEL_CACHE_TTL_SECONDS", 0))
+JADAWEL_CACHE_TTL_SECONDS = int(os.getenv("JADAWEL_CACHE_TTL_SECONDS", 120))
 
 PUBLIC_VIEW_AUTHORIZATION_HEADER = "Jadawel-View-Authorization"
 

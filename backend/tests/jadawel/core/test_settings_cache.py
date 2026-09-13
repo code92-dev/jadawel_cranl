@@ -1,8 +1,11 @@
+import importlib
+
 from django.db import connection
 from django.test.utils import CaptureQueriesContext, override_settings
 
 import pytest
 
+from jadawel.config.settings import base
 from jadawel.core.cache import (
     get_cached_settings,
     invalidate_cached_settings,
@@ -12,6 +15,32 @@ from jadawel.core.handler import CoreHandler
 
 _CACHE_ON = override_settings(JADAWEL_CACHE_TTL_SECONDS=30)
 _CACHE_OFF = override_settings(JADAWEL_CACHE_TTL_SECONDS=0)
+
+
+@pytest.mark.parametrize(
+    ("value", "expected"),
+    [
+        (None, 120),
+        ("0", 0),
+        ("30", 30),
+        ("-1", -1),
+    ],
+)
+def test_cache_ttl_default_and_override(monkeypatch, value, expected):
+    """The general cache is enabled for 120s unless explicitly overridden."""
+    name = "JADAWEL_CACHE_TTL_SECONDS"
+    with monkeypatch.context() as context:
+        if value is None:
+            context.delenv(name, raising=False)
+        else:
+            context.setenv(name, value)
+        try:
+            configured = importlib.reload(base).JADAWEL_CACHE_TTL_SECONDS
+        finally:
+            context.undo()
+            importlib.reload(base)
+
+    assert configured == expected
 
 
 @pytest.mark.django_db
