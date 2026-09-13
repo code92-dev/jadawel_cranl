@@ -1,3 +1,5 @@
+import re
+
 from jadawel.core.formula import JadawelFormula, JadawelFormulaVisitor
 from jadawel.core.formula.parser.exceptions import (
     FieldByIdReferencesAreDeprecated,
@@ -40,9 +42,9 @@ class JadawelFormulaExecutionVisitor(JadawelFormulaVisitor):
     def process_string(self, ctx):
         literal_without_outer_quotes = ctx.getText()[1:-1]
         if ctx.SINGLEQ_STRING_LITERAL() is not None:
-            literal = literal_without_outer_quotes.replace("\\'", "'")
+            literal = re.sub(r"\\(['\\])", r"\1", literal_without_outer_quotes)
         else:
-            literal = literal_without_outer_quotes.replace('\\"', '"')
+            literal = re.sub(r'\\(["\\])', r"\1", literal_without_outer_quotes)
         return literal
 
     def visitFunctionCall(self, ctx: JadawelFormula.FunctionCallContext):
