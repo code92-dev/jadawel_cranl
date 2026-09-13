@@ -24,6 +24,7 @@ export const allowedIdenticalValues = new Set([
   'Airtable',
   'Anthropic',
   'CSV',
+  'Excel',
   'HTTP',
   'HTTPS',
   'HTML',
@@ -69,7 +70,9 @@ export function parseLocaleJson(contents, filename = 'locale file') {
   try {
     return JSON.parse(contents)
   } catch (error) {
-    throw new Error(`${filename} is not valid JSON: ${error.message}`)
+    throw new Error(`${filename} is not valid JSON: ${error.message}`, {
+      cause: error,
+    })
   }
 }
 

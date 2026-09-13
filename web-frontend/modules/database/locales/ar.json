@@ -1190,5 +1190,20 @@
   },
   "rowCreateModal": {
     "addField": "إضافة حقل"
+  },
+  "tableExcelImporter": {
+    "chooseFileLabel": "اختر ملف Excel",
+    "chooseFileDescription": "يمكنك استيراد جدول بيانات قائم عبر رفع ملف بامتداد ‎.xlsx‎ أو ‎.xls‎ أو ‎.ods‎. إذا كان الملف يحتوي على عدة أوراق فيمكنك اختيار الورقة التي تريد استيرادها.",
+    "chooseFile": "اختر ملف Excel",
+    "sheet": "الورقة",
+    "firstRowHeader": "الصف الأول هو العنوان",
+    "limitFileSize": "الحد الأقصى لحجم الملف هو {limit} ميجابايت.",
+    "limitError": "لا يمكن استيراد أكثر من {limit} صفًا.",
+    "processingError": "حدث خطأ أثناء معالجة ملف Excel: {error}",
+    "emptyError": "لا يحتوي ملف Excel هذا على أي أوراق.",
+    "emptySheetError": "الورقة المحددة فارغة."
+  },
+  "importerType": {
+    "excel": "Excel"
   }
 }
