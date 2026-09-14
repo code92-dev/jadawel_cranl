@@ -15,28 +15,7 @@ from jadawel.contrib.database.fields.constants import (
 )
 from jadawel.core.datetime import FormattedDate, FormattedDateTime
 from jadawel.core.duration import parse_duration_string
-from jadawel.core.formula.service_file import ServiceFile
-from jadawel.core.models import UserFile
 from jadawel.core.utils import split_comma_separated_string
-
-
-def ensure_file(value: Any) -> ServiceFile:
-    if isinstance(value, ServiceFile):
-        return value
-
-    if isinstance(value, UserFile):
-        return ServiceFile.from_user_file(value)
-
-    if isinstance(value, dict):
-        if value.get("__file__") or ("name" in value and "url" in value):
-            return ServiceFile.from_serialized(value)
-
-        raise ValidationError("A valid file or url is required.")
-
-    if isinstance(value, str):
-        return ServiceFile.from_remote_url(value)
-
-    raise ValidationError("A valid file or url is required.")
 
 
 def ensure_boolean(value: Any, strict=True) -> bool:

@@ -10,6 +10,7 @@ const mockUuid = () => nextFilterUuid++
 
 vi.mock('@jadawel/modules/core/utils/string', () => ({
   uuid: () => mockUuid(),
+  generateUUID: () => mockUuid(),
 }))
 
 vi.mock('uuid', () => ({

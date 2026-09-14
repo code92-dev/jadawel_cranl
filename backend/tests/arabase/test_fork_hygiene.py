@@ -68,15 +68,11 @@ def test_upstream_attribution_is_intact(relative_path, notice):
     )
 
 
+# Only historical migrations get a path-level exemption: their model names and
+# dependencies are referenced by later RenameModel operations and must never be
+# renamed. Every other allowance is applied per-line, below, so a new
+# ``baserow`` identifier cannot hide merely because of the file it sits in.
 FOUR_DOCUMENTED_BASEROW_EXCEPTION_PATHS = (
-    # 1. Licence notices (asserted above) live in LICENSE and the two notice
-    #    files; upstream Docker image/issue URLs and provenance live under
-    #    deploy/ and .github/.
-    "LICENSE",
-    "docs/",
-    "deploy/",
-    ".github/",
-    # 2. Historical migration identifiers that RenameModel operations refer to.
     "migrations/",
 )
 
@@ -112,8 +108,8 @@ def test_no_new_baserow_namespace_identifiers():
 
     Four things still read ``baserow`` on purpose (see AGENTS.md): licence
     notices, upstream URLs/provenance, the premium/enterprise package names,
-    and historical migration names. Outside the paths carrying those, a
-    ``baserow``-prefixed identifier in code is rename drift.
+    and historical migration names. The allowances below are the exact
+    spelling of those four categories — no blanket path or prefix exemptions.
     """
     offenders = []
     for path in _iter_tracked_source_files():
@@ -125,19 +121,36 @@ def test_no_new_baserow_namespace_identifiers():
             # is namespace drift.
             if not re.search(r"\bbaserow", line, re.IGNORECASE):
                 continue
+            stripped = line.strip()
+            # Historical migration identifiers embedded in non-migration
+            # files must never get a case-insensitive rename (they contain
+            # the `DatabaseRow` substring).
             if "DatabaseRow" in line:
                 continue
-            stripped = line.strip()
-            # Comments and docstrings may legitimately mention upstream.
-            if stripped.startswith(("#", "*", "//", "/*", "<!--", '"""', "'''")):
+            # 1. Licence notices (upstream authors, asserted in full above).
+            if re.search(
+                r"Baserow B\.V\.|Jack Linke|Tal Shprecher|Copyright \(c\)",
+                line,
+            ):
                 continue
-            # The premium/enterprise guardrails and the legacy env-var
-            # acceptance shim read `baserow` on purpose (see AGENTS.md).
+            # 2. Upstream issue URLs and provenance (docker image paths).
+            if re.search(
+                r"baserow\.io|gitlab\.com/baserow|github\.com/baserow|"
+                r"baserow/baserow",
+                line,
+            ):
+                continue
+            # 3. The premium/enterprise guardrails themselves (asserting the
+            #    packages are NOT importable) plus historical comments that
+            #    name the upstream enterprise module.
             if re.search(r"baserow_(premium|enterprise)", line):
                 continue
-            if "BASEROW_" in line or "baserow/baserow" in line:
+            # 4. The documented legacy env-var acceptance shim
+            #    (config/legacy_env.py) and the Airtable legacy color mapping
+            if re.search(r"BASEROW_[A-Z0-9_]+", line) and str(path).endswith(
+                "config/legacy_env.py"
+            ):
                 continue
-            # Historical upstream naming inside the Airtable legacy mapping.
             if "AIRTABLE_BASEROW_COLOR_MAPPING" in line:
                 continue
             offenders.append(

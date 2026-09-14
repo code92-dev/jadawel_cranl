@@ -42,13 +42,12 @@ from jadawel.contrib.database.views.exceptions import (
     ViewGroupByFieldNotSupported,
     ViewGroupByLimitReached,
 )
-
 from jadawel.contrib.database.views.handler import ViewHandler
 from jadawel.contrib.database.views.models import DEFAULT_SORT_TYPE_KEY, ViewGroupBy
 from jadawel.core.utils import split_comma_separated_string
 
 
-def get_public_view_visible_field_ids(view, view_type) -> set:
+def get_public_view_visible_field_ids(view) -> set:
     """
     Returns the ids of the fields a visitor of the publicly shared ``view``
     may see: those whose field option is not hidden.
@@ -67,7 +66,6 @@ def get_public_view_visible_field_ids(view, view_type) -> set:
 
 def resolve_public_view_group_bys(
     view,
-    view_type,
     request: Request,
     visible_field_ids: set,
 ) -> Optional[List[ViewGroupBy]]:
@@ -83,7 +81,6 @@ def resolve_public_view_group_bys(
     public response merely because it is part of the saved view configuration.
 
     :param view: The publicly shared grid view.
-    :param view_type: The resolved view type of ``view``.
     :param request: The request carrying the optional ad-hoc ``group_by`` param.
     :param visible_field_ids: The ids of the fields visible to public visitors.
     :return: The effective group-bys, or ``None`` when the ad-hoc parameter is
@@ -735,7 +732,7 @@ def get_grid_view_group_by_aggregations(view, view_type) -> List[Tuple[Field, st
 
     if not getattr(view_type, "can_aggregate_field", False):
         return []
-    visible_field_ids = get_public_view_visible_field_ids(view, view_type)
+    visible_field_ids = get_public_view_visible_field_ids(view)
     return [
         (field.specific, raw_type)
         for field, raw_type in view_type.get_aggregations(view)

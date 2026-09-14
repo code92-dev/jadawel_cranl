@@ -3,12 +3,12 @@ from datetime import date, datetime, timedelta
 import pytest
 
 from jadawel.core.formula.argument_types import (
-    DateTimeJadawelRuntimeFormulaArgumentType,
     DatetimeFormatJadawelRuntimeFormulaArgumentType,
+    DateTimeJadawelRuntimeFormulaArgumentType,
     DecimalSeparatorJadawelRuntimeFormulaArgumentType,
     DictJadawelRuntimeFormulaArgumentType,
-    DurationJadawelRuntimeFormulaArgumentType,
     DurationFormatJadawelRuntimeFormulaArgumentType,
+    DurationJadawelRuntimeFormulaArgumentType,
     NumberJadawelRuntimeFormulaArgumentType,
     TextJadawelRuntimeFormulaArgumentType,
     ThousandSeparatorJadawelRuntimeFormulaArgumentType,

@@ -14,6 +14,14 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Theme-colored grid column headers (2026-09-14)
+
+| File                                                               | Change                                                                                       | Reason                                                                                         | Merge risk |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ---------- |
+| `web-frontend/modules/core/assets/scss/components/views/grid.scss` | Grid column headers use the active interface theme's header and border CSS custom properties | Prevent fixed sage palette values from covering the selected theme on every table's column row | low        |
+
+**Test:** `web-frontend/test/unit/core/gridHeaderTheme.spec.js`.
+
 ## Upstream 2.3 port — runtime, cache and row-move semantics (2026-09-13)
 
 **Context:** Phase 1 of `docs/NEW_FEATURES_PLAN.md` ports three upstream Baserow 2.3
@@ -73,8 +81,8 @@ plumbing changes below come from upstream 2.3 and are shared with CSV.
 | `backend/src/jadawel/contrib/database/export/handler.py`                                       | Passes those two options through to the serializer                                  | Same                                                                                                                                                                     | low            |
 | `backend/src/jadawel/contrib/database/api/export/serializers.py`                               | Adds `include_row_id` / `include_primary_field` and the XLSX/ODS option serializers | Same                                                                                                                                                                     | low            |
 | `backend/src/jadawel/contrib/database/export/table_exporters/csv_table_exporter.py`            | `CsvQuerysetSerializer.__init__` forwards `**kwargs`                                | **Fixes an upstream 2.3 omission**: upstream added the options to the base but left the CSV subclass overriding them, so any CSV export that set them raised `TypeError` | low            |
-| `backend/src/jadawel/contrib/database/apps.py`                                                 | Registers the XLSX and ODS exporters                                                | Registration site                                                                                                                                                        | low            |
-| `backend/src/jadawel/contrib/database/export/table_exporters/spreadsheet_table_exporter.py`    | New: the two exporters                                                              | The feature                                                                                                                                                              | low (new file) |
+| — (originally `backend/src/jadawel/contrib/database/apps.py`)                                    | Registration moved out of core `apps.py`: the XLSX/ODS exporters now register additively in `ArabaseConfig.ready()` (commit `2a94b601`)             | Fork hygiene: the exporters are fork-owned code under `arabase/export/`, so no core edit is needed for registration                                                            | low            |
+| — (originally `backend/src/jadawel/contrib/database/export/table_exporters/spreadsheet_table_exporter.py`) | Implementation moved to `backend/src/arabase/export/spreadsheet_table_exporter.py` (additive)                                        | Same fork-hygiene move; the core path no longer exists                                                                                                                   | low            |
 | `backend/src/jadawel/contrib/database/migrations/0212_fileimportjob_importer_type_and_more.py` | New: adds the two file-import metadata columns                                      | Ported from upstream 0210, re-pointed at the fork's database head                                                                                                        | low            |
 
 Cells whose text begins with `=`, `+`, `-`, `@`, `|`, `%`, tab, CR or LF are written
@@ -1481,3 +1489,19 @@ updater then read.
 | File                                  | Change                                                                                        | Reason                                                                                                                                                                 | Risk                                                              |
 | ------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | `backend/src/jadawel/core/handler.py` | Invoke an optional plugin callback before creating or accepting a legacy workspace invitation | Bound organization workspaces must use organization invitations so seat locking, roles and audit records cannot be bypassed; unmanaged workspaces retain the core flow | Low; callback is optional and only installed plugins implement it |
+
+## Follow-up remediation — translatable export errors and cancel cleanup (2026-09-14)
+
+Implements Phase 3 (localized dimension failures, cancellation cleanup) of
+`docs/NEW_FEATURES_REMEDIATION_FOLLOWUP_PLAN.md`.
+
+| File                                                    | Change                                                                                                             | Reason                                                                                                            | Merge risk |
+| ------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ---------- |
+| `backend/src/jadawel/contrib/database/export/handler.py` | Runs the export job under the exporting user's language (`translation.override`); deletes the partial storage file when a job is cancelled after rows were written | Dimension-limit errors are gettext strings so Arabic/English users get the right message; a cancelled export must not leave a downloadable partial workbook | low        |
+| `backend/src/jadawel/contrib/database/api/views/grid/utils.py`, `grid/views.py`, `views/view_aggregations.py` | Ruff isort/import hygiene only (no behavior change)                                                            | Phase 5 lint gate of the follow-up plan                                                                           | none       |
+
+The XLSX/ODS exporter itself stays under `backend/src/arabase/export/` (additive);
+its dimension-limit exception now uses `gettext_lazy`, and the Arabic catalogue
+`backend/src/arabase/locale/ar/LC_MESSAGES/` supplies the translations (the `.mo`
+is committed; regenerate it after editing the `.po` — msgfmt is not installed in
+the image, compile per PATCHES conventions).

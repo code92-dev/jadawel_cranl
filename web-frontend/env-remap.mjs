@@ -1,9 +1,9 @@
 /**
- * Environment variable remapping for Nuxt 3 runtime config.
+ * Environment variable remapping for Nuxt 4 runtime config.
  * Remaps legacy env vars to NUXT_ prefixed vars for runtime config support.
  *
  * This allows existing environment variable names (e.g., PUBLIC_BACKEND_URL)
- * to work with Nuxt 3's runtime config system, which expects NUXT_PUBLIC_*
+ * to work with Nuxt 4's runtime config system, which expects NUXT_PUBLIC_*
  * prefixed variables for runtime overrides.
  *
  * Import this file before starting Nuxt (dev or prod).

@@ -17,6 +17,10 @@ from django.db.models import (
 )
 
 from jadawel.contrib.database.db.aggregations import Percentile
+from jadawel.contrib.database.fields.field_filters import (
+    AnnotatedQ,
+    OptionallyAnnotatedQ,
+)
 from jadawel.contrib.database.fields.field_types import (
     AutonumberFieldType,
     BooleanFieldType,
@@ -39,10 +43,6 @@ from jadawel.contrib.database.fields.field_types import (
     SingleSelectFieldType,
     TextFieldType,
     URLFieldType,
-)
-from jadawel.contrib.database.fields.field_filters import (
-    AnnotatedQ,
-    OptionallyAnnotatedQ,
 )
 from jadawel.contrib.database.fields.registries import field_type_registry
 from jadawel.contrib.database.formula import (

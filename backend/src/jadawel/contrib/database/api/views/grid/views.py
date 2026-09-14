@@ -111,7 +111,6 @@ from .utils import (
     build_group_by_data_response,
     empty_group_by_data_page,
     get_grid_view_group_by_aggregations,
-    get_public_view_visible_field_ids,
     parse_adhoc_view_group_bys,
     resolve_public_view_group_bys,
 )
@@ -1031,7 +1030,7 @@ class PublicGridViewGroupByDataView(APIView):
         # over the saved configuration. The shared resolver also drops saved
         # group-bys pointing at hidden fields, so their values can never leak.
         view_group_bys = resolve_public_view_group_bys(
-            view, view_type, request, visible_field_ids
+            view, request, visible_field_ids
         )
 
         if not view_group_bys:

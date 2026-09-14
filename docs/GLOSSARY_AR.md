@@ -96,6 +96,36 @@ term exists).
 | Email | بريد إلكتروني |
 | Duration | مدة |
 
+## Spreadsheets and files
+
+Terms introduced by the Excel/ODS import and export features. Keep "Excel",
+"ODS", "XLSX" and "CSV" Latin as technical format tokens.
+
+| English | Arabic |
+|---------|--------|
+| Spreadsheet | جدول بيانات |
+| Sheet | ورقة |
+| Workbook | مصنّف جداول |
+| Row | صف |
+| Column | عمود |
+
+## Builder menu variants
+
+| English | Arabic |
+|---------|--------|
+| Expanded | موسّع |
+| Compact | مضغوط |
+
+## Formulas
+
+| English | Arabic | Notes |
+|---------|--------|-------|
+| Utility | أداة مساعدة | Formula function category for general-purpose helpers (`range`, `to_json`, `from_json`, `null`). |
+| Duration format | تنسيق المدة | Token string such as `d h:mm`; keep tokens Latin. |
+| Datetime format | تنسيق التاريخ والوقت | Token string such as `DD/MM/YYYY`; keep tokens Latin. |
+| Thousand separator | فاصل الآلاف | |
+| Decimal separator | فاصل العشريات | |
+
 ## MCP data protection
 
 | English | Arabic | Notes |
