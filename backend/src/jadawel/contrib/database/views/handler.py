@@ -5626,4 +5626,3 @@ class ViewSubscriptionHandler:
             if changed:
                 view_state.row_ids = new_row_ids
                 view_state.save()
-

@@ -7,15 +7,15 @@ the CranL deployment copy, so it carries the root `Dockerfile` and
 
 **Pushing code does not change what is deployed.** The root `Dockerfile` pulls a
 published image instead of building the monorepo, because the Nuxt production build
-is OOM-killed on a 4 GB plan. Shipping is three steps: run the *Publish all-in-one
-image* workflow, bump `ARG JADAWEL_IMAGE`, redeploy. `docs/DEPLOY_CRANL.md` holds
+is OOM-killed on a 4 GB plan. Shipping is three steps: run the _Publish all-in-one
+image_ workflow, bump `ARG JADAWEL_IMAGE`, redeploy. `docs/DEPLOY_CRANL.md` holds
 the procedure and `cranl_fix.md` the environment set that actually boots.
 
 ## Layout
 
 ```
 backend/         Django project — src/jadawel (upstream), src/arabase (fork), tests/
-web-frontend/    Nuxt 3 app — modules/{core,database,dashboard,…}, modules/arabase (fork)
+web-frontend/    Nuxt 4 app — modules/{core,database,dashboard,…}, modules/arabase (fork)
 website/         Static marketing pages
 e2e-tests/       Playwright suites
 embeddings/      Embedding sidecar, compose profile `ai`
@@ -74,23 +74,23 @@ Backend commands run through `uv`, frontend commands through `yarn` on Node 24.
   `jadawel_template_version` key and every bundled template's sample data, the
   `X-Jadawel-*` webhook headers and the `Jadawel-View-Authorization` header.
 - Four things still read `baserow` **on purpose**, and renaming any of them is a bug:
-  1. The `Baserow B.V.` copyright, plus the Jack Linke and Tal Shprecher notices.
-     MIT terminates the grant if the notice is dropped, so `test_fork_hygiene.py`
-     asserts each one. **Never rewrite an upstream author's name.**
-  2. Upstream's Docker images, issue URLs and the fork's own provenance line.
-  3. `baserow_premium` / `baserow_enterprise` — upstream's real package names, which
-     `test_fork_hygiene.py` asserts are *not* importable.
-  4. Historical migration filenames and their `CreateModel`/dependency strings, which
-     later `RenameModel` operations refer to by name.
-  `DatabaseRow*` contains the substring `baserow`; a case-insensitive rename will
-  corrupt it. `docs/RENAME_TO_JADAWEL.md` records how the rename was carried out.
+    1. The `Baserow B.V.` copyright, plus the Jack Linke and Tal Shprecher notices.
+       MIT terminates the grant if the notice is dropped, so `test_fork_hygiene.py`
+       asserts each one. **Never rewrite an upstream author's name.**
+    2. Upstream's Docker images, issue URLs and the fork's own provenance line.
+    3. `baserow_premium` / `baserow_enterprise` — upstream's real package names, which
+       `test_fork_hygiene.py` asserts are _not_ importable.
+    4. Historical migration filenames and their `CreateModel`/dependency strings, which
+       later `RenameModel` operations refer to by name.
+       `DatabaseRow*` contains the substring `baserow`; a case-insensitive rename will
+       corrupt it. `docs/RENAME_TO_JADAWEL.md` records how the rename was carried out.
 
 ## Coding style
 
 Python 3.14, 4-space indentation, Ruff (`ruff check`, `ruff format`) at 88 columns,
 with `jadawel` and `arabase` both first-party for isort. Name tests `test_*.py`.
 
-Vue 3 and Nuxt 3 with ESLint, Stylelint and Prettier. SCSS class names follow the BEM
+Vue 3 and Nuxt 4 with ESLint, Stylelint and Prettier. SCSS class names follow the BEM
 pattern Stylelint enforces. Render functions use Vue 3 semantics — import `h` from
 `vue`. A file containing JSX needs a `.jsx` or `.tsx` extension so Vite parses it.
 
@@ -117,14 +117,14 @@ and attach screenshots for UI work.
 `.agents/skills/` is canonical. `.claude/skills` is a symlink to it that a Windows
 checkout leaves as a plain text file, so read through `.agents/skills/`.
 
-| Skill | When to use |
-|---|---|
-| `add-django-config-env-var` | Adding a Django setting backed by an env var and propagating it to `base.py`, the compose files, `env-remap.mjs` and `docs/CONFIGURATION.md` |
-| `create-in-app-notification` | Adding a `NotificationType` with its frontend rendering, target routing and duplicate prevention |
-| `create-update-service` | Creating or updating an integration type or service type in `contrib/integrations` |
-| `silk-profiler` | Investigating a slow endpoint, an N+1 query or a request's query pattern with Django Silk |
-| `write-backend-unit-test` | Writing pytest tests with the repository's DRF `APIClient` and fixture patterns |
-| `write-frontend-unit-test` | Writing Vitest tests with the repository's `TestApp`, Vue Test Utils and snapshot patterns |
+| Skill                        | When to use                                                                                                                                  |
+| ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| `add-django-config-env-var`  | Adding a Django setting backed by an env var and propagating it to `base.py`, the compose files, `env-remap.mjs` and `docs/CONFIGURATION.md` |
+| `create-in-app-notification` | Adding a `NotificationType` with its frontend rendering, target routing and duplicate prevention                                             |
+| `create-update-service`      | Creating or updating an integration type or service type in `contrib/integrations`                                                           |
+| `silk-profiler`              | Investigating a slow endpoint, an N+1 query or a request's query pattern with Django Silk                                                    |
+| `write-backend-unit-test`    | Writing pytest tests with the repository's DRF `APIClient` and fixture patterns                                                              |
+| `write-frontend-unit-test`   | Writing Vitest tests with the repository's `TestApp`, Vue Test Utils and snapshot patterns                                                   |
 
 ## Security and configuration
 
@@ -133,6 +133,7 @@ Docker, and the deploy configs for production. Report vulnerabilities privately
 through the contact path in `SECURITY.md`.
 
 <!-- graft:start -->
+
 ## Graft — repo context graph
 
 This repo is indexed in `graft/`: small linked markdown nodes that explain each

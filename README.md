@@ -10,26 +10,26 @@ be brought in line with PDPL data-residency obligations.
 
 ## What makes it Arabic-first
 
-* Arabic is the default UI locale — the interface ships in Arabic, not translated into
+- Arabic is the default UI locale — the interface ships in Arabic, not translated into
   it as an afterthought.
-* `dir="rtl"` is applied at the document root; layout, grids, menus, forms and the
+- `dir="rtl"` is applied at the document root; layout, grids, menus, forms and the
   frozen-column handles are all direction-aware.
-* Styling uses CSS logical properties so LTR locales keep working unchanged. English,
+- Styling uses CSS logical properties so LTR locales keep working unchanged. English,
   French, Dutch, German, Spanish, Italian, Polish, Korean and Ukrainian remain
   selectable per user.
-* Arabic terminology is kept consistent through a project glossary
+- Arabic terminology is kept consistent through a project glossary
   (`docs/GLOSSARY_AR.md`).
 
 ## Tech stack
 
-| Layer | Technology |
-|---|---|
-| Backend | Django 5.2, Django REST Framework, Python 3.14 |
-| Async / scheduled work | Celery + Redis |
-| Database | PostgreSQL (pgvector) |
-| Frontend | Nuxt 3, Vue 3, Vuex, Vite, SCSS |
-| Tests | pytest / pytest-django, Vitest, Playwright (e2e) |
-| Packaging | `uv` (Python), `yarn` (Node 24), Docker |
+| Layer                  | Technology                                       |
+| ---------------------- | ------------------------------------------------ |
+| Backend                | Django 5.2, Django REST Framework, Python 3.14   |
+| Async / scheduled work | Celery + Redis                                   |
+| Database               | PostgreSQL (pgvector)                            |
+| Frontend               | Nuxt 4, Vue 3, Vuex, Vite, SCSS                  |
+| Tests                  | pytest / pytest-django, Vitest, Playwright (e2e) |
+| Packaging              | `uv` (Python), `yarn` (Node 24), Docker          |
 
 ## Running the development stack
 
@@ -91,7 +91,7 @@ Helm chart for Kubernetes lives in `deploy/helm/jadawel`.
 
 ```
 backend/            Django project (src/, tests/)
-web-frontend/       Nuxt 3 application (modules/, server/, test/, stories/)
+web-frontend/       Nuxt 4 application (modules/, server/, test/, stories/)
 premium/            Paid-tier backend + web-frontend extensions
 enterprise/         Enterprise-tier backend + web-frontend extensions
 e2e-tests/          Playwright end-to-end suites
