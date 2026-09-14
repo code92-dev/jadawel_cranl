@@ -30,6 +30,18 @@ describe('MenuElement compact menu accessibility', () => {
     store.dispatch('page/setDeviceTypeSelected', 'desktop')
   })
 
+  let activeWrapper = null
+
+  afterEach(async () => {
+    // mountSuspended attaches to document.body; without an unmount, panels
+    // from earlier tests stay open in the document and their click-outside
+    // handlers interfere with later focus assertions.
+    if (activeWrapper) {
+      await activeWrapper.unmount()
+      activeWrapper = null
+    }
+  })
+
   const page = {
     id: 1,
     path: '/',
@@ -79,7 +91,7 @@ describe('MenuElement compact menu accessibility', () => {
   const mountComponent = async ({ element, componentMode = 'public' }) => {
     page.elements = [element]
     await store.dispatch('page/setDeviceTypeSelected', 'desktop')
-    return mountSuspended(MenuElement, {
+    const wrapper = await mountSuspended(MenuElement, {
       props: { element },
       global: {
         provide: {
@@ -97,6 +109,8 @@ describe('MenuElement compact menu accessibility', () => {
       },
       attachTo: document.body,
     })
+    activeWrapper = wrapper
+    return wrapper
   }
 
   test('trigger is a semantic button with an accessible name', async () => {
@@ -181,13 +195,41 @@ describe('MenuElement compact menu accessibility', () => {
     await wrapper
       .find('.menu-element__compact-menu-trigger button')
       .trigger('click')
-    await wrapper.find('.menu-element__container--compact').trigger('focus')
 
     const panel = wrapper.find('.menu-element__container--compact')
     expect(panel.exists()).toBe(true)
+    // The watcher focuses the panel itself (tabindex="-1"), so keyboard
+    // users land inside the dialog instead of staying on the trigger.
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(document.activeElement).toBe(panel.element)
   })
 
-  test('close control is keyboard operable and labelled', async () => {
+  test('Tab is trapped inside the open panel', async () => {
+    const wrapper = await mountComponent({ element: createElement() })
+
+    await wrapper
+      .find('.menu-element__compact-menu-trigger button')
+      .trigger('click')
+    const panel = wrapper.find('.menu-element__container--compact')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    const close = wrapper.find('.menu-element__compact-menu-close')
+    const links = panel.findAll('a')
+    const lastLink = links.at(links.length - 1)
+
+    // The test runner does not emulate the browser's default Tab focus
+    // move, so the trap is asserted at the wrap edges, where the handler
+    // itself moves focus: Shift+Tab on the first focusable element wraps
+    // to the last one.
+    close.element.focus()
+    await close.trigger('keydown', { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(lastLink.element)
+
+    // ... and Tab on the last focusable element wraps back to the first.
+    await lastLink.trigger('keydown', { key: 'Tab' })
+    expect(document.activeElement).toBe(close.element)
+  })
+  test('close control is keyboard operable, labelled and restores focus', async () => {
     const wrapper = await mountComponent({ element: createElement() })
 
     await wrapper
@@ -201,5 +243,83 @@ describe('MenuElement compact menu accessibility', () => {
     expect(wrapper.find('.menu-element__container--compact').exists()).toBe(
       false
     )
+    // Every close path — including the close button — must hand focus back
+    // to the trigger.
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(document.activeElement).toBe(
+      wrapper.find('.menu-element__compact-menu-trigger button').element
+    )
+  })
+
+  test('activating a menu link closes the panel and restores focus', async () => {
+    const wrapper = await mountComponent({ element: createElement() })
+
+    await wrapper
+      .find('.menu-element__compact-menu-trigger button')
+      .trigger('click')
+
+    const link = wrapper.find('.menu-element__container--compact a')
+    await link.trigger('click')
+
+    expect(wrapper.find('.menu-element__container--compact').exists()).toBe(
+      false
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    const trigger = wrapper.find('.menu-element__compact-menu-trigger button')
+    expect(document.activeElement).toBe(trigger.element)
+  })
+
+  test('empty compact menu keeps focus trapped on the panel', async () => {
+    const wrapper = await mountComponent({
+      element: createElement({ menu_items: [] }),
+    })
+
+    await wrapper
+      .find('.menu-element__compact-menu-trigger button')
+      .trigger('click')
+    const panel = wrapper.find('.menu-element__container--compact')
+    await new Promise((resolve) => setTimeout(resolve, 0))
+
+    // With no items, Tab keeps focus on the panel itself.
+    await panel.trigger('keydown', { key: 'Tab' })
+    expect(document.activeElement).toBe(panel.element)
+  })
+
+  test('nested submenu toggle is keyboard operable with ARIA state', async () => {
+    const parentItem = createMenuItem({
+      id: 2,
+      uid: 'menu-item-parent',
+      children: [createMenuItem({ id: 3, uid: 'menu-item-child' })],
+    })
+    const wrapper = await mountComponent({
+      element: createElement({ menu_items: [parentItem] }),
+    })
+
+    await wrapper
+      .find('.menu-element__compact-menu-trigger button')
+      .trigger('click')
+
+    // The compact variant renders submenus inline; the toggle is a div
+    // with the full button contract instead of a nested interactive
+    // control inside the parent link.
+    const toggle = wrapper.find('.menu-element__menu-item-with-children')
+    expect(toggle.attributes('role')).toBe('button')
+    expect(toggle.attributes('tabindex')).toBe('0')
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+
+    // Enter and Space activate it like a button.
+    await toggle.trigger('keydown', { key: 'Enter' })
+    expect(toggle.attributes('aria-expanded')).toBe('true')
+    expect(wrapper.find('.menu-element__sub-link--container').exists()).toBe(
+      true
+    )
+
+    await toggle.trigger('keydown', { key: ' ', code: 'Space' })
+    expect(toggle.attributes('aria-expanded')).toBe('false')
+
+    // When expanded, the controlled region is referenced by id.
+    await toggle.trigger('keydown', { key: 'Enter' })
+    const container = wrapper.find('.menu-element__sub-link--container')
+    expect(toggle.attributes('aria-controls')).toBe(container.attributes('id'))
   })
 })

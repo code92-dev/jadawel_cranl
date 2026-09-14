@@ -37,25 +37,25 @@
         v-if="isCompactMenuOpen"
         :id="compactPanelId"
         ref="compactPanel"
+        v-click-outside="closeCompactMenuOnClickOutside"
         role="dialog"
         :aria-label="$t('menuElement.compactMenuLabel')"
-        v-click-outside="closeCompactMenu"
         :class="compactPanelClasses"
         :style="{
           ...getStyleOverride('menu'),
           '--alignment': 'flex-start',
         }"
         tabindex="-1"
-        @keydown.escape="onPanelEscape"
+        @keydown="onPanelKeydown"
+        @click.capture="onPanelClick"
         @mousedown.stop
-        @dragstart.prevent.stop
       >
         <ABIcon
           icon="iconoir-cancel"
           class="menu-element__compact-menu-close"
           is-button
           :aria-label="$t('menuElement.closeCompactMenu')"
-          @click="closeCompactMenu({ restoreFocus: false })"
+          @click="closeCompactMenu()"
         />
         <div
           v-for="item in element.menu_items"
@@ -165,6 +165,13 @@ export default {
         })
       }
     },
+    // Leaving the compact variant (device or variant change) must not leave
+    // an open menu, focus or preview lock behind.
+    useCompactMenu(isCompact) {
+      if (!isCompact && this.isCompactMenuOpen) {
+        this.closeCompactMenu({ restoreFocus: false })
+      }
+    },
   },
   beforeUnmount() {
     this.setCompactMenuPreviewLock(false)
@@ -176,6 +183,12 @@ export default {
         return
       }
       this.compactMenuOpen = !this.compactMenuOpen
+    },
+    closeCompactMenuOnClickOutside() {
+      // Kept separate from closeCompactMenu() because the click-outside
+      // directive passes the originating event as an argument; backdrop
+      // dismissal is still a close path that must restore focus.
+      this.closeCompactMenu()
     },
     closeCompactMenu({ restoreFocus = true } = {}) {
       if (this.isEditMode) {
@@ -189,8 +202,59 @@ export default {
         })
       }
     },
-    onPanelEscape() {
-      this.closeCompactMenu()
+    onPanelKeydown(event) {
+      if (event.key === 'Escape') {
+        this.closeCompactMenu()
+        return
+      }
+      if (event.key === 'Tab') {
+        this.trapFocusInPanel(event)
+      }
+    },
+    trapFocusInPanel(event) {
+      const panel = this.$refs.compactPanel
+      if (!panel) {
+        return
+      }
+      const focusables = panel.querySelectorAll(
+        'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])'
+      )
+      if (!focusables.length) {
+        // Nothing else to focus: keep focus on the panel itself so Tab does
+        // not escape the dialog.
+        event.preventDefault()
+        panel.focus()
+        return
+      }
+      const first = focusables[0]
+      const last = focusables[focusables.length - 1]
+      const active = document.activeElement
+      if (event.shiftKey) {
+        if (active === first || !panel.contains(active)) {
+          event.preventDefault()
+          last.focus()
+        }
+      } else if (active === last || !panel.contains(active)) {
+        event.preventDefault()
+        first.focus()
+      }
+    },
+    onPanelClick(event) {
+      // Activating a menu item (link or button) navigates or fires its
+      // event: the overlay must close and hand focus back to the trigger.
+      // The capture phase is used because child links stop propagation; the
+      // close control and the nested submenu toggle are excluded because
+      // they must keep the menu open.
+      if (
+        event.target.closest(
+          '.menu-element__compact-menu-close, .menu-element__menu-item-with-children'
+        )
+      ) {
+        return
+      }
+      if (event.target.closest('a, button')) {
+        this.closeCompactMenu()
+      }
     },
     setCompactMenuPreviewLock(locked) {
       // the setPagePreviewLocked is not provided in public mode

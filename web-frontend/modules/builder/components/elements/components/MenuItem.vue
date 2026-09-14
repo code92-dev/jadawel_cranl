@@ -22,7 +22,13 @@
         v-else
         ref="menuSubLinkContainer"
         class="menu-element__menu-item-with-children"
+        role="button"
+        tabindex="0"
+        :aria-expanded="isExpanded ? 'true' : 'false'"
+        :aria-controls="useInlineSubLinks ? subLinkId : null"
         @click="toggleSubMenu()"
+        @keydown.enter.prevent="toggleSubMenu()"
+        @keydown.space.prevent="toggleSubMenu()"
       >
         <div>
           <ABLink :variant="menuItem.variant" :force-active="sublinkIsActive">
@@ -43,7 +49,11 @@
           </ABLink>
         </div>
 
-        <div v-if="isExpanded" class="menu-element__sub-link--container">
+        <div
+          v-if="isExpanded"
+          :id="subLinkId"
+          class="menu-element__sub-link--container"
+        >
           <div
             v-for="child in menuItem.children"
             :key="child.id"
@@ -169,6 +179,9 @@ export default {
         this.element.orientation === ORIENTATIONS.VERTICAL ||
         this.element.variant?.[deviceType] === 'compact'
       )
+    },
+    subLinkId() {
+      return `menu-element-${this.element.id}-submenu-${this.menuItem.id}`
     },
   },
   mounted() {
