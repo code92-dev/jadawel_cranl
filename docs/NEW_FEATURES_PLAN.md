@@ -375,9 +375,35 @@ button field, but the button formula type never defines `empty_query`. Fixing it
 means deciding the correct empty semantics for a button value, which is outside
 this plan's scope.
 
+### Verification actually performed
+
+| Gate | Result |
+| --- | --- |
+| Python 3.14.6 | Backend builder stage built; `python -V` → 3.14.6, and psycopg2, numpy and cryptography import |
+| Nuxt 4 production build | `nuxt build` exits 0; the SSR entry contains all 43 routes |
+| SSR smoke test | Built server serves `/login` at HTTP 200 with a working auth form; `/login/` renders `lang="ar" dir="rtl"` with the Arabic locale cookie and `lang="en" dir="ltr"` without it |
+| Backend tests | `tests/jadawel/core/formula`, `test_duration`, `tests/jadawel/contrib/database/{field,view,api/views,import_export,file_import,builder}`, `tests/jadawel/core/jobs` — green, except the pre-existing failure below |
+| Fork hygiene | `pytest tests/arabase -q` → 402 passed |
+| Locale parity | `yarn locale:check` → 3825/3825, 0 missing |
+| Frontend tests | `yarn vitest --run` → 4634 passed; the 7 failures (viewFilterForm 3, viewFilters 4) also fail on `main` |
+| Migrations | `migrate --plan` places 0069, 0070, 0212 and 0213 correctly after each app's local head; `makemigrations --check` reports only the two pre-existing drifts |
+
+The build needs roughly 6 GB of heap plus swap on an 8 GB host; the Nitro stage is
+the peak. It succeeded with `NODE_OPTIONS=--max-old-space-size=6144` and a 4 GB
+swapfile, and OOM-killed below 5120.
+
 ### Deferred
 
 The remaining work is deployment, and it is gated on explicit authorisation:
 publish the all-in-one image, bump `ARG JADAWEL_IMAGE` in the root `Dockerfile`,
 follow `docs/DEPLOY_CRANL.md`, and verify the live image. A source push alone does
 not deploy Jadawel.
+
+Two follow-ups that this plan did not cover and that are not blockers: the
+pre-existing `empty_query` failure recorded above, and native review of the
+authored Arabic strings for the new group-by, spreadsheet and builder UI.
+
+Live browser journeys (grouped grid against a seeded table, spreadsheet
+round-trip through the importer, five-level grouping, responsive Builder pages)
+were not run; the accompanying evidence is component- and API-level. Those belong
+with the deployment verification, against a real backend.
