@@ -1,10 +1,19 @@
 # New features remediation plan
 
-Status: **Phases 0-6 implemented; Phase 7 (publish/deploy) awaits explicit authorization**
+Status: **follow-up remediation Phases 0-5 implemented and gated; Phase 6 partially
+evidenced; Phase 7 remains unauthorized** (see
+[`NEW_FEATURES_REMEDIATION_FOLLOWUP_PLAN.md`](NEW_FEATURES_REMEDIATION_FOLLOWUP_PLAN.md))
 
 Source review: `new_features` at `f702ed8e1609e3a2deeeb61cf0a7917453a8a159`
 
 Parent plan: [`NEW_FEATURES_PLAN.md`](NEW_FEATURES_PLAN.md)
+
+Post-implementation review:
+[`NEW_FEATURES_REMEDIATION_FOLLOWUP_PLAN.md`](NEW_FEATURES_REMEDIATION_FOLLOWUP_PLAN.md)
+
+> The implementation record below is historical evidence, not a current completion
+> claim. A review of `f702ed8e..e8d90df9` found additional gaps. Phases 0-6 may be
+> called complete only after the follow-up plan's gates pass.
 
 ## Objective
 
@@ -320,9 +329,11 @@ lockfile changes with the feature that requires them.
 
 ---
 
-## Remediation implementation record (2026-09-14)
+## Historical remediation implementation record (2026-09-14)
 
-All Phase 0-5 items landed on `new_features` as one commit per phase:
+The first remediation pass landed on `new_features` as one commit per phase. The
+follow-up review found that this record overstates completion; see
+[`NEW_FEATURES_REMEDIATION_FOLLOWUP_PLAN.md`](NEW_FEATURES_REMEDIATION_FOLLOWUP_PLAN.md).
 
 | Phase | Commit(s)               | Result                                                                                                                                                                                                                                                           |
 | ----- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
