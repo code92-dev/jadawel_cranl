@@ -36,6 +36,107 @@ are unchanged.
 **Tests:** `backend/tests/jadawel/contrib/database/rows/test_rows_handler.py::test_move_row_does_not_update_last_modified`,
 `backend/tests/jadawel/core/test_settings_cache.py`.
 
+## Upstream 2.3 port — runtime formulas and duration (2026-09-13)
+
+**Context:** Phase 3 of `docs/NEW_FEATURES_PLAN.md`. The runtime expression set and
+the duration engine it builds on. Ported by a reviewed three-way merge of upstream
+2.2.2 and 2.3.3 against the fork; the fork's copies were mechanical renames of 2.2.2,
+so the merge was clean apart from `files` merged whole that also carried unrelated
+2.3 features (stripped).
+
+| File | Change | Reason | Merge risk |
+|------|--------|--------|------------|
+| `backend/src/jadawel/core/duration.py` | New: duration token parse/format engine | Shared by the runtime functions, the duration field and the validator | low (new file) |
+| `backend/src/jadawel/core/formula/service_file.py` | New: normalised file value for service formulas | Imported by `validator.py` | low (new file) |
+| `backend/src/jadawel/core/formula/runtime_formula_types.py` | Adds abs, range, to_json, from_json, null, number_format, to_duration, duration_format, to_datetime; timedelta-aware arithmetic | Upstream 2.3 rendering formula additions | medium |
+| `backend/src/jadawel/core/formula/argument_types.py` | Adds duration, timedelta, datetime-format, duration-format and separator argument types with `get_error_message` | Lets a bad argument report the values that are valid | low |
+| `backend/src/jadawel/core/formula/registries.py` | `validate_type_of_args` returns `(index, arg)` pairs | So the registry can raise the argument type's own message | medium (contract change; no other implementors in the tree) |
+| `backend/src/jadawel/core/formula/validator.py` | `ensure_duration`, `ensure_deserialized_json`, `ensure_json_serializable`, timedelta-aware JSON encoder | Support the functions above | low |
+| `backend/src/jadawel/core/formula/field.py` | Copy before minifying | A second `get_prep_value` call could blank an already-minified formula | low |
+| `backend/src/jadawel/core/formula/utils/date.py` | `is_valid_datetime_format` | Used by the new argument type | low |
+| `backend/src/jadawel/contrib/database/fields/utils/duration.py` | Duration parsing used by the field | Shared with the new engine | low |
+| `backend/src/jadawel/config/settings/base.py` | New `FORMULA_RANGE_MAX_ITEMS` (default 10000) | `range()` must not be able to allocate an unbounded list | low |
+| `backend/src/jadawel/core/apps.py` | Registers the nine new runtime functions | Registration site | low |
+
+**Tests:** `backend/tests/jadawel/core/test_duration.py` and
+`backend/tests/jadawel/core/formula/` (ported from upstream) — 1323 passed.
+
+## Upstream 2.3 port — spreadsheet export (2026-09-13)
+
+**Context:** Phase 4 of `docs/NEW_FEATURES_PLAN.md`. Export is additive: no upstream
+exporter covers XLSX or ODS in core, so the fork supplies one. The shared export
+plumbing changes below come from upstream 2.3 and are shared with CSV.
+
+| File | Change | Reason | Merge risk |
+|------|--------|--------|------------|
+| `backend/src/jadawel/contrib/database/export/file_writer.py` | `QuerysetSerializer` gains `include_row_id` and `include_primary_field` | Upstream 2.3 makes the Row ID and primary field columns optional in an export | low |
+| `backend/src/jadawel/contrib/database/export/handler.py` | Passes those two options through to the serializer | Same | low |
+| `backend/src/jadawel/contrib/database/api/export/serializers.py` | Adds `include_row_id` / `include_primary_field` and the XLSX/ODS option serializers | Same | low |
+| `backend/src/jadawel/contrib/database/export/table_exporters/csv_table_exporter.py` | `CsvQuerysetSerializer.__init__` forwards `**kwargs` | **Fixes an upstream 2.3 omission**: upstream added the options to the base but left the CSV subclass overriding them, so any CSV export that set them raised `TypeError` | low |
+| `backend/src/jadawel/contrib/database/apps.py` | Registers the XLSX and ODS exporters | Registration site | low |
+| `backend/src/jadawel/contrib/database/export/table_exporters/spreadsheet_table_exporter.py` | New: the two exporters | The feature | low (new file) |
+| `backend/src/jadawel/contrib/database/migrations/0212_fileimportjob_importer_type_and_more.py` | New: adds the two file-import metadata columns | Ported from upstream 0210, re-pointed at the fork's database head | low |
+
+Cells whose text begins with `=`, `+`, `-`, `@`, `|`, `%`, tab, CR or LF are written
+as text, so opening a downloaded workbook cannot execute user data (CWE-1236). No new
+Python dependency was added: `openpyxl` was already present for XLSX, and ODS is
+written with the standard library because `odfpy` measured 1233 MB / 583 s for
+200,000 rows against the export worker's 768 MB limit (streaming writer: 354 MB / 4.4 s).
+
+**Tests:** `backend/tests/jadawel/contrib/database/import_export/` — 47 passed.
+
+## Upstream 2.3 port — enhanced Group By (2026-09-13)
+
+**Context:** Phase 5 of `docs/NEW_FEATURES_PLAN.md`. Sorting and grouping gain an
+explicit order, a view can group by five fields, and a grouped grid fetches its
+groups separately from its rows.
+
+| File | Change | Reason | Merge risk |
+|------|--------|--------|------------|
+| `backend/src/jadawel/contrib/database/views/models.py` | `ViewSort`/`ViewGroupBy` gain `priority` and are ordered by it | Stable, user-controllable ordering | medium |
+| `backend/src/jadawel/contrib/database/views/handler.py` | Priority-chain helpers and the group-by data engine | The feature | high |
+| `backend/src/jadawel/contrib/database/views/{actions,operations,signals,exceptions,view_aggregations}.py` | Prioritize actions, signal and error types; filtered distinct count | Supporting the above | low |
+| `backend/src/jadawel/contrib/database/views/constants.py` | New | `GROUP_BY_DATA_DEFAULT_LIMIT` | low (new file) |
+| `backend/src/jadawel/contrib/database/api/views/**` | Group-by data endpoints, serializers, URLs and response assembly | The feature | medium |
+| `backend/src/jadawel/contrib/database/fields/{registries,field_types}.py` | `get_group_by_order`, `get_group_by_display_values`; M2M groups key on their id set | Group values match the row API's shape and are order-insensitive | medium |
+| `backend/src/jadawel/contrib/database/ws/views/signals.py`, `airtable/registry.py` | Realtime announce a reordered chain; carry priority on import | Supporting | low |
+| `backend/src/jadawel/contrib/database/migrations/0213_viewgroupby_viewsort_priority.py` | New | Ported from upstream 0211, re-pointed at the fork's head | low |
+| `web-frontend/modules/database/store/view/grid.js` | Grouped data model, collapse state, absolute-offset placement | The feature | high |
+| `web-frontend/modules/database/utils/{gridGroupBy,gridGroupByRender,rowLifecycle}.js` | New | Grouped model and layout maths | low (new files) |
+| `web-frontend/modules/database/components/view/grid/**` | New group-by banner/rows/value components; grid components updated | The feature | medium |
+| `web-frontend/modules/database/components/view/{ViewGroupByContext,ViewSortContext}.vue` | Drag ordering, five-level cap, collapse-all/expand-all | The feature | low |
+| `web-frontend/modules/core/assets/scss/components/views/grid.scss`, `group_bys.scss`, `sortings.scss` | Grouped-grid styles, logical properties | RTL | low |
+
+Deleted: `web-frontend/modules/database/components/view/grid/GridViewGroup(s).vue` and
+`utils/groupBy.js` — the code this replaces; `fieldValuesAreEqualInObjects` had no
+remaining consumer.
+
+Not ported, deliberately: the 2.3 presence subsystem, the row-context-menu refactor,
+the `starts with` view filter and the cookie-namespacing change. All arrive in files
+this port merges, none relate to grouping.
+
+**Tests:** `backend/tests/jadawel/contrib/database/{view,api/views}/` — 987 passed,
+19 skipped, plus the pre-existing `empty_query` failure noted in
+`docs/NEW_FEATURES_PLAN.md`. Frontend: the ported `gridGroupBy` specs (112 tests),
+the five new group-by component specs, the 6th-group-by refusal test, and the
+store/view/utils/fieldTypes suites (595 passed).
+
+## Upstream 2.3 port — responsive Builder columns and burger menus (2026-09-13)
+
+**Context:** Phase 6 of `docs/NEW_FEATURES_PLAN.md`.
+
+| File | Change | Reason | Merge risk |
+|------|--------|--------|------------|
+| `backend/src/jadawel/contrib/builder/elements/models.py` | `ColumnElement` gains `layout_type`, `column_weights`, `column_stacking`; `MenuElement` gains `variant` | The feature | medium |
+| `backend/src/jadawel/contrib/builder/elements/element_types.py` | Serializer fields and validation for both | The feature | low |
+| `backend/src/jadawel/contrib/builder/migrations/{0069,0070}_*.py` | New | Ported from upstream 0069 and 0072; re-pointed at the fork's builder head because the fork does not port upstream's 0068 or the element-graph migration. Defaults preserve existing desktop rendering | low |
+| `web-frontend/modules/builder/components/elements/components/**`, `page/{PageContent,PagePreview}.vue`, `elementTypes.js`, `enums.js` | Grid layout, layout selector, burger menu, mount-time device dispatch | The feature | low |
+| `web-frontend/modules/core/assets/scss/components/builder/**` | Column and menu styles, logical properties | RTL | low |
+| `web-frontend/vitest.setup.ts` | Import `config` from `@vue/test-utils` | The Nuxt 4 commit used it without importing it, so every component spec died with a `ReferenceError` before the first test | low |
+
+**Tests:** `backend/tests/jadawel/contrib/builder` — 1016 passed, 155 skipped;
+`web-frontend/test/unit/builder` — 172 passed, 1 skipped.
+
 ---
 
 ## Rich-text floating menu RTL placement (2026-09-09)
