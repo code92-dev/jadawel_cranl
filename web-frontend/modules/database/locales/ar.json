@@ -932,10 +932,18 @@
     "groupBy": "مجموعة حسب",
     "thenBy": "ثم حسب",
     "addGroupBy": "اختر حقلًا للتجميع حسبه",
+    "maxGroupBysReached": "يمكنك التجميع حسب ما يصل إلى {count} حقول.",
+    "collapseAllGroups": "طيّ الكل",
+    "expandAllGroups": "توسيع الكل",
     "hiddenFieldWarning": "يشير تجميع واحد أو أكثر إلى حقول مخفية لن تكون ظاهرة للمحررين والأدوار الأدنى."
   },
   "viewGroupBy": {
     "groupBy": "مجموعة | مجموعة حسب حقل واحد | مجموعة حسب {count} حقول"
+  },
+  "gridViewGroupByBanner": {
+    "emptyValue": "(فارغ)",
+    "expandGroup": "توسيع المجموعة",
+    "collapseGroup": "طيّ المجموعة"
   },
   "viewContext": {
     "exportView": "تصدير العرض",
@@ -963,6 +971,8 @@
     "createFilter": "إنشاء عامل تصفية",
     "duplicate": "تكرار الحقل",
     "sortField": "ترتيب",
+    "groupByField": "التجميع حسب",
+    "ungroupByField": "إلغاء التجميع حسب",
     "hideField": "إخفاء الحقل",
     "dataSyncField": "الحقل للقراءة فقط وهو جزء من مزامنة بيانات الجدول.",
     "dataSyncFieldTwoWaySync": "يتزامن الحقل مع مزامنة بيانات الجدول.",

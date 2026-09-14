@@ -114,7 +114,10 @@ import RowCardFieldEmail from '@jadawel/modules/database/components/card/RowCard
 import RowCardFieldFile from '@jadawel/modules/database/components/card/RowCardFieldFile'
 import RowCardFieldFormula from '@jadawel/modules/database/components/card/RowCardFieldFormula'
 import RowCardFieldLinkRow from '@jadawel/modules/database/components/card/RowCardFieldLinkRow'
+import GridViewGroupValueBoolean from '@jadawel/modules/database/components/view/grid/GridViewGroupValueBoolean'
 import GridViewGroupValueLinkRow from '@jadawel/modules/database/components/view/grid/GridViewGroupValueLinkRow'
+import GridViewGroupValueMultipleCollaborators from '@jadawel/modules/database/components/view/grid/GridViewGroupValueMultipleCollaborators'
+import GridViewGroupValueMultipleSelect from '@jadawel/modules/database/components/view/grid/GridViewGroupValueMultipleSelect'
 import RowCardFieldMultipleSelect from '@jadawel/modules/database/components/card/RowCardFieldMultipleSelect'
 import RowCardFieldNumber from '@jadawel/modules/database/components/card/RowCardFieldNumber'
 import RowCardFieldRating from '@jadawel/modules/database/components/card/RowCardFieldRating'
@@ -2204,6 +2207,10 @@ export class BooleanFieldType extends FieldType {
     return RowHistoryFieldBoolean
   }
 
+  getGroupByComponent() {
+    return GridViewGroupValueBoolean
+  }
+
   getEmptyValue(field) {
     return false
   }
@@ -3945,6 +3952,10 @@ export class MultipleSelectFieldType extends SelectOptionBaseFieldType {
     return RowHistoryFieldMultipleSelect
   }
 
+  getGroupByComponent() {
+    return GridViewGroupValueMultipleSelect
+  }
+
   getSort(name, order) {
     return (a, b) => {
       const valuesA = a[name]
@@ -4381,6 +4392,14 @@ export class FormulaFieldType extends mix(
     return RowCardFieldFormula
   }
 
+  getGroupByComponent(field) {
+    const underlyingFieldType = this.app.$registry.get(
+      'field',
+      this._mapFormulaTypeToFieldType(field.formula_type)
+    )
+    return underlyingFieldType.getGroupByComponent(field)
+  }
+
   getFilterInputComponent(field, filterType) {
     return this.getFormulaType(field)?.getFilterInputComponent(
       field,
@@ -4655,6 +4674,10 @@ export class MultipleCollaboratorsFieldType extends FieldType {
 
   getRowHistoryEntryComponent() {
     return RowHistoryFieldMultipleCollaborators
+  }
+
+  getGroupByComponent() {
+    return GridViewGroupValueMultipleCollaborators
   }
 
   prepareValueForUpdate(field, value) {

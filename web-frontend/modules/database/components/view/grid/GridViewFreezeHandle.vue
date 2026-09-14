@@ -32,10 +32,8 @@
 
 <script>
 import { notifyIf } from '@jadawel/modules/core/utils/error'
-import {
-  filterVisibleFieldsFunction,
-  sortFieldsByOrderAndIdFunction,
-} from '@jadawel/modules/database/utils/view'
+import { sortFieldsByOrderAndIdFunction } from '@jadawel/modules/database/utils/view'
+import { filterGridViewVisibleFieldsFunction } from '@jadawel/modules/database/components/view/grid/utils'
 import { getInlinePointerPosition } from '@jadawel/modules/database/utils/gridViewDrag'
 
 const MAX_FROZEN_COLUMNS = 4
@@ -105,7 +103,7 @@ export default {
     sortedFields() {
       return this.fields
         .slice()
-        .filter(filterVisibleFieldsFunction(this.fieldOptions))
+        .filter(filterGridViewVisibleFieldsFunction(this.fieldOptions))
         .sort(sortFieldsByOrderAndIdFunction(this.fieldOptions, true))
     },
     maxFrozenColumns() {

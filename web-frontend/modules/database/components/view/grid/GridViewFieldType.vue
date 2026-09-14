@@ -6,8 +6,9 @@
         !view.filters_disabled &&
         view.filters.findIndex((filter) => filter.field === field.id) !== -1,
       'grid-view__column--grouped':
+        showGroupByFieldBackground &&
         view.group_bys.findIndex((groupBy) => groupBy.field === field.id) !==
-        -1,
+          -1,
       'grid-view__column--sorted':
         view.sortings.findIndex((sort) => sort.field === field.id) !== -1,
     }"
@@ -266,6 +267,29 @@
         </li>
         <li
           v-if="
+            canGroupBy &&
+            $hasPermission(
+              'database.table.view.create_group_by',
+              view,
+              database.workspace.id
+            )
+          "
+          class="context__menu-item"
+        >
+          <a
+            class="context__menu-item-link"
+            @click="toggleGroupBy($event, view, field)"
+          >
+            <i class="context__menu-item-icon iconoir-book-stack"></i>
+            {{
+              groupByForField
+                ? $t('gridViewFieldType.ungroupByField')
+                : $t('gridViewFieldType.groupByField')
+            }}
+          </a>
+        </li>
+        <li
+          v-if="
             !field.primary &&
             $hasPermission(
               'database.table.view.update_field_options',
@@ -301,7 +325,10 @@ import InsertFieldContext from '@jadawel/modules/database/components/field/Inser
 import DuplicateFieldModal from '@jadawel/modules/database/components/field/DuplicateFieldModal'
 import HorizontalResize from '@jadawel/modules/core/components/HorizontalResize'
 import gridViewHelpers from '@jadawel/modules/database/mixins/gridViewHelpers'
-import { DEFAULT_SORT_TYPE_KEY } from '@jadawel/modules/database/constants'
+import {
+  DEFAULT_SORT_TYPE_KEY,
+  MAX_GROUP_BYS,
+} from '@jadawel/modules/database/constants'
 import fieldOptions from '~/modules/database/store/view/fieldOptions'
 
 export default {
@@ -338,6 +365,11 @@ export default {
       type: Array,
       required: true,
     },
+    showGroupByFieldBackground: {
+      type: Boolean,
+      required: false,
+      default: () => true,
+    },
   },
   emits: ['dragging', 'field-created', 'move-field', 'refresh', 'updated'],
   data() {
@@ -357,6 +389,18 @@ export default {
         }
       }
       return false
+    },
+    groupByForField() {
+      return this.view.group_bys.find(
+        (groupBy) => groupBy.field === this.field.id
+      )
+    },
+    canGroupBy() {
+      return (
+        this.getCanGroupByInView(this.field) &&
+        (this.groupByForField !== undefined ||
+          this.view.group_bys.length < MAX_GROUP_BYS)
+      )
     },
     showFieldContext() {
       return (
@@ -503,6 +547,33 @@ export default {
           })
         }
 
+        this.$emit('refresh', { sourceEvent: 'sort' })
+      } catch (error) {
+        notifyIf(error, 'view')
+      }
+    },
+    async toggleGroupBy(event, view, field) {
+      // stops the body click-outside handler from also acting on this click
+      event.stopPropagation()
+      event.preventDefault()
+      this.$refs.context.hide()
+
+      const groupBy = view.group_bys.find((g) => g.field === field.id)
+
+      try {
+        if (groupBy === undefined) {
+          await this.$store.dispatch('view/createGroupBy', {
+            view,
+            values: {
+              field: field.id,
+              order: 'ASC',
+              type: DEFAULT_SORT_TYPE_KEY,
+            },
+          })
+        } else {
+          await this.$store.dispatch('view/deleteGroupBy', { view, groupBy })
+        }
+
         this.$emit('refresh')
       } catch (error) {
         notifyIf(error, 'view')
@@ -537,6 +608,9 @@ export default {
     },
     getCanSortInView(field) {
       return this.$registry.get('field', field.type).getCanSortInView(field)
+    },
+    getCanGroupByInView(field) {
+      return this.$registry.get('field', field.type).getCanGroupByInView(field)
     },
 
     getIconsBefore() {

@@ -61,7 +61,6 @@ exports[`GridView component with decoration > Default component with first_cell 
             
             
           </div>
-          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -301,7 +300,6 @@ exports[`GridView component with decoration > Default component with first_cell 
             />
             
           </div>
-          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -506,7 +504,6 @@ exports[`GridView component with decoration > Default component with row wrapper
             
             
           </div>
-          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -748,7 +745,6 @@ exports[`GridView component with decoration > Default component with row wrapper
             />
             
           </div>
-          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -961,7 +957,6 @@ exports[`GridView component with decoration > Default component with unavailable
             
             
           </div>
-          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -1195,7 +1190,6 @@ exports[`GridView component with decoration > Default component with unavailable
             />
             
           </div>
-          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"

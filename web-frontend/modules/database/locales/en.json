@@ -563,10 +563,18 @@
     "groupBy": "Group by",
     "thenBy": "Then by",
     "addGroupBy": "choose a field to group by",
+    "maxGroupBysReached": "You can group by up to {count} fields.",
+    "collapseAllGroups": "Collapse all",
+    "expandAllGroups": "Expand all",
     "hiddenFieldWarning": "One or more group bys reference hidden fields that won't be visible to editors and lower roles."
   },
   "viewGroupBy": {
     "groupBy": "Group | Group by 1 fields | Group by {count} fields"
+  },
+  "gridViewGroupByBanner": {
+    "emptyValue": "(Empty)",
+    "expandGroup": "Expand group",
+    "collapseGroup": "Collapse group"
   },
   "viewSortContext": {
     "noSortTitle": "You have not yet created a sort",
@@ -674,6 +682,8 @@
     "createFilter": "Create filter",
     "duplicate": "Duplicate field",
     "sortField": "Sort",
+    "groupByField": "Group by",
+    "ungroupByField": "Don't group by",
     "hideField": "Hide field",
     "dataSyncField": "The field is read only and part of the table's data sync.",
     "dataSyncFieldTwoWaySync": "The field is synchronized with the table's data sync.",

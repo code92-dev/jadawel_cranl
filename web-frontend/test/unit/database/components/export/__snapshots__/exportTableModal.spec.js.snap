@@ -219,6 +219,36 @@ exports[`Preview exportTableModal > Modal with no view 1`] = `
                       </a>
                       <!--v-if-->
                     </li>
+                    <li>
+                      <a
+                        class="choice-items__link"
+                      >
+                        <i
+                          class="choice-items__icon jadawel-icon-file-excel"
+                        />
+                        <span>
+                          exporterType.xlsx
+                        </span>
+                        <!--v-if-->
+                        <!--v-if-->
+                      </a>
+                      <!--v-if-->
+                    </li>
+                    <li>
+                      <a
+                        class="choice-items__link"
+                      >
+                        <i
+                          class="choice-items__icon jadawel-icon-file-excel"
+                        />
+                        <span>
+                          exporterType.ods
+                        </span>
+                        <!--v-if-->
+                        <!--v-if-->
+                      </a>
+                      <!--v-if-->
+                    </li>
                     
                   </ul>
                   
@@ -1884,6 +1914,36 @@ exports[`Preview exportTableModal > Modal with view 1`] = `
                         <i
                           class="choice-items__icon-active iconoir-check-circle"
                         />
+                      </a>
+                      <!--v-if-->
+                    </li>
+                    <li>
+                      <a
+                        class="choice-items__link"
+                      >
+                        <i
+                          class="choice-items__icon jadawel-icon-file-excel"
+                        />
+                        <span>
+                          exporterType.xlsx
+                        </span>
+                        <!--v-if-->
+                        <!--v-if-->
+                      </a>
+                      <!--v-if-->
+                    </li>
+                    <li>
+                      <a
+                        class="choice-items__link"
+                      >
+                        <i
+                          class="choice-items__icon jadawel-icon-file-excel"
+                        />
+                        <span>
+                          exporterType.ods
+                        </span>
+                        <!--v-if-->
+                        <!--v-if-->
                       </a>
                       <!--v-if-->
                     </li>
