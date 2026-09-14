@@ -6,6 +6,7 @@ from typing import Any, Dict, Optional
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import transaction
+from django.utils import translation
 
 from loguru import logger
 
@@ -155,14 +156,29 @@ class ExportHandler:
         table = job.table
         view = job.view
         ExportHandler._raise_if_no_export_permissions(job.user, table, view)
-        try:
-            return _mark_job_as_finished(_open_file_and_run_export(job))
-        except ExportJobCanceledException:
-            # If the job was canceled then it must not be marked as failed.
-            pass
-        except Exception as e:
-            _mark_job_as_failed(job, e)
-            raise e
+        # Job errors (e.g. the workbook dimension limits) are gettext
+        # strings; run the job under the exporting user's language so the
+        # stored error message is translated. Same pattern as table
+        # creation. A public view export has no user, so fall back to the
+        # default language.
+        with translation.override(
+            job.user.profile.language if job.user else None
+        ):
+            try:
+                return _mark_job_as_finished(_open_file_and_run_export(job))
+            except ExportJobCanceledException:
+                # The job may have been cancelled after some rows were
+                # already written, leaving a partial workbook in storage.
+                # Delete it so nothing partial can be downloaded.
+                if job.exported_file_name:
+                    get_default_storage().delete(
+                        ExportHandler.export_file_path(job.exported_file_name)
+                    )
+                    job.exported_file_name = None
+                    job.save(update_fields=("exported_file_name",))
+            except Exception as e:
+                _mark_job_as_failed(job, e)
+                raise e
 
     @staticmethod
     def export_file_path(exported_file_name) -> str:

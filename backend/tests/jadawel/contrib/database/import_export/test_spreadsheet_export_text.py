@@ -9,10 +9,10 @@ equals the original value exactly — in particular that no apostrophe is
 prepended to values that merely begin with a formula-like character.
 """
 
+import zipfile
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 from xml.etree import ElementTree
-import zipfile
 
 import pytest
 
@@ -40,12 +40,13 @@ def ods_paragraph_text(value):
     """
     The text an XML parser reports for a value written into ``content.xml``.
 
-    XML 1.0 normalises a literal carriage return in text content to a line
-    feed, so a ``\\r`` in a cell comes back as ``\\n`` no matter how the cell
-    is stored.
+    The exporter writes carriage returns as the character reference ``&#13;``,
+    so parsers resolve them back to ``\\r`` without applying the XML 1.0
+    line-ending normalization that only affects literal CR bytes. The round
+    trip must be exact for every character.
     """
 
-    return value.replace("\r", "\n")
+    return value
 
 
 def run_export(table, user, options):
@@ -83,7 +84,9 @@ def read_ods_rows(payload):
     """Extract the sheet as a list of rows of cell text, straight from the zip."""
 
     with zipfile.ZipFile(BytesIO(payload)) as archive:
-        content = ElementTree.fromstring(archive.read("content.xml"))
+        # S314: parsing our own exporter's generated output in a test, not
+        # untrusted user data.
+        content = ElementTree.fromstring(archive.read("content.xml"))  # noqa: S314
 
     rows = []
     for row in content.iter(f"{{{TABLE_NS}}}table-row"):
@@ -99,7 +102,9 @@ def read_ods_cells(payload):
     """Extract the sheet as rows of the raw ``table-cell`` XML elements."""
 
     with zipfile.ZipFile(BytesIO(payload)) as archive:
-        content = ElementTree.fromstring(archive.read("content.xml"))
+        # S314: parsing our own exporter's generated output in a test, not
+        # untrusted user data.
+        content = ElementTree.fromstring(archive.read("content.xml"))  # noqa: S314
 
     rows = []
     for row in content.iter(f"{{{TABLE_NS}}}table-row"):
@@ -203,3 +208,53 @@ def test_spreadsheet_export_plain_text_round_trips(
 
     rows = reader(payload)
     assert rows[1][1] == plain
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize(
+    ("exporter_type", "reader"),
+    [("xlsx", read_xlsx_rows), ("ods", read_ods_rows)],
+)
+@pytest.mark.parametrize(
+    "newlines",
+    ["a\rb", "a\nb", "a\r\nb", "\r\nstart", "end\r", "\r\n\r\n"],
+)
+def test_spreadsheet_export_preserves_newlines_exactly(
+    single_value_setup, exporter_type, reader, newlines
+):
+    """
+    CR, LF and CRLF all survive an export/import round trip byte for byte.
+    The ODS writer must emit CR as ``&#13;`` because a literal CR byte in XML
+    character data is normalized to LF by every conforming parser.
+    """
+
+    user, table = single_value_setup(newlines)
+
+    payload = run_export(table, user, {"exporter_type": exporter_type})
+
+    rows = reader(payload)
+    assert rows[1][1] == newlines
+
+
+@pytest.mark.django_db
+def test_ods_writes_cr_as_character_reference(single_value_setup):
+    """
+    The ODS package must not contain a literal CR byte in character data:
+    the character reference is what keeps parsers from normalizing it.
+    """
+
+    user, table = single_value_setup("a\rb")
+
+    payload = run_export(table, user, {"exporter_type": "ods"})
+
+    with zipfile.ZipFile(BytesIO(payload)) as archive:
+        raw = archive.read("content.xml")
+    # S314: parsing our own exporter's generated output in a test, not
+    # untrusted user data.
+    content = ElementTree.fromstring(raw)  # noqa: S314
+    data_row = list(content.iter(f"{{{TABLE_NS}}}table-row"))[1]
+    paragraph = data_row.findall(f"{{{TABLE_NS}}}table-cell")[1].find(f"{{{TEXT_NS}}}p")
+    assert paragraph.text == "a\rb"
+    assert b"a&#13;b" in raw
+    # No literal CR byte may sit in character data.
+    assert b"\r" not in raw.replace(b"a&#13;b", b"")

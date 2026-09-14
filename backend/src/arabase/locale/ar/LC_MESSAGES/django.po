@@ -1,0 +1,33 @@
+# Jadawel — Arabic catalogue for the `arabase` fork app.
+#
+# Same convention as the `contrib/database` catalogue: upstream ships no `ar`
+# backend strings, so messages would otherwise fall through to English. This
+# file supplies the Arabic strings for messages the fork raises itself; the
+# compiled `.mo` sits next to it because nothing in the build runs
+# `compilemessages`.
+#
+# Regenerate the `.mo` after editing this file (see PATCHES.md).
+msgid ""
+msgstr ""
+"Project-Id-Version: jadawel\n"
+"Report-Msgid-Bugs-To: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=(n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5);\n"
+
+msgid "rows"
+msgstr "صفوف"
+
+msgid "columns"
+msgstr "أعمدة"
+
+msgid ""
+"The table has too many %(dimension)s to export as %(exporter_type)s: the "
+"limit is %(limit)s. Reduce the number of %(dimension)s or pick another "
+"export format."
+msgstr ""
+"يحتوي الجدول على عدد %(dimension)s كبير جدًا للتصدير بصيغة "
+"%(exporter_type)s: الحد الأقصى هو %(limit)s. قلّل عدد %(dimension)s أو اختر "
+"صيغة تصدير أخرى."

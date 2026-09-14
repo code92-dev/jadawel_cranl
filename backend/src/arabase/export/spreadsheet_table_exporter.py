@@ -27,6 +27,8 @@ from collections import OrderedDict
 from typing import List, Optional, Type
 from xml.sax.saxutils import escape
 
+from django.utils.translation import gettext_lazy as _
+
 from jadawel.contrib.database.api.export.serializers import (
     BaseExporterOptionsSerializer,
     ExcelExporterOptionsSerializer,
@@ -58,17 +60,42 @@ def _max_columns(exporter_type: str) -> int:
 
 # Raised when a table exceeds the workbook format limits. Stops the export
 # before any (partial) workbook can be produced and surfaces a translated,
-# actionable message instead of a silently truncated file.
+# actionable message instead of a silently truncated file. The message is
+# lazy: it is rendered in the exporting user's language when the export task
+# stringifies it for the job error.
 class SpreadsheetDimensionLimitExceeded(Exception):
     def __init__(self, exporter_type: str, dimension: str, limit: int):
         self.exporter_type = exporter_type
         self.dimension = dimension
         self.limit = limit
         super().__init__(
-            f"The table has too many {dimension} to export as {exporter_type}: "
-            f"the limit is {limit}. Reduce the number of {dimension} or pick "
-            f"another export format."
+            _(
+                "The table has too many %(dimension)s to export as "
+                "%(exporter_type)s: the limit is %(limit)s. Reduce the number "
+                "of %(dimension)s or pick another export format."
+            )
+            % {
+                "dimension": _(dimension),
+                "exporter_type": exporter_type,
+                "limit": limit,
+            }
         )
+
+
+def escape_ods_text(value: str) -> str:
+    """
+    Escape a cell value for embedding in ``content.xml``.
+
+    ``xml.sax.saxutils.escape`` leaves control characters alone, but a literal
+    carriage return in XML character data is normalized to a line feed by
+    every conforming parser (XML 1.0 §2.11/§3.3.3), which would corrupt any
+    cell value containing ``\\r`` or ``\\r\\n`` on round trip. Writing the CR
+    as the character reference ``&#13;`` instead keeps the exact value:
+    parsers resolve character references without applying line-ending
+    normalization.
+    """
+
+    return escape(value).replace("\r", "&#13;")
 
 
 def _spreadsheet_text(value) -> str:
@@ -283,7 +310,7 @@ class OdsQuerysetSerializer(SpreadsheetQuerysetSerializer):
                         content.write(
                             (
                                 '<table:table-cell office:value-type="string">'
-                                f"<text:p>{escape(value)}</text:p>"
+                                f"<text:p>{escape_ods_text(value)}</text:p>"
                                 "</table:table-cell>"
                             ).encode("utf-8")
                         )

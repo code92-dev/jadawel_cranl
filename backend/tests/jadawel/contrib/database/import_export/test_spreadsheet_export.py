@@ -7,11 +7,11 @@ they cover the row values, the header behaviour, the row-id/primary-field
 options and the formula-injection escaping together.
 """
 
+import csv
+import zipfile
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 from xml.etree import ElementTree
-import csv
-import zipfile
 
 import pytest
 
@@ -67,7 +67,9 @@ def read_ods_rows(payload):
     """Extract the sheet as a list of rows of cell text, straight from the zip."""
 
     with zipfile.ZipFile(BytesIO(payload)) as archive:
-        content = ElementTree.fromstring(archive.read("content.xml"))
+        # S314: parsing our own exporter's generated output in a test, not
+        # untrusted user data.
+        content = ElementTree.fromstring(archive.read("content.xml"))  # noqa: S314
 
     rows = []
     for row in content.iter(f"{{{TABLE_NS}}}table-row"):
