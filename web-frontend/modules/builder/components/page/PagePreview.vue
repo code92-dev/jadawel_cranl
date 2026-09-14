@@ -9,6 +9,9 @@
       <div
         ref="previewScaled"
         class="page-preview__scaled"
+        :class="{
+          'page-preview__scaled--preview-locked': isPreviewLocked,
+        }"
         tabindex="0"
         data-highlight="builder-preview"
         @keydown="handleKeyDown"
@@ -146,7 +149,11 @@ export default {
   },
   inject: ['builder', 'currentPage', 'workspace'],
   provide() {
-    return { pageTopData: this.pageTop, dndContext: this.dndState }
+    return {
+      pageTopData: this.pageTop,
+      dndContext: this.dndState,
+      setPagePreviewLocked: this.setPagePreviewLocked,
+    }
   },
   data() {
     return {
@@ -164,6 +171,7 @@ export default {
         draggedElement: null,
         dropTargetId: null,
       },
+      isPreviewLocked: false,
     }
   },
   computed: {
@@ -341,6 +349,9 @@ export default {
       actionSelectElement: 'element/select',
       actionMoveElement: 'element/move',
     }),
+    setPagePreviewLocked(locked) {
+      this.isPreviewLocked = locked
+    },
     preventScrollIfFocused(e) {
       if (this.$refs.previewScaled === document.activeElement) {
         switch (e.key) {

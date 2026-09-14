@@ -2647,6 +2647,10 @@ export class MenuElementType extends ElementType {
       .flat()
   }
 
+  getPopulateStoreProperties() {
+    return { compactMenuOpen: false }
+  }
+
   getErrorMessage(element, applicationContext) {
     const { builder } = applicationContext
     // There must be at least one menu item
@@ -2742,5 +2746,13 @@ export class MenuElementType extends ElementType {
 
   getDisplayName(element, applicationContext) {
     return this.name
+  }
+
+  getDefaultValues(page, values) {
+    const superValues = super.getDefaultValues(page, values)
+    return {
+      ...superValues,
+      styles: { burger: { body_font_size: 25 } },
+    }
   }
 }

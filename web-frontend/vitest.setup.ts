@@ -1,4 +1,5 @@
 import { beforeEach, vi, expect } from 'vitest'
+import { config } from '@vue/test-utils'
 
 const tMock = (key: string, data: any) =>
   data?.count !== undefined ? `${key} - ${data.count}` : key

@@ -6,6 +6,7 @@
     >
       <template #default>
         <FormGroup
+          v-if="!extraArgs?.noFontSelector"
           horizontal-narrow
           small-label
           class="margin-bottom-2"
@@ -20,6 +21,7 @@
           </template>
         </FormGroup>
         <FormGroup
+          v-if="!extraArgs?.noFontWeight"
           horizontal-narrow
           small-label
           class="margin-bottom-2"
