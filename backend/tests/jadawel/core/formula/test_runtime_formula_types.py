@@ -2771,7 +2771,7 @@ def test_runtime_to_duration_execute_raises_when_value_does_not_match_format():
         # Invalid single-arg — arg is returned as invalid
         (["foo"], [(0, "foo")]),
         ([""], [(0, "")]),
-        ([None], [(0, None)]),
+        ([None], []),
         # Two-arg form: arg 0 check is deferred to validate_args(), so any
         # arg 0 is accepted at this stage when the format is valid.
         (["1:30", "h:mm"], []),
@@ -2849,7 +2849,7 @@ def test_runtime_duration_format_execute_returns_none_for_null_duration():
         # arg 0 must be a duration/timedelta-coercible value
         (["not a duration", "h:mm"], [(0, "not a duration")]),
         ([123, "h:mm"], []),
-        ([None, "h:mm"], [(0, None)]),
+        ([None, "h:mm"], []),
         # arg 1 must be a valid format string
         ([timedelta(hours=1), ":::"], [(1, ":::")]),
         ([timedelta(hours=1), "h h"], [(1, "h h")]),
@@ -3158,9 +3158,7 @@ def execute_formula_through_visitor(formula: str):
     )
 
     tree = get_parse_tree_for_formula(formula)
-    visitor = JadawelFormulaExecutionVisitor(
-        formula_runtime_function_registry, {}
-    )
+    visitor = JadawelFormulaExecutionVisitor(formula_runtime_function_registry, {})
     return visitor.visit(tree)
 
 
@@ -3184,9 +3182,7 @@ def test_runtime_duration_format_still_raises_for_non_duration_string():
     # The null contract must not weaken type checking: a string that is not
     # a duration must keep failing.
     with pytest.raises((JadawelFormulaSyntaxError, ValidationError)):
-        execute_formula_through_visitor(
-            "duration_format('not a duration', 'h:mm')"
-        )
+        execute_formula_through_visitor("duration_format('not a duration', 'h:mm')")
 
 
 def test_runtime_duration_format_still_raises_for_missing_format_argument():

@@ -3,9 +3,9 @@ from typing import Any, Dict, List, Optional, TypeVar
 
 from jadawel.core.formula.argument_types import JadawelRuntimeFormulaArgumentType
 from jadawel.core.formula.parser.exceptions import (
-    JadawelFormulaSyntaxError,
     FormulaFunctionTypeDoesNotExist,
     InvalidFormulaArgumentType,
+    JadawelFormulaSyntaxError,
 )
 from jadawel.core.formula.types import (
     FormulaArg,

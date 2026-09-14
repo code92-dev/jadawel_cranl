@@ -19,12 +19,12 @@ from jadawel.core.formula.argument_types import (
     AnyJadawelRuntimeFormulaArgumentType,
     ArrayOfNumbersJadawelRuntimeFormulaArgumentType,
     BooleanJadawelRuntimeFormulaArgumentType,
-    DateTimeJadawelRuntimeFormulaArgumentType,
     DatetimeFormatJadawelRuntimeFormulaArgumentType,
+    DateTimeJadawelRuntimeFormulaArgumentType,
     DecimalSeparatorJadawelRuntimeFormulaArgumentType,
     DictJadawelRuntimeFormulaArgumentType,
-    DurationJadawelRuntimeFormulaArgumentType,
     DurationFormatJadawelRuntimeFormulaArgumentType,
+    NullableDurationJadawelRuntimeFormulaArgumentType,
     NumberJadawelRuntimeFormulaArgumentType,
     TextJadawelRuntimeFormulaArgumentType,
     ThousandSeparatorJadawelRuntimeFormulaArgumentType,
@@ -877,7 +877,7 @@ class RuntimeToDuration(RuntimeFormulaFunction):
     type = "to_duration"
 
     args = [
-        DurationJadawelRuntimeFormulaArgumentType(),
+        NullableDurationJadawelRuntimeFormulaArgumentType(),
         DurationFormatJadawelRuntimeFormulaArgumentType(optional=True),
     ]
 
@@ -941,7 +941,7 @@ class RuntimeDurationFormat(RuntimeFormulaFunction):
     type = "duration_format"
 
     args = [
-        DurationJadawelRuntimeFormulaArgumentType(),
+        NullableDurationJadawelRuntimeFormulaArgumentType(),
         DurationFormatJadawelRuntimeFormulaArgumentType(),
     ]
 

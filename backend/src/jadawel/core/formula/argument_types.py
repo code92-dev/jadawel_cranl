@@ -225,6 +225,29 @@ class DurationJadawelRuntimeFormulaArgumentType(JadawelRuntimeFormulaArgumentTyp
         )
 
 
+class NullableDurationJadawelRuntimeFormulaArgumentType(
+    DurationJadawelRuntimeFormulaArgumentType
+):
+    """
+    A duration argument that also accepts ``None``.
+
+    Used by functions whose null contract is "null in, null out" (e.g.
+    ``duration_format(null(), 'h:mm')`` must return ``None``). Duration
+    validation itself is not weakened: any non-null value still has to parse
+    as a duration.
+    """
+
+    def test(self, value):
+        if value is None:
+            return True
+        return super().test(value)
+
+    def parse(self, value):
+        if value is None:
+            return None
+        return super().parse(value)
+
+
 class DatetimeFormatJadawelRuntimeFormulaArgumentType(
     JadawelRuntimeFormulaArgumentType
 ):
