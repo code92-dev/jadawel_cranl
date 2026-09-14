@@ -55,6 +55,16 @@
     "avgDescription": "يحسب متوسط الأرقام داخل الوسيطة.",
     "atDescription": "إرجاع العنصر الموجود في الوسيطة الأولى في الفهرس المحدد بواسطة الوسيطة الثانية.",
     "toArrayDescription": "يحوّل سلسلة مفصولة بفواصل إلى مصفوفة.",
+    "absDescription": "تُرجِع القيمة المطلقة للوسيط.",
+    "rangeDescription": "تُرجِع مصفوفة من الأرقام. استخدم range(stop) أو range(start, stop) أو range(start, stop, step).",
+    "toJsonDescription": "تحويل القيمة إلى نص مُرمَّز بصيغة JSON مع تهريب علامات الاقتباس والشرطات المائلة والأحرف الخاصة ليُمكن تضمينها بأمان داخل مستند JSON.",
+    "fromJsonDescription": "يُحلِّل نصًا مُرمَّزًا بصيغة JSON إلى قيمة مثل كائن أو مصفوفة أو رقم. تُرجِع null إذا كان النص غير صالح.",
+    "nullDescription": "تُرجِع null، ويُمكن استخدامها كقيمة أو للمقارنة.",
+    "numberFormatDescription": "تنسيق رقم كنص مع خانات عشرية وفاصل آلاف وفاصل عشري قابلة للضبط.",
+    "toDurationDescription": "تُرجِع المدة المقابلة للوسيط المُقدَّم.",
+    "durationFormatDescription": "تنسيق مدة كنص باستخدام سلسلة تنسيق تحتوي الرموز 'd' (أيام) و'h' (ساعات) و'm' (دقائق) و's' (ثوانٍ)، مثل 'h:mm' و'd h:mm:ss'.",
+    "toDatetimeDescription": "تُحلِّل نصًا إلى كائن تاريخ ووقت. وسيط ثانٍ اختياري يحدد التنسيق (مثل 'DD/MM/YYYY'). إذا أُهمل يُفترض تنسيق ISO 8601.",
+    "categoryUtility": "أداة مساعدة",
     "formulaTypeFormula": "دالة | دوال",
     "formulaTypeOperator": "عامل | عوامل",
     "formulaTypeData": "بيانات",
@@ -64,6 +74,16 @@
     "categoryBoolean": "منطقية",
     "categoryDate": "تاريخ",
     "categoryCondition": "شرط"
+  },
+  "runtimeFormulaTypeErrors": {
+    "invalidNumber": "'{value}' ليس رقمًا صالحًا.",
+    "invalidTimezone": "'{value}' ليست منطقة زمنية صالحة. استخدم منطقة زمنية IANA صالحة (مثل 'Europe/Amsterdam').",
+    "invalidThousandSeparator": "'{value}' ليس فاصل آلاف صالحًا. الخيارات الصالحة هي: ',' أو '.' أو ' ' أو '' (سلسلة فارغة).",
+    "invalidDecimalSeparator": "'{value}' ليس فاصلًا عشريًا صالحًا. الخيارات الصالحة هي: ',' أو '.'.",
+    "sameSeparators": "لا يمكن أن يكون فاصل الآلاف وفاصل العشريات نفسه.",
+    "invalidDuration": "'{value}' ليست مدة صالحة. الخيارات الصالحة مثل: '1 day' أو '2 hours'.",
+    "invalidDatetimeFormat": "'{value}' ليس تنسيق تاريخ ووقت صالحًا. الخيارات مثل: 'YYYY-MM-DD' أو 'DD/MM/YYYY HH:mm:ss'.",
+    "invalidDurationFormat": "'{value}' ليس تنسيق مدة صالحًا. استخدم 'd' (أيام) و'h' (ساعات) و'm' (دقائق) و's' (ثوانٍ)، مثل 'd:h' و'd h:mm:ss'."
   },
   "functionnalGridViewFieldLinkRow": {
     "unnamed": "صف غير مسمى {value}"

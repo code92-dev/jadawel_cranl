@@ -30,10 +30,10 @@ describe('builder breakpoint contract', () => {
   const TABLET_MAX = 768
 
   test('exports the canonical boundaries from the deviceTypes module', () => {
-    expect(typeof SmartphoneDeviceType.SMARTPHONE_MAX_WIDTH).toBe('number')
-    expect(typeof TabletDeviceType.TABLET_MAX_WIDTH).toBe('number')
-    expect(SmartphoneDeviceType.SMARTPHONE_MAX_WIDTH).toBe(SMARTPHONE_MAX)
-    expect(TabletDeviceType.TABLET_MAX_WIDTH).toBe(TABLET_MAX)
+    expect(typeof SmartphoneDeviceType.smartphoneMaxWidth).toBe('number')
+    expect(typeof TabletDeviceType.tabletMaxWidth).toBe('number')
+    expect(SmartphoneDeviceType.smartphoneMaxWidth).toBe(SMARTPHONE_MAX)
+    expect(TabletDeviceType.tabletMaxWidth).toBe(TABLET_MAX)
   })
 
   test('device intervals are non-overlapping and gapless', () => {
@@ -60,12 +60,12 @@ describe('builder breakpoint contract', () => {
           : width <= TABLET_MAX
             ? 'tablet'
             : 'desktop'
-
-      const device = width <= SmartphoneDeviceType.SMARTPHONE_MAX_WIDTH
-        ? new SmartphoneDeviceType()
-        : width <= TabletDeviceType.TABLET_MAX_WIDTH
-          ? new TabletDeviceType()
-          : new DesktopDeviceType()
+      const device =
+        width <= SmartphoneDeviceType.smartphoneMaxWidth
+          ? new SmartphoneDeviceType()
+          : width <= TabletDeviceType.tabletMaxWidth
+            ? new TabletDeviceType()
+            : new DesktopDeviceType()
 
       expect(device.getType()).toBe(expected)
     }

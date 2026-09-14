@@ -294,7 +294,8 @@
   "formulaParserErrors": {
     "invalidArgCountMin": "تتوقع الدالة \"{funcType}\" {minArgs} وسيطات على الأقل.",
     "invalidArgCountExact": "تتوقع الدالة \"{funcType}\" {minArgs} وسيطات بالضبط.",
-    "invalidArgCountRange": "تتوقع الدالة \"{funcType}\" بين {minArgs} و{maxArgs} وسيطة."
+    "invalidArgCountRange": "تتوقع الدالة \"{funcType}\" بين {minArgs} و{maxArgs} وسيطة.",
+    "invalidArgumentType": "'{value}' ليس وسيطًا صالحًا للدالة '{funcType}'."
   },
   "dataExplorer": {
     "noMatchingNodesText": "لم يتم العثور على نتائج مطابقة.",

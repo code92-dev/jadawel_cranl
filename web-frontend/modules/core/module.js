@@ -72,6 +72,7 @@ export default defineNuxtModule({
         jadawelEmbeddedShareUrl: 'http://localhost:3000',
         jadawelUsePgFulltextSearch: 'true',
         integrationLocalJadawelPageSizeLimit: 200,
+        jadawelFormulaRangeMaxItems: 10000,
         extraPublicWebFrontendHostnames: [],
         jadawelBuilderDomains: [],
         jadawelRowPageSizeLimit: 200,
