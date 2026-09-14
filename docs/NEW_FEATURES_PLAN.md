@@ -1,6 +1,6 @@
 # Jadawel upstream 2.3 feature port plan
 
-Status: planned on branch `new_features`
+Status: **implemented on branch `new_features`**; deployment not yet performed.
 
 Baseline: Jadawel `2.2.2`-derived source at commit `e14f16335619`
 
@@ -328,3 +328,56 @@ existing installation; full CI, locale parity, and fork hygiene pass; deployment
 documentation reflects the new runtime; and a published, digest-pinned image has
 been verified on CranL. Until the publication and redeployment steps are explicitly
 authorized and completed, the branch is implementation-ready but not deployed.
+
+---
+
+## Implementation record
+
+Landed on `new_features` as one commit per phase, in the order above. What each
+commit contains, and what is deliberately still open:
+
+| Phase | Commit | Notes |
+| --- | --- | --- |
+| 0 | `1bdc4b3d`, `bf68ca97` | Port maps in `docs/PORT_MAP_*.md`, produced by a three-way merge of upstream 2.2.2 and 2.3.3 against the renamed fork |
+| 1 | `7ef71ea0`, `7672dfd5`, `a12ba0dd` | Python 3.14.6 verified by building the backend base stage; cache default 120s with the signal-invalidated paths unchanged; `move_row` persists `order` only |
+| 2 | `9e8f30a0` | Nuxt 4.4.2. The three modules pinning `compatibility: { nuxt: '^3.0.0' }` would have been silently disabled by Nuxt 4 and are removed |
+| 3 | `0b1b0706` | Backend runtime functions and duration engine, with the upstream test suites |
+| 4 | `34b3fdef`, `ab625d84`, `d4075550` | Import is browser-side SheetJS plus two job metadata columns; export is additive and reuses the export job |
+| 5 | `b9ad917a` | Group-by backend: priority ordering, the paged group-data engine, per-group aggregates, five-level cap |
+| 6 | `ca98038a`, `019184f0` | Builder columns and burger menus, both migrations defaulting existing rows to their current rendering |
+
+### Decisions taken while implementing
+
+- **ODS export does not use `odfpy`.** The plan asked for a focused spike before
+  accepting a writer. `odfpy` needs 1233 MB and 583 s for 200,000 rows because it
+  builds the document as a DOM, against the export worker's 768 MB limit. The
+  committed exporter writes the ODF package with the standard library and streams
+  `content.xml`: 354 MB, 4.4 s, and the output opens in LibreOffice and Excel. No
+  new Python dependency was added.
+- **`openpyxl` was already a backend dependency**, so the xlsx writer needed no
+  packaging change.
+- **Formula injection.** Both workbook exporters store a cell whose text begins
+  with `=`, `+`, `-`, `@`, `|`, `%`, tab, CR or LF as text, so opening a downloaded
+  workbook cannot execute user data.
+- **Merging upstream files pulls in unrelated features.** Every file merged from
+  2.3.3 was reviewed; where a merge carried a non-group-by change (the `starts
+  with` view filter, presence, the 2.3 telemetry refactor, 2FA admin actions) it
+  was removed rather than landed.
+
+### Known pre-existing failure
+
+`backend/tests/jadawel/contrib/database/view/test_view_aggregations.py::test_view_empty_count_aggregation_for_interesting_table`
+raises `AttributeError: 'JadawelFormulaButtonType' object has no attribute
+'empty_query'` when `tests/jadawel/contrib/database/api/views/` runs first in the
+same session. It reproduces identically on `main` at `e14f1633`, so it predates
+this work: `EmptyCountViewAggregationType.field_is_compatible` accepts a formula
+button field, but the button formula type never defines `empty_query`. Fixing it
+means deciding the correct empty semantics for a button value, which is outside
+this plan's scope.
+
+### Deferred
+
+The remaining work is deployment, and it is gated on explicit authorisation:
+publish the all-in-one image, bump `ARG JADAWEL_IMAGE` in the root `Dockerfile`,
+follow `docs/DEPLOY_CRANL.md`, and verify the live image. A source push alone does
+not deploy Jadawel.
