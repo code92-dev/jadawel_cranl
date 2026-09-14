@@ -161,9 +161,7 @@ class ExportHandler:
         # stored error message is translated. Same pattern as table
         # creation. A public view export has no user, so fall back to the
         # default language.
-        with translation.override(
-            job.user.profile.language if job.user else None
-        ):
+        with translation.override(job.user.profile.language if job.user else None):
             try:
                 return _mark_job_as_finished(_open_file_and_run_export(job))
             except ExportJobCanceledException:

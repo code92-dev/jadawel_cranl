@@ -118,9 +118,7 @@ def test_public_group_by_data_hidden_first_visible_second_only_exposes_visible_l
 
 
 @pytest.mark.django_db
-def test_public_group_by_data_hidden_middle_level_is_skipped(
-    api_client, data_fixture
-):
+def test_public_group_by_data_hidden_middle_level_is_skipped(api_client, data_fixture):
     """
     visible-first + hidden-middle + visible-third: the hidden level must be
     removed from the hierarchy so depth 1 groups directly by the third field,
@@ -468,9 +466,10 @@ def test_public_group_by_data_five_saved_levels_and_limit_reached_on_sixth(
     assert response.status_code == HTTP_200_OK
     page = _get_only_page(response)
     assert page["group_count"] == 2
-    assert [
-        group["path"][f"field_{levels[0].id}"] for group in page["groups"]
-    ] == ["A", "B"]
+    assert [group["path"][f"field_{levels[0].id}"] for group in page["groups"]] == [
+        "A",
+        "B",
+    ]
     assert [group["row_count"] for group in page["groups"]] == [3, 1]
     for group in page["groups"]:
         assert group["depth"] == 0

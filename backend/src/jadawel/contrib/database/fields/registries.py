@@ -2612,6 +2612,7 @@ class FieldAggregationType(Instance):
             return (raw_aggregation_result / total_count) * 100
         return raw_aggregation_result
 
+
 class FieldAggregationTypeRegistry(Registry):
     """
     The main registry for storing field aggregation types. This is different

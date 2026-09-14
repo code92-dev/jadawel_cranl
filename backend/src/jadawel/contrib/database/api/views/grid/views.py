@@ -1029,9 +1029,7 @@ class PublicGridViewGroupByDataView(APIView):
         # to change the view, so an explicit `group_by` parameter takes precedence
         # over the saved configuration. The shared resolver also drops saved
         # group-bys pointing at hidden fields, so their values can never leak.
-        view_group_bys = resolve_public_view_group_bys(
-            view, request, visible_field_ids
-        )
+        view_group_bys = resolve_public_view_group_bys(view, request, visible_field_ids)
 
         if not view_group_bys:
             return Response(
@@ -1231,9 +1229,9 @@ class PublicGridViewRowsView(APIView):
                 option.field_id for option in publicly_visible_field_options
             }
             group_by_fields = [
-                model._field_objects[
-                    get_field_id_from_field_key(field_string, False)
-                ]["field"]
+                model._field_objects[get_field_id_from_field_key(field_string, False)][
+                    "field"
+                ]
                 for field_string in split_comma_separated_string(group_by)
                 if get_field_id_from_field_key(field_string, False)
                 in visible_field_option_ids

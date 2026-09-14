@@ -924,7 +924,9 @@ class ViewType(
 
         return values
 
-    def enhance_queryset(self, queryset: django_models.QuerySet) -> django_models.QuerySet:
+    def enhance_queryset(
+        self, queryset: django_models.QuerySet
+    ) -> django_models.QuerySet:
         """
         This hook can be used to enhance a queryset when fetching multiple views of a
         table. It will only be applied on the specific model queryset of the view.

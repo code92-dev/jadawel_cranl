@@ -72,9 +72,7 @@ def test_upstream_attribution_is_intact(relative_path, notice):
 # dependencies are referenced by later RenameModel operations and must never be
 # renamed. Every other allowance is applied per-line, below, so a new
 # ``baserow`` identifier cannot hide merely because of the file it sits in.
-FOUR_DOCUMENTED_BASEROW_EXCEPTION_PATHS = (
-    "migrations/",
-)
+FOUR_DOCUMENTED_BASEROW_EXCEPTION_PATHS = ("migrations/",)
 
 _SOURCE_SUFFIXES = (".py", ".js", ".vue", ".ts", ".scss")
 
