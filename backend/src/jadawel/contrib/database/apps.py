@@ -115,6 +115,8 @@ class DatabaseConfig(AppConfig):
             DuplicateViewActionType,
             EditFormRowActionType,
             OrderViewsActionType,
+            PrioritizeViewGroupBysActionType,
+            PrioritizeViewSortsActionType,
             RotateViewSlugActionType,
             SubmitFormActionType,
             UpdateDecorationActionType,
@@ -138,9 +140,11 @@ class DatabaseConfig(AppConfig):
         action_type_registry.register(CreateViewSortActionType())
         action_type_registry.register(UpdateViewSortActionType())
         action_type_registry.register(DeleteViewSortActionType())
+        action_type_registry.register(PrioritizeViewSortsActionType())
         action_type_registry.register(CreateViewGroupByActionType())
         action_type_registry.register(UpdateViewGroupByActionType())
         action_type_registry.register(DeleteViewGroupByActionType())
+        action_type_registry.register(PrioritizeViewGroupBysActionType())
         action_type_registry.register(SubmitFormActionType())
         action_type_registry.register(EditFormRowActionType())
         action_type_registry.register(RotateViewSlugActionType())
@@ -578,8 +582,14 @@ class DatabaseConfig(AppConfig):
         page_registry.register(RowPageType())
 
         from .export.table_exporters.csv_table_exporter import CsvTableExporter
+        from .export.table_exporters.spreadsheet_table_exporter import (
+            OdsTableExporter,
+            XlsxTableExporter,
+        )
 
         table_exporter_registry.register(CsvTableExporter())
+        table_exporter_registry.register(XlsxTableExporter())
+        table_exporter_registry.register(OdsTableExporter())
 
         from .trash.trash_types import (
             FieldTrashableItemType,
@@ -861,6 +871,8 @@ class DatabaseConfig(AppConfig):
             ListViewsOperationType,
             ListViewSortOperationType,
             OrderViewsOperationType,
+            PrioritizeViewGroupByOperationType,
+            PrioritizeViewSortOperationType,
             ReadAdjacentViewRowOperationType,
             ReadAggregationsViewOperationType,
             ReadViewDecorationOperationType,
@@ -939,6 +951,8 @@ class DatabaseConfig(AppConfig):
         operation_type_registry.register(SubmitAnonymousFieldValuesOperationType())
         operation_type_registry.register(DeleteViewSortOperationType())
         operation_type_registry.register(DeleteViewGroupByOperationType())
+        operation_type_registry.register(PrioritizeViewSortOperationType())
+        operation_type_registry.register(PrioritizeViewGroupByOperationType())
         operation_type_registry.register(UpdateViewSlugOperationType())
         operation_type_registry.register(UpdateViewPublicOperationType())
         operation_type_registry.register(ReadViewsOrderOperationType())

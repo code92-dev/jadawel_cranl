@@ -1534,9 +1534,13 @@ class DateFieldType(FieldType):
         filters = {field_name: value}
         annotations = {}
 
-        if value and isinstance(value, datetime):
-            # DateTrunc cuts of every after the minute, so we can do a comparison
-            # with the provided value that doesn't have the seconds and microseconds.
+        # Shadow the column with a minute-truncated annotation so seconds and
+        # microseconds are ignored when grouping. Gate on the field, not the value,
+        # so the grouped-data query (which builds the shadow without a concrete
+        # value) truncates group keys the same way the per-row metadata query does;
+        # otherwise datetime groups key on the raw timestamp and drilling into them
+        # matches no rows. Date-only fields have no time component to truncate.
+        if field.date_include_time:
             annotations[field_name] = DateTrunc(
                 "minute", field_name, output_field=models.DateTimeField(null=True)
             )
@@ -2520,6 +2524,40 @@ class LinkRowFieldType(
             annotation=annotation,
             order=[linked_value, linked_order, linked_id],
         )
+
+    def get_group_by_display_values(self, field, field_name, raw_values):
+        ids = {row_id for value in raw_values for row_id in (value or [])}
+        related_model = field.link_row_table.get_model()
+        primary_field_object = next(
+            (
+                obj
+                for obj in related_model._field_objects.values()
+                if obj["field"].primary
+            ),
+            None,
+        )
+        id_to_value = {}
+        if ids and primary_field_object is not None:
+            primary_field_name = primary_field_object["name"]
+            queryset = related_model.objects.filter(id__in=ids)
+            # The linked table's primary can be an m2m field (e.g. multiple
+            # select), and `.only()` raises on non-concrete fields, so only
+            # defer columns when the primary is a concrete column.
+            if related_model._meta.get_field(primary_field_name).concrete:
+                queryset = queryset.only("id", primary_field_name)
+            for row in queryset:
+                id_to_value[row.id] = primary_field_object[
+                    "type"
+                ].get_human_readable_value(
+                    getattr(row, primary_field_name), primary_field_object
+                )
+        return [
+            [
+                {"id": row_id, "value": id_to_value.get(row_id)}
+                for row_id in (value or [])
+            ]
+            for value in raw_values
+        ]
 
     def get_search_expression(self, field: Field, queryset: QuerySet) -> Expression:
         remote_field = queryset.model._meta.get_field(field.db_column).remote_field
@@ -4050,6 +4088,16 @@ class SelectOptionBaseFieldType(FieldType):
     _can_group_by = True
     _db_column_fields = []
 
+    def _get_select_option_display_map(self, field):
+        return {
+            option.id: {
+                "id": option.id,
+                "value": option.value,
+                "color": option.color,
+            }
+            for option in field.select_options.all()
+        }
+
     def get_default_value(self, field: Field) -> Any:
         return getattr(field, self.get_default_options_field_name(), None)
 
@@ -4530,6 +4578,10 @@ class SingleSelectFieldType(CollationSortMixin, SelectOptionBaseFieldType):
         if value is None:
             return None if rich_value else ""
         return value.value
+
+    def get_group_by_display_values(self, field, field_name, raw_values):
+        options = self._get_select_option_display_map(field)
+        return [options.get(value) for value in raw_values]
 
     def get_model_field(self, instance, **kwargs):
         default = self.get_instance_default_value(
@@ -5260,11 +5312,12 @@ class MultipleSelectFieldType(
 
         return OptionallyAnnotatedOrderBy(annotation=annotation, order=order)
 
-    def get_group_by_aggregated_order(self, related_field):
-        # The multiple select field must be ordered by the id of the entry in the
-        # through table because it respects the insertion order. It respects the
-        # `MultipleSelectManyToManyDescriptor::related_manager_cls::_apply_rel_ordering`
-        return ("id",) + super().get_group_by_aggregated_order(related_field)
+    def get_group_by_display_values(self, field, field_name, raw_values):
+        options = self._get_select_option_display_map(field)
+        return [
+            [options[option_id] for option_id in (value or []) if option_id in options]
+            for value in raw_values
+        ]
 
     def before_field_options_update(
         self, field, to_create=None, to_update=None, to_delete=None
@@ -7157,12 +7210,6 @@ class MultipleCollaboratorsFieldType(
 
         return OptionallyAnnotatedOrderBy(annotation=annotation, order=order)
 
-    def get_group_by_aggregated_order(self, related_field):
-        # The multiple select field must be ordered by the id of the entry in the
-        # through table because it respects the insertion order. It respects the
-        # `MultipleSelectManyToManyDescriptor::related_manager_cls::_apply_rel_ordering`
-        return ("id",) + super().get_group_by_aggregated_order(related_field)
-
     def get_value_for_filter(self, row: "GeneratedTableModel", field) -> any:
         related_objects = getattr(row, field.db_column)
         values = [related_object.first_name for related_object in related_objects.all()]
@@ -7176,6 +7223,18 @@ class MultipleCollaboratorsFieldType(
         sort_type: str,
     ) -> Expression | F:
         return F(f"{field_name}__first_name")
+
+    def get_group_by_display_values(self, field, field_name, raw_values):
+        ids = {uid for value in raw_values for uid in (value or [])}
+        names = (
+            dict(User.objects.filter(id__in=ids).values_list("id", "first_name"))
+            if ids
+            else {}
+        )
+        return [
+            [{"id": uid, "name": names.get(uid)} for uid in (value or [])]
+            for value in raw_values
+        ]
 
     def to_jadawel_formula_type(self, field: Field):
         return JadawelFormulaMultipleCollaboratorsType(nullable=True)

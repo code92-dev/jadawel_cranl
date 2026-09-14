@@ -85,6 +85,8 @@ from jadawel.contrib.database.views.actions import (
     DeleteViewSortActionType,
     DuplicateViewActionType,
     OrderViewsActionType,
+    PrioritizeViewGroupBysActionType,
+    PrioritizeViewSortsActionType,
     RotateViewSlugActionType,
     UpdateDecorationActionType,
     UpdateViewActionType,
@@ -113,6 +115,8 @@ from jadawel.contrib.database.views.exceptions import (
     ViewGroupByDoesNotExist,
     ViewGroupByFieldAlreadyExist,
     ViewGroupByFieldNotSupported,
+    ViewGroupByLimitReached,
+    ViewGroupByNotInView,
     ViewGroupByNotSupported,
     ViewNotInTable,
     ViewOwnershipTypeDoesNotExist,
@@ -120,6 +124,7 @@ from jadawel.contrib.database.views.exceptions import (
     ViewSortDoesNotExist,
     ViewSortFieldAlreadyExist,
     ViewSortFieldNotSupported,
+    ViewSortNotInView,
     ViewSortNotSupported,
 )
 from jadawel.contrib.database.views.handler import ViewHandler
@@ -162,6 +167,8 @@ from .errors import (
     ERROR_VIEW_GROUP_BY_DOES_NOT_EXIST,
     ERROR_VIEW_GROUP_BY_FIELD_ALREADY_EXISTS,
     ERROR_VIEW_GROUP_BY_FIELD_NOT_SUPPORTED,
+    ERROR_VIEW_GROUP_BY_LIMIT_REACHED,
+    ERROR_VIEW_GROUP_BY_NOT_IN_VIEW,
     ERROR_VIEW_GROUP_BY_NOT_SUPPORTED,
     ERROR_VIEW_NOT_IN_TABLE,
     ERROR_VIEW_OWNERSHIP_TYPE_DOES_NOT_EXIST,
@@ -169,6 +176,7 @@ from .errors import (
     ERROR_VIEW_SORT_DOES_NOT_EXIST,
     ERROR_VIEW_SORT_FIELD_ALREADY_EXISTS,
     ERROR_VIEW_SORT_FIELD_NOT_SUPPORTED,
+    ERROR_VIEW_SORT_NOT_IN_VIEW,
     ERROR_VIEW_SORT_NOT_SUPPORTED,
 )
 from .serializers import (
@@ -179,6 +187,8 @@ from .serializers import (
     CreateViewSortSerializer,
     ListQueryParamatersSerializer,
     OrderViewsSerializer,
+    PrioritizeViewGroupBysSerializer,
+    PrioritizeViewSortingsSerializer,
     PublicViewAuthRequestSerializer,
     PublicViewAuthResponseSerializer,
     UpdateViewDecorationSerializer,
@@ -1501,6 +1511,55 @@ class ViewDecorationView(APIView):
         return Response(status=204)
 
 
+class PrioritizeViewSortingsView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="view_id",
+                location=OpenApiParameter.PATH,
+                type=OpenApiTypes.INT,
+                description="Updates the priority of the sortings in the view "
+                "related to the provided value.",
+            ),
+            CLIENT_SESSION_ID_SCHEMA_PARAMETER,
+            CLIENT_UNDO_REDO_ACTION_GROUP_ID_SCHEMA_PARAMETER,
+        ],
+        tags=["Database table view sortings"],
+        operation_id="prioritize_database_table_view_sortings",
+        description=(
+            "Updates the priority of the sorts to match the order of the given "
+            "IDs. Sorts earlier in the list are applied first."
+        ),
+        request=PrioritizeViewSortingsSerializer,
+        responses={
+            204: None,
+            400: get_error_schema(
+                ["ERROR_USER_NOT_IN_GROUP", "ERROR_VIEW_SORT_NOT_IN_VIEW"]
+            ),
+            404: get_error_schema(["ERROR_VIEW_DOES_NOT_EXIST"]),
+        },
+    )
+    @validate_body(PrioritizeViewSortingsSerializer)
+    @transaction.atomic
+    @map_exceptions(
+        {
+            ViewDoesNotExist: ERROR_VIEW_DOES_NOT_EXIST,
+            UserNotInWorkspace: ERROR_USER_NOT_IN_GROUP,
+            ViewSortNotInView: ERROR_VIEW_SORT_NOT_IN_VIEW,
+        }
+    )
+    def post(self, request, data, view_id):
+        """Updates the priority of the sortings in a view."""
+
+        view = ViewHandler().get_view(view_id)
+        action_type_registry.get_by_type(PrioritizeViewSortsActionType).do(
+            request.user, view, data["view_sort_ids"]
+        )
+        return Response(status=204)
+
+
 class ViewSortingsView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -2195,6 +2254,56 @@ class PublicViewInfoView(APIView):
         )
 
 
+class PrioritizeViewGroupBysView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="view_id",
+                location=OpenApiParameter.PATH,
+                type=OpenApiTypes.INT,
+                description="Updates the priority of the group bys in the view "
+                "related to the provided value.",
+            ),
+            CLIENT_SESSION_ID_SCHEMA_PARAMETER,
+            CLIENT_UNDO_REDO_ACTION_GROUP_ID_SCHEMA_PARAMETER,
+        ],
+        tags=["Database table view groupings"],
+        operation_id="prioritize_database_table_view_group_bys",
+        description=(
+            "Updates the priority of the provided view group by ids to the matching "
+            "position that the id has in the list. The group by with the lowest "
+            "position in the list is applied first when ordering rows."
+        ),
+        request=PrioritizeViewGroupBysSerializer,
+        responses={
+            204: None,
+            400: get_error_schema(
+                ["ERROR_USER_NOT_IN_GROUP", "ERROR_VIEW_GROUP_BY_NOT_IN_VIEW"]
+            ),
+            404: get_error_schema(["ERROR_VIEW_DOES_NOT_EXIST"]),
+        },
+    )
+    @validate_body(PrioritizeViewGroupBysSerializer)
+    @transaction.atomic
+    @map_exceptions(
+        {
+            ViewDoesNotExist: ERROR_VIEW_DOES_NOT_EXIST,
+            UserNotInWorkspace: ERROR_USER_NOT_IN_GROUP,
+            ViewGroupByNotInView: ERROR_VIEW_GROUP_BY_NOT_IN_VIEW,
+        }
+    )
+    def post(self, request, data, view_id):
+        """Updates the priority of the group bys in a view."""
+
+        view = ViewHandler().get_view(view_id)
+        action_type_registry.get_by_type(PrioritizeViewGroupBysActionType).do(
+            request.user, view, data["view_group_by_ids"]
+        )
+        return Response(status=204)
+
+
 class ViewGroupBysView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -2267,6 +2376,7 @@ class ViewGroupBysView(APIView):
                     "ERROR_FIELD_NOT_IN_TABLE",
                     "ERROR_VIEW_GROUP_BY_FIELD_ALREADY_EXISTS",
                     "ERROR_VIEW_GROUP_BY_FIELD_NOT_SUPPORTED",
+                    "ERROR_VIEW_GROUP_BY_LIMIT_REACHED",
                 ]
             ),
             404: get_error_schema(["ERROR_VIEW_DOES_NOT_EXIST"]),
@@ -2282,6 +2392,7 @@ class ViewGroupBysView(APIView):
             ViewGroupByNotSupported: ERROR_VIEW_GROUP_BY_NOT_SUPPORTED,
             ViewGroupByFieldAlreadyExist: ERROR_VIEW_GROUP_BY_FIELD_ALREADY_EXISTS,
             ViewGroupByFieldNotSupported: ERROR_VIEW_GROUP_BY_FIELD_NOT_SUPPORTED,
+            ViewGroupByLimitReached: ERROR_VIEW_GROUP_BY_LIMIT_REACHED,
         }
     )
     def post(self, request, data, view_id):
