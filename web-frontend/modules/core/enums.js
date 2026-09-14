@@ -82,6 +82,6 @@ export const FORMULA_CATEGORY = {
   },
   UTILITY: {
     category: 'categoryUtility',
-    iconClass: 'iconoir-tool',
+    iconClass: 'iconoir-archive',
   },
 }
