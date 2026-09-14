@@ -1,21 +1,22 @@
 import { Registerable } from '@jadawel/modules/core/registry'
+import deviceBreakpoints from '@jadawel/modules/builder/deviceBreakpoints.json'
 
 /**
  * The canonical responsive boundary model for the Application Builder.
  *
- * These numbers are the single source of truth for device classification.
- * The SCSS media queries consume the same values through the
- * `$device-*-width` variables in `modules/core/assets/scss/variables.scss`,
- * so JavaScript state and CSS rendering always resolve to the same device
- * at every viewport width:
+ * The numbers come from `modules/builder/deviceBreakpoints.json` — the one
+ * source of truth for device classification. The generated Sass partial
+ * (`_generated-device-breakpoints.scss`, built from the same JSON by
+ * `yarn generate:device-breakpoints`) feeds the `$device-*` variables in
+ * `modules/core/assets/scss/variables.scss`, so JavaScript state and CSS
+ * rendering always resolve to the same device at every viewport width:
  *
- * - smartphone: width <= 500px
- * - tablet:     501px <= width <= 768px
- * - desktop:    width >= 769px
+ * - smartphone: width <= smartphoneMaxWidth (500)
+ * - tablet:     smartphoneMaxWidth < width <= tabletMaxWidth (768)
+ * - desktop:    width > tabletMaxWidth
  */
-export const SMARTPHONE_MAX_WIDTH = 500
-export const TABLET_MAX_WIDTH = 768
-
+export const SMARTPHONE_MAX_WIDTH = deviceBreakpoints.smartphoneMaxWidth
+export const TABLET_MAX_WIDTH = deviceBreakpoints.tabletMaxWidth
 export class DeviceType extends Registerable {
   get iconClass() {
     return null
@@ -25,10 +26,12 @@ export class DeviceType extends Registerable {
     return null
   }
 
-  get minWidth() {
-    return 0
-  }
-
+  /**
+   * The inclusive upper viewport bound this device applies to, or null for
+   * "unlimited" (desktop). `PageContent.closestDeviceType` classifies the
+   * viewport against these bounds; the numbers derive from the canonical
+   * JSON above.
+   */
   get maxWidth() {
     return 0
   }
@@ -39,20 +42,12 @@ export class DesktopDeviceType extends DeviceType {
     return 'desktop'
   }
 
-  static get tabletMaxWidth() {
-    return TABLET_MAX_WIDTH
-  }
-
   get iconClass() {
     return 'iconoir-apple-imac-2021'
   }
 
   getOrder() {
     return 1
-  }
-
-  get minWidth() {
-    return TABLET_MAX_WIDTH + 1
   }
 
   get maxWidth() {
@@ -65,20 +60,12 @@ export class TabletDeviceType extends DeviceType {
     return 'tablet'
   }
 
-  static get tabletMaxWidth() {
-    return TABLET_MAX_WIDTH
-  }
-
   get iconClass() {
     return 'jadawel-icon-tablet'
   }
 
   getOrder() {
     return 2
-  }
-
-  get minWidth() {
-    return SMARTPHONE_MAX_WIDTH + 1
   }
 
   get maxWidth() {
@@ -91,20 +78,12 @@ export class SmartphoneDeviceType extends DeviceType {
     return 'smartphone'
   }
 
-  static get smartphoneMaxWidth() {
-    return SMARTPHONE_MAX_WIDTH
-  }
-
   get iconClass() {
     return 'jadawel-icon-smartphone'
   }
 
   getOrder() {
     return 3
-  }
-
-  get minWidth() {
-    return 0
   }
 
   get maxWidth() {

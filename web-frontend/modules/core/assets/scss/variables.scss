@@ -116,10 +116,9 @@ $grid-view-row-height-large: 99px;
 
 $spacings: 8, 12, 16, 24, 32;
 
-// Application Builder responsive boundaries. These MUST stay in sync with
-// SMARTPHONE_MAX_WIDTH / TABLET_MAX_WIDTH in
-// web-frontend/modules/builder/deviceTypes.js, which is the single source of
-// truth for device classification (smartphone <= 500 < tablet <= 768 <
-// desktop).
-$device-smartphone-max-width: 500;
-$device-tablet-max-width: 768;
+// Application Builder responsive boundaries. The values are GENERATED from
+// the one canonical source: web-frontend/modules/builder/deviceBreakpoints.json
+// (run `yarn generate:device-breakpoints` after changing it; CI checks drift).
+// JavaScript classification consumes the same JSON via
+// web-frontend/modules/builder/deviceTypes.js.
+@import 'generated-device-breakpoints';

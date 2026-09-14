@@ -18,37 +18,31 @@
 import { readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 import {
-  DeviceType,
   DesktopDeviceType,
   TabletDeviceType,
   SmartphoneDeviceType,
 } from '@jadawel/modules/builder/deviceTypes'
+import deviceBreakpoints from '@jadawel/modules/builder/deviceBreakpoints.json'
 
 describe('builder breakpoint contract', () => {
-  // The canonical contract: exported once, consumed everywhere.
-  const SMARTPHONE_MAX = 500
-  const TABLET_MAX = 768
-
-  test('exports the canonical boundaries from the deviceTypes module', () => {
-    expect(typeof SmartphoneDeviceType.smartphoneMaxWidth).toBe('number')
-    expect(typeof TabletDeviceType.tabletMaxWidth).toBe('number')
-    expect(SmartphoneDeviceType.smartphoneMaxWidth).toBe(SMARTPHONE_MAX)
-    expect(TabletDeviceType.tabletMaxWidth).toBe(TABLET_MAX)
-  })
+  // The canonical contract: one JSON, consumed by JS and (via the generated
+  // partial) by SCSS.
+  const SMARTPHONE_MAX = deviceBreakpoints.smartphoneMaxWidth
+  const TABLET_MAX = deviceBreakpoints.tabletMaxWidth
 
   test('device intervals are non-overlapping and gapless', () => {
     const desktop = new DesktopDeviceType()
     const tablet = new TabletDeviceType()
     const smartphone = new SmartphoneDeviceType()
 
-    // Desktop starts right above tablet's ceiling.
-    expect(desktop.minWidth).toBe(TABLET_MAX + 1)
-    // Tablet covers (smartphone ceiling, tablet ceiling].
-    expect(tablet.minWidth).toBe(SMARTPHONE_MAX + 1)
+    // The classification path (PageContent.closestDeviceType) walks the
+    // devices from widest to narrowest against maxWidth, so the contract is:
+    // desktop unlimited, tablet capped at the tablet boundary, smartphone
+    // capped at the smartphone boundary, in that order.
+    expect(desktop.maxWidth).toBeNull()
     expect(tablet.maxWidth).toBe(TABLET_MAX)
-    // Smartphone covers everything up to its ceiling.
-    expect(smartphone.minWidth).toBe(0)
     expect(smartphone.maxWidth).toBe(SMARTPHONE_MAX)
+    expect(SMARTPHONE_MAX).toBeLessThan(TABLET_MAX)
   })
 
   test.each([419, 420, 421, 499, 500, 501, 767, 768, 769])(
@@ -60,24 +54,22 @@ describe('builder breakpoint contract', () => {
           : width <= TABLET_MAX
             ? 'tablet'
             : 'desktop'
-      const device =
-        width <= SmartphoneDeviceType.smartphoneMaxWidth
-          ? new SmartphoneDeviceType()
-          : width <= TabletDeviceType.tabletMaxWidth
-            ? new TabletDeviceType()
-            : new DesktopDeviceType()
+      // Mirror PageContent.closestDeviceType: devices sorted by order and
+      // reversed, so the narrowest device whose maxWidth covers the width
+      // wins.
+      const device = [
+        new SmartphoneDeviceType(),
+        new TabletDeviceType(),
+        new DesktopDeviceType(),
+      ].find((d) => d.maxWidth === null || width <= d.maxWidth)
 
       expect(device.getType()).toBe(expected)
     }
   )
 
   test('the compiled element SCSS consumes the same boundaries', () => {
-    // The stylesheet must no longer hardcode 500/768; it must derive the
-    // media queries from the exported contract (via SCSS variables injected
-    // from the same source of truth). Until the unification lands the raw
-    // files still contain hardcoded pixels, so assert against the contract
-    // the fix will produce: the SCSS sources reference the shared variables
-    // instead of raw numbers at the tablet/smartphone edges.
+    // The stylesheet must not hardcode 500/768; it derives the media queries
+    // from the generated partial, which is built from the same JSON.
     const columnScss = readFileSync(
       resolve(
         __dirname,
@@ -86,11 +78,24 @@ describe('builder breakpoint contract', () => {
       'utf8'
     )
 
-    // Current code hardcodes the boundaries; the contract requires the SCSS
-    // to consume shared variables named after the device types.
     expect(columnScss).toMatch(/\$device-smartphone-max-width/)
     expect(columnScss).toMatch(/\$device-tablet-max-width/)
     expect(columnScss).not.toMatch(/max-width:\s*500px/)
     expect(columnScss).not.toMatch(/min-width:\s*501px/)
+  })
+
+  test('the generated Sass partial matches the canonical JSON', () => {
+    const generated = readFileSync(
+      resolve(
+        __dirname,
+        '../../../modules/core/assets/scss/_generated-device-breakpoints.scss'
+      ),
+      'utf8'
+    )
+
+    expect(generated).toContain(
+      `$device-smartphone-max-width: ${SMARTPHONE_MAX};`
+    )
+    expect(generated).toContain(`$device-tablet-max-width: ${TABLET_MAX};`)
   })
 })

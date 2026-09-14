@@ -1,0 +1,6 @@
+// GENERATED FILE — do not edit by hand.
+// Source of truth: web-frontend/modules/builder/deviceBreakpoints.json
+// Regenerate with: yarn generate:device-breakpoints (CI runs --check).
+// Consume through the $device-* variables re-exported by variables.scss.
+$device-smartphone-max-width: 500;
+$device-tablet-max-width: 768;
