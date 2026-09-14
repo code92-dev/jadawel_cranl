@@ -13,7 +13,7 @@ does not exist yet. The module imports the named limit constants at the top,
 so today the whole file fails at *collection* with:
 
     ImportError: cannot import name 'XLSX_MAX_ROWS' ... from
-    'jadawel.contrib.database.export.table_exporters.spreadsheet_table_exporter'
+    'arabase.export.spreadsheet_table_exporter'
 
 That ImportError is the expected, documented failure. Once the constants
 land, every test below must hold. All tests stay fast: limits are
@@ -21,26 +21,24 @@ monkeypatched down to 2, at most 3 rows/fields are created, and storage is a
 MagicMock backed by an in-memory buffer.
 """
 
+import zipfile
 from contextlib import contextmanager
 from io import BytesIO
 from unittest.mock import MagicMock, patch
 from xml.etree import ElementTree
-import zipfile
 
 import pytest
 
-from jadawel.contrib.database.export.models import (
-    EXPORT_JOB_FAILED_STATUS,
-    EXPORT_JOB_FINISHED_STATUS,
-)
-from jadawel.contrib.database.export.table_exporters import (
-    spreadsheet_table_exporter,
-)
-from jadawel.contrib.database.export.table_exporters.spreadsheet_table_exporter import (
+from arabase.export import spreadsheet_table_exporter
+from arabase.export.spreadsheet_table_exporter import (
     ODS_MAX_COLUMNS,
     ODS_MAX_ROWS,
     XLSX_MAX_COLUMNS,
     XLSX_MAX_ROWS,
+)
+from jadawel.contrib.database.export.models import (
+    EXPORT_JOB_FAILED_STATUS,
+    EXPORT_JOB_FINISHED_STATUS,
 )
 
 TABLE_NS = "urn:oasis:names:tc:opendocument:xmlns:table:1.0"
@@ -59,7 +57,7 @@ def read_ods_rows(payload):
     """Extract the sheet as a list of rows of cell text, straight from the zip."""
 
     with zipfile.ZipFile(BytesIO(payload)) as archive:
-        content = ElementTree.fromstring(archive.read("content.xml"))
+        content = ElementTree.fromstring(archive.read("content.xml"))  # noqa: S314 - fixed trusted payload
 
     rows = []
     for row in content.iter(f"{{{TABLE_NS}}}table-row"):

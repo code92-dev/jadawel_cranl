@@ -582,14 +582,8 @@ class DatabaseConfig(AppConfig):
         page_registry.register(RowPageType())
 
         from .export.table_exporters.csv_table_exporter import CsvTableExporter
-        from .export.table_exporters.spreadsheet_table_exporter import (
-            OdsTableExporter,
-            XlsxTableExporter,
-        )
 
         table_exporter_registry.register(CsvTableExporter())
-        table_exporter_registry.register(XlsxTableExporter())
-        table_exporter_registry.register(OdsTableExporter())
 
         from .trash.trash_types import (
             FieldTrashableItemType,

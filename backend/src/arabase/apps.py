@@ -40,6 +40,18 @@ class ArabaseConfig(AppConfig):
         service_type_registry.register(
             LocalJadawelGroupedAggregateRowsUserServiceType()
         )
+
+        # Additive XLSX/ODS table exporters (upstream core only ships CSV).
+        from arabase.export.spreadsheet_table_exporter import (
+            OdsTableExporter,
+            XlsxTableExporter,
+        )
+        from jadawel.contrib.database.export.registries import (
+            table_exporter_registry,
+        )
+
+        table_exporter_registry.register(XlsxTableExporter())
+        table_exporter_registry.register(OdsTableExporter())
         service_type_registry.register(LocalJadawelUpcomingRowsUserServiceType())
 
         from arabase.dashboard.widgets.widget_types import (
