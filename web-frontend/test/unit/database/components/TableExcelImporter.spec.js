@@ -22,6 +22,8 @@
 import { TestApp } from '@jadawel/test/helpers/testApp'
 import TableExcelImporter from '@jadawel/modules/database/components/table/TableExcelImporter.vue'
 import { DEFAULT_MAX_IMPORT_FILE_SIZE_MB } from '@jadawel/modules/database/utils/importFile'
+import databaseEnRaw from '@jadawel/modules/database/locales/en.json?raw'
+import databaseArRaw from '@jadawel/modules/database/locales/ar.json?raw'
 
 describe('TableExcelImporter upload limit', () => {
   let testApp = null
@@ -81,8 +83,8 @@ describe('TableExcelImporter upload limit', () => {
     expect(wrapper.vm.error).not.toBe('')
   })
 
-  test('a zero runtime value falls back to the documented default', async () => {
-    const wrapper = await mountImporter(0)
+  test('a negative runtime value falls back to the documented default', async () => {
+    const wrapper = await mountImporter(-5)
 
     const oversized = fileOfSize(
       (DEFAULT_MAX_IMPORT_FILE_SIZE_MB + 1) * 1024 * 1024
@@ -92,4 +94,85 @@ describe('TableExcelImporter upload limit', () => {
     expect(wrapper.vm.values.filename).toBeFalsy()
     expect(wrapper.vm.error).not.toBe('')
   })
+
+  test('a non-numeric runtime value falls back to the documented default', async () => {
+    const wrapper = await mountImporter('1abc')
+
+    const oversized = fileOfSize(
+      (DEFAULT_MAX_IMPORT_FILE_SIZE_MB + 1) * 1024 * 1024
+    )
+    await wrapper.vm.select({ target: { files: [oversized] } })
+
+    expect(wrapper.vm.values.filename).toBeFalsy()
+    expect(wrapper.vm.error).not.toBe('')
+  })
+
+  test('a NaN runtime value falls back to the documented default', async () => {
+    const wrapper = await mountImporter('NaN')
+
+    const oversized = fileOfSize(
+      (DEFAULT_MAX_IMPORT_FILE_SIZE_MB + 1) * 1024 * 1024
+    )
+    await wrapper.vm.select({ target: { files: [oversized] } })
+
+    expect(wrapper.vm.values.filename).toBeFalsy()
+    expect(wrapper.vm.error).not.toBe('')
+  })
+
+  test('accepts a file exactly at the configured limit', async () => {
+    const wrapper = await mountImporter(1)
+
+    const exact = fileOfSize(1024 * 1024)
+    await wrapper.vm.select({ target: { files: [exact] } })
+
+    expect(wrapper.vm.error).toBe('')
+  })
+
+  test('rejects a file one byte over the configured limit', async () => {
+    const wrapper = await mountImporter(1)
+
+    const oneByteOver = fileOfSize(1024 * 1024 + 1)
+    await wrapper.vm.select({ target: { files: [oneByteOver] } })
+
+    expect(wrapper.vm.values.filename).toBeFalsy()
+    expect(wrapper.vm.error).not.toBe('')
+  })
+
+  test.each([
+    { locale: 'en', name: 'English' },
+    { locale: 'ar', name: 'Arabic' },
+  ])(
+    'the rejection message interpolates the limit in $name',
+    async ({ locale }) => {
+      // Both catalogues must carry the key with the {limit} placeholder so
+      // the interpolated limit reaches the user in each language.
+      const messages = JSON.parse(
+        locale === 'en' ? databaseEnRaw : databaseArRaw
+      )
+      expect(messages.tableExcelImporter.limitFileSize).toContain('{limit}')
+      // The component must reject through the localized key, passing the
+      // resolved configured limit as the interpolation parameter.
+      const tCalls = []
+      const wrapper = await testApp.mount(TableExcelImporter, {
+        props: { importData: null, application: null },
+        global: {
+          mocks: {
+            $t: (key, params) => {
+              tCalls.push({ key, params })
+              return key
+            },
+          },
+        },
+      })
+      publicConfig.jadawelMaxImportFileSizeMb = 1
+      const oversized = fileOfSize(2 * 1024 * 1024)
+      await wrapper.vm.select({ target: { files: [oversized] } })
+
+      const call = tCalls.find(
+        ({ key }) => key === 'tableExcelImporter.limitFileSize'
+      )
+      expect(call).toBeTruthy()
+      expect(call.params).toEqual({ limit: 1 })
+    }
+  )
 })
