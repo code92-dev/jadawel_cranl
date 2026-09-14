@@ -3142,3 +3142,68 @@ def test_runtime_to_datetime_validate_args_raises_for_unsupported_format_token(a
     with pytest.raises(JadawelFormulaSyntaxError) as exc_info:
         RuntimeToDatetime().validate_args(args)
     assert "is not a valid datetime format" in str(exc_info.value)
+
+
+def execute_formula_through_visitor(formula: str):
+    """
+    Executes a formula through the real parser and execution visitor path,
+    exactly as it happens at runtime, rather than calling execute() directly.
+    """
+    from jadawel.core.formula.parser.formula_execution_visitor import (
+        JadawelFormulaExecutionVisitor,
+    )
+    from jadawel.core.formula.parser.parser import get_parse_tree_for_formula
+    from jadawel.core.formula.registries import (
+        formula_runtime_function_registry,
+    )
+
+    tree = get_parse_tree_for_formula(formula)
+    visitor = JadawelFormulaExecutionVisitor(
+        formula_runtime_function_registry, {}
+    )
+    return visitor.visit(tree)
+
+
+def test_runtime_duration_format_returns_none_for_null_via_parser():
+    # A plain null() must flow through parse_args -> ensure_duration without
+    # raising, and duration_format must return None for it.
+    result = execute_formula_through_visitor("duration_format(null(), 'h:mm')")
+    assert result is None
+
+
+def test_runtime_to_duration_returns_none_for_null_via_parser():
+    # The null contract must also cover to_duration: a plain null() argument
+    # must not be rejected by ensure_duration during parse_args.
+    result = execute_formula_through_visitor("to_duration(null())")
+    assert result is None
+
+
+def test_runtime_duration_format_still_raises_for_non_duration_string():
+    from django.core.exceptions import ValidationError
+
+    # The null contract must not weaken type checking: a string that is not
+    # a duration must keep failing.
+    with pytest.raises((JadawelFormulaSyntaxError, ValidationError)):
+        execute_formula_through_visitor(
+            "duration_format('not a duration', 'h:mm')"
+        )
+
+
+def test_runtime_duration_format_still_raises_for_missing_format_argument():
+    from jadawel.core.formula.parser.exceptions import JadawelFormulaException
+
+    # Calling duration_format with a missing format argument must keep
+    # raising. Today the execution path surfaces this as a ValueError from
+    # arg unpacking; the validation path raises InvalidNumberOfArguments
+    # (a JadawelFormulaException), so accept either family.
+    with pytest.raises((ValueError, JadawelFormulaException)):
+        execute_formula_through_visitor("duration_format('1 hour')")
+
+
+def test_runtime_duration_format_returns_none_for_nested_null_via_parser():
+    # null() reached through a nested if() expression must also flow through
+    # parse_args -> ensure_duration without raising.
+    result = execute_formula_through_visitor(
+        "duration_format(if(is_even(2), null(), null()), 'h:mm')"
+    )
+    assert result is None

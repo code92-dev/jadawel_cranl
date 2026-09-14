@@ -1,6 +1,13 @@
 # Jadawel upstream 2.3 feature port plan
 
-Status: **implemented on branch `new_features`**; deployment not yet performed.
+Status: **remediation planned on branch `new_features`**; see
+[`NEW_FEATURES_REMEDIATION_PLAN.md`](NEW_FEATURES_REMEDIATION_PLAN.md). Deployment
+has not been performed.
+
+Implementation record (remediation review of `f702ed8e1609`): focused backend
+suites 43 passed, focused frontend suites 670 passed, Arabic locale parity
+3825/3825, fork hygiene 402 passed. Findings are tracked with regression tests in
+`NEW_FEATURES_REMEDIATION_PLAN.md` Phases 0-5; Phase 6 reruns the full gates.
 
 Baseline: Jadawel `2.2.2`-derived source at commit `e14f16335619`
 
