@@ -126,15 +126,10 @@ export default {
       }
 
       const file = event.target.files[0]
-      const maxSize =
-        parseInt(this.config.public.jadawelMaxImportFileSizeMb, 10) *
-        1024 *
-        1024
-
-      if (file.size > maxSize) {
+      if (fileExceedsImportSizeLimit(file, this.config.public)) {
         this.handleImporterError(
           this.$t('tableXMLImporter.limitFileSize', {
-            limit: this.config.public.jadawelMaxImportFileSizeMb,
+            limit: getMaxImportFileSizeMb(this.config.public),
           })
         )
         this.values.filename = ''

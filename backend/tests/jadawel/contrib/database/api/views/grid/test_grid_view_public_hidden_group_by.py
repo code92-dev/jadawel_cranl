@@ -184,16 +184,22 @@ def test_public_group_by_data_hidden_middle_level_is_skipped(
     page_a = _get_page_by_parent(response_json, {f"field_{visible_1.id}": "A"})
     assert page_a["group_count"] == 1
     group_a = page_a["groups"][0]
-    assert set(group_a["path"].keys()) == {f"field_{visible_2.id}"}
-    assert group_a["path"][f"field_{visible_2.id}"] == "p"
+    # The hidden middle level is removed, so the depth-1 group's path runs
+    # through the visible levels only: the parent prefix plus its own value.
+    assert group_a["path"] == {
+        f"field_{visible_1.id}": "A",
+        f"field_{visible_2.id}": "p",
+    }
     assert group_a["row_count"] == 2
     assert group_a["aggregations"] == {f"field_{amount.id}": 30}
 
     page_b = _get_page_by_parent(response_json, {f"field_{visible_1.id}": "B"})
     assert page_b["group_count"] == 1
     group_b = page_b["groups"][0]
-    assert set(group_b["path"].keys()) == {f"field_{visible_2.id}"}
-    assert group_b["path"][f"field_{visible_2.id}"] == "q"
+    assert group_b["path"] == {
+        f"field_{visible_1.id}": "B",
+        f"field_{visible_2.id}": "q",
+    }
     assert group_b["row_count"] == 1
     assert group_b["aggregations"] == {f"field_{amount.id}": 40}
 

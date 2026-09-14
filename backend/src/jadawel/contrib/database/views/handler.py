@@ -3896,7 +3896,17 @@ class ViewHandler(metaclass=jadawel_trace_methods(tracer)):
             adhoc_filters = AdHocFilters()
 
         visible_field_options = view_type.get_visible_field_options_in_order(view)
-        visible_field_ids = {o.field_id for o in visible_field_options}
+        # A saved group-by must not make its field publicly visible: hidden
+        # fields stay hidden even when the view groups by them, or their raw
+        # values, ordering and metadata would leak to public visitors.
+        if view_type.can_group_by:
+            visible_field_ids = {
+                o.field_id
+                for o in visible_field_options
+                if not getattr(o, "hidden", False)
+            }
+        else:
+            visible_field_ids = {o.field_id for o in visible_field_options}
 
         field_ids = get_include_exclude_field_ids(
             view.table, include_fields, exclude_fields

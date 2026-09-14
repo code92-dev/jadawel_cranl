@@ -104,6 +104,10 @@ import { useRuntimeConfig } from '#imports'
 import form from '@jadawel/modules/core/mixins/form'
 import importer from '@jadawel/modules/database/mixins/importer'
 import { ExcelParser } from '@jadawel/modules/database/utils/excel'
+import {
+  fileExceedsImportSizeLimit,
+  getMaxImportFileSizeMb,
+} from '@jadawel/modules/database/utils/importFile'
 
 // Number of rows fetched for the preview parse. Kept small so the initial
 // parse is fast even on large workbooks, but generous enough to absorb a
@@ -162,16 +166,12 @@ export default {
       }
 
       const file = event.target.files[0]
-      const maxSize =
-        parseInt(this.config.public.baserowMaxImportFileSizeMb, 10) *
-        1024 *
-        1024
 
-      if (file.size > maxSize) {
+      if (fileExceedsImportSizeLimit(file, this.config.public)) {
         this.values.filename = ''
         this.handleImporterError(
           this.$t('tableExcelImporter.limitFileSize', {
-            limit: this.config.public.baserowMaxImportFileSizeMb,
+            limit: getMaxImportFileSizeMb(this.config.public),
           })
         )
         return

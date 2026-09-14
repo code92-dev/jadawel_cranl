@@ -111,7 +111,9 @@ from .utils import (
     build_group_by_data_response,
     empty_group_by_data_page,
     get_grid_view_group_by_aggregations,
+    get_public_view_visible_field_ids,
     parse_adhoc_view_group_bys,
+    resolve_public_view_group_bys,
 )
 
 
@@ -1026,14 +1028,11 @@ class PublicGridViewGroupByDataView(APIView):
         )
         # Visitors of a publicly shared view can group ad hoc without being able
         # to change the view, so an explicit `group_by` parameter takes precedence
-        # over the saved configuration (mirroring the public rows endpoint).
-        view_group_bys = parse_adhoc_view_group_bys(
-            request.GET.get("group_by"),
-            queryset.model,
-            allowed_field_ids=visible_field_ids,
+        # over the saved configuration. The shared resolver also drops saved
+        # group-bys pointing at hidden fields, so their values can never leak.
+        view_group_bys = resolve_public_view_group_bys(
+            view, view_type, request, visible_field_ids
         )
-        if view_group_bys is None:
-            view_group_bys = list(view.viewgroupby_set.all())
 
         if not view_group_bys:
             return Response(
@@ -1225,14 +1224,20 @@ class PublicGridViewRowsView(APIView):
             response.data.update(**public_view_field_options)
 
         if group_by_metadata and group_by:
+            # Only fields visible to public visitors may appear in the
+            # metadata: the queryset validation guarantees every *admitted*
+            # group_by field is valid, and this filter guarantees none of the
+            # rejected (hidden) ones leaks counts or values.
+            visible_field_option_ids = {
+                option.field_id for option in publicly_visible_field_options
+            }
             group_by_fields = [
-                # We can safely do this without having to check whether the
-                # `group_by` input is valid because this has already been validated
-                # by the `get_public_rows_queryset_and_field_ids`.
-                model._field_objects[get_field_id_from_field_key(field_string, False)][
-                    "field"
-                ]
+                model._field_objects[
+                    get_field_id_from_field_key(field_string, False)
+                ]["field"]
                 for field_string in split_comma_separated_string(group_by)
+                if get_field_id_from_field_key(field_string, False)
+                in visible_field_option_ids
             ]
             serialized_group_by_metadata = serialize_group_by_fields_metadata(
                 queryset, group_by_fields, page

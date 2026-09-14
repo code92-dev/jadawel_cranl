@@ -42,9 +42,69 @@ from jadawel.contrib.database.views.exceptions import (
     ViewGroupByFieldNotSupported,
     ViewGroupByLimitReached,
 )
+
 from jadawel.contrib.database.views.handler import ViewHandler
 from jadawel.contrib.database.views.models import DEFAULT_SORT_TYPE_KEY, ViewGroupBy
 from jadawel.core.utils import split_comma_separated_string
+
+
+def get_public_view_visible_field_ids(view, view_type) -> set:
+    """
+    Returns the ids of the fields a visitor of the publicly shared ``view``
+    may see: those whose field option is not hidden.
+
+    This is the single source of truth for public-view field visibility. It
+    deliberately does NOT go through ``GridViewType.get_visible_field_options_in_order``,
+    whose union with the saved group-by fields would re-admit hidden fields.
+    """
+
+    return set(
+        view.get_field_options(create_if_missing=True)
+        .filter(hidden=False)
+        .values_list("field_id", flat=True)
+    )
+
+
+def resolve_public_view_group_bys(
+    view,
+    view_type,
+    request: Request,
+    visible_field_ids: set,
+) -> Optional[List[ViewGroupBy]]:
+    """
+    Resolves the effective public Group By rules for both public group-by data
+    and public row endpoints.
+
+    An explicit ad-hoc ``group_by`` parameter takes precedence over the saved
+    configuration (visitors of a publicly shared view can group ad hoc without
+    being able to change the view), and every referenced field must be visible.
+    Saved group-by rules pointing at hidden fields are dropped, so a hidden
+    field's raw value, display value, metadata or aggregate can never reach a
+    public response merely because it is part of the saved view configuration.
+
+    :param view: The publicly shared grid view.
+    :param view_type: The resolved view type of ``view``.
+    :param request: The request carrying the optional ad-hoc ``group_by`` param.
+    :param visible_field_ids: The ids of the fields visible to public visitors.
+    :return: The effective group-bys, or ``None`` when the ad-hoc parameter is
+        missing or empty and the saved configuration should still be consulted.
+    """
+
+    adhoc_group_bys = parse_adhoc_view_group_bys(
+        request.GET.get("group_by"),
+        view.table.get_model(),
+        allowed_field_ids=visible_field_ids,
+    )
+    if adhoc_group_bys is not None:
+        return adhoc_group_bys
+
+    saved_group_bys = list(view.viewgroupby_set.all())
+    return [
+        group_by
+        for group_by in saved_group_bys
+        if group_by.field_id in visible_field_ids
+    ]
+
 
 GROUP_BY_DATA_DESCENDANT_MAX_GROUPS = 2000
 # Only a coarse backstop: a deep tree legitimately produces one parent page per internal
@@ -675,9 +735,7 @@ def get_grid_view_group_by_aggregations(view, view_type) -> List[Tuple[Field, st
 
     if not getattr(view_type, "can_aggregate_field", False):
         return []
-    visible_field_ids = {
-        option.field_id for option in view_type.get_visible_field_options_in_order(view)
-    }
+    visible_field_ids = get_public_view_visible_field_ids(view, view_type)
     return [
         (field.specific, raw_type)
         for field, raw_type in view_type.get_aggregations(view)

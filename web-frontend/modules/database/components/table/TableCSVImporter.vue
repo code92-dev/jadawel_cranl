@@ -125,6 +125,10 @@ import { useRuntimeConfig } from '#imports'
 import form from '@jadawel/modules/core/mixins/form'
 import CharsetDropdown from '@jadawel/modules/core/components/helpers/CharsetDropdown'
 import importer from '@jadawel/modules/database/mixins/importer'
+import {
+  fileExceedsImportSizeLimit,
+  getMaxImportFileSizeMb,
+} from '@jadawel/modules/database/utils/importFile'
 
 export default {
   name: 'TableCSVImporter',
@@ -180,16 +184,11 @@ export default {
       }
 
       const file = event.target.files[0]
-      const maxSize =
-        parseInt(this.config.public.jadawelMaxImportFileSizeMb, 10) *
-        1024 *
-        1024
-
-      if (file.size > maxSize) {
+      if (fileExceedsImportSizeLimit(file, this.config.public)) {
         this.values.filename = ''
         this.handleImporterError(
           this.$t('tableCSVImporter.limitFileSize', {
-            limit: this.config.public.jadawelMaxImportFileSizeMb,
+            limit: getMaxImportFileSizeMb(this.config.public),
           })
         )
       } else {

@@ -3960,20 +3960,12 @@ def test_list_rows_public_with_query_param_group_by_hidden_field_with_stored_gro
         f"{url}?group_by=field_{hidden_field.id}&include=group_by_metadata",
     )
     response_json = response.json()
-    assert response.status_code == HTTP_200_OK
-    assert len(response_json["results"]) == 3
-    assert response_json["results"][0]["id"] == second_row.id
-    assert response_json["results"][1]["id"] == first_row.id
-    assert response_json["results"][2]["id"] == third_row.id
-    assert response_json["group_by_metadata"] == {
-        f"field_{hidden_field.id}": unordered(
-            [
-                {"count": 1, f"field_{hidden_field.id}": "x"},
-                {"count": 2, f"field_{hidden_field.id}": "y"},
-            ]
-        )
-    }
-    assert f"field_{hidden_field.id}" in response_json["results"][0]
+    # A saved group-by on a hidden field must not leak that field's values,
+    # ordering or metadata to public visitors: the explicit `group_by`
+    # parameter naming the hidden field is rejected, and the rows and any
+    # metadata never contain the hidden field.
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    assert response.json()["error"] == "ERROR_ORDER_BY_FIELD_NOT_FOUND"
 
 
 @pytest.mark.django_db

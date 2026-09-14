@@ -7,6 +7,7 @@ Keep them fast and DB-free.
 """
 
 import importlib
+import re
 from pathlib import Path
 
 from django.conf import settings
@@ -64,4 +65,87 @@ def test_upstream_attribution_is_intact(relative_path, notice):
     assert notice in path.read_text(encoding="utf-8"), (
         f"{relative_path} no longer carries {notice!r}. A rename pass must never "
         f"rewrite an upstream author's name — restore it."
+    )
+
+
+FOUR_DOCUMENTED_BASEROW_EXCEPTION_PATHS = (
+    # 1. Licence notices (asserted above) live in LICENSE and the two notice
+    #    files; upstream Docker image/issue URLs and provenance live under
+    #    deploy/ and .github/.
+    "LICENSE",
+    "docs/",
+    "deploy/",
+    ".github/",
+    # 2. Historical migration identifiers that RenameModel operations refer to.
+    "migrations/",
+)
+
+_SOURCE_SUFFIXES = (".py", ".js", ".vue", ".ts", ".scss")
+
+
+def _iter_tracked_source_files():
+    import shutil
+    import subprocess
+
+    git = shutil.which("git") or "git"
+    # Fixed argv, no user input; upstream source uses noqa: S603 likewise.
+    listing = subprocess.run(  # noqa: S603
+        [git, "ls-files", "backend/src", "web-frontend/modules"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout.splitlines()
+    for relative in listing:
+        path = REPO_ROOT / relative
+        if not path.is_file():
+            continue
+        if any(part in relative for part in FOUR_DOCUMENTED_BASEROW_EXCEPTION_PATHS):
+            continue
+        if not relative.endswith(_SOURCE_SUFFIXES):
+            continue
+        yield path
+
+
+def test_no_new_baserow_namespace_identifiers():
+    """
+    New source identifiers must use the ``jadawel`` namespace, not ``baserow``.
+
+    Four things still read ``baserow`` on purpose (see AGENTS.md): licence
+    notices, upstream URLs/provenance, the premium/enterprise package names,
+    and historical migration names. Outside the paths carrying those, a
+    ``baserow``-prefixed identifier in code is rename drift.
+    """
+    offenders = []
+    for path in _iter_tracked_source_files():
+        for line_number, line in enumerate(
+            path.read_text(encoding="utf-8").splitlines(), start=1
+        ):
+            # `baseRow`-style identifiers merely contain the substring; only
+            # the `baserow` word (or a prefixed identifier like `baserowFoo`)
+            # is namespace drift.
+            if not re.search(r"\bbaserow", line, re.IGNORECASE):
+                continue
+            if "DatabaseRow" in line:
+                continue
+            stripped = line.strip()
+            # Comments and docstrings may legitimately mention upstream.
+            if stripped.startswith(("#", "*", "//", "/*", "<!--", '"""', "'''")):
+                continue
+            # The premium/enterprise guardrails and the legacy env-var
+            # acceptance shim read `baserow` on purpose (see AGENTS.md).
+            if re.search(r"baserow_(premium|enterprise)", line):
+                continue
+            if "BASEROW_" in line or "baserow/baserow" in line:
+                continue
+            # Historical upstream naming inside the Airtable legacy mapping.
+            if "AIRTABLE_BASEROW_COLOR_MAPPING" in line:
+                continue
+            offenders.append(
+                f"{path.relative_to(REPO_ROOT)}:{line_number}: {stripped[:100]}"
+            )
+
+    assert not offenders, (
+        "New `baserow`-namespace source identifiers found (the fork is named "
+        "`jadawel`; see AGENTS.md for the four documented exceptions):\n"
+        + "\n".join(offenders[:20])
     )
