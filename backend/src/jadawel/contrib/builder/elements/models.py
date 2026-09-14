@@ -59,6 +59,11 @@ class INPUT_TEXT_TYPES(models.TextChoices):
     PASSWORD = "password"  # nosec bandit B105
 
 
+class MENU_VARIANTS(models.TextChoices):
+    EXPANDED = "expanded"
+    COMPACT = "compact"
+
+
 def get_default_element_content_type():
     return ContentType.objects.get_for_model(Element)
 
@@ -66,6 +71,22 @@ def get_default_element_content_type():
 def get_default_table_orientation():
     return {
         "smartphone": "horizontal",
+        "tablet": "horizontal",
+        "desktop": "horizontal",
+    }
+
+
+def get_default_variant():
+    return {
+        "smartphone": MENU_VARIANTS.COMPACT,
+        "tablet": MENU_VARIANTS.COMPACT,
+        "desktop": MENU_VARIANTS.EXPANDED,
+    }
+
+
+def get_default_column_stacking():
+    return {
+        "smartphone": "stacked",
         "tablet": "horizontal",
         "desktop": "horizontal",
     }
@@ -422,6 +443,21 @@ class ColumnElement(ContainerElement):
     A column element that can contain other elements.
     """
 
+    class LAYOUT_TYPES(models.TextChoices):
+        AUTO = "auto"
+        RATIO_1_2 = "1:2"
+        RATIO_2_1 = "2:1"
+        RATIO_1_3 = "1:3"
+        RATIO_3_1 = "3:1"
+        RATIO_1_1_2 = "1:1:2"
+        RATIO_2_1_1 = "2:1:1"
+        RATIO_1_2_1 = "1:2:1"
+        CUSTOM = "custom"
+
+    class COLUMN_STACKING_TYPES(models.TextChoices):
+        HORIZONTAL = "horizontal"
+        STACKED = "stacked"
+
     column_amount = models.IntegerField(
         default=3,
         help_text="The amount of columns inside this column element.",
@@ -442,6 +478,27 @@ class ColumnElement(ContainerElement):
         choices=VerticalAlignments.choices,
         max_length=10,
         default=VerticalAlignments.TOP,
+    )
+    layout_type = models.CharField(
+        choices=LAYOUT_TYPES.choices,
+        max_length=20,
+        default=LAYOUT_TYPES.AUTO,
+        db_default=LAYOUT_TYPES.AUTO,
+        help_text="The layout type determining column weights.",
+    )
+    column_weights = models.JSONField(
+        default=list,
+        db_default=[],
+        help_text=(
+            "Custom weight configuration for each column. Used when layout_type is "
+            "'custom'."
+        ),
+    )
+    column_stacking = models.JSONField(
+        blank=True,
+        default=get_default_column_stacking,
+        db_default=get_default_column_stacking(),
+        help_text="Whether columns are horizontal or stacked for each device type.",
     )
 
 
@@ -1111,6 +1168,13 @@ class MenuElement(Element):
         choices=HorizontalAlignments.choices,
         max_length=10,
         default=HorizontalAlignments.LEFT,
+    )
+
+    variant = models.JSONField(
+        blank=True,
+        default=get_default_variant,
+        db_default=get_default_variant(),
+        help_text="The menu variant (expanded or compact) for each device type",
     )
 
     menu_items = models.ManyToManyField(MenuItemElement)

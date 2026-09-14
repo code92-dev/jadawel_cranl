@@ -526,3 +526,80 @@ def test_0026_element_styles(migrator, teardown_table_metadata):
     }
     assert form.styles == {"button": {"button_alignment": "right"}}
     assert table.styles == {"button": {"button_alignment": "center"}}
+
+
+@pytest.mark.once_per_day_in_ci
+# You must add --run-once-per-day-in-ci to execute this test
+def test_0069_0070_existing_elements_keep_previous_rendering(
+    migrator, teardown_table_metadata
+):
+    """
+    Existing Column and Menu rows must keep rendering exactly as they did before
+    the responsive layout fields were added: the layout defaults leave the desktop
+    grid untouched and existing menus stay expanded on desktop.
+    """
+
+    migrate_from = [
+        ("builder", "0068_jadawel_rename_local_jadawel_models"),
+    ]
+    migrate_to = [
+        ("builder", "0070_columnelement_layout_options"),
+    ]
+
+    old_state = migrator.migrate(migrate_from)
+
+    ContentType = old_state.apps.get_model("contenttypes", "ContentType")
+    Workspace = old_state.apps.get_model("core", "Workspace")
+    Builder = old_state.apps.get_model("builder", "Builder")
+    Page = old_state.apps.get_model("builder", "Page")
+    ColumnElement = old_state.apps.get_model("builder", "ColumnElement")
+    MenuElement = old_state.apps.get_model("builder", "MenuElement")
+
+    workspace = Workspace.objects.create(name="Workspace")
+    builder = Builder.objects.create(
+        order=2,
+        name="Builder",
+        workspace=workspace,
+        content_type=ContentType.objects.get_for_model(Builder),
+    )
+    page = Page.objects.create(order=2, builder=builder, name="Page", path="page/")
+
+    # These rows are created before the new columns exist, exactly like a page
+    # authored on the previous release.
+    column = ColumnElement.objects.create(
+        order=1,
+        page=page,
+        column_amount=3,
+        column_gap=20,
+        content_type=ContentType.objects.get_for_model(ColumnElement),
+    )
+    menu = MenuElement.objects.create(
+        order=2,
+        page=page,
+        orientation="horizontal",
+        alignment="left",
+        content_type=ContentType.objects.get_for_model(MenuElement),
+    )
+
+    new_state = migrator.migrate(migrate_to)
+
+    ColumnElement = new_state.apps.get_model("builder", "ColumnElement")
+    MenuElement = new_state.apps.get_model("builder", "MenuElement")
+
+    migrated_column = ColumnElement.objects.get(id=column.id)
+    assert migrated_column.layout_type == "auto"
+    assert migrated_column.column_weights == []
+    # Desktop and tablet keep the previous side-by-side layout; only the
+    # smartphone falls back to stacking, which is the upstream intent.
+    assert migrated_column.column_stacking == {
+        "smartphone": "stacked",
+        "tablet": "horizontal",
+        "desktop": "horizontal",
+    }
+
+    migrated_menu = MenuElement.objects.get(id=menu.id)
+    assert migrated_menu.variant == {
+        "smartphone": "compact",
+        "tablet": "compact",
+        "desktop": "expanded",
+    }
