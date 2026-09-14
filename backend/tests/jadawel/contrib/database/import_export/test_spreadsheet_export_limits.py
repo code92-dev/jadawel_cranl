@@ -29,7 +29,10 @@ import zipfile
 
 import pytest
 
-from jadawel.contrib.database.export.models import EXPORT_JOB_FAILED_STATUS
+from jadawel.contrib.database.export.models import (
+    EXPORT_JOB_FAILED_STATUS,
+    EXPORT_JOB_FINISHED_STATUS,
+)
 from jadawel.contrib.database.export.table_exporters import (
     spreadsheet_table_exporter,
 )
@@ -231,7 +234,9 @@ def test_export_exactly_at_the_row_limit_still_succeeds(
         rows = read_xlsx_rows(payload)
     else:
         rows = read_ods_rows(payload)
-    assert rows == [["row-0"], ["row-1"]]
+    # The row-id column is included by default, so each row is [id, "row-N"].
+    assert [row[-1] for row in rows] == ["row-0", "row-1"]
+    assert len(rows) == 2
 
 
 @pytest.mark.django_db

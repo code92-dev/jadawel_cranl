@@ -84,9 +84,7 @@ def read_ods_rows(payload):
     ("exporter_type", "reader"),
     [("xlsx", read_xlsx_rows), ("ods", read_ods_rows)],
 )
-def test_spreadsheet_export_writes_header_and_rows(
-    export_setup, exporter_type, reader
-):
+def test_spreadsheet_export_writes_header_and_rows(export_setup, exporter_type, reader):
     """Both exporters write the field names, then every row, in table order."""
 
     user, table, _, _ = export_setup
@@ -103,9 +101,7 @@ def test_spreadsheet_export_writes_header_and_rows(
     ("exporter_type", "reader"),
     [("xlsx", read_xlsx_rows), ("ods", read_ods_rows)],
 )
-def test_spreadsheet_export_can_omit_the_header(
-    export_setup, exporter_type, reader
-):
+def test_spreadsheet_export_can_omit_the_header(export_setup, exporter_type, reader):
     user, table, _, _ = export_setup
 
     payload = run_export(
@@ -163,9 +159,10 @@ def test_spreadsheet_export_stores_formula_like_text_as_text(
     data_fixture, exporter_type, read_cell, dangerous
 ):
     """
-    A cell whose text would be read as a formula must survive as literal text.
-    Anything else is stored as a live formula, which is a formula-injection
-    (CWE-1236) the moment the downloaded workbook is opened.
+    A cell whose text would be read as a formula must be stored inert and
+    round-trip exactly: the writers use explicitly string-typed cells, so no
+    apostrophe escape is needed and the stored value equals the original.
+    (Formula injection, CWE-1236.)
     """
 
     user = data_fixture.create_user()
@@ -176,10 +173,7 @@ def test_spreadsheet_export_stores_formula_like_text_as_text(
     payload = run_export(table, user, {"exporter_type": exporter_type})
 
     stored = read_cell(payload)
-    # Lead whitespace is normalised away by the reader, so compare the content
-    # after the apostrophe escape.
-    assert stored.startswith("'")
-    assert stored[1:] in (dangerous, dangerous.lstrip())
+    assert stored == dangerous
 
 
 @pytest.mark.django_db
@@ -196,7 +190,7 @@ def test_xlsx_cell_beginning_with_equals_is_not_a_formula(data_fixture):
     payload = run_export(table, user, {"exporter_type": "xlsx"})
     worksheet = load_workbook(BytesIO(payload)).active
     cell = worksheet.cell(row=2, column=2)
-    assert cell.value == "'=SUM(1)"
+    assert cell.value == "=SUM(1)"
     assert cell.data_type == "s"
 
 
@@ -242,9 +236,7 @@ def test_csv_export_unchanged_by_the_row_id_option(data_fixture):
     name_field = data_fixture.create_text_field(table=table, name="Name", primary=True)
     table.get_model().objects.create(**{f"field_{name_field.id}": "Tesla"})
 
-    payload = run_export(
-        table, user, {"exporter_type": "csv", "include_row_id": False}
-    )
+    payload = run_export(table, user, {"exporter_type": "csv", "include_row_id": False})
 
     rows = list(csv.reader(payload.decode().lstrip("\ufeff").splitlines()))
     assert rows[0] == ["Name"]

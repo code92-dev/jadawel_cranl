@@ -22,10 +22,10 @@ the standard library and streams the sheet XML: the same 200,000 rows peak at
 354 MB and take 4.4 s, and the result opens in LibreOffice and Excel.
 """
 
+import zipfile
 from collections import OrderedDict
 from typing import List, Optional, Type
 from xml.sax.saxutils import escape
-import zipfile
 
 from jadawel.contrib.database.api.export.serializers import (
     BaseExporterOptionsSerializer,
@@ -36,32 +36,56 @@ from jadawel.contrib.database.export.file_writer import FileWriter, QuerysetSeri
 from jadawel.contrib.database.export.registries import TableExporter
 from jadawel.contrib.database.views.view_types import GridViewType
 
-# A leading character that a spreadsheet application treats as the start of a
-# formula. A cell whose text begins with one of these is written as an explicit
-# text cell, otherwise opening a downloaded workbook would execute user data
-# (CWE-1236). The tab/CR/LF cases matter because some parsers skip leading
-# whitespace before deciding.
-_FORMULA_PREFIXES = ("=", "+", "-", "@", "|", "%", "\t", "\r", "\n")
-
 ODS_MIMETYPE = "application/vnd.oasis.opendocument.spreadsheet"
+
+# Hard format limits. XLSX: 1,048,576 rows x 16,384 columns (Open XML spec).
+# ODS has no comparably hard ceiling in practice, so a deliberately generous
+# pair keeps the memory/streaming behaviour of the writer predictable. The
+# header row consumes one row of the budget when included.
+XLSX_MAX_ROWS = 1_048_576
+XLSX_MAX_COLUMNS = 16_384
+ODS_MAX_ROWS = 1_048_576
+ODS_MAX_COLUMNS = 16_384
+
+
+def _max_rows(exporter_type: str) -> int:
+    return XLSX_MAX_ROWS if exporter_type == "xlsx" else ODS_MAX_ROWS
+
+
+def _max_columns(exporter_type: str) -> int:
+    return XLSX_MAX_COLUMNS if exporter_type == "xlsx" else ODS_MAX_COLUMNS
+
+
+# Raised when a table exceeds the workbook format limits. Stops the export
+# before any (partial) workbook can be produced and surfaces a translated,
+# actionable message instead of a silently truncated file.
+class SpreadsheetDimensionLimitExceeded(Exception):
+    def __init__(self, exporter_type: str, dimension: str, limit: int):
+        self.exporter_type = exporter_type
+        self.dimension = dimension
+        self.limit = limit
+        super().__init__(
+            f"The table has too many {dimension} to export as {exporter_type}: "
+            f"the limit is {limit}. Reduce the number of {dimension} or pick "
+            f"another export format."
+        )
 
 
 def _spreadsheet_text(value) -> str:
     """
     Convert a value to the string that will be stored in a spreadsheet cell.
 
-    A value that would be interpreted as a formula is prefixed with an
-    apostrophe, the conventional spreadsheet escape for "this is text", so the
-    stored string still reads as the original value in the cell.
+    Both writers store every value in an explicitly string-typed cell (the
+    XLSX writer forces ``data_type = "s"``, the ODS writer emits
+    ``office:value-type="string"``), so a value beginning with a formula
+    character is inert already. No apostrophe escape is prepended: the cell
+    must round-trip the stored value exactly.
 
     :param value: The already-exported field value.
     :return: The text to place in the cell.
     """
 
-    text = str(value)
-    if text.startswith(_FORMULA_PREFIXES):
-        return "'" + text
-    return text
+    return str(value)
 
 
 class SpreadsheetQuerysetSerializer(QuerysetSerializer):
@@ -88,6 +112,45 @@ class SpreadsheetQuerysetSerializer(QuerysetSerializer):
             _spreadsheet_text(field_serializer(row)[2])
             for field_serializer in self.field_serializers
         ]
+
+    def _check_limits(self, exporter_type: str, include_header: bool) -> None:
+        """
+        Validates the field count against the workbook format limit before any
+        byte is written, so an oversized export fails cleanly instead of
+        producing a truncated file.
+
+        :param exporter_type: The exporter type ("xlsx" or "ods").
+        :param include_header: Whether a header row will be written; it
+            consumes one row of the limit budget.
+        :raises SpreadsheetDimensionLimitExceeded: When the table cannot fit
+            the workbook format.
+        """
+
+        n_columns = len(self.headers)
+        max_columns = _max_columns(exporter_type)
+        if n_columns > max_columns:
+            raise SpreadsheetDimensionLimitExceeded(
+                exporter_type, "columns", max_columns
+            )
+
+        # The row count is validated lazily by the writer callback below
+        # because a table can grow while the export runs; checking the exact
+        # count here would race with concurrent inserts anyway.
+        self._rows_left_before_header = (
+            _max_rows(exporter_type) - 1 if include_header else _max_rows(exporter_type)
+        )
+
+    def _check_row_limit(self, exporter_type: str) -> None:
+        """
+        Stops row generation once the workbook row budget is exhausted, so a
+        too-large table raises instead of writing a silently truncated file.
+        """
+
+        if self._rows_left_before_header <= 0:
+            raise SpreadsheetDimensionLimitExceeded(
+                exporter_type, "rows", _max_rows(exporter_type)
+            )
+        self._rows_left_before_header -= 1
 
 
 class XlsxQuerysetSerializer(SpreadsheetQuerysetSerializer):
@@ -116,6 +179,8 @@ class XlsxQuerysetSerializer(SpreadsheetQuerysetSerializer):
         from openpyxl import Workbook
         from openpyxl.cell.cell import WriteOnlyCell
 
+        self._check_limits("xlsx", excel_include_header)
+
         workbook = Workbook(write_only=True)
         worksheet = workbook.create_sheet()
 
@@ -130,6 +195,7 @@ class XlsxQuerysetSerializer(SpreadsheetQuerysetSerializer):
             worksheet.append([cell(value) for value in self._header_row()])
 
         def write_row(row, _):
+            self._check_row_limit("xlsx")
             worksheet.append([cell(value) for value in self._serialize_row(row)])
 
         file_writer.write_rows(self.queryset, write_row)
@@ -148,7 +214,7 @@ class OdsQuerysetSerializer(SpreadsheetQuerysetSerializer):
     # an XML library dependency for output that never changes shape.
     _MANIFEST = (
         '<?xml version="1.0" encoding="UTF-8"?>'
-        '<manifest:manifest '
+        "<manifest:manifest "
         'xmlns:manifest="urn:oasis:names:tc:opendocument:xmlns:manifest:1.0" '
         'manifest:version="1.2">'
         '<manifest:file-entry manifest:full-path="/" '
@@ -166,9 +232,7 @@ class OdsQuerysetSerializer(SpreadsheetQuerysetSerializer):
         'office:version="1.2">'
         "<office:body><office:spreadsheet>"
     )
-    _CONTENT_TAIL = (
-        "</office:spreadsheet></office:body></office:document-content>"
-    )
+    _CONTENT_TAIL = "</office:spreadsheet></office:body></office:document-content>"
 
     def write_to_file(
         self,
@@ -185,6 +249,18 @@ class OdsQuerysetSerializer(SpreadsheetQuerysetSerializer):
             first row.
         """
 
+        self._check_limits("ods", excel_include_header)
+
+        try:
+            self._write_ods_package(file_writer, excel_include_header)
+        except SpreadsheetDimensionLimitExceeded:
+            # The ZIP context manager closed content.xml and wrote the central
+            # directory, producing a technically valid but truncated package.
+            # Invalidate it so nothing partial can be mistaken for a download.
+            file_writer._file.truncate(0)
+            raise
+
+    def _write_ods_package(self, file_writer, excel_include_header):
         sheet_name = escape("export", {'"': "&quot;"})
 
         with zipfile.ZipFile(file_writer._file, "w", zipfile.ZIP_DEFLATED) as archive:
@@ -217,6 +293,7 @@ class OdsQuerysetSerializer(SpreadsheetQuerysetSerializer):
                     write_cells(self._header_row())
 
                 def write_row(row, _):
+                    self._check_row_limit("ods")
                     write_cells(self._serialize_row(row))
 
                 file_writer.write_rows(self.queryset, write_row)
