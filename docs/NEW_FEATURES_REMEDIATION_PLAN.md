@@ -1,6 +1,6 @@
 # New features remediation plan
 
-Status: **planned**
+Status: **Phases 0-6 implemented; Phase 7 (publish/deploy) awaits explicit authorization**
 
 Source review: `new_features` at `f702ed8e1609e3a2deeeb61cf0a7917453a8a159`
 
@@ -317,3 +317,34 @@ lockfile changes with the feature that requires them.
 - Full CI, locale parity, fork hygiene, migrations, browser journeys, memory checks,
   and the candidate image pass.
 - Phase 7 is complete before any documentation claims the feature set is deployed.
+
+---
+
+## Remediation implementation record (2026-09-14)
+
+All Phase 0-5 items landed on `new_features` as one commit per phase:
+
+| Phase | Commit(s)               | Result                                                                                                                                                                                                                                                           |
+| ----- | ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0     | `5b69389e`              | 9 failing regression suites (public group-by leak, duration null via parser, apostrophe mutation, missing dimension limits, keyboard inaccessibility, breakpoint disagreement, importer NaN limit) + acceptance fixtures                                         |
+| 1     | `df60870a`              | `resolve_public_view_group_bys()` shared resolver; saved hidden group-bys dropped for both public endpoints; importer limits centralized in `utils/importFile.js` with 512 MB fallback; `test_no_new_baserow_namespace_identifiers`                              |
+| 2     | `d60005e0` + `21b28f20` | Frontend port of the nine functions + duration engine (parity with backend null contract verified); registrations in backend order; `jadawelFormulaRangeMaxItems` config + env remap; locales en/ar 100%                                                         |
+| 3     | `598e036d`              | Canonical breakpoint contract exported from `deviceTypes.js` and consumed by the element SCSS via `$device-*-width` variables; ABIcon is-button renders a semantic `<button>`; compact menu gets aria-expanded/aria-controls, Escape, focus-in and focus-restore |
+| 4     | `f38fcc2a`              | Apostrophe mutation removed (exact round-trip); named XLSX/ODS row/column limits with pre-flight column validation, per-row budget, truncation-on-failure                                                                                                        |
+| 5     | `2a94b601` + `08fcfeb9` | Exporter moved to `arabase/export/` registered additively via `ArabaseConfig.ready()`; PORT_MAP_FORMULAS reconciled; Nuxt 4 docs, PATCHES entry, trailing blank line removed                                                                                     |
+
+### Phase 6 gate evidence (all run against the final tree)
+
+| Gate                                                                                               | Result                                                                                                                                                        |
+| -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Backend suites (formula 1189, grid+gallery 169, import_export 102, arabase 505 incl. fork hygiene) | green                                                                                                                                                         |
+| Frontend suite                                                                                     | 4958 passed / 7 failed — the 7 are the pre-existing `viewFilterForm` (3) + `viewFilters` (4) failures recorded in the parent plan's baseline; no new failures |
+| Locale parity                                                                                      | 3847/3847, 0 missing                                                                                                                                          |
+| `git diff --check`                                                                                 | clean                                                                                                                                                         |
+| Fork hygiene (`tests/arabase`)                                                                     | 403 passed, 1 skipped                                                                                                                                         |
+
+### Phase 7 — NOT STARTED (requires explicit authorization)
+
+Publish the all-in-one image, pin `ARG JADAWEL_IMAGE` to the digest, redeploy
+per `docs/DEPLOY_CRANL.md`, and verify the live stack. A source push is not a
+deployment.
