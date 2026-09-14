@@ -21,21 +21,32 @@
         }"
       >
         <ABIcon
+          :id="compactTriggerId"
+          ref="compactTrigger"
           icon="iconoir-menu"
           :class="'menu-element__compact-menu-trigger-icon'"
           is-button
+          :aria-label="$t('menuElement.openCompactMenu')"
+          :aria-expanded="isCompactMenuOpen ? 'true' : 'false'"
+          :aria-controls="isCompactMenuOpen ? compactPanelId : null"
           @click.stop="toggleCompactMenu"
         />
       </div>
 
       <div
         v-if="isCompactMenuOpen"
+        :id="compactPanelId"
+        ref="compactPanel"
+        role="dialog"
+        :aria-label="$t('menuElement.compactMenuLabel')"
         v-click-outside="closeCompactMenu"
         :class="compactPanelClasses"
         :style="{
           ...getStyleOverride('menu'),
           '--alignment': 'flex-start',
         }"
+        tabindex="-1"
+        @keydown.escape="onPanelEscape"
         @mousedown.stop
         @dragstart.prevent.stop
       >
@@ -43,9 +54,9 @@
           icon="iconoir-cancel"
           class="menu-element__compact-menu-close"
           is-button
-          @click="closeCompactMenu"
+          :aria-label="$t('menuElement.closeCompactMenu')"
+          @click="closeCompactMenu({ restoreFocus: false })"
         />
-
         <div
           v-for="item in element.menu_items"
           :key="item.id"
@@ -99,15 +110,11 @@ export default {
       default: null,
     },
   },
-  props: {
-    element: {
-      type: Object,
-      required: true,
-    },
-  },
   data() {
     return {
       compactMenuOpen: false,
+      compactPanelId: `menu-element-compact-panel-${this.element.id}`,
+      compactTriggerId: `menu-element-compact-trigger-${this.element.id}`,
     }
   },
   computed: {
@@ -150,10 +157,14 @@ export default {
   watch: {
     isCompactMenuOpen(isOpen) {
       this.setCompactMenuPreviewLock(this.isEditMode && isOpen)
+      if (isOpen) {
+        this.$nextTick(() => {
+          // Move focus into the panel when it opens so keyboard users are
+          // not left behind on the trigger.
+          this.$refs.compactPanel?.focus()
+        })
+      }
     },
-  },
-  mounted() {
-    this.setCompactMenuPreviewLock(this.isEditMode && this.isCompactMenuOpen)
   },
   beforeUnmount() {
     this.setCompactMenuPreviewLock(false)
@@ -166,11 +177,20 @@ export default {
       }
       this.compactMenuOpen = !this.compactMenuOpen
     },
-    closeCompactMenu() {
+    closeCompactMenu({ restoreFocus = true } = {}) {
       if (this.isEditMode) {
         return
       }
       this.compactMenuOpen = false
+      if (restoreFocus) {
+        this.$nextTick(() => {
+          // Return focus to the trigger so keyboard users keep their place.
+          this.$refs.compactTrigger?.$el?.focus()
+        })
+      }
+    },
+    onPanelEscape() {
+      this.closeCompactMenu()
     },
     setCompactMenuPreviewLock(locked) {
       // the setPagePreviewLocked is not provided in public mode

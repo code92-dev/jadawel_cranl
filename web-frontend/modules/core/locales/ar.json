@@ -1208,5 +1208,10 @@
     "noNotification": "سنُعلمك بالتحديثات المهمة وفي كل مرة يُشار إليك في منصة جداول.",
     "newNotificationsAvailable": "توجد إشعارات جديدة",
     "refresh": "تحديث"
+  },
+  "menuElement": {
+    "openCompactMenu": "فتح القائمة",
+    "closeCompactMenu": "إغلاق القائمة",
+    "compactMenuLabel": "القائمة"
   }
 }
