@@ -13,6 +13,7 @@ import {
   DecimalSeparatorJadawelRuntimeFormulaArgumentType,
   TimedeltaJadawelRuntimeFormulaArgumentType,
   DurationJadawelRuntimeFormulaArgumentType,
+  NullableDurationJadawelRuntimeFormulaArgumentType,
   DatetimeFormatJadawelRuntimeFormulaArgumentType,
   DurationFormatJadawelRuntimeFormulaArgumentType,
 } from '@jadawel/modules/core/runtimeFormulaArgumentTypes'
@@ -2639,16 +2640,25 @@ export class RuntimeRange extends RuntimeFormulaFunction {
           : [args[0], args[1], args[2]]
 
     if (step === 0) {
-      return null
+      throw new InvalidFormulaArgument(
+        this.getType(),
+        this.app.$i18n.t('runtimeFormulaTypeErrors.rangeZeroStep')
+      )
     }
 
     // range() length is computed up front so an oversized range is rejected
-    // before building the array.
+    // before building the array. Mirrors the backend's
+    // JadawelFormulaSyntaxError for the same condition.
     const count = Math.max(0, Math.ceil((stop - start) / step))
     const rawMax = Number(this.app.$config.public.jadawelFormulaRangeMaxItems)
     const maxItems = Number.isFinite(rawMax) && rawMax > 0 ? rawMax : 10000
     if (count > maxItems) {
-      return null
+      throw new InvalidFormulaArgument(
+        this.getType(),
+        this.app.$i18n.t('runtimeFormulaTypeErrors.rangeTooManyItems', {
+          max: maxItems,
+        })
+      )
     }
 
     const result = []
@@ -2920,7 +2930,10 @@ export class RuntimeToDatetime extends RuntimeFormulaFunction {
       } catch {
         throw new InvalidFormulaArgument(
           this.getType(),
-          `'${value}' could not be parsed using format '${fmt}'.`
+          this.app.$i18n.t('runtimeFormulaTypeErrors.datetimeFormatMismatch', {
+            value,
+            format: fmt,
+          })
         )
       }
     } else {
@@ -2931,7 +2944,7 @@ export class RuntimeToDatetime extends RuntimeFormulaFunction {
       if (!hasMinDatePart) {
         throw new InvalidFormulaArgument(
           this.getType(),
-          `'${value}' is not a valid datetime string.`
+          this.invalidDatetimeStringError(value)
         )
       }
 
@@ -2940,10 +2953,16 @@ export class RuntimeToDatetime extends RuntimeFormulaFunction {
       } catch {
         throw new InvalidFormulaArgument(
           this.getType(),
-          `'${value}' is not a valid datetime string.`
+          this.invalidDatetimeStringError(value)
         )
       }
     }
+  }
+
+  invalidDatetimeStringError(value) {
+    return this.app.$i18n.t('runtimeFormulaTypeErrors.invalidDatetimeString', {
+      value,
+    })
   }
 
   execute(context, args) {
@@ -2987,17 +3006,22 @@ export class RuntimeToDuration extends RuntimeFormulaFunction {
 
   get args() {
     return [
-      new DurationJadawelRuntimeFormulaArgumentType(),
+      new NullableDurationJadawelRuntimeFormulaArgumentType(),
       new DurationFormatJadawelRuntimeFormulaArgumentType({ optional: true }),
     ]
   }
 
   formatMismatchError(value, durationFormat) {
-    return `'${value}' could not be parsed using format '${durationFormat}'.`
+    return this.app.$i18n.t('runtimeFormulaTypeErrors.durationFormatMismatch', {
+      value,
+      format: durationFormat,
+    })
   }
 
   timedeltaWithFormatError() {
-    return 'A duration format cannot be applied to a timedelta value.'
+    return this.app.$i18n.t(
+      'runtimeFormulaTypeErrors.durationFormatOnTimedelta'
+    )
   }
 
   validateTypeOfArgs(args) {
@@ -3098,10 +3122,9 @@ export class RuntimeDurationFormat extends RuntimeFormulaFunction {
   static getCategoryType() {
     return FORMULA_CATEGORY.DATE
   }
-
   get args() {
     return [
-      new DurationJadawelRuntimeFormulaArgumentType(),
+      new NullableDurationJadawelRuntimeFormulaArgumentType(),
       new DurationFormatJadawelRuntimeFormulaArgumentType(),
     ]
   }

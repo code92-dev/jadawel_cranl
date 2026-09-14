@@ -90,6 +90,7 @@ only after measuring both steady-state memory and p95 document latency.
 |---|---|---|
 | `JADAWEL_IMPORT_ARCHIVE_MAX_UNCOMPRESSED_SIZE_MB` | Maximum combined expanded size of every entry in a workspace import ZIP. Archives over this limit are rejected before any entry is parsed or extracted. Raise it only when the storage and worker limits can safely handle larger exports. | `1024` |
 | `JADAWEL_IMPORT_ARCHIVE_MAX_JSON_SIZE_MB` | Maximum expanded size of an application-data JSON entry. The manifest has a stricter built-in 8 MiB ceiling. | `64` |
+| `JADAWEL_FORMULA_RANGE_MAX_ITEMS` | Maximum number of items the `range()` formula function may generate. The same value is exposed to the browser as `NUXT_PUBLIC_JADAWEL_FORMULA_RANGE_MAX_ITEMS`; both sides must stay in sync or the backend rejects a range the frontend accepted (or vice versa). | `10000` |
 
 ### General object cache
 

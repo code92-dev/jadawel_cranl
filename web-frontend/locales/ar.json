@@ -83,7 +83,13 @@
     "sameSeparators": "لا يمكن أن يكون فاصل الآلاف وفاصل العشريات نفسه.",
     "invalidDuration": "'{value}' ليست مدة صالحة. الخيارات الصالحة مثل: '1 day' أو '2 hours'.",
     "invalidDatetimeFormat": "'{value}' ليس تنسيق تاريخ ووقت صالحًا. الخيارات مثل: 'YYYY-MM-DD' أو 'DD/MM/YYYY HH:mm:ss'.",
-    "invalidDurationFormat": "'{value}' ليس تنسيق مدة صالحًا. استخدم 'd' (أيام) و'h' (ساعات) و'm' (دقائق) و's' (ثوانٍ)، مثل 'd:h' و'd h:mm:ss'."
+    "invalidDurationFormat": "'{value}' ليس تنسيق مدة صالحًا. استخدم 'd' (أيام) و'h' (ساعات) و'm' (دقائق) و's' (ثوانٍ)، مثل 'd:h' و'd h:mm:ss'.",
+    "rangeZeroStep": "يجب ألا تكون قيمة خطوة دالة 'range' صفرًا.",
+    "rangeTooManyItems": "لا يمكن لدالة 'range' توليد أكثر من {max} عنصر.",
+    "datetimeFormatMismatch": "تعذر تحليل '{value}' باستخدام التنسيق '{format}'.",
+    "invalidDatetimeString": "'{value}' ليست سلسلة تاريخ ووقت صالحة.",
+    "durationFormatMismatch": "تعذر تحليل '{value}' باستخدام التنسيق '{format}'.",
+    "durationFormatOnTimedelta": "لا يمكن تطبيق تنسيق مدة على قيمة مدة زمنية (timedelta)."
   },
   "functionnalGridViewFieldLinkRow": {
     "unnamed": "صف غير مسمى {value}"

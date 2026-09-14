@@ -172,6 +172,11 @@ class ThousandSeparatorJadawelRuntimeFormulaArgumentType(
         return value in VALID_THOUSAND_SEPARATORS
 
     def parse(self, value):
+        # The execution path runs parse_args without validate_args, so an
+        # invalid separator must fail here too — the frontend raises for the
+        # same expression when executing a formula.
+        if not self.test(value):
+            raise ValidationError(self.get_error_message(value))
         return ensure_string(value)
 
     def get_error_message(self, value) -> Optional[str]:
@@ -190,6 +195,10 @@ class DecimalSeparatorJadawelRuntimeFormulaArgumentType(
         return value in VALID_DECIMAL_SEPARATORS
 
     def parse(self, value):
+        # See ThousandSeparatorJadawelRuntimeFormulaArgumentType.parse: the
+        # execution path must reject invalid separators like the frontend.
+        if not self.test(value):
+            raise ValidationError(self.get_error_message(value))
         return ensure_string(value)
 
     def get_error_message(self, value) -> Optional[str]:
@@ -255,6 +264,10 @@ class DatetimeFormatJadawelRuntimeFormulaArgumentType(
         return is_valid_datetime_format(value)
 
     def parse(self, value):
+        # See ThousandSeparatorJadawelRuntimeFormulaArgumentType.parse: the
+        # execution path must reject invalid formats like the frontend.
+        if not self.test(value):
+            raise ValidationError(self.get_error_message(value))
         return ensure_string(value)
 
     def get_error_message(self, value) -> Optional[str]:
@@ -271,6 +284,10 @@ class DurationFormatJadawelRuntimeFormulaArgumentType(
         return is_valid_duration_format(value)
 
     def parse(self, value):
+        # See ThousandSeparatorJadawelRuntimeFormulaArgumentType.parse: the
+        # execution path must reject invalid formats like the frontend.
+        if not self.test(value):
+            raise ValidationError(self.get_error_message(value))
         return ensure_string(value)
 
     def get_error_message(self, value) -> Optional[str]:

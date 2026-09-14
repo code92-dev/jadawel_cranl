@@ -1954,8 +1954,6 @@ describe('RuntimeRange', () => {
     { args: [0, 10, 3], expected: [0, 3, 6, 9] },
     { args: [10, 0, -1], expected: [10, 9, 8, 7, 6, 5, 4, 3, 2, 1] },
     { args: [0, 10, -1], expected: [] },
-    // a zero step returns null
-    { args: [0, 5, 0], expected: null },
     // arguments are coerced to integers
     { args: ['1', '4'], expected: [1, 2, 3] },
     { args: [1.9, 4.9], expected: [1, 2, 3] },
@@ -1964,6 +1962,20 @@ describe('RuntimeRange', () => {
     const parsedArgs = formulaType.parseArgs(args)
     const result = formulaType.execute({}, parsedArgs)
     expect(result).toEqual(expected)
+  })
+
+  test('a zero step throws instead of returning null', () => {
+    const formulaType = new RuntimeRange({
+      app: {
+        $config: app.$config,
+        $i18n: {
+          t: () => "The 'range' function step argument must not be zero.",
+        },
+      },
+    })
+    expect(() => formulaType.execute({}, [0, 5, 0])).toThrow(
+      "The 'range' function step argument must not be zero."
+    )
   })
 
   test.each([
@@ -1995,23 +2007,40 @@ describe('RuntimeRange', () => {
   })
 
   test('caps the number of generated items', () => {
-    const formulaType = new RuntimeRange({ app })
+    const formulaType = new RuntimeRange({
+      app: {
+        $config: app.$config,
+        $i18n: {
+          t: (key, params) =>
+            `The 'range' function cannot generate more than ${params.max} items.`,
+        },
+      },
+    })
     const atLimit = formulaType.execute({}, formulaType.parseArgs([0, 10000]))
     expect(atLimit).toHaveLength(10000)
 
-    const overLimit = formulaType.execute({}, formulaType.parseArgs([0, 10001]))
-    expect(overLimit).toBeNull()
+    expect(() => formulaType.execute({}, [0, 10001])).toThrow(
+      "The 'range' function cannot generate more than 10000 items."
+    )
   })
 
   test('uses the configured max items from runtime config', () => {
     const formulaType = new RuntimeRange({
-      app: { $config: { public: { jadawelFormulaRangeMaxItems: 5 } } },
+      app: {
+        $config: { public: { jadawelFormulaRangeMaxItems: 5 } },
+        $i18n: {
+          t: (key, params) =>
+            `The 'range' function cannot generate more than ${params.max} items.`,
+        },
+      },
     })
 
     expect(formulaType.execute({}, formulaType.parseArgs([0, 5]))).toEqual([
       0, 1, 2, 3, 4,
     ])
-    expect(formulaType.execute({}, formulaType.parseArgs([0, 6]))).toBeNull()
+    expect(() => formulaType.execute({}, [0, 6])).toThrow(
+      "The 'range' function cannot generate more than 5 items."
+    )
   })
 })
 
@@ -2224,6 +2253,14 @@ describe('RuntimeToDuration', () => {
     // At runtime, arg 0 may resolve to a Timedelta (e.g. from a get() on a
     // duration field), in which case applying a format doesn't make sense.
     const formulaType = new RuntimeToDuration()
+    formulaType.app = {
+      $i18n: {
+        t: (key) =>
+          key === 'runtimeFormulaTypeErrors.durationFormatOnTimedelta'
+            ? 'A duration format cannot be applied to a timedelta value.'
+            : key,
+      },
+    }
     const parsedArgs = formulaType.parseArgs([new Timedelta(3600000), 'h:mm'])
     expect(() => formulaType.execute({}, parsedArgs)).toThrow(
       'A duration format cannot be applied to a timedelta value.'
@@ -2232,6 +2269,14 @@ describe('RuntimeToDuration', () => {
 
   test('execute throws when value does not match format', () => {
     const formulaType = new RuntimeToDuration()
+    formulaType.app = {
+      $i18n: {
+        t: (key, params) =>
+          key === 'runtimeFormulaTypeErrors.durationFormatMismatch'
+            ? `'${params.value}' could not be parsed using format '${params.format}'.`
+            : key,
+      },
+    }
     const parsedArgs = formulaType.parseArgs(['not a duration', 'h:mm'])
     expect(() => formulaType.execute({}, parsedArgs)).toThrow(
       "'not a duration' could not be parsed using format 'h:mm'."
@@ -2273,6 +2318,14 @@ describe('RuntimeToDuration', () => {
 
   test('validateArgs throws when value does not match format', () => {
     const formulaType = new RuntimeToDuration()
+    formulaType.app = {
+      $i18n: {
+        t: (key, params) =>
+          key === 'runtimeFormulaTypeErrors.durationFormatMismatch'
+            ? `'${params.value}' could not be parsed using format '${params.format}'.`
+            : key,
+      },
+    }
     expect(() => formulaType.validateArgs(['not a duration', 'h:mm'])).toThrow(
       "'not a duration' could not be parsed using format 'h:mm'."
     )
@@ -2400,11 +2453,24 @@ describe('RuntimeToDatetime', () => {
     expect(result).toBeInstanceOf(Date)
     expect(result.getTime()).toBe(expectedTime)
   })
+  const i18nApp = {
+    $i18n: {
+      t: (key, params) => {
+        if (key === 'runtimeFormulaTypeErrors.invalidDatetimeString') {
+          return `'${params.value}' is not a valid datetime string.`
+        }
+        if (key === 'runtimeFormulaTypeErrors.datetimeFormatMismatch') {
+          return `'${params.value}' could not be parsed using format '${params.format}'.`
+        }
+        return key
+      },
+    },
+  }
 
   test('validateArgs throws for an invalid ISO string', () => {
-    const formulaType = new RuntimeToDatetime()
+    const formulaType = new RuntimeToDatetime({ app: i18nApp })
     expect(() => formulaType.validateArgs(['not-a-date'])).toThrow(
-      'is not a valid datetime string'
+      "'not-a-date' is not a valid datetime string."
     )
   })
 
@@ -2413,17 +2479,17 @@ describe('RuntimeToDatetime', () => {
     { value: '2025', desc: 'year only' },
     { value: '2025-01', desc: 'year-month only' },
   ])('validateArgs throws for incomplete ISO string ($desc)', ({ value }) => {
-    const formulaType = new RuntimeToDatetime()
+    const formulaType = new RuntimeToDatetime({ app: i18nApp })
     expect(() => formulaType.validateArgs([value])).toThrow(
-      'is not a valid datetime string'
+      `'${value}' is not a valid datetime string.`
     )
   })
 
   test('validateArgs throws when string does not match provided format', () => {
-    const formulaType = new RuntimeToDatetime()
+    const formulaType = new RuntimeToDatetime({ app: i18nApp })
     expect(() =>
       formulaType.validateArgs(['2024-01-15', 'DD/MM/YYYY'])
-    ).toThrow('could not be parsed using format')
+    ).toThrow("'2024-01-15' could not be parsed using format 'DD/MM/YYYY'.")
   })
 
   test.each([

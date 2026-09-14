@@ -263,9 +263,6 @@ export class TimedeltaJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFo
 
 export class DurationJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFormulaArgumentType {
   test(value) {
-    if (value === null) {
-      return true
-    }
     try {
       ensureDuration(value)
       return true
@@ -275,14 +272,32 @@ export class DurationJadawelRuntimeFormulaArgumentType extends JadawelRuntimeFor
   }
 
   parse(value) {
-    if (value === null) {
-      return null
-    }
     return ensureDuration(value)
   }
 
   getErrorMessage(value, i18n) {
     return i18n.t('runtimeFormulaTypeErrors.invalidDuration', { value })
+  }
+}
+
+export class NullableDurationJadawelRuntimeFormulaArgumentType extends DurationJadawelRuntimeFormulaArgumentType {
+  // A duration argument that also accepts null, for functions whose null
+  // contract is "null in, null out" (e.g. `duration_format(null(), 'h:mm')`
+  // must return null). Duration validation itself is not weakened: any
+  // non-null value still has to parse as a duration. Mirrors the backend's
+  // NullableDurationJadawelRuntimeFormulaArgumentType.
+  test(value) {
+    if (value === null) {
+      return true
+    }
+    return super.test(value)
+  }
+
+  parse(value) {
+    if (value === null) {
+      return null
+    }
+    return super.parse(value)
   }
 }
 

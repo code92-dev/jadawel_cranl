@@ -1,0 +1,66 @@
+{
+  "PARITY_CASES": [
+    { "formula": "abs(-2)", "context": {}, "result": 2 },
+    { "formula": "abs(2)", "context": {}, "result": 2 },
+    { "formula": "abs(-2.5)", "context": {}, "result": 2.5 },
+    { "formula": "abs('a')", "context": {}, "error": "invalid_argument" },
+    { "formula": "abs(null())", "context": {}, "error": "invalid_argument" },
+
+    { "formula": "range(4)", "context": {}, "result": [0, 1, 2, 3] },
+    { "formula": "range(0)", "context": {}, "result": [] },
+    { "formula": "range(1, 5)", "context": {}, "result": [1, 2, 3, 4] },
+    { "formula": "range(5, 1)", "context": {}, "result": [] },
+    { "formula": "range(0, 10, 3)", "context": {}, "result": [0, 3, 6, 9] },
+    { "formula": "range(10, 0, -1)", "context": {}, "result": [10, 9, 8, 7, 6, 5, 4, 3, 2, 1] },
+    { "formula": "range(1.9, 4.9)", "context": {}, "result": [1, 2, 3] },
+    { "formula": "range('a')", "context": {}, "error": "invalid_argument" },
+    { "formula": "range(0, 5, 0)", "context": {}, "error": "invalid_argument" },
+    { "formula": "range(0, 10000)", "context": {}, "array_length": 10000 },
+    { "formula": "range(0, 10001)", "context": {}, "error": "invalid_argument" },
+    { "formula": "to_json(range(3))", "context": {}, "result": "[0,1,2]" },
+    { "formula": "to_json(to_duration('1 hour'))", "context": {}, "result": "3600" },
+    { "formula": "to_json(123)", "context": {}, "result": "123" },
+    { "formula": "to_json(true)", "context": {}, "result": "true" },
+    { "formula": "to_json(null())", "context": {}, "result": "null" },
+
+    { "formula": "from_json('[1, 2, 3]')", "context": {}, "result": [1, 2, 3] },
+    { "formula": "from_json('\"x\"')", "context": {}, "result": "x" },
+    { "formula": "from_json('{\"a\": 1}')", "context": {}, "result": { "a": 1 } },
+    { "formula": "from_json('1.5')", "context": {}, "result": 1.5 },
+    { "formula": "from_json(123)", "context": {}, "result": 123 },
+    { "formula": "from_json('not json')", "context": {}, "result": null },
+
+    { "formula": "null()", "context": {}, "result": null },
+
+    { "formula": "number_format(1000000)", "context": {}, "result": "1,000,000" },
+    { "formula": "number_format(1000000, 2)", "context": {}, "result": "1,000,000.00" },
+    { "formula": "number_format(1000000, 2, '.', ',')", "context": {}, "result": "1.000.000,00" },
+    { "formula": "number_format(-1234.5, 2)", "context": {}, "result": "-1,234.50" },
+    { "formula": "number_format(1000000, 2, ',', ',')", "context": {}, "error": "invalid_argument" },
+    { "formula": "number_format(1000000, 2, ';', '.')", "context": {}, "error": "invalid_argument" },
+    { "formula": "number_format('x')", "context": {}, "error": "invalid_argument" },
+
+    { "formula": "to_duration('1 day')", "context": {}, "duration_seconds": 86400 },
+    { "formula": "to_duration('45 seconds')", "context": {}, "duration_seconds": 45 },
+    { "formula": "to_duration('1:30', 'h:mm')", "context": {}, "duration_seconds": 5400 },
+    { "formula": "to_duration('1:30:15.234', 'h:mm:ss.fff')", "context": {}, "duration_seconds": 5415.234 },
+    { "formula": "to_duration(null())", "context": {}, "result": null },
+    { "formula": "to_duration('2:30')", "context": {}, "duration_seconds": 150 },
+    { "formula": "to_duration('garbage', 'h:mm')", "context": {}, "error": "invalid_argument" },
+    { "formula": "to_duration('1 hour', 'h:mm')", "context": {}, "error": "invalid_argument" },
+
+    { "formula": "duration_format(to_duration('1:30:25.234', 'h:mm:ss.fff'), 'h:mm:ss.f')", "context": {}, "result": "1:30:25.2" },
+    { "formula": "duration_format(to_duration('2:30'), 'd h:mm')", "context": {}, "result": "0 0:02" },
+    { "formula": "duration_format(null(), 'h:mm')", "context": {}, "result": null },
+    { "formula": "duration_format('not a duration', 'h:mm')", "context": {}, "error": "invalid_argument" },
+    { "formula": "duration_format('1 hour', 'h:h')", "context": {}, "error": "invalid_argument" },
+    { "formula": "duration_format('1 hour', 'd h:mm')", "context": {}, "result": "0 1:00" },
+
+    { "formula": "to_datetime('2024-01-15')", "context": {}, "datetime_iso": "2024-01-15T00:00:00" },
+    { "formula": "to_datetime('2024-06-15T23:59:59')", "context": {}, "datetime_iso": "2024-06-15T23:59:59" },
+    { "formula": "to_datetime('15/01/2024', 'DD/MM/YYYY')", "context": {}, "datetime_iso": "2024-01-15T00:00:00" },
+    { "formula": "to_datetime('2024-13-45')", "context": {}, "error": "invalid_argument" },
+    { "formula": "to_datetime('2024-01-15', 'DD/MM/YYYY')", "context": {}, "error": "invalid_argument" },
+    { "formula": "to_datetime('123')", "context": {}, "error": "invalid_argument" }
+  ]
+}

@@ -848,6 +848,18 @@ class RuntimeNumberFormat(RuntimeFormulaFunction):
                 "The thousand separator and decimal separator cannot be the same."
             )
 
+    def parse_args(self, args: FormulaArgs) -> FormulaArgs:
+        parsed = super().parse_args(args)
+        # The execution visitor only runs parse_args before execute, so the
+        # separator check from validate_args must also hold on the execution
+        # path: the frontend raises for the same expression when executing a
+        # formula, and both runtimes must fail alike.
+        if len(parsed) >= 4 and parsed[2] == parsed[3]:
+            raise JadawelFormulaSyntaxError(
+                "The thousand separator and decimal separator cannot be the same."
+            )
+        return parsed
+
     def execute(self, context: FormulaContext, args: FormulaArgs):
         value = args[0]
         decimal_places = max(int(args[1]), 0) if len(args) > 1 else 0
