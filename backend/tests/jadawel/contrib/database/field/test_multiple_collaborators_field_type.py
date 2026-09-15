@@ -1172,7 +1172,7 @@ def test_get_group_by_metadata_in_rows_with_multiple_collaborators_field(data_fi
                     f"field_{multiple_collaborators_field.id}": [user.id],
                 },
                 {
-                    "count": 2,
+                    "count": 3,
                     f"field_{multiple_collaborators_field.id}": [
                         user.id,
                         user_2.id,
@@ -1181,13 +1181,6 @@ def test_get_group_by_metadata_in_rows_with_multiple_collaborators_field(data_fi
                 {
                     "count": 2,
                     f"field_{multiple_collaborators_field.id}": [user_2.id],
-                },
-                {
-                    "count": 1,
-                    f"field_{multiple_collaborators_field.id}": [
-                        user_2.id,
-                        user.id,
-                    ],
                 },
             ]
         )
@@ -1225,7 +1218,10 @@ def test_list_rows_with_group_by_and_multiple_collaborators_field(
     )
 
     url = reverse("api:database:views:grid:list", kwargs={"view_id": grid.id})
-    response = api_client.get(url, **{"HTTP_AUTHORIZATION": f"JWT {token}"})
+    response = api_client.get(
+        f"{url}?include=group_by_metadata",
+        **{"HTTP_AUTHORIZATION": f"JWT {token}"},
+    )
     response_json = response.json()
 
     assert response_json["group_by_metadata"] == {

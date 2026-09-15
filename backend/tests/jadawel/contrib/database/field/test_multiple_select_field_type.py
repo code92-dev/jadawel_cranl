@@ -2618,7 +2618,7 @@ def test_get_group_by_metadata_in_rows_with_many_to_many_field(data_fixture):
                     f"field_{multiple_select_field.id}": [select_option_1.id],
                 },
                 {
-                    "count": 2,
+                    "count": 3,
                     f"field_{multiple_select_field.id}": [
                         select_option_1.id,
                         select_option_2.id,
@@ -2627,13 +2627,6 @@ def test_get_group_by_metadata_in_rows_with_many_to_many_field(data_fixture):
                 {
                     "count": 2,
                     f"field_{multiple_select_field.id}": [select_option_2.id],
-                },
-                {
-                    "count": 1,
-                    f"field_{multiple_select_field.id}": [
-                        select_option_2.id,
-                        select_option_1.id,
-                    ],
                 },
             ]
         )
@@ -2681,7 +2674,10 @@ def test_list_rows_with_group_by_and_many_to_many_field(api_client, data_fixture
     )
 
     url = reverse("api:database:views:grid:list", kwargs={"view_id": grid.id})
-    response = api_client.get(url, **{"HTTP_AUTHORIZATION": f"JWT {token}"})
+    response = api_client.get(
+        f"{url}?include=group_by_metadata",
+        **{"HTTP_AUTHORIZATION": f"JWT {token}"},
+    )
     response_json = response.json()
 
     assert response_json["group_by_metadata"] == {
@@ -2815,7 +2811,7 @@ def test_get_group_by_metadata_in_rows_multiple_and_single_select_fields(data_fi
                     f"field_{multiple_select_field.id}": [ms_option_1.id],
                 },
                 {
-                    "count": 2,
+                    "count": 3,
                     f"field_{multiple_select_field.id}": [
                         ms_option_1.id,
                         ms_option_2.id,
@@ -2824,13 +2820,6 @@ def test_get_group_by_metadata_in_rows_multiple_and_single_select_fields(data_fi
                 {
                     "count": 2,
                     f"field_{multiple_select_field.id}": [ms_option_2.id],
-                },
-                {
-                    "count": 1,
-                    f"field_{multiple_select_field.id}": [
-                        ms_option_2.id,
-                        ms_option_1.id,
-                    ],
                 },
             ]
         ),
@@ -2862,19 +2851,11 @@ def test_get_group_by_metadata_in_rows_multiple_and_single_select_fields(data_fi
                         ms_option_1.id,
                         ms_option_2.id,
                     ],
-                    "count": 2,
+                    "count": 3,
                 },
                 {
                     f"field_{single_select_field.id}": None,
                     f"field_{multiple_select_field.id}": [ms_option_2.id],
-                    "count": 1,
-                },
-                {
-                    f"field_{single_select_field.id}": None,
-                    f"field_{multiple_select_field.id}": [
-                        ms_option_2.id,
-                        ms_option_1.id,
-                    ],
                     "count": 1,
                 },
                 {
