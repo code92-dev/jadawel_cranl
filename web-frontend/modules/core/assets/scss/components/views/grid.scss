@@ -428,8 +428,8 @@
   .grid-view__head & {
     block-size: 32px;
     border-block-end: none;
-    background-color: $palette-neutral-100;
-    border-inline-end-color: $palette-neutral-400;
+    background-color: var(--jadawel-header-background, #f0f7f3);
+    border-inline-end-color: var(--jadawel-border-color, #cfe8d9);
   }
 
   .grid-view__foot & {
@@ -464,7 +464,6 @@
   &.grid-view__column--filtered::after {
     background-color: rgba($color-success-100, 0.5);
   }
-
 }
 
 .grid-view__group-by-divider {

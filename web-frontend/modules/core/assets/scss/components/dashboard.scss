@@ -1,14 +1,18 @@
 .dashboard__container {
   padding: 24px;
-  background: var(--jadawel-app-background, #f5faf7);
+  background: $white;
   block-size: 100%;
+}
+
+.layout__col-2:has(.dashboard__header) {
+  background-color: $white;
 }
 
 .dashboard__scroll-container {
   block-size: calc(100vh - 74px);
   overflow-y: auto;
   padding: 24px;
-  background: var(--jadawel-app-background, #f5faf7);
+  background: $white;
 }
 
 .dashboard__header {
@@ -23,7 +27,8 @@
   display: flex;
   gap: 15px;
   align-items: center;
-  background: var(--jadawel-header-background, #f0f7f3);
+  background: $white;
+  color: $palette-neutral-1200;
   z-index: 1;
   block-size: 74px;
   inline-size: 100%;

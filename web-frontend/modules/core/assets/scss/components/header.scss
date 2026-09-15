@@ -1,15 +1,16 @@
 .header {
   display: flex;
   justify-content: flex-start;
-  background-color: var(--jadawel-header-background, #f0f7f3);
-  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
+  background-color: $color-primary-500;
+  border-block-end: 1px solid $color-primary-600;
+  color: $white;
 
   &.header--space-between {
     justify-content: space-between;
   }
 
   &.header--dark-border {
-    border-block-end-color: $palette-neutral-400;
+    border-block-end-color: $color-primary-700;
   }
 }
 
@@ -53,16 +54,16 @@
 
   display: inline-block;
   font-size: 12px;
-  color: $color-neutral-400;
+  color: rgba($white, 0.48);
   cursor: inherit;
   margin: 0 2px;
 
   &.active {
     cursor: pointer;
-    color: $color-neutral-800;
+    color: rgba($white, 0.82);
 
     &:hover {
-      color: $color-primary-500;
+      color: $white;
     }
   }
 }
@@ -108,14 +109,14 @@
   font-weight: 500;
   padding: 0 10px;
   white-space: nowrap;
-  color: $palette-neutral-900;
+  color: $white;
 
   @include fixed-height(32px, 13px);
   @include rounded($rounded-md);
 
   &:hover {
     text-decoration: none;
-    background-color: var(--jadawel-hover-background, #f7fbf8);
+    background-color: rgba($white, 0.12);
   }
 
   &--disabled:hover {
@@ -124,27 +125,32 @@
   }
 
   &.active {
-    color: $palette-neutral-1200;
+    color: $white;
   }
 
   &.active--success {
     background-color: $color-success-100;
+    color: $palette-neutral-1200;
   }
 
   &.active--primary {
-    background-color: $color-primary-100;
+    background-color: rgba($white, 0.18);
+    color: $white;
   }
 
   &.active--warning {
     background-color: $color-warning-100;
+    color: $palette-neutral-1200;
   }
 
   &.active--error {
     background-color: $color-error-100;
+    color: $palette-neutral-1200;
   }
 
   &.active--purple {
     background-color: $color-purple-100;
+    color: $palette-neutral-1200;
   }
 }
 
@@ -179,7 +185,7 @@
 }
 
 .header__filter-icon {
-  color: $palette-neutral-900;
+  color: $white;
   font-size: 16px;
 
   &:not(:last-child) {
@@ -191,17 +197,23 @@
   }
 
   &.header-filter-icon--view {
-    color: $color-primary-500;
+    color: $white;
     font-size: 18px;
   }
 
   &.header-filter-icon--no-choice {
-    color: $color-neutral-200;
+    color: rgba($white, 0.48);
   }
 
   .header__filter-link.active & {
-    color: $palette-neutral-1200;
+    color: inherit;
   }
+}
+
+// The table view menu uses the legacy Jadawel icon font. Keep this explicit so
+// its glyph cannot inherit a dark view-type colour on the solid selected bar.
+.header__filter-icon.jadawel-icon-more-vertical {
+  color: $white;
 }
 
 .header__filter-error-icon {
@@ -211,7 +223,7 @@
 .header__sub-icon {
   margin-inline: 6px -2px;
   font-size: 14px;
-  color: $palette-neutral-600;
+  color: rgba($white, 0.7);
 }
 
 .header__info {
@@ -225,7 +237,7 @@
   li {
     float: inline-start;
     padding: 2px 12px;
-    border-inline-end: 1px solid $color-neutral-200;
+    border-inline-end: 1px solid rgba($white, 0.24);
     font-size: 14px;
     font-weight: 600;
 
@@ -250,7 +262,7 @@
 }
 
 .header__search-icon {
-  color: $color-neutral-900;
+  color: inherit;
   font-size: 16px;
 }
 
@@ -262,7 +274,7 @@
   justify-content: center;
 
   &--with-separator {
-    border-inline-start: 1px solid var(--jadawel-border-color, #e0f1e7);
+    border-inline-start: 1px solid rgba($white, 0.24);
   }
 }
 

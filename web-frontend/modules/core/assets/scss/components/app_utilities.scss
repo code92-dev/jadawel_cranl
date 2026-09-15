@@ -37,12 +37,29 @@
   align-items: center;
   justify-content: center;
   font-size: 17px;
-  color: $palette-neutral-800;
+  color: rgba($white, 0.78);
 
   @include rounded($rounded-md);
 
   &:hover {
     text-decoration: none;
+    color: $white;
+    background-color: rgba($white, 0.12);
+  }
+
+  &.app-utilities__item--active {
+    color: $white;
+    background-color: rgba($white, 0.18);
+  }
+}
+
+// Workspace home deliberately keeps its header white. The utilities occupy
+// that header's end-side band, so they return to their normal dark treatment
+// there while remaining white on table and builder top bars.
+.layout__col-2:has(.dashboard__header) .app-utilities__item {
+  color: $palette-neutral-800;
+
+  &:hover {
     color: $palette-neutral-1200;
     background-color: rgba($palette-neutral-1300, 0.04);
   }
