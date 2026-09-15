@@ -24,8 +24,11 @@ export const DEFAULT_MAX_IMPORT_FILE_SIZE_MB = 512
  *   number.
  */
 export function getMaxImportFileSizeMb(publicConfig) {
-  const parsed = parseInt(publicConfig?.jadawelMaxImportFileSizeMb, 10)
-  if (!Number.isFinite(parsed) || parsed <= 0) {
+  // Number(), not parseInt(): parseInt prefix-parses, so a malformed value
+  // like "999999abc" would silently become a 999999 MB limit. Anything that
+  // is not exactly a positive finite number falls back to the default.
+  const parsed = Number(publicConfig?.jadawelMaxImportFileSizeMb)
+  if (!Number.isInteger(parsed) || parsed <= 0) {
     return DEFAULT_MAX_IMPORT_FILE_SIZE_MB
   }
   return parsed

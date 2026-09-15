@@ -242,13 +242,19 @@ export default {
     onPanelClick(event) {
       // Activating a menu item (link or button) navigates or fires its
       // event: the overlay must close and hand focus back to the trigger.
-      // The capture phase is used because child links stop propagation; the
-      // close control and the nested submenu toggle are excluded because
-      // they must keep the menu open.
+      // The capture phase is used because child links stop propagation. The
+      // close control and the submenu toggle's own label are excluded —
+      // they must keep the menu open — but a link inside the expanded
+      // submenu is an item activation and closes it.
+      if (event.target.closest('.menu-element__compact-menu-close')) {
+        return
+      }
+      const toggle = event.target.closest(
+        '.menu-element__menu-item-with-children'
+      )
       if (
-        event.target.closest(
-          '.menu-element__compact-menu-close, .menu-element__menu-item-with-children'
-        )
+        toggle &&
+        !event.target.closest('.menu-element__sub-link--container')
       ) {
         return
       }

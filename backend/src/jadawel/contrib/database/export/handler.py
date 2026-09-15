@@ -165,16 +165,14 @@ class ExportHandler:
             try:
                 return _mark_job_as_finished(_open_file_and_run_export(job))
             except ExportJobCanceledException:
-                # The job may have been cancelled after some rows were
-                # already written, leaving a partial workbook in storage.
-                # Delete it so nothing partial can be downloaded.
-                if job.exported_file_name:
-                    get_default_storage().delete(
-                        ExportHandler.export_file_path(job.exported_file_name)
-                    )
-                    job.exported_file_name = None
-                    job.save(update_fields=("exported_file_name",))
+                # A cancelled job must not stay marked as failed.
+                _delete_partial_export_file(job)
             except Exception as e:
+                # The job may have failed after some rows were already
+                # written (e.g. the workbook dimension limits), leaving a
+                # partial workbook in storage. Delete it so nothing partial
+                # can be downloaded, then record the failure.
+                _delete_partial_export_file(job)
                 _mark_job_as_failed(job, e)
                 raise e
 
@@ -311,6 +309,21 @@ def _mark_job_as_finished(export_job: ExportJob) -> ExportJob:
     export_job.progress_percentage = 100.0
     export_job.save()
     return export_job
+
+
+def _delete_partial_export_file(job):
+    """
+    Deletes the job's partial export file from storage, if one was created,
+    and clears the job's file reference so nothing partial can be
+    downloaded. A failed or cancelled export may have written rows before
+    the exception surfaced (the ODS/XLSX writers stream rows as they go).
+    """
+
+    if not job.exported_file_name:
+        return
+    get_default_storage().delete(ExportHandler.export_file_path(job.exported_file_name))
+    job.exported_file_name = None
+    job.save(update_fields=("exported_file_name",))
 
 
 def _mark_job_as_failed(job, e):

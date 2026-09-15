@@ -16,7 +16,7 @@ raises in the other runtime too. One runtime returning ``null`` where the
 other raises is a parity failure and shows up as a failing case here.
 """
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from django.core.exceptions import ValidationError
 
@@ -51,6 +51,13 @@ def normalize_result(case, result):
     if "datetime_iso" in case:
         assert isinstance(result, datetime)
         return result.isoformat(timespec="seconds")
+    if "datetime_utc" in case:
+        assert isinstance(result, datetime)
+        # Offset-bearing inputs are compared as UTC instants, so the two
+        # runtimes agree regardless of the test machine's timezone.
+        if result.tzinfo is None:
+            result = result.replace(tzinfo=timezone.utc)
+        return result.astimezone(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
     return result
 
 
@@ -86,5 +93,7 @@ def test_formula_parity_case(case, settings):
         if "duration_seconds" in case
         else case.get("datetime_iso")
         if "datetime_iso" in case
+        else case.get("datetime_utc")
+        if "datetime_utc" in case
         else case["array_length"]
     )

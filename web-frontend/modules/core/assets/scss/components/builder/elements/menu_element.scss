@@ -159,7 +159,9 @@ $bg-color-contrast: var(--page-background-color-contrast, $palette-neutral-100);
   border-start-end-radius: 6px;
   border-end-end-radius: 6px;
 
-  @media (min-width: 500px) {
+  // Slide-in only above the smartphone boundary; the variable comes from
+  // the generated device-breakpoints partial (see variables.scss).
+  @media (min-width: #{$device-smartphone-max-width + 1}px) {
     animation: menu-element-slide-in-from-start 180ms ease-out;
 
     [dir='rtl'] & {

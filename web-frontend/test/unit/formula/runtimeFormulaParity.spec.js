@@ -60,6 +60,12 @@ describe('cross-runtime formula parity', () => {
       // datetime.isoformat(timespec='seconds').
       return moment(result).format('YYYY-MM-DDTHH:mm:ss')
     }
+    if ('datetime_utc' in caseData) {
+      expect(result).toBeInstanceOf(Date)
+      // Offset-bearing inputs are compared as UTC instants, so the two
+      // runtimes agree regardless of the test machine's timezone.
+      return moment.utc(result).format('YYYY-MM-DDTHH:mm:ss[Z]')
+    }
     return result
   }
 
@@ -80,7 +86,9 @@ describe('cross-runtime formula parity', () => {
           ? caseData.duration_seconds
           : 'datetime_iso' in caseData
             ? caseData.datetime_iso
-            : caseData.array_length
+            : 'datetime_utc' in caseData
+              ? caseData.datetime_utc
+              : caseData.array_length
     expect(normalized).toEqual(expected)
   })
 })

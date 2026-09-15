@@ -322,4 +322,60 @@ describe('MenuElement compact menu accessibility', () => {
     const container = wrapper.find('.menu-element__sub-link--container')
     expect(toggle.attributes('aria-controls')).toBe(container.attributes('id'))
   })
+
+  test('activating an expanded submenu child closes the panel and restores focus', async () => {
+    const parentItem = createMenuItem({
+      id: 2,
+      uid: 'menu-item-parent',
+      children: [createMenuItem({ id: 3, uid: 'menu-item-child' })],
+    })
+    const wrapper = await mountComponent({
+      element: createElement({ menu_items: [parentItem] }),
+    })
+
+    await wrapper
+      .find('.menu-element__compact-menu-trigger button')
+      .trigger('click')
+
+    const toggle = wrapper.find('.menu-element__menu-item-with-children')
+    await toggle.trigger('keydown', { key: 'Enter' })
+    const childLink = wrapper.find('.menu-element__sub-link--container a')
+    expect(childLink.exists()).toBe(true)
+
+    // A child link is an item activation even though it sits inside the
+    // toggle row (and stops propagation): the panel must close and focus
+    // return to the trigger.
+    await childLink.trigger('click')
+    expect(wrapper.find('.menu-element__container--compact').exists()).toBe(
+      false
+    )
+    await new Promise((resolve) => setTimeout(resolve, 0))
+    expect(document.activeElement).toBe(
+      wrapper.find('.menu-element__compact-menu-trigger button').element
+    )
+  })
+
+  test('the submenu toggle label itself keeps the panel open', async () => {
+    const parentItem = createMenuItem({
+      id: 2,
+      uid: 'menu-item-parent',
+      children: [createMenuItem({ id: 3, uid: 'menu-item-child' })],
+    })
+    const wrapper = await mountComponent({
+      element: createElement({ menu_items: [parentItem] }),
+    })
+
+    await wrapper
+      .find('.menu-element__compact-menu-trigger button')
+      .trigger('click')
+
+    // Clicking the toggle's label toggles the submenu; it must not close
+    // the whole panel.
+    await wrapper
+      .find('.menu-element__menu-item-with-children')
+      .trigger('click')
+    expect(wrapper.find('.menu-element__container--compact').exists()).toBe(
+      true
+    )
+  })
 })

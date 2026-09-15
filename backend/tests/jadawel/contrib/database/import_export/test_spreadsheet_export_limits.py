@@ -415,3 +415,46 @@ def test_cancelled_export_after_rows_written_leaves_no_downloadable_file(
         # openpyxl's write-only workbook only writes on the final save(),
         # which the cancellation prevents, so storage never received bytes.
         assert len(buffer.getvalue()) == 0
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("exporter_type", ["xlsx", "ods"])
+def test_failed_export_after_rows_written_leaves_no_downloadable_file(
+    data_fixture, monkeypatch, exporter_type
+):
+    """
+    A failure that lands after rows have been written (e.g. the dimension
+    limits) must not leave a downloadable partial workbook either: the
+    failure path deletes the partial file and clears the job's file
+    reference, exactly like the cancellation path.
+    """
+
+    if exporter_type == "xlsx":
+        monkeypatch.setattr(spreadsheet_table_exporter, "XLSX_MAX_ROWS", 2)
+    else:
+        monkeypatch.setattr(spreadsheet_table_exporter, "ODS_MAX_ROWS", 2)
+
+    user, table = make_table_with_rows(data_fixture, row_count=3)
+
+    with export_job(table, user, {"exporter_type": exporter_type}) as (
+        handler,
+        job,
+        storage_mock,
+        buffer,
+    ):
+        # The failure cleanup deletes through the handler's own storage
+        # import, so patch that name too.
+        with patch(
+            "jadawel.contrib.database.export.handler.get_default_storage",
+            return_value=storage_mock,
+        ):
+            with pytest.raises(Exception):
+                handler.run_export_job(job)
+
+    job.refresh_from_db()
+    assert job.state == EXPORT_JOB_FAILED_STATUS
+    assert "rows" in job.error
+    assert job.exported_file_name is None
+    assert storage_mock.delete.called
+    deleted_path = storage_mock.delete.call_args[0][0]
+    assert deleted_path.endswith(exporter_type)

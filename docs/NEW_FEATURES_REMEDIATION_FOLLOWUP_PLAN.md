@@ -1,7 +1,8 @@
 # New features remediation follow-up plan
 
-Status: **Phases 0-5 implemented and gated (see the implementation record below);
-Phase 6 partially evidenced; Phase 7 remains unauthorized**
+Status: **Phases 0-5 implemented; an independent Codex audit found residual gaps
+(fixed in the audit-repair commits — see the implementation record); Phase 6 is
+partially evidenced; Phase 7 remains unauthorized**
 
 Reviewed range: `f702ed8e1609e3a2deeeb61cf0a7917453a8a159..e8d90df921408cc24a2ec4e224276b410ac7e1f6`
 
@@ -291,48 +292,70 @@ the red result in the implementation record.
 
 ---
 
-## Implementation record (2026-09-14)
+## Implementation record (2026-09-14/15)
 
 Phases 0-5 landed on `new_features` as phase-sized commits on top of `e8d90df9`:
 `15480a15` (formula parity), `faf4cf9d` (menu accessibility),
 `b3c8879c` (export localization + cancel cleanup), `982afe31` (breakpoints),
 `98123e4a` (fork hygiene), `3da644f0`/`a19223bf`/`5faf71f9` (test + lint gate
-repairs), `a2844715` (utility category icon).
+repairs), `a2844715` (utility category icon), `686d38a4` (airtable priority
+expectations).
 
-## Gate evidence (run against commit `a2844715`)
+An independent Codex audit of the tree then found three correctness gaps and
+several record errors; the gaps were fixed in the audit-repair commits and the
+record corrected:
 
-| Gate                                                                                                                                                                                                 | Result                                                                                                                                                                                  |
-| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Backend focused suites (formula core 1278, formula full-group 970 incl. the 55-case shared parity matrix on both runtimes, import_export 155, export handler + limits 40, validator 81, airtable 25) | green                                                                                                                                                                                   |
-| Backend suite, chunked under xdist on a 2-CPU host (core 2213, database 3667, contrib-minus-database 1962, arabase + root 978)                                                                       | 8820 passed, 44 failed — every failure classified below                                                                                                                                 |
-| Frontend suite                                                                                                                                                                                       | 5040 passed, 4 skipped, 0 failed (was 7 failing at plan start)                                                                                                                          |
-| `ruff check` + `ruff format --check` (backend lint gate)                                                                                                                                             | clean (6 drifted files reformatted)                                                                                                                                                     |
-| ESLint, Stylelint, Prettier, breakpoint drift check (frontend lint gate)                                                                                                                             | clean                                                                                                                                                                                   |
-| `yarn locale:check`                                                                                                                                                                                  | 3853/3853 keys, 0 missing                                                                                                                                                               |
-| `pytest tests/arabase -q`                                                                                                                                                                            | 740 passed, 1 skipped                                                                                                                                                                   |
-| Forward migrations on a scratch PostgreSQL database                                                                                                                                                  | 500 migrations applied to head; template sync and Arabase post-migrate hooks clean. Rollback follows `docs/BACKUP_RESTORE.md` (dump + restore via the fork's `backup_database` tooling) |
+- import limit: `parseInt` prefix-parsed malformed values (`"999999abc"` became
+  a 999999 MB limit); now `Number()` + integer check with direct helper tests.
+- compact menu: activating a link inside an expanded submenu was swallowed by
+  the toggle-row exclusion; child links now close the panel and restore focus
+  (tests assert `document.activeElement` for child activation and that the
+  toggle label itself keeps the panel open).
+- export cleanup: only the cancellation path deleted the partial file; the
+  generic failure path now deletes it too, for both XLSX and ODS.
+- formula matrix: added an offset-bearing `to_datetime` case compared as a UTC
+  instant on both runtimes.
+- menu SCSS: the slide-in media query now uses the generated
+  `$device-smartphone-max-width` variable instead of a literal.
+- `PATCHES.md` and `PORT_MAP_FORMULAS.md` marked the removed `ServiceFile`/
+  `ensure_file` as such.
 
-### Explained backend failures (all reproduce on the pre-remediation base
+## Gate evidence (pre-audit functional gates ran through `a2844715`; the
 
-commit `e8d90df9` or are host-environment limits; none are caused by this
-remediation)
+airtable expectation fix `686d38a4` and the audit-repair commits above landed
+afterwards, and their own focused suites were re-run green on the final tree)
 
-- 30 × `advocate.exceptions.ConfigException: netifaces module was not
+| Gate | Result |
+| Backend focused suites (formula core 1278, formula full-group 970 incl. the shared parity matrix on both runtimes, import_export, export handler + limits 15, validator 81, airtable 25) | green. Post-audit focused re-runs on the final tree: parity 55+55 with the UTC-instant case, import-file helper 13, TableExcelImporter 11, compact-menu 25, export limits 15 |
+| Backend suite, chunked under xdist on a 2-CPU host (core 2213, database 3669, contrib-minus-database 1962, arabase + root 978) | 8822 passed, 41 failed — exact per-family classification below; every family reproduces on the base commit or is a host limit |
+| Frontend suite | 5040 passed, 4 skipped, 0 failed (was 7 failing at plan start) |
+| `ruff check` + `ruff format --check` (backend lint gate) | clean (6 drifted files reformatted) |
+| ESLint, Stylelint, Prettier, breakpoint drift check (frontend lint gate) | clean |
+| `yarn locale:check` | 3853/3853 keys, 0 missing |
+| `pytest tests/arabase -q` | 740 passed, 1 skipped |
+| Forward migrations on a scratch PostgreSQL database | 500 migrations applied to head; template sync and Arabase post-migrate hooks clean. Rollback follows `docs/BACKUP_RESTORE.md` (dump + restore via the fork's `backup_database` tooling) |
+
+### Explained backend failures
+
+41 total. Every family below reproduces on the pre-remediation base commit
+`e8d90df9` or is a host-environment limit; none are caused by this remediation.
+
+- 16 × `advocate.exceptions.ConfigException: netifaces module was not
 importable` — netifaces 0.11.0 does not compile against this host's musl +
   Python 3.14 toolchain (C-source incompatibility), so every SSRF-guard test
   around `advocate` (webhook URL validation, user-file-by-URL) errors before
   its assertions. Environment limit, not code.
-- 15 × data-sync PostgreSQL failures (`smallint out of range` and cascades) —
-  the `pgvector:pg16` test container does not satisfy the data-sync fixture's
-  schema assumptions. Environment limit, not code.
-- 6 × `KeyError: 'group_by_metadata'` in link-row/multiple-select/
-  multiple-collaborators list-rows tests — stale 2.2-era expectations: the
-  metadata is include-gated and the tests never pass `include=group_by_metadata`.
+- 15 × data-sync PostgreSQL failures (`smallint out of range` and cascades,
+  including two API-level cases) — the `pgvector:pg16` test container does not
+  satisfy the data-sync fixture's schema assumptions. Environment limit, not
+  code.
+- 8 × `KeyError: 'group_by_metadata'` / metadata-shape assertions in
+  link-row/multiple-select/multiple-collaborators list-rows tests — stale
+  2.2-era expectations: the metadata is include-gated and the tests never pass
+  `include=group_by_metadata`.
 - 1 × MCP SSE logging test hangs standalone (worker crash under xdist).
 - 1 × view-aggregations empty-count test passes in isolation; ordering
   pollution under xdist.
-- 2 × airtable import expectations missing the `priority` field added by the
-  grouped-grid feature — **fixed** in `3da644f0`.
 
 ### Not performed in this environment
 
