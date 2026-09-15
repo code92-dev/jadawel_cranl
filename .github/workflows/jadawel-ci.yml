@@ -188,10 +188,6 @@ jobs:
     timeout-minutes: 60
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "24"
-      - uses: extractions/setup-just@v3
       - name: Reclaim runner disk
         run: |
           # The E2E job builds both application images and installs two browser
@@ -200,6 +196,10 @@ jobs:
           sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
                       /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
           df -h /
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - uses: extractions/setup-just@v3
       - name: Install Playwright and Chromium/Firefox dependencies
         working-directory: e2e-tests
         run: |
