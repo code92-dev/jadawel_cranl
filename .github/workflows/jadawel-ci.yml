@@ -162,6 +162,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+      - name: Reclaim runner disk
+        run: |
+          # Both CI images together exceed the hosted runner's free disk once
+          # its unused mobile/.NET/Haskell toolchains are counted.
+          sudo rm -rf /usr/share/dotnet /usr/local/lib/android /opt/ghc \
+                      /usr/local/share/boost "$AGENT_TOOLSDIRECTORY"
+          df -h /
       - uses: docker/setup-buildx-action@v3
       - name: Build backend image (ci target)
         uses: docker/build-push-action@v6
