@@ -1,7 +1,7 @@
 .sidebar {
   @include absolute(0);
 
-  background-color: var(--jadawel-sidebar-background, #f3f8f5);
+  background-color: var(--jadawel-sidebar-background, #fafbfc);
   border-inline-end: solid 1px var(--jadawel-border-color, #e7e9ec);
   block-size: 100%;
   display: flex;
@@ -88,7 +88,7 @@
 
 .sidebar__user {
   border-block-start: solid 1px var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-sidebar-background, #f3f8f5);
+  background: var(--jadawel-sidebar-background, #fafbfc);
   padding-block-end: 8px;
   border-end-start-radius: $rounded-md;
   border-end-end-radius: $rounded-md;

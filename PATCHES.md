@@ -1508,3 +1508,28 @@ its dimension-limit exception now uses `gettext_lazy`, and the Arabic catalogue
 `backend/src/arabase/locale/ar/LC_MESSAGES/` supplies the translations (the `.mo`
 is committed; regenerate it after editing the `.po` — msgfmt is not installed in
 the image, compile per PATCHES conventions).
+
+## Phase — Apply the interface theme before the first paint (2026-09-16)
+
+**Context:** Two theme defects came from the same place: the document was themed
+after hydration instead of before the first paint. `head.js` declared
+`data-interface-theme="white"` as a static html attribute, and unhead re-applies
+every attribute it manages on hydration (`$el.getAttribute(k) !== v →
+setAttribute`), so it reset the attribute to `white` right after the client
+plugin had set the stored theme on it. The custom properties kept the stored
+palette while the `[data-interface-theme='white']` chrome rules kept applying, so
+a stored theme looked unapplied until the user re-picked it from the menu. And
+because SSR cannot read localStorage, the first frame painted in the stylesheet's
+own `var()` fallbacks — still the sage-derived greens — which is the green flash
+on every refresh.
+
+| File | Change | Reason | Merge risk |
+| ---- | ------ | ------ | ---------- |
+| `web-frontend/modules/core/head.js` | Drop the static `htmlAttrs['data-interface-theme']`; add an inline, synchronous head script that applies the stored theme | unhead must not own that attribute, and the theme has to be on the document before the body is parsed | low |
+| `web-frontend/modules/core/utils/interfaceThemes.js` | Extract `getInterfaceThemeVariables` / `INTERFACE_THEME_VARIABLES`; add `getInterfaceThemeBootScript` | One source for the custom properties, shared by the runtime apply and the pre-paint script, so the two cannot drift | low |
+| `web-frontend/modules/core/assets/scss/components/{layout,sidebar,card,dashboard}.scss` | Retarget the `var()` fallbacks for sidebar/content/raised/hover backgrounds from the sage-derived values to the white theme's | The fallbacks are what paints when the properties are unset; they were green | low |
+| `web-frontend/test/unit/core/{utils/interfaceThemes.spec.js,gridHeaderTheme.spec.js}` | Cover the boot script, assert the head never declares the attribute, and scan every `var()` fallback against the default theme | Both defects are regressions a unit test can hold; the fallback scan is what keeps green from creeping back in | low |
+
+The client plugin `plugins/interfaceTheme.client.js` stays. It is now a
+correction rather than the primary path: it repairs storage that names a removed
+theme, and still applies the theme if the head script could not run.

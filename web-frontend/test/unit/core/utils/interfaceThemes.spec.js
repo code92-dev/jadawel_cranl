@@ -1,7 +1,10 @@
+import head from '@jadawel/modules/core/head'
 import {
   applyInterfaceTheme,
   DEFAULT_INTERFACE_THEME,
+  getInterfaceThemeBootScript,
   getInterfaceThemeSurfaces,
+  getInterfaceThemeVariables,
   initializeInterfaceTheme,
   INTERFACE_THEMES,
   INTERFACE_THEME_STORAGE_KEY,
@@ -143,5 +146,71 @@ describe('interface themes', () => {
       INTERFACE_THEME_STORAGE_KEY,
       'white'
     )
+  })
+})
+
+describe('interface theme boot script', () => {
+  /** Runs the head script against a throwaway document-like environment. */
+  const boot = (stored) => {
+    const root = document.createElement('div')
+    const setProperty = vi.fn((name, value) =>
+      root.style.setProperty(name, value)
+    )
+    const context = {
+      document: {
+        documentElement: {
+          style: { setProperty },
+          setAttribute: (name, value) => root.setAttribute(name, value),
+        },
+      },
+      window: {
+        localStorage: {
+          getItem: () => stored,
+        },
+      },
+    }
+
+    new Function('document', 'window', getInterfaceThemeBootScript())(
+      context.document,
+      context.window
+    )
+    return root
+  }
+
+  test('paints the stored theme and its attribute together', () => {
+    const root = boot('blue')
+    const blue = INTERFACE_THEMES.find(({ id }) => id === 'blue')
+
+    expect(root.getAttribute('data-interface-theme')).toBe('blue')
+    Object.entries(getInterfaceThemeVariables(blue)).forEach(
+      ([property, color]) => {
+        expect(root.style.getPropertyValue(property)).toBe(color)
+      }
+    )
+  })
+
+  test('falls back to the default for missing and unknown selections', () => {
+    expect(boot(null).getAttribute('data-interface-theme')).toBe(
+      DEFAULT_INTERFACE_THEME
+    )
+    expect(boot('removed-theme').getAttribute('data-interface-theme')).toBe(
+      DEFAULT_INTERFACE_THEME
+    )
+  })
+
+  test('the head ships it inline so nothing paints before it runs', () => {
+    const tag = head.script.find(({ key }) => key === 'interface-theme')
+
+    expect(tag.tagPosition).toBe('head')
+    expect(tag.innerHTML).toBe(getInterfaceThemeBootScript())
+    expect(tag.src).toBeUndefined()
+    expect(tag.innerHTML).not.toContain('</script')
+  })
+
+  test('the static head never declares the theme attribute', () => {
+    // unhead re-applies the attributes it manages on hydration, so declaring
+    // this one would reset the document to the default theme while the custom
+    // properties kept the stored one.
+    expect(head.htmlAttrs?.['data-interface-theme']).toBeUndefined()
   })
 })

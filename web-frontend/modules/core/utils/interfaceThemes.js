@@ -145,6 +145,25 @@ export const getInterfaceThemeSurfaces = (colors, overrides = {}) => ({
   ...overrides,
 })
 
+/**
+ * Every custom property a theme sets, as one flat map. Both the runtime
+ * `applyInterfaceTheme` and the pre-paint boot script read this, so the two
+ * cannot drift apart and repaint the document differently.
+ */
+export const getInterfaceThemeVariables = (theme) => ({
+  ...Object.fromEntries(
+    Object.entries(theme.colors).map(([step, color]) => [
+      `--jadawel-primary-${step}`,
+      color,
+    ])
+  ),
+  ...getInterfaceThemeSurfaces(theme.colors, theme.surfaces),
+})
+
+export const INTERFACE_THEME_VARIABLES = Object.fromEntries(
+  INTERFACE_THEMES.map((theme) => [theme.id, getInterfaceThemeVariables(theme)])
+)
+
 export const applyInterfaceTheme = (
   themeId,
   root = globalThis.document?.documentElement
@@ -156,20 +175,42 @@ export const applyInterfaceTheme = (
     return theme.id
   }
 
-  Object.entries(theme.colors).forEach(([step, color]) => {
-    root.style.setProperty(`--jadawel-primary-${step}`, color)
-  })
-  Object.entries(
-    getInterfaceThemeSurfaces(theme.colors, theme.surfaces)
-  ).forEach(([property, color]) => root.style.setProperty(property, color))
+  Object.entries(getInterfaceThemeVariables(theme)).forEach(
+    ([property, color]) => root.style.setProperty(property, color)
+  )
   root.dataset.interfaceTheme = theme.id
 
   return theme.id
 }
 
 /**
- * Restores the stored theme before the application mounts. The server-rendered
- * document starts with the white default because SSR cannot read localStorage.
+ * The theme has to be on the document before the first paint, and it has to be
+ * the *stored* one. SSR cannot read localStorage, so a server-rendered default
+ * plus a client plugin means one painted frame in the wrong colours — the green
+ * flash on every refresh. This returns a tiny synchronous script for the head:
+ * it runs before the body is parsed, so the first frame is already themed.
+ *
+ * It is also the only thing that sets `data-interface-theme`. Declaring that
+ * attribute in the static head instead would hand it to unhead, which re-applies
+ * its own value on hydration and would reset the attribute to the default while
+ * the custom properties stayed on the stored theme — chrome styled for one theme
+ * painted in the colours of another, until the user re-picked from the menu.
+ */
+export const getInterfaceThemeBootScript = () =>
+  `(function(){var v=${JSON.stringify(INTERFACE_THEME_VARIABLES)};` +
+  `var d=${JSON.stringify(DEFAULT_INTERFACE_THEME)},t=d;` +
+  `try{var s=window.localStorage.getItem(${JSON.stringify(
+    INTERFACE_THEME_STORAGE_KEY
+  )});if(s&&v[s]){t=s}}catch(e){}` +
+  `var r=document.documentElement,p=v[t]||v[d];` +
+  `for(var n in p){r.style.setProperty(n,p[n])}` +
+  `r.setAttribute('data-interface-theme',t)})()`
+
+/**
+ * Re-applies the stored theme once the application boots, and repairs storage
+ * that names a theme which no longer exists. The head script has normally
+ * painted the same theme already; this keeps the picker, storage and document
+ * agreeing even when that script could not run.
  */
 export const initializeInterfaceTheme = (
   storage = globalThis.localStorage,

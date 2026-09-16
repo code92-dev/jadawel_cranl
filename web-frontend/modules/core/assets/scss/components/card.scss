@@ -16,7 +16,7 @@
 // margin-top, margin-bottom, padding-top, padding-bottom, height, line-height, etc
 .card {
   position: relative;
-  background-color: var(--jadawel-raised-background, #fbfdfb);
+  background-color: var(--jadawel-raised-background, #fff);
   border: solid 1px var(--jadawel-border-color, #e7e9ec);
 
   @include elevation($elevation-low);

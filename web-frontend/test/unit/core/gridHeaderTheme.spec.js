@@ -1,4 +1,10 @@
-import { readFileSync } from 'node:fs'
+import { globSync, readFileSync } from 'node:fs'
+
+import {
+  DEFAULT_INTERFACE_THEME,
+  getInterfaceThemeVariables,
+  INTERFACE_THEMES,
+} from '@jadawel/modules/core/utils/interfaceThemes'
 
 const gridStyles = readFileSync(
   'modules/core/assets/scss/components/views/grid.scss',
@@ -36,6 +42,8 @@ describe('interface theme styling', () => {
     )?.groups.rules
 
     expect(columnRules).toBeDefined()
+    // The fallbacks are the white theme's, because white is the default one
+    // the document falls back to when the custom properties are not set.
     expect(columnRules).toMatch(
       /background-color:\s*var\(--jadawel-header-background,\s*#f5f6f7\)/
     )
@@ -106,6 +114,80 @@ describe('interface theme styling', () => {
     expect(buttonStyles).toMatch(/\$background-active:\s*\$color-primary-700,/)
     expect(buttonStyles).not.toMatch(
       /\$(?:button-primary|background-hover|background-active):\s*\$palette-brand-/
+    )
+  })
+})
+
+describe('interface theme fallbacks', () => {
+  test('every var() fallback is the default theme, so nothing paints green', () => {
+    // These fallbacks are what a document shows when the custom properties are
+    // not set. They were derived from the sage palette, so any frame that got
+    // painted before the theme was applied came up green.
+    const defaults = getInterfaceThemeVariables(
+      INTERFACE_THEMES.find(({ id }) => id === DEFAULT_INTERFACE_THEME)
+    )
+    const expand = (hex) =>
+      hex.length === 4
+        ? `#${hex[1]}${hex[1]}${hex[2]}${hex[2]}${hex[3]}${hex[3]}`
+        : hex
+
+    const files = globSync('modules/**/*.{scss,vue}', {
+      exclude: (name) => name === 'node_modules',
+    })
+    const seen = []
+
+    files.forEach((file) => {
+      const source = readFileSync(file, 'utf8')
+      for (const [, property, fallback] of source.matchAll(
+        /var\((--jadawel-[a-z0-9-]+),\s*(#[0-9a-fA-F]{3,8})\)/g
+      )) {
+        seen.push(property)
+        expect({
+          file,
+          property,
+          fallback: expand(fallback.toLowerCase()),
+        }).toEqual({
+          file,
+          property,
+          fallback: expand(defaults[property]?.toLowerCase()),
+        })
+      }
+    })
+
+    expect(seen.length).toBeGreaterThan(0)
+  })
+})
+
+describe('default avatar color', () => {
+  const avatarStyles = readFileSync(
+    'modules/core/assets/scss/components/avatar.scss',
+    'utf8'
+  )
+
+  test('the default avatar follows the theme instead of the brand green', () => {
+    // `blue` is the Avatar component's default, so it is what the settings
+    // modal, sidebar and member lists render. Pinned to the raw brand scale it
+    // stayed green under every other interface theme.
+    const rules = avatarStyles.match(/\.avatar--blue \{(?<rules>[^}]*)\}/s)
+      ?.groups.rules
+
+    expect(rules).toBeDefined()
+    expect(rules).toMatch(/background:\s*\$color-primary-500/)
+    expect(rules).not.toMatch(/\$palette-brand-/)
+  })
+
+  test('the named avatar colors stay fixed', () => {
+    // These are chosen explicitly (`color="red"`), so they must not drift with
+    // the theme the way the default one now does.
+    ;['cyan', 'green', 'yellow', 'red', 'magenta', 'purple', 'neutral'].forEach(
+      (name) => {
+        const rules = avatarStyles.match(
+          new RegExp(`\\.avatar--${name} \\{(?<rules>[^}]*)\\}`, 's')
+        )?.groups.rules
+
+        expect(rules).toBeDefined()
+        expect(rules).not.toMatch(/\$color-primary-/)
+      }
     )
   })
 })

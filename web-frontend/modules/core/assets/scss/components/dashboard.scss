@@ -127,7 +127,7 @@
   @include rounded($rounded-md);
 
   &:hover {
-    background: var(--jadawel-hover-background, #f7fbf8);
+    background: var(--jadawel-hover-background, #f0f2f4);
 
     .dashboard__application-more-button {
       display: block;
@@ -152,7 +152,7 @@
 .dashboard__application-icon {
   display: flex;
   border: 1px solid var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-raised-background, #fbfdfb);
+  background: var(--jadawel-raised-background, #fff);
   inline-size: 40px;
   block-size: 40px;
   flex: 0 0 40px;
@@ -259,7 +259,7 @@
 
 .dashboard__resource {
   border: 1px solid var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-raised-background, #fbfdfb);
+  background: var(--jadawel-raised-background, #fff);
   padding: 9px 12px;
   text-decoration: none;
   display: flex;
@@ -269,7 +269,7 @@
   &:hover {
     text-decoration: none;
     border-color: $palette-neutral-400;
-    background: var(--jadawel-hover-background, #f7fbf8);
+    background: var(--jadawel-hover-background, #f0f2f4);
   }
 }
 
@@ -366,7 +366,7 @@
 }
 
 .dashboard__stat-tile {
-  background: var(--jadawel-raised-background, #fbfdfb);
+  background: var(--jadawel-raised-background, #fff);
   padding: 12px 14px;
 
   @include rounded($rounded-md);
@@ -393,7 +393,7 @@
 
 .chart {
   border: 1px solid var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-raised-background, #fbfdfb);
+  background: var(--jadawel-raised-background, #fff);
   padding: 14px 16px;
   min-inline-size: 0;
 
@@ -569,7 +569,7 @@
   display: flex;
   flex-direction: column;
   border: 1px solid var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-raised-background, #fbfdfb);
+  background: var(--jadawel-raised-background, #fff);
   padding: 14px;
   cursor: pointer;
   text-decoration: none;
@@ -579,7 +579,7 @@
   &:hover {
     text-decoration: none;
     border-color: $palette-neutral-400;
-    background: var(--jadawel-hover-background, #f7fbf8);
+    background: var(--jadawel-hover-background, #f0f2f4);
   }
 }
 

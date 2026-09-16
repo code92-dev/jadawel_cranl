@@ -1,11 +1,8 @@
+import { getInterfaceThemeBootScript } from './utils/interfaceThemes'
+
 export default {
   title: 'جداول',
   titleTemplate: '%s | جداول',
-  // SSR has no access to localStorage. Render the default theme immediately so
-  // the old green fallbacks never paint while the client restores a selection.
-  htmlAttrs: {
-    'data-interface-theme': 'white',
-  },
   meta: [
     { charset: 'utf-8' },
     {
@@ -16,6 +13,18 @@ export default {
     {
       name: 'format-detection',
       content: 'telephone=no, email=no, address=no, date=no',
+    },
+  ],
+  // Applies the stored interface theme to the document before the first paint.
+  // SSR has no access to localStorage, so without this the page paints once in
+  // the stylesheet's own fallback colours — the green flash on every refresh —
+  // before a client plugin can correct it. Inline and synchronous on purpose:
+  // it has to finish before the body is parsed.
+  script: [
+    {
+      key: 'interface-theme',
+      tagPosition: 'head',
+      innerHTML: getInterfaceThemeBootScript(),
     },
   ],
   // The `key` on each favicon is what allows other parts of the app (e.g. the

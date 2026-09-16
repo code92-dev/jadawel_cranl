@@ -62,8 +62,13 @@
   @include rounded($rounded-3xl);
 }
 
+// The Avatar component's default colour, and the only one nothing in the
+// product asks for by name — every explicit avatar picks yellow, red, cyan or
+// neutral. It is therefore the accent avatar, not a blue one, so it follows the
+// selected interface theme through `$color-primary-500` rather than pinning the
+// brand green the way the genuinely named colours below do.
 .avatar--blue {
-  background: $palette-brand-500;
+  background: $color-primary-500;
 }
 
 .avatar--cyan {
