@@ -37,10 +37,10 @@ describe('interface theme styling', () => {
 
     expect(columnRules).toBeDefined()
     expect(columnRules).toMatch(
-      /background-color:\s*var\(--jadawel-header-background,\s*#f0f7f3\)/
+      /background-color:\s*var\(--jadawel-header-background,\s*#f5f6f7\)/
     )
     expect(columnRules).toMatch(
-      /border-inline-end-color:\s*var\(--jadawel-border-color,\s*#cfe8d9\)/
+      /border-inline-end-color:\s*var\(--jadawel-border-color,\s*#e7e9ec\)/
     )
     expect(columnRules).not.toMatch(
       /(?:background-color|border-inline-end-color):\s*\$palette-neutral-/
