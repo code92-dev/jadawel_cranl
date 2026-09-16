@@ -17,9 +17,14 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-10 from commit f8bc73de, tag 2.3.6-billing-orgs-bundled.
-# Bundles the billing and organization Python packages, migrations, and Nuxt
-# modules. The 2.3.5 image omitted these standalone plugins.
+# Published 2026-09-16 from commit afbcc369, tag 2.3.7-white-theme-20260916.
+# Aligns the white-theme workspace chrome and carries the fully validated
+# current main revision.
+# Previous deployment pin (2.3.6-billing-orgs-bundled):
+# sha256:120dfcc493bed6435b499f7128d9c076817ae1aacd7701bce245116c7abc2533.
+#
+# 2.3.6-billing-orgs-bundled added the billing and organization Python packages,
+# migrations, and Nuxt modules. The 2.3.5 image omitted these standalone plugins.
 # Previous image pin (2.3.5-billing-orgs, incomplete plugin packaging):
 # sha256:8e865d52238db1e1f1abbb794e26f6dd0023b5e848653e035da10775a9194d53.
 # Previous deployment pin (2.3.4-kanban-grouping-dropdown):
@@ -206,7 +211,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:120dfcc493bed6435b499f7128d9c076817ae1aacd7701bce245116c7abc2533
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:1f89d8fe78f43f86c5ce987c7445f394d6db5b8de2925df4d49a604d406a5ec4
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
