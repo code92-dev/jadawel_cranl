@@ -2,7 +2,7 @@
   @include absolute(0);
 
   background-color: var(--jadawel-sidebar-background, #f3f8f5);
-  border-inline-end: solid 1px var(--jadawel-border-color, #e0f1e7);
+  border-inline-end: solid 1px var(--jadawel-border-color, #e7e9ec);
   block-size: 100%;
   display: flex;
   flex-direction: column;
@@ -13,7 +13,7 @@
   flex: 0 0;
 
   &:not(:last-child) {
-    border-block-end: solid 1px var(--jadawel-border-color, #e0f1e7);
+    border-block-end: solid 1px var(--jadawel-border-color, #e7e9ec);
   }
 
   &.sidebar__section--scrollable {
@@ -61,6 +61,16 @@
   }
 }
 
+[data-interface-theme='white'] .sidebar__workspaces-selector {
+  color: $palette-neutral-1200;
+  background-color: var(--jadawel-header-background, #f5f6f7);
+  border-block-end-color: var(--jadawel-border-color, #e7e9ec);
+
+  .avatar {
+    background: rgba($palette-neutral-1300, 0.08);
+  }
+}
+
 .sidebar__workspaces-selector-selected-workspace {
   @extend %ellipsis;
 
@@ -70,10 +80,14 @@
 .sidebar__workspaces-selector-icon {
   font-size: 18px;
   color: rgba($white, 0.7);
+
+  [data-interface-theme='white'] & {
+    color: rgba($palette-neutral-1200, 0.55);
+  }
 }
 
 .sidebar__user {
-  border-block-start: solid 1px var(--jadawel-border-color, #e0f1e7);
+  border-block-start: solid 1px var(--jadawel-border-color, #e7e9ec);
   background: var(--jadawel-sidebar-background, #f3f8f5);
   padding-block-end: 8px;
   border-end-start-radius: $rounded-md;
@@ -107,7 +121,7 @@
 }
 
 .sidebar__new-wrapper--separator {
-  border-block-start: solid 1px var(--jadawel-border-color, #e0f1e7);
+  border-block-start: solid 1px var(--jadawel-border-color, #e7e9ec);
 }
 
 .sidebar__new {
@@ -139,6 +153,10 @@
   border-radius: 100%;
   background-color: $white;
   margin-inline-start: 4px;
+
+  [data-interface-theme='white'] & {
+    background-color: $color-primary-500;
+  }
 }
 
 .sidebar__impersonate {
@@ -175,7 +193,7 @@
 .sidebar__foot-separator {
   inline-size: 1px;
   block-size: 16px;
-  background-color: var(--jadawel-border-color, #e0f1e7);
+  background-color: var(--jadawel-border-color, #e7e9ec);
 
   .sidebar--collapsed & {
     inline-size: 16px;
@@ -251,7 +269,7 @@
 .sidebar__head {
   @include flex-align-items(15px);
 
-  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-block-end: 1px solid var(--jadawel-border-color, #e7e9ec);
   padding: 0 21px;
   block-size: 51px;
   color: $palette-neutral-1200;

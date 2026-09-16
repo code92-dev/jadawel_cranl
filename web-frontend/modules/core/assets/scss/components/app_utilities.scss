@@ -53,6 +53,22 @@
   }
 }
 
+// The white theme also gives table and application pages a light header, so
+// their utility controls need the same dark treatment as the workspace home.
+[data-interface-theme='white'] .app-utilities__item {
+  color: $palette-neutral-800;
+
+  &:hover {
+    color: $palette-neutral-1200;
+    background-color: rgba($palette-neutral-1300, 0.04);
+  }
+
+  &.app-utilities__item--active {
+    color: var(--jadawel-primary-500, #69717d);
+    background-color: var(--jadawel-primary-100, #fff);
+  }
+}
+
 // Workspace home deliberately keeps its header white. The utilities occupy
 // that header's end-side band, so they return to their normal dark treatment
 // there while remaining white on table and builder top bars.
@@ -65,8 +81,8 @@
   }
 
   &.app-utilities__item--active {
-    color: $color-primary-500;
-    background-color: $color-primary-100;
+    color: var(--jadawel-primary-500, #69717d);
+    background-color: var(--jadawel-primary-100, #fff);
   }
 }
 

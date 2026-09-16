@@ -8,7 +8,7 @@ html {
 }
 
 body {
-  background-color: var(--jadawel-app-background, #f5faf7);
+  background-color: var(--jadawel-app-background, #f5f6f7);
 
   // A faint theme-aware grid behind the app surface. `.layout__col-2-scroll` is
   // transparent unless a page opts into `--white-background`, so this shows
@@ -18,13 +18,13 @@ body {
   background-image:
     linear-gradient(
       to right,
-      color-mix(in srgb, var(--jadawel-border-color, #e0f1e7) 48%, transparent)
+      color-mix(in srgb, var(--jadawel-border-color, #e7e9ec) 48%, transparent)
         1px,
       transparent 1px
     ),
     linear-gradient(
       to bottom,
-      color-mix(in srgb, var(--jadawel-border-color, #e0f1e7) 48%, transparent)
+      color-mix(in srgb, var(--jadawel-border-color, #e7e9ec) 48%, transparent)
         1px,
       transparent 1px
     );

@@ -2,7 +2,9 @@ import {
   applyInterfaceTheme,
   DEFAULT_INTERFACE_THEME,
   getInterfaceThemeSurfaces,
+  initializeInterfaceTheme,
   INTERFACE_THEMES,
+  INTERFACE_THEME_STORAGE_KEY,
   mixWithWhite,
 } from '@jadawel/modules/core/utils/interfaceThemes'
 
@@ -85,8 +87,8 @@ describe('interface themes', () => {
     INTERFACE_THEMES.forEach((theme) => {
       const surfaces = getInterfaceThemeSurfaces(theme.colors, theme.surfaces)
 
-      expect(surfaces['--jadawel-app-background']).not.toBe(
-        surfaces['--jadawel-header-background']
+      expect(surfaces['--jadawel-header-background']).not.toBe(
+        surfaces['--jadawel-content-background']
       )
       expect(
         contrast(surfaces['--jadawel-border-color'], '#ffffff')
@@ -98,6 +100,7 @@ describe('interface themes', () => {
     const white = INTERFACE_THEMES.find(({ id }) => id === 'white')
     const surfaces = getInterfaceThemeSurfaces(white.colors, white.surfaces)
 
+    expect(surfaces['--jadawel-header-background']).toBe('#f5f6f7')
     expect(surfaces['--jadawel-border-color']).toBe('#e7e9ec')
     // The overrides must not drop the neutral table canvas the derivation sets.
     expect(surfaces['--jadawel-grid-surface']).toBe('#ffffff')
@@ -113,11 +116,32 @@ describe('interface themes', () => {
     expect(root.dataset.interfaceTheme).toBe('white')
     expect(root.style.getPropertyValue('--jadawel-primary-500')).toBe('#69717d')
     expect(root.style.getPropertyValue('--jadawel-header-background')).toBe(
-      '#ffffff'
+      '#f5f6f7'
     )
     expect(root.style.getPropertyValue('--jadawel-grid-surface')).toBe(
       '#ffffff'
     )
     expect(root.style.getPropertyValue('--jadawel-grid-line')).toBe('#e5e7eb')
+  })
+
+  test('restores a stored theme before mount and repairs an unknown id', () => {
+    const root = document.createElement('div')
+    const storage = {
+      getItem: vi.fn(() => 'blue'),
+      setItem: vi.fn(),
+    }
+
+    expect(initializeInterfaceTheme(storage, root)).toBe('blue')
+    expect(root.dataset.interfaceTheme).toBe('blue')
+    expect(root.style.getPropertyValue('--jadawel-primary-500')).toBe('#275d9f')
+    expect(storage.setItem).not.toHaveBeenCalled()
+
+    storage.getItem.mockReturnValue('removed-theme')
+    expect(initializeInterfaceTheme(storage, root)).toBe('white')
+    expect(root.dataset.interfaceTheme).toBe('white')
+    expect(storage.setItem).toHaveBeenCalledWith(
+      INTERFACE_THEME_STORAGE_KEY,
+      'white'
+    )
   })
 })

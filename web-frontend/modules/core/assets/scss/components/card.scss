@@ -17,7 +17,7 @@
 .card {
   position: relative;
   background-color: var(--jadawel-raised-background, #fbfdfb);
-  border: solid 1px var(--jadawel-border-color, #e0f1e7);
+  border: solid 1px var(--jadawel-border-color, #e7e9ec);
 
   @include elevation($elevation-low);
   @include rounded($rounded-md);

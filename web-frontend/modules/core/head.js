@@ -1,6 +1,11 @@
 export default {
   title: 'جداول',
   titleTemplate: '%s | جداول',
+  // SSR has no access to localStorage. Render the default theme immediately so
+  // the old green fallbacks never paint while the client restores a selection.
+  htmlAttrs: {
+    'data-interface-theme': 'white',
+  },
   meta: [
     { charset: 'utf-8' },
     {

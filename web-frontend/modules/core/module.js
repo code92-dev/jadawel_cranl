@@ -107,6 +107,9 @@ export default defineNuxtModule({
       'login'
     )
 
+    // Restore the interface theme before Vue mounts. The SSR document starts
+    // with the white default and this replaces it with any stored selection.
+    addPlugin(resolve('plugins/interfaceTheme.client.js'))
     addPlugin(resolve('plugins/store.js'))
     addPlugin(resolve('plugins/errorHandler.js'))
     addPlugin(resolve('plugins/filters.js'))

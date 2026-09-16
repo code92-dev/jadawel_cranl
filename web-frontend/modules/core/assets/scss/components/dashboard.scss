@@ -23,7 +23,7 @@
   // Jadawel: same reservation as `.layout__col-2-1`; this page has its own,
   // taller header rather than the shared one.
   padding-inline-end: $app-utilities-band;
-  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-block-end: 1px solid var(--jadawel-border-color, #e7e9ec);
   display: flex;
   gap: 15px;
   align-items: center;
@@ -32,6 +32,10 @@
   z-index: 1;
   block-size: 74px;
   inline-size: 100%;
+
+  [data-interface-theme='white'] & {
+    background: var(--jadawel-header-background, #f5f6f7);
+  }
 }
 
 .dashboard__header-left {
@@ -147,7 +151,7 @@
 
 .dashboard__application-icon {
   display: flex;
-  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border: 1px solid var(--jadawel-border-color, #e7e9ec);
   background: var(--jadawel-raised-background, #fbfdfb);
   inline-size: 40px;
   block-size: 40px;
@@ -190,7 +194,7 @@
 
 .dashboard__application-separator {
   block-size: 1px;
-  background: var(--jadawel-border-color, #e0f1e7);
+  background: var(--jadawel-border-color, #e7e9ec);
   inline-size: calc(100% - 65px);
   margin-block: 6px;
   margin-inline: auto 0;
@@ -254,7 +258,7 @@
 }
 
 .dashboard__resource {
-  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border: 1px solid var(--jadawel-border-color, #e7e9ec);
   background: var(--jadawel-raised-background, #fbfdfb);
   padding: 9px 12px;
   text-decoration: none;
@@ -388,7 +392,7 @@
 }
 
 .chart {
-  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border: 1px solid var(--jadawel-border-color, #e7e9ec);
   background: var(--jadawel-raised-background, #fbfdfb);
   padding: 14px 16px;
   min-inline-size: 0;
@@ -564,7 +568,7 @@
 .dashboard__template-card {
   display: flex;
   flex-direction: column;
-  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border: 1px solid var(--jadawel-border-color, #e7e9ec);
   background: var(--jadawel-raised-background, #fbfdfb);
   padding: 14px;
   cursor: pointer;

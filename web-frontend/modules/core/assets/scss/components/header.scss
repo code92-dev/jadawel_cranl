@@ -188,6 +188,10 @@
   color: $white;
   font-size: 16px;
 
+  [data-interface-theme='white'] & {
+    color: $palette-neutral-900;
+  }
+
   &:not(:last-child) {
     margin-inline-end: 4px;
   }
@@ -199,10 +203,18 @@
   &.header-filter-icon--view {
     color: $white;
     font-size: 18px;
+
+    [data-interface-theme='white'] & {
+      color: $palette-neutral-900;
+    }
   }
 
   &.header-filter-icon--no-choice {
     color: rgba($white, 0.48);
+
+    [data-interface-theme='white'] & {
+      color: rgba($palette-neutral-1200, 0.55);
+    }
   }
 
   .header__filter-link.active & {
@@ -214,6 +226,10 @@
 // its glyph cannot inherit a dark view-type colour on the solid selected bar.
 .header__filter-icon.jadawel-icon-more-vertical {
   color: $white;
+
+  [data-interface-theme='white'] & {
+    color: $palette-neutral-900;
+  }
 }
 
 .header__filter-error-icon {
@@ -224,6 +240,10 @@
   margin-inline: 6px -2px;
   font-size: 14px;
   color: rgba($white, 0.7);
+
+  [data-interface-theme='white'] & {
+    color: rgba($palette-neutral-1200, 0.55);
+  }
 }
 
 .header__info {
@@ -290,4 +310,52 @@
   justify-content: center;
   gap: 12px;
   padding-inline-end: 24px;
+}
+
+// The white interface theme uses a light neutral top bar on both application
+// and table pages. Keep the foreground treatment here in sync so controls do
+// not retain the white-on-colour styling used by the other themes.
+[data-interface-theme='white'] {
+  .header {
+    background-color: var(--jadawel-header-background, #f5f6f7);
+    border-block-end-color: var(--jadawel-border-color, #e7e9ec);
+    color: $palette-neutral-1200;
+  }
+
+  .header__undo-redo a {
+    color: rgba($palette-neutral-1200, 0.48);
+
+    &.active {
+      color: rgba($palette-neutral-1200, 0.82);
+
+      &:hover {
+        color: $palette-neutral-1200;
+      }
+    }
+  }
+
+  .header__filter-link {
+    color: $palette-neutral-1000;
+
+    &:hover {
+      background-color: rgba($palette-neutral-1300, 0.06);
+    }
+
+    &.active {
+      color: $palette-neutral-1200;
+    }
+
+    &.active--primary {
+      color: $palette-neutral-1200;
+      background-color: rgba($palette-neutral-1300, 0.08);
+    }
+  }
+
+  .header__info li {
+    border-inline-end-color: rgba($palette-neutral-1300, 0.16);
+  }
+
+  .header__buttons--with-separator {
+    border-inline-start-color: rgba($palette-neutral-1300, 0.16);
+  }
 }

@@ -25,7 +25,7 @@ export const INTERFACE_THEMES = [
     // its surfaces rather than derive them, stepping down its own neutrals.
     surfaces: {
       '--jadawel-app-background': '#f5f6f7',
-      '--jadawel-header-background': '#ffffff',
+      '--jadawel-header-background': '#f5f6f7',
       '--jadawel-sidebar-background': '#fafbfc',
       '--jadawel-content-background': '#ffffff',
       '--jadawel-raised-background': '#ffffff',
@@ -165,4 +165,24 @@ export const applyInterfaceTheme = (
   root.dataset.interfaceTheme = theme.id
 
   return theme.id
+}
+
+/**
+ * Restores the stored theme before the application mounts. The server-rendered
+ * document starts with the white default because SSR cannot read localStorage.
+ */
+export const initializeInterfaceTheme = (
+  storage = globalThis.localStorage,
+  root = globalThis.document?.documentElement
+) => {
+  const stored = storage?.getItem(INTERFACE_THEME_STORAGE_KEY)
+  const activeTheme = applyInterfaceTheme(stored, root)
+
+  // Replace removed or unknown theme ids with the resolved default so the
+  // picker, storage and document cannot disagree on subsequent page loads.
+  if (storage && stored !== activeTheme) {
+    storage.setItem(INTERFACE_THEME_STORAGE_KEY, activeTheme)
+  }
+
+  return activeTheme
 }

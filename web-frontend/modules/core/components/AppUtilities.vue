@@ -179,6 +179,7 @@ import Context from '@jadawel/modules/core/components/Context'
 import {
   applyInterfaceTheme,
   DEFAULT_INTERFACE_THEME,
+  initializeInterfaceTheme,
   INTERFACE_THEMES,
   INTERFACE_THEME_STORAGE_KEY,
 } from '@jadawel/modules/core/utils/interfaceThemes'
@@ -225,14 +226,7 @@ export default {
     }),
   },
   mounted() {
-    const stored = localStorage.getItem(INTERFACE_THEME_STORAGE_KEY)
-    this.activeTheme = applyInterfaceTheme(stored)
-    // `applyInterfaceTheme` falls back to the default when the stored id no
-    // longer names a theme, but the dead id stayed in storage — so every load
-    // resolved it again, and the picker and storage disagreed for ever.
-    if (stored !== this.activeTheme) {
-      localStorage.setItem(INTERFACE_THEME_STORAGE_KEY, this.activeTheme)
-    }
+    this.activeTheme = initializeInterfaceTheme()
   },
   methods: {
     selectTheme(themeId) {

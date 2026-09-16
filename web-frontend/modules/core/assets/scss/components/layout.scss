@@ -37,7 +37,7 @@
   // Jadawel: logical inset so col-2 sits after the sidebar in both LTR and RTL.
   inset-block: 0;
   inset-inline: 240px 0;
-  background-color: var(--jadawel-app-background, #f5faf7);
+  background-color: var(--jadawel-app-background, #f5f6f7);
 }
 
 .layout__col-2-scroll {
@@ -67,7 +67,7 @@
   position: absolute;
   z-index: $z-index-layout-col-3-2;
   inset: 51px 0 0;
-  background-color: var(--jadawel-app-background, #f5faf7);
+  background-color: var(--jadawel-app-background, #f5f6f7);
 }
 
 .layout__col-3 {
