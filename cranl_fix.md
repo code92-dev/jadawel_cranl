@@ -103,10 +103,16 @@ container.
 port, and Nitro reads `PORT` to decide where to listen — so the frontend kept
 trying to take Caddy's socket.
 
-**Fix:** set `PORT=3000` explicitly in the environment. `NITRO_PORT=3000` and
-`JADAWEL_WEB_FRONTEND_PORT=3000` alone did **not** win; `PORT` overrides them.
-A runtime env var set on the app beats CranL's injected one, which is why this
-works and why it cannot be baked into the image instead.
+**Current fix:** the root deployment `Dockerfile` adds
+`environment=PORT="3000"` only to Supervisor's web-frontend program. CranL now
+filters attempts to persist a user-defined `PORT`, so the old dashboard
+workaround below no longer survives an environment refresh. `NITRO_PORT=3000`
+and `JADAWEL_WEB_FRONTEND_PORT=3000` alone do **not** win because Nitro gives
+`PORT` precedence.
+
+Historically, setting `PORT=3000` explicitly in the dashboard worked because a
+runtime app variable beat CranL's injected `PORT=80`. The Supervisor override
+is stronger and scoped: Nitro receives 3000, while Caddy still owns `:80`.
 
 This is the failure most likely to recur, because it comes back the moment
 `PORT` is cleared or the app is recreated.
@@ -202,7 +208,7 @@ URLs in `JADAWEL_PUBLIC_URL`.
 
 | Variable | Value | Why |
 |---|---|---|
-| `PORT` | `3000` | **Critical.** Overrides CranL's injected `PORT=80`, which otherwise makes Nuxt fight Caddy for the socket (§4). |
+| `PORT` | **Do not add in CranL** | The root deployment `Dockerfile` now scopes `PORT=3000` to the web-frontend process because CranL filters the reserved key. Without that image-layer override, Nuxt fights Caddy for `:80` (§4). |
 | `DISABLE_VOLUME_CHECK` | `yes` | Unblocks boot; no persistent volume by design (§3). |
 | `SECRET_KEY` | *50 chars, generated* | Must be explicit — `jadawel.sh:201` otherwise writes one to the ephemeral `/jadawel/data/.secret`, so every redeploy would invalidate all sessions. |
 | `JADAWEL_JWT_SIGNING_KEY` | *50 chars, generated* | Same, via `.jwt_signing_key`. |
@@ -300,8 +306,8 @@ tolerates it, but it is worth trimming next time the variable is touched.
 
 | Symptom | Cause | Fix |
 |---|---|---|
-| Fast 502 from BunnyCDN on every path | Nothing bound to :80 — container crashed or crash-looping | Read the container log. Most likely `PORT` is not 3000 (§4). |
-| `EADDRINUSE :::80` in the log | Nuxt taking Caddy's port | `PORT=3000` |
+| Fast 502 from BunnyCDN on every path | Nothing bound to :80 — container crashed or crash-looping | Read the container log. Most likely the Supervisor frontend `PORT` override is missing (§4). |
+| `EADDRINUSE :::80` in the log | Nuxt taking Caddy's port | Confirm the root deployment `Dockerfile` adds `environment=PORT="3000"` to the web-frontend program. |
 | Log stops after the data-folder warning | Volume check blocking boot | `DISABLE_VOLUME_CHECK=yes` |
 | `chown` / "no such user" at startup | Embedded services not disabled on the lite image | `DISABLE_EMBEDDED_PSQL=yes`, `DISABLE_EMBEDDED_REDIS=yes` |
 | `401 Unauthorized` pulling the image | GHCR package private | Make the package (not the repo) public |
@@ -331,9 +337,9 @@ tolerates it, but it is worth trimming next time the variable is touched.
 3. **S3 credentials** — blocked on the CranL token quota bug.
 4. **`jadawl.site`** — DNS and SSL pending.
 5. **`JADAWEL_ENABLE_SECURE_PROXY_SSL_HEADER`** — not set.
-6. **`PORT=3000` is fragile.** It is a manual env var defending against a
-   platform-injected one. Making the image immune would mean forcing `PORT` in
-   the frontend's supervisor wrapper in `Azizahmed/Jadawel` and republishing.
+6. **Resolved: `PORT=3000` is scoped in Supervisor.** CranL filters the reserved
+   environment key, so the root deployment `Dockerfile` injects it only into
+   the frontend program and fails its build if the inherited command changes.
 7. **`/api/schema.json` returns 500**, so `/api/redoc/` renders nothing. It
    predates the fork's own code: `manage.py spectacular` fails identically at
    `5f6b4cf55` and at the chart-widget commit, in drf-spectacular's

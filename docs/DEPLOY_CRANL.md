@@ -130,13 +130,14 @@ for n in SECRET_KEY JADAWEL_JWT_SIGNING_KEY; do echo "$n=$(tr -dc 'a-z0-9' </dev
 ```
 
 The list below was written before the first deploy and proved incomplete. Five
-more variables turned out to be mandatory — `PORT=3000` above all, without which
-the container crash-loops. See [cranl_fix.md](../cranl_fix.md) for the full
-working set and why each is needed.
+more settings turned out to be mandatory. The internal frontend port must also
+be pinned to 3000, which the root deployment `Dockerfile` now does because
+CranL reserves the `PORT` environment key. See [cranl_fix.md](../cranl_fix.md)
+for the full working set and why each is needed.
 
 | Variable | Value | Why |
 |---|---|---|
-| `PORT` | `3000` | CranL injects `PORT=80` to match the routing port, and Nitro obeys it — so the web-frontend tries to bind Caddy's socket and dies with `EADDRINUSE :::80`. `NITRO_PORT` does not override it. |
+| `PORT` | **Do not add in CranL** | CranL injects and reserves `PORT=80`, and its dashboard now filters attempts to persist a replacement. The root deployment `Dockerfile` scopes `PORT=3000` to the Supervisor web-frontend program instead, leaving Caddy on `:80`. `NITRO_PORT` does not override CranL's injected value. |
 | `DISABLE_VOLUME_CHECK` | `yes` | Boot otherwise stops at the unmounted-data-folder warning. Safe: Postgres and Redis are external. |
 | `JADAWEL_RUN_MINIMAL` | `yes` | Folds the export worker into the main worker on a 4 GB plan. |
 | `JADAWEL_AMOUNT_OF_WORKERS` | `1` | Required for the above to take effect. |

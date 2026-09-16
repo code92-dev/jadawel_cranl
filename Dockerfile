@@ -220,6 +220,14 @@ ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:7b00d5320e4d2606054744
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
 
+# CranL injects PORT=80 for application routing and filters attempts to persist
+# a user-defined PORT value. Nitro gives PORT precedence over NITRO_PORT, so
+# scope the frontend process to its internal port in Supervisor while leaving
+# Caddy on :80. Fail the build if the inherited command changes instead of
+# silently producing another crash-looping deployment.
+RUN grep -Fqx 'command=/jadawel/supervisor/wrapper.sh YELLOW WEBFRONTEND node --import ./env-remap.mjs .output/server/index.mjs' /jadawel/supervisor/supervisor.conf \
+    && sed -i '/^command=\/jadawel\/supervisor\/wrapper.sh YELLOW WEBFRONTEND node --import \.\/env-remap\.mjs \.output\/server\/index\.mjs$/a environment=PORT="3000"' /jadawel/supervisor/supervisor.conf
+
 # The portable image defaults to one Nitro worker so it remains safe under its
 # documented 768 MB frontend cap. CranL has a 4 GB whole-app allocation, and
 # the two-worker production benchmark removes single-process SSR queueing while
