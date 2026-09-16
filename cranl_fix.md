@@ -209,6 +209,7 @@ URLs in `JADAWEL_PUBLIC_URL`.
 | Variable | Value | Why |
 |---|---|---|
 | `PORT` | **Do not add in CranL** | The root deployment `Dockerfile` now scopes `PORT=3000` to the web-frontend process because CranL filters the reserved key. Without that image-layer override, Nuxt fights Caddy for `:80` (§4). |
+| `POSTHOG_PROJECT_API_KEY`, `POSTHOG_HOST` | **Do not add in CranL** | Analytics is intentionally disabled. CranL retained the deleted values in running containers, so the root deployment `Dockerfile` also forces the legacy and Nuxt runtime names empty for every Supervisor child process. |
 | `DISABLE_VOLUME_CHECK` | `yes` | Unblocks boot; no persistent volume by design (§3). |
 | `SECRET_KEY` | *50 chars, generated* | Must be explicit — `jadawel.sh:201` otherwise writes one to the ephemeral `/jadawel/data/.secret`, so every redeploy would invalidate all sessions. |
 | `JADAWEL_JWT_SIGNING_KEY` | *50 chars, generated* | Same, via `.jwt_signing_key`. |

@@ -220,6 +220,14 @@ ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:7b00d5320e4d2606054744
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
 
+# CranL keeps deleted environment variables in the running container, so
+# removing the PostHog values in its dashboard does not reliably disable
+# analytics. Override both the legacy and Nuxt runtime names in Supervisor's
+# global child environment so the backend, workers, and frontend all start
+# with PostHog disabled.
+RUN grep -Fqx 'environment =' /jadawel/supervisor/supervisor.conf \
+    && sed -i 's/^environment =$/environment = POSTHOG_PROJECT_API_KEY="",POSTHOG_HOST="",NUXT_PUBLIC_POSTHOG_PROJECT_API_KEY="",NUXT_PUBLIC_POSTHOG_HOST=""/' /jadawel/supervisor/supervisor.conf
+
 # CranL injects PORT=80 for application routing and filters attempts to persist
 # a user-defined PORT value. Nitro gives PORT precedence over NITRO_PORT, so
 # scope the frontend process to its internal port in Supervisor while leaving

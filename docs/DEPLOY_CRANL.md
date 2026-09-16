@@ -138,6 +138,7 @@ for the full working set and why each is needed.
 | Variable | Value | Why |
 |---|---|---|
 | `PORT` | **Do not add in CranL** | CranL injects and reserves `PORT=80`, and its dashboard now filters attempts to persist a replacement. The root deployment `Dockerfile` scopes `PORT=3000` to the Supervisor web-frontend program instead, leaving Caddy on `:80`. `NITRO_PORT` does not override CranL's injected value. |
+| `POSTHOG_PROJECT_API_KEY`, `POSTHOG_HOST` | **Do not add in CranL** | PostHog is disabled for this deployment. The root `Dockerfile` forces both the legacy and Nuxt runtime names empty because CranL can retain deleted values in an existing container. |
 | `DISABLE_VOLUME_CHECK` | `yes` | Boot otherwise stops at the unmounted-data-folder warning. Safe: Postgres and Redis are external. |
 | `JADAWEL_RUN_MINIMAL` | `yes` | Folds the export worker into the main worker on a 4 GB plan. |
 | `JADAWEL_AMOUNT_OF_WORKERS` | `1` | Required for the above to take effect. |
