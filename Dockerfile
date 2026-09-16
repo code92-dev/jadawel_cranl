@@ -17,9 +17,13 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-16 from commit afbcc369, tag 2.3.7-white-theme-20260916.
-# Aligns the white-theme workspace chrome and carries the fully validated
-# current main revision.
+# Published 2026-09-16 from commit 0fb12bbe, tag
+# 2.3.8-theme-boot-no-flash. Applies the interface theme before first paint to
+# prevent a flash of the previous palette during startup.
+# Previous deployment pin (2.3.7-white-theme-20260916):
+# sha256:1f89d8fe78f43f86c5ce987c7445f394d6db5b8de2925df4d49a604d406a5ec4.
+#
+# 2.3.7-white-theme-20260916 aligned the white-theme workspace chrome.
 # Previous deployment pin (2.3.6-billing-orgs-bundled):
 # sha256:120dfcc493bed6435b499f7128d9c076817ae1aacd7701bce245116c7abc2533.
 #
@@ -211,7 +215,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:1f89d8fe78f43f86c5ce987c7445f394d6db5b8de2925df4d49a604d406a5ec4
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:7b00d5320e4d2606054744516197b5c10b65945fd3217c61173b2b1a76d5c8c0
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
