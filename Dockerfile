@@ -17,7 +17,14 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-16 from commit 0fb12bbe, tag
+# Published 2026-09-18 from commit da77d64d, tag 2.3.8-table-access.
+# Adds table-scoped guest access: a GUEST workspace member reaches only the
+# tables they were granted, invited through the standard workspace invitation
+# flow from the new "Table access" tab in the workspace settings.
+# Previous deployment pin (2.3.8-theme-boot-no-flash):
+# sha256:7b00d5320e4d2606054744516197b5c10b65945fd3217c61173b2b1a76d5c8c0.
+#
+# Previously published 2026-09-16 from commit 0fb12bbe, tag
 # 2.3.8-theme-boot-no-flash. Applies the interface theme before first paint to
 # prevent a flash of the previous palette during startup.
 # Previous deployment pin (2.3.7-white-theme-20260916):
@@ -215,7 +222,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:7b00d5320e4d2606054744516197b5c10b65945fd3217c61173b2b1a76d5c8c0
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:a8f8707b19a4b1d1ed1d50d6a223edf3a3df117c4ab3d33e3831e0c34c5acd8b
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
