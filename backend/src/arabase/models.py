@@ -36,6 +36,11 @@ from arabase.mcp.protection.models import (
     MCPProtectionMutationAudit,
     MCPProtectionPolicy,
 )
+from arabase.table_access.models import (
+    PendingTableGrant,
+    TableAccessLevel,
+    TableGrant,
+)
 from arabase.views.models import (
     HtmlPageView,
     HtmlPageViewFieldOptions,
@@ -72,4 +77,7 @@ __all__ = [
     "HtmlPageView",
     "HtmlPageViewFieldOptions",
     "HtmlPageViewRevision",
+    "PendingTableGrant",
+    "TableAccessLevel",
+    "TableGrant",
 ]

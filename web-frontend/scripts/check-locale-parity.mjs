@@ -49,6 +49,7 @@ export const allowedIdenticalValues = new Set([
   'smtp.gmail.com',
   "your-email{'@'}example.com",
   "sender{'@'}example.com",
+  "guest{'@'}example.com",
   '587',
   '0-23',
   '0-59',

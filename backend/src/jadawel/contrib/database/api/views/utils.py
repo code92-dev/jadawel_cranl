@@ -53,6 +53,33 @@ def get_public_view_authorization_token(request: Request) -> Optional[str]:
     return token
 
 
+def get_additional_hidden_field_ids(user: AbstractUser, table) -> Set[int]:
+    """Fork hook: let an additive plugin hide further fields from `user`.
+
+    Field listing and row serialization are otherwise all-or-nothing on the
+    table, which is not enough for a table-scoped guest: a link row, lookup or
+    formula field carries values out of a table they were never granted. See
+    docs/TABLE_LEVEL_ACCESS_PLAN.md and PATCHES.md.
+    """
+
+    from jadawel.core.registries import plugin_registry
+
+    hidden: Set[int] = set()
+    for plugin in plugin_registry.registry.values():
+        callback = getattr(plugin, "get_hidden_field_ids", None)
+        if callback:
+            hidden |= set(callback(user, table) or set())
+    return hidden
+
+
+def get_hidden_field_ids_for_table_user(
+    user: AbstractUser, table
+) -> Optional[Set[int]]:
+    """The hidden fields of a table read outside any view."""
+
+    return get_additional_hidden_field_ids(user, table) or None
+
+
 def get_hidden_field_ids_for_view_user(
     user: AbstractUser, view: View
 ) -> Optional[Set[int]]:
@@ -62,9 +89,15 @@ def get_hidden_field_ids_for_view_user(
     """
 
     if hasattr(view, "_hidden_field_ids"):
-        return view._hidden_field_ids
-    ownership_type = view_ownership_type_registry.get(view.ownership_type)
-    return ownership_type.get_hidden_field_ids_for_user(user, view)
+        hidden = view._hidden_field_ids
+    else:
+        ownership_type = view_ownership_type_registry.get(view.ownership_type)
+        hidden = ownership_type.get_hidden_field_ids_for_user(user, view)
+
+    additional = get_additional_hidden_field_ids(user, view.table)
+    if additional:
+        return set(hidden or set()) | additional
+    return hidden
 
 
 def get_view_filtered_queryset(

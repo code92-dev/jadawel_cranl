@@ -122,6 +122,23 @@ class ArabaseConfig(AppConfig):
                 settings.PERMISSION_MANAGERS.index("basic"), "viewer_role"
             )
 
+        from arabase.permissions.table_grants import TableGrantPermissionManagerType
+        from arabase.table_access.handler import connect_table_access_signals
+
+        # Table-scoped guest access (docs/TABLE_LEVEL_ACCESS_PLAN.md): a GUEST
+        # workspace member only reaches the tables they were granted. Like
+        # `viewer_role` this must sit before core's `basic` manager, because
+        # for a guest it answers every check itself rather than deferring.
+        permission_manager_type_registry.register(TableGrantPermissionManagerType())
+        if (
+            "table_grants" not in settings.PERMISSION_MANAGERS
+            and "basic" in settings.PERMISSION_MANAGERS
+        ):
+            settings.PERMISSION_MANAGERS.insert(
+                settings.PERMISSION_MANAGERS.index("basic"), "table_grants"
+            )
+        connect_table_access_signals()
+
         from arabase.template_catalog import (
             LOCAL_TEMPLATE_PATTERN,
             reconcile_local_template_catalog_after_migrate,

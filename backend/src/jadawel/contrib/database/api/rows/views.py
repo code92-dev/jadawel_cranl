@@ -78,6 +78,7 @@ from jadawel.contrib.database.api.views.errors import (
     ERROR_VIEW_FILTER_TYPE_UNSUPPORTED_FIELD,
 )
 from jadawel.contrib.database.api.views.utils import (
+    get_hidden_field_ids_for_table_user,
     get_hidden_field_ids_for_view_user,
     serialize_single_row_metadata,
 )
@@ -627,7 +628,9 @@ class RowsView(APIView):
             raise RequestBodyValidationException(detail=e.message)
 
         hidden_field_ids = (
-            get_hidden_field_ids_for_view_user(request.user, view) if view else None
+            get_hidden_field_ids_for_view_user(request.user, view)
+            if view
+            else get_hidden_field_ids_for_table_user(request.user, table)
         )
         serializer_class = get_row_serializer_class(
             model,
@@ -860,7 +863,9 @@ class RowView(APIView):
         row = RowHandler().get_row(request.user, table, row_id, model, view=view)
 
         hidden_field_ids = (
-            get_hidden_field_ids_for_view_user(request.user, view) if view else None
+            get_hidden_field_ids_for_view_user(request.user, view)
+            if view
+            else get_hidden_field_ids_for_table_user(request.user, table)
         )
         serializer_class = get_row_serializer_class(
             model,
@@ -1030,7 +1035,9 @@ class RowView(APIView):
             raise RequestBodyValidationException(detail=exc.message) from exc
 
         hidden_field_ids = (
-            get_hidden_field_ids_for_view_user(request.user, view) if view else None
+            get_hidden_field_ids_for_view_user(request.user, view)
+            if view
+            else get_hidden_field_ids_for_table_user(request.user, table)
         )
         serializer_class = get_row_serializer_class(
             model,
@@ -1404,7 +1411,9 @@ class BatchRowsView(APIView):
             raise RequestBodyValidationException(detail=exc.message)
 
         hidden_field_ids = (
-            get_hidden_field_ids_for_view_user(request.user, view) if view else None
+            get_hidden_field_ids_for_view_user(request.user, view)
+            if view
+            else get_hidden_field_ids_for_table_user(request.user, table)
         )
         response_row_serializer_class = get_row_serializer_class(
             model,
@@ -1564,7 +1573,9 @@ class BatchRowsView(APIView):
             raise RequestBodyValidationException(detail=e.message)
 
         hidden_field_ids = (
-            get_hidden_field_ids_for_view_user(request.user, view) if view else None
+            get_hidden_field_ids_for_view_user(request.user, view)
+            if view
+            else get_hidden_field_ids_for_table_user(request.user, table)
         )
         response_row_serializer_class = get_row_serializer_class(
             model,
@@ -1821,7 +1832,9 @@ class RowAdjacentView(APIView):
             return Response(status=HTTP_204_NO_CONTENT)
 
         hidden_field_ids = (
-            get_hidden_field_ids_for_view_user(request.user, view) if view else None
+            get_hidden_field_ids_for_view_user(request.user, view)
+            if view
+            else get_hidden_field_ids_for_table_user(request.user, table)
         )
         serializer_class = get_row_serializer_class(
             model,

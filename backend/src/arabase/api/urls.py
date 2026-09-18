@@ -28,6 +28,7 @@ from arabase.api.mcp_protection.views import (
     MCPProtectionPolicyView,
     MCPProtectionReadinessView,
 )
+from arabase.api.table_access.views import TableAccessGuestView, TableAccessView
 from arabase.api.views import WorkspaceActivityView, WorkspaceDatabaseStatsView
 
 app_name = "arabase.api"
@@ -77,6 +78,17 @@ urlpatterns = [
         r"^workspace/(?P<workspace_id>[0-9]+)/database-stats/$",
         WorkspaceDatabaseStatsView.as_view(),
         name="workspace_database_stats",
+    ),
+    re_path(
+        r"^workspace/(?P<workspace_id>[0-9]+)/table-access/$",
+        TableAccessView.as_view(),
+        name="table_access",
+    ),
+    re_path(
+        r"^workspace/(?P<workspace_id>[0-9]+)/table-access/"
+        r"(?P<workspace_user_id>[0-9]+)/$",
+        TableAccessGuestView.as_view(),
+        name="table_access_guest",
     ),
     re_path(
         r"^workspace/(?P<workspace_id>[0-9]+)/activity/$",

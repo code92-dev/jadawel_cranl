@@ -14,6 +14,18 @@ class ArabasePlugin(Plugin):
 
     type = "arabase"
 
+    def get_hidden_field_ids(self, user, table):
+        """Core hook: hide fields that read outside a guest's granted tables.
+
+        Called from `contrib/database/api/views/utils.py` for every field list
+        and row payload. Returns an empty set for anyone who is not a table
+        guest, which is every normal member.
+        """
+
+        from arabase.table_access.hidden_fields import hidden_field_ids_for_guest
+
+        return hidden_field_ids_for_guest(user, table)
+
     def get_api_urls(self):
         return [
             path(

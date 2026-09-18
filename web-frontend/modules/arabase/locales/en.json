@@ -354,6 +354,10 @@
     "viewer": {
       "name": "Viewer",
       "description": "Read-only access: sees all data and row colors, but cannot change view settings such as colors, filters, sorts or groupings."
+    },
+    "guest": {
+      "name": "Guest",
+      "description": "Limited to specific tables: reads (or edits) only the tables they were granted, and sees nothing else in the workspace."
     }
   },
   "kanbanViewType": {
@@ -365,5 +369,24 @@
     "noSingleSelectField": "Add a single select field to the table first.",
     "emptyStack": "No value",
     "loadMore": "Load more"
+  },
+  "tableAccess": {
+    "tabTitle": "Table access",
+    "description": "Invite someone to specific tables instead of the whole workspace. A guest only sees the tables listed here — every other database, table and setting stays hidden.",
+    "email": "Email address",
+    "emailPlaceholder": "guest{'@'}example.com",
+    "tables": "Tables",
+    "noTables": "This workspace has no tables to share yet.",
+    "invite": "Send invitation",
+    "guests": "Guests",
+    "noGuests": "No guests yet.",
+    "pending": "Pending invitations",
+    "noPending": "No pending guest invitations.",
+    "revoke": "Remove",
+    "error": "That table access change could not be saved.",
+    "levels": {
+      "VIEWER": "Viewer",
+      "EDITOR": "Editor"
+    }
   }
 }

@@ -11,7 +11,12 @@ import {
 import { BackupAdminType } from '@jadawel/modules/arabase/adminTypes'
 import { ArabasePlugin } from '@jadawel/modules/arabase/plugins'
 import { ViewerRoleType } from '@jadawel/modules/arabase/roleTypes'
-import { ViewerRoleTranslationsPermissionManagerType } from '@jadawel/modules/arabase/permissions'
+import {
+  GuestRoleTranslationsPermissionManagerType,
+  TableGrantsPermissionManagerType,
+  ViewerRoleTranslationsPermissionManagerType,
+} from '@jadawel/modules/arabase/permissions'
+import { TableAccessWorkspaceSettingsPageType } from '@jadawel/modules/arabase/workspaceSettingsPageTypes'
 import { KanbanViewType } from '@jadawel/modules/arabase/kanban/viewType'
 import kanbanStore from '@jadawel/modules/arabase/kanban/store'
 import publicDashboardApplicationStore from '@jadawel/modules/arabase/dashboard/store/publicDashboardApplication'
@@ -95,6 +100,25 @@ export default defineNuxtPlugin({
     $registry.register(
       'permissionManager',
       new ViewerRoleTranslationsPermissionManagerType(context)
+    )
+
+    // Table-scoped guest access (docs/TABLE_LEVEL_ACCESS_PLAN.md): the tab that
+    // invites and manages guests, plus the GUEST label for core's members
+    // table. GUEST is not registered as a role: it is only ever handed out
+    // together with a set of tables.
+    $registry.register(
+      'workspaceSettingsPage',
+      new TableAccessWorkspaceSettingsPageType(context)
+    )
+    $registry.register(
+      'permissionManager',
+      new GuestRoleTranslationsPermissionManagerType(context)
+    )
+    // Named after the backend manager so core's permissions plugin finds it in
+    // the registry instead of warning about a missing one.
+    $registry.register(
+      'permissionManager',
+      new TableGrantsPermissionManagerType(context)
     )
 
     // Row coloring (#28): decorators fed by single select colors or

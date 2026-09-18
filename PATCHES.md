@@ -14,6 +14,30 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Table-scoped guest access — hidden field hook (2026-09-18)
+
+**Context:** `docs/TABLE_LEVEL_ACCESS_PLAN.md`. A GUEST workspace member only
+reaches the tables they were granted, enforced additively by the `table_grants`
+permission manager in `backend/src/arabase/permissions/`. The permission
+registry cannot finish the job on its own: field listing and row serialization
+are all-or-nothing on the table, so a link row, lookup, rollup, count or formula
+field would still hand the guest values out of a table nobody granted them.
+
+These three edits add one plugin hook and route the existing hidden-field
+plumbing through it. Core behaviour is unchanged for every actor that is not a
+table guest: the hook returns an empty set and the original value is returned.
+
+| File | Change | Reason | Merge risk |
+| --- | --- | --- | --- |
+| `backend/src/jadawel/contrib/database/api/views/utils.py` | Added `get_additional_hidden_field_ids()` (iterates `plugin_registry` for a `get_hidden_field_ids` callback) and `get_hidden_field_ids_for_table_user()`; `get_hidden_field_ids_for_view_user()` now unions the plugin's ids into its result | One hook covering the ten grid/gallery/row read paths that already funnel through this helper | low |
+| `backend/src/jadawel/contrib/database/api/rows/views.py` | Six `get_hidden_field_ids_for_view_user(...) if view else None` sites now fall back to `get_hidden_field_ids_for_table_user(request.user, table)` | Rows read outside a view had no hidden-field set at all, which is the majority of a guest's reads | low |
+| `backend/src/jadawel/contrib/database/api/fields/views.py` | `FieldsView.get` excludes the hook's field ids from the returned queryset | A guest must not learn that a field reading into an ungranted table exists | low |
+
+**Tests:** `backend/tests/arabase/test_table_access.py` (link field to an
+ungranted table is hidden from both the field list and the row payload; the same
+field stays visible once the linked table is granted; a normal member still sees
+every field).
+
 ## Theme-colored interface chrome (2026-09-14–15)
 
 | File                                                                                                                                                                 | Change                                                                                                         | Reason                                                                                                | Merge risk |

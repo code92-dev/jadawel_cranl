@@ -1,0 +1,118 @@
+// The Table access settings tab (docs/TABLE_LEVEL_ACCESS_PLAN.md).
+// Logical properties only — `csstools/use-logical` is a hard error under this
+// module, and the tab has to read correctly in both directions.
+// A standalone stylesheet registered by modules/arabase/module.js, so it
+// imports the palette itself: nothing is in scope for a file outside core's
+// aggregated default.scss.
+@import '@jadawel/modules/core/assets/scss/colors';
+
+.table-access {
+  padding-block: 24px;
+  padding-inline: 30px;
+}
+
+.table-access__description {
+  color: $palette-neutral-700;
+  max-inline-size: 70ch;
+  margin-block-end: 24px;
+}
+
+.table-access__invite {
+  display: grid;
+  gap: 16px;
+  max-inline-size: 560px;
+  margin-block-end: 32px;
+}
+
+.table-access__table-list {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  max-block-size: 260px;
+  overflow-y: auto;
+}
+
+.table-access__table-list li {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.table-access__table-name {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.table-access__separator {
+  color: $palette-neutral-400;
+}
+
+.table-access__level {
+  margin-inline-start: auto;
+
+  // Wide enough for the longest level name in both locales without the item
+  // list wrapping onto a second line.
+  min-inline-size: 140px;
+}
+
+.table-access__heading {
+  font-size: 16px;
+  margin-block: 24px 12px;
+}
+
+.table-access__empty {
+  color: $palette-neutral-700;
+}
+
+.table-access__guests {
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.table-access__guests > li {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding-block: 12px;
+  border-block-end: 1px solid $palette-neutral-200;
+}
+
+.table-access__guest-identity {
+  display: grid;
+  gap: 2px;
+  min-inline-size: 220px;
+}
+
+.table-access__guest-email {
+  color: $palette-neutral-700;
+  font-size: 13px;
+}
+
+.table-access__guest-tables {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+  flex: 1;
+}
+
+.table-access__guest-tables li {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.table-access__badge {
+  padding-block: 1px;
+  padding-inline: 6px;
+  border-radius: 3px;
+  background-color: $palette-neutral-100;
+  color: $palette-neutral-700;
+  font-size: 11px;
+}

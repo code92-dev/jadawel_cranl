@@ -67,6 +67,9 @@ from jadawel.contrib.database.api.tables.errors import (
 )
 from jadawel.contrib.database.api.tokens.authentications import TokenAuthentication
 from jadawel.contrib.database.api.tokens.errors import ERROR_NO_PERMISSION_TO_TABLE
+from jadawel.contrib.database.api.views.utils import (
+    get_additional_hidden_field_ids,
+)
 from jadawel.contrib.database.application_types import DatabaseApplicationType
 from jadawel.contrib.database.fields.actions import (
     ChangePrimaryFieldActionType,
@@ -257,8 +260,16 @@ class FieldsView(APIView):
                 request.user, view, base_field_queryset
             )
 
+        # Fork: a table-scoped guest must not even learn that a field reading
+        # into an ungranted table exists. See PATCHES.md and
+        # docs/TABLE_LEVEL_ACCESS_PLAN.md.
+        hidden_field_ids = get_additional_hidden_field_ids(request.user, table)
+        field_queryset = base_field_queryset.filter(table=table)
+        if hidden_field_ids:
+            field_queryset = field_queryset.exclude(id__in=hidden_field_ids)
+
         fields = specific_iterator(
-            base_field_queryset.filter(table=table),
+            field_queryset,
             per_content_type_queryset_hook=(
                 lambda field, queryset: field_type_registry.get_by_model(
                     field

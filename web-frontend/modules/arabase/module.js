@@ -46,11 +46,41 @@ export default defineNuxtModule({
     nuxt.options.css.push(resolve('./assets/scss/mcp_protection.scss'))
     nuxt.options.css.push(resolve('./assets/scss/row_coloring.scss'))
     nuxt.options.css.push(resolve('./assets/scss/kanban.scss'))
+    nuxt.options.css.push(resolve('./assets/scss/table_access.scss'))
 
     // Public dashboard share pages. Anonymous routes, so they must live
     // outside the authenticated `app` layout.
     extendPages((pages) => {
       pages.push(...routes)
+
+      // The Table access tab is a child of core's `settings` route, so it
+      // renders inside the same tab shell as Members and Invites. Injecting it
+      // here keeps core/routes.js untouched.
+      //
+      // The search has to recurse: `settings` is not a top-level page, it is a
+      // child of core's `root` route.
+      const findPage = (candidates, name) => {
+        for (const page of candidates) {
+          if (page.name === name) {
+            return page
+          }
+          const nested = page.children && findPage(page.children, name)
+          if (nested) {
+            return nested
+          }
+        }
+        return null
+      }
+
+      const settings = findPage(pages, 'settings')
+      if (settings) {
+        settings.children = settings.children || []
+        settings.children.push({
+          name: 'settings-table-access',
+          path: 'table-access',
+          file: resolve('./pages/settings/tableAccess.vue'),
+        })
+      }
     })
 
     // The `ar` locale itself is activated via config/locales.js (shared list).

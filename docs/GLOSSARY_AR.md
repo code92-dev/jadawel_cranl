@@ -48,6 +48,10 @@ term exists).
 | Trash | سلة المهملات | |
 | Snapshot | لقطة | pl. لقطات |
 | Member | عضو | pl. الأعضاء |
+| Guest | ضيف | pl. الضيوف. A workspace member limited to specific tables. |
+| Table access | وصول الجداول | The settings tab that grants guests specific tables. |
+| Viewer (table level) | مُشاهد | Reads a granted table; see also the workspace VIEWER role. |
+| Editor (table level) | محرِّر | Reads and edits the rows of a granted table, never its structure. |
 | Template | قالب | pl. قوالب |
 | Webhook | خطاف ويب | pl. خطافات الويب |
 | Automation | أتمتة | |
