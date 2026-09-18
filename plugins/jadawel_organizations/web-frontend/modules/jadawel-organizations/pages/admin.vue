@@ -144,7 +144,10 @@
       {{ $t("organizations.ownerSetupToken") }}:
       <code dir="ltr">{{ ownerSetupToken }}</code>
     </p>
-    <p v-if="error" role="alert">{{ $t("organizations.error") }}</p>
+    <p v-if="error" role="alert">
+      {{ $t("organizations.error") }}
+      <span v-if="errorDetail" dir="auto">— {{ errorDetail }}</span>
+    </p>
   </main>
 </template>
 
@@ -158,6 +161,7 @@ definePageMeta({
 <script>
 /* eslint-disable import/first -- Nuxt page metadata uses a separate setup block. */
 import { uuid } from "@jadawel/modules/core/utils/string";
+import { describeApiError } from "../utils/apiError";
 /* eslint-enable import/first */
 
 export default {
@@ -178,15 +182,24 @@ export default {
       loading: true,
       busy: false,
       error: false,
+      errorDetail: "",
     };
   },
   async mounted() {
     await this.load();
   },
   methods: {
+    // The admin endpoints answer with DRF field errors ("owner":
+    // "choose_id_or_email"). Swallowing them left a 400 in the console and no
+    // way to tell which field the server rejected.
+    fail(error) {
+      this.error = true;
+      this.errorDetail = describeApiError(error);
+    },
     async load() {
       this.loading = true;
       this.error = false;
+      this.errorDetail = "";
       try {
         const [organizations, plans] = await Promise.all([
           this.$client.get("/organizations/admin/", {
@@ -199,8 +212,8 @@ export default {
         this.plans = (plans.data.results || plans.data).filter(
           (plan) => plan.kind === "TEAM",
         );
-      } catch {
-        this.error = true;
+      } catch (error) {
+        this.fail(error);
       } finally {
         this.loading = false;
       }
@@ -208,6 +221,7 @@ export default {
     async create() {
       this.busy = true;
       this.error = false;
+      this.errorDetail = "";
       this.creationKey = this.creationKey || uuid();
       try {
         const payload = {
@@ -233,14 +247,15 @@ export default {
         this.ownerEmail = "";
         this.grant = { plan: "", seat_limit: 1, expires_at: "", reason: "" };
         await this.load();
-      } catch {
-        this.error = true;
+      } catch (error) {
+        this.fail(error);
       } finally {
         this.busy = false;
       }
     },
     async resendOwner(organization, email = "") {
       this.error = false;
+      this.errorDetail = "";
       try {
         const response = await this.$client.post(
           `/organizations/admin/${organization.id}/owner-setup/`,
@@ -248,21 +263,22 @@ export default {
         );
         this.ownerSetupToken = response.data.owner_setup_token;
         if (email) this.reassignEmails[organization.id] = "";
-      } catch {
-        this.error = true;
+      } catch (error) {
+        this.fail(error);
       }
     },
     async loadMoreOrganizations() {
       if (!this.organizationsNext || this.loading) return;
       this.loading = true;
       this.error = false;
+      this.errorDetail = "";
       try {
         const response = await this.$client.get(this.organizationsNext);
         const data = response.data;
         this.organizations.push(...(data.results || data));
         this.organizationsNext = data.next || null;
-      } catch {
-        this.error = true;
+      } catch (error) {
+        this.fail(error);
       } finally {
         this.loading = false;
       }

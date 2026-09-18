@@ -15,7 +15,10 @@
           }}
         </span>
       </header>
-      <p v-if="error" role="alert">{{ $t("billing.error") }}</p>
+      <p v-if="error" role="alert">
+        {{ $t("billing.error") }}
+        <span v-if="errorDetail" dir="auto">— {{ errorDetail }}</span>
+      </p>
       <p v-if="loading" role="status">{{ $t("billing.loading") }}</p>
       <ul
         class="billing-admin__summary"
@@ -628,7 +631,10 @@ definePageMeta({
 </script>
 
 <script>
+/* eslint-disable import/first -- Nuxt page metadata uses a separate setup block. */
 import GrantPanel from "../components/GrantPanel.vue";
+import { describeApiError } from "../utils/apiError";
+/* eslint-enable import/first */
 export default {
   name: "BillingAdmin",
   components: { GrantPanel },
@@ -649,6 +655,7 @@ export default {
       loading: true,
       saving: false,
       error: false,
+      errorDetail: "",
       accounts: [],
       accountsNext: null,
       plans: [],
@@ -695,12 +702,20 @@ export default {
         currency: "SAR",
       }).format(amount / 100);
     },
+    // The admin endpoints answer with DRF field errors ("responsible_email":
+    // "user_not_found"). Swallowing them left a 400 in the console and no way
+    // to tell which field the server rejected.
+    fail(error) {
+      this.error = true;
+      this.errorDetail = describeApiError(error);
+    },
     formatDate(value) {
       return value ? new Date(value).toLocaleString(this.$i18n.locale) : "";
     },
     async refresh() {
       this.loading = true;
       this.error = false;
+      this.errorDetail = "";
       try {
         const [
           accounts,
@@ -753,8 +768,8 @@ export default {
         if (!this.externalPayment.account) {
           this.externalPayment.account = this.accounts[0]?.id || "";
         }
-      } catch {
-        this.error = true;
+      } catch (error) {
+        this.fail(error);
       } finally {
         this.loading = false;
       }
@@ -763,10 +778,11 @@ export default {
       if (this.saving) return;
       this.saving = true;
       this.error = false;
+      this.errorDetail = "";
       try {
         await action();
-      } catch {
-        this.error = true;
+      } catch (error) {
+        this.fail(error);
       } finally {
         this.saving = false;
       }
@@ -800,6 +816,7 @@ export default {
     },
     async selectPlan(plan) {
       this.error = false;
+      this.errorDetail = "";
       try {
         const { data } = await this.$client.get(
           "/billing/admin/plans/" + plan.id + "/prices/",
@@ -807,8 +824,8 @@ export default {
         this.selectedPlan = plan;
         this.prices = data.results;
         this.pricesNext = data.next;
-      } catch {
-        this.error = true;
+      } catch (error) {
+        this.fail(error);
       }
     },
     async createPrice() {
