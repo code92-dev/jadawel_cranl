@@ -24,6 +24,7 @@ from typing import Any, Dict, List, Optional, Set
 
 from arabase.table_access.constants import WORKSPACE_USER_PERMISSION_GUEST
 from arabase.table_access.models import TableAccessLevel
+from jadawel.core.cache import local_cache
 from jadawel.core.exceptions import UserInvalidWorkspacePermissionsError
 from jadawel.core.models import WorkspaceUser
 from jadawel.core.registries import PermissionManagerType, object_scope_type_registry
@@ -99,41 +100,77 @@ class TableGrantPermissionManagerType(PermissionManagerType):
 
     # -- lookups ---------------------------------------------------------
 
+    def _roles(self, workspace, actors, include_trash=False) -> Dict[int, Any]:
+        """Map of user id -> workspace role, for the given actors.
+
+        Request-scoped, because this manager sits in front of every check and
+        every listing: without the cache a single request pays one query per
+        call site, which showed up as a doubled query count in core's workspace
+        search budget. `None` is cached too — it is the answer for a user who is
+        not in the workspace at all, and it must not be re-queried either.
+        """
+
+        cached = local_cache.get(f"arabase_table_access_roles_{workspace.id}", dict)
+
+        missing = [actor for actor in actors if actor.id not in cached]
+        if missing:
+            manager = (
+                WorkspaceUser.objects_and_trash
+                if include_trash
+                else WorkspaceUser.objects
+            )
+            found = dict(
+                manager.filter(
+                    workspace=workspace, user_id__in=[actor.id for actor in missing]
+                ).values_list("user_id", "permissions")
+            )
+            for actor in missing:
+                cached[actor.id] = found.get(actor.id)
+
+        return cached
+
     def _guest_user_ids(self, workspace, actors, include_trash=False) -> Set[int]:
         """The subset of `actors` that hold the GUEST role in this workspace."""
 
-        manager = (
-            WorkspaceUser.objects_and_trash if include_trash else WorkspaceUser.objects
-        )
+        roles = self._roles(workspace, actors, include_trash)
         return {
-            workspace_user.user_id
-            for workspace_user in manager.filter(
-                workspace=workspace, user_id__in=[actor.id for actor in actors]
-            )
-            if workspace_user.permissions == WORKSPACE_USER_PERMISSION_GUEST
+            actor.id
+            for actor in actors
+            if roles.get(actor.id) == WORKSPACE_USER_PERMISSION_GUEST
         }
 
     def _grants(self, workspace, user_ids, include_trash=False):
-        """Map of user id -> {table id: level} for the given guests."""
+        """Map of user id -> {table id: level} for the given guests.
+
+        Cached per request for the same reason as `_roles`, and only ever
+        reached for an actor already known to be a guest.
+        """
 
         from arabase.table_access.models import TableGrant
 
-        manager = (
-            WorkspaceUser.objects_and_trash if include_trash else WorkspaceUser.objects
-        )
-        workspace_user_ids = dict(
-            manager.filter(workspace=workspace, user_id__in=user_ids).values_list(
-                "id", "user_id"
+        cached = local_cache.get(f"arabase_table_access_grants_{workspace.id}", dict)
+
+        missing = [user_id for user_id in user_ids if user_id not in cached]
+        if missing:
+            manager = (
+                WorkspaceUser.objects_and_trash
+                if include_trash
+                else WorkspaceUser.objects
             )
-        )
-        grants: Dict[int, Dict[int, str]] = {user_id: {} for user_id in user_ids}
-        rows = TableGrant.objects.filter(
-            workspace_user_id__in=workspace_user_ids.keys()
-        ).values_list("workspace_user_id", "table_id", "level")
-        for workspace_user_id, table_id, level in rows:
-            user_id = workspace_user_ids[workspace_user_id]
-            grants[user_id][table_id] = level
-        return grants
+            workspace_user_ids = dict(
+                manager.filter(workspace=workspace, user_id__in=missing).values_list(
+                    "id", "user_id"
+                )
+            )
+            for user_id in missing:
+                cached[user_id] = {}
+            rows = TableGrant.objects.filter(
+                workspace_user_id__in=workspace_user_ids.keys()
+            ).values_list("workspace_user_id", "table_id", "level")
+            for workspace_user_id, table_id, level in rows:
+                cached[workspace_user_ids[workspace_user_id]][table_id] = level
+
+        return {user_id: cached[user_id] for user_id in user_ids}
 
     def _scope_of(self, context: Any, cache: Dict[Any, Any]):
         """Resolve a check context to ``(table_id, database_id)``.

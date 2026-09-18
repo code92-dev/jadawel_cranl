@@ -5,6 +5,7 @@ class TableGrantDoesNotExist(Exception):
 class TableNotInWorkspace(Exception):
     """Raised when a grant would point at a table outside the workspace."""
 
+
 # An organization-managed workspace refuses guests too, but that rejection is
 # core's: `CoreHandler.create_workspace_invitation` calls the organizations
 # plugin's `validate_workspace_membership_mutation`, which raises
