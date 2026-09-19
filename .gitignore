@@ -180,3 +180,6 @@ web-frontend/storybook-static
 
 # graft's local graph cache — regenerable, not committed (run `graft build`).
 /graft/
+
+# Generated: graft graph visualiser output (rebuild with .scratch/graft-vis/build.py)
+.scratch/graft-vis/index.html
