@@ -4,7 +4,8 @@
   <template v-else>
     <div class="logo">
       <img
-        src="@jadawel/modules/core/static/img/logo.svg?url"
+        src="@jadawel/modules/core/static/img/logo.png?url"
+        height="29"
         v-bind="$attrs"
         :class="[$attrs.class]"
       />

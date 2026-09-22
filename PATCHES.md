@@ -14,6 +14,16 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Platform logo and simplified MCP setup (2026-09-22)
+
+| File                                                                                                                                           | Change                                                                                                             | Reason                                                                                                    | Merge risk |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- | ---------- |
+| `web-frontend/modules/core/{static,server/public}/img/logo.png`, `components/Logo.vue`                                                         | Added the approved transparent Jadawel master and made the shared logo component use it                            | Apply the new Arabic wordmark and blue grid lockup to every product surface rendered through `Logo`       | low        |
+| `backend/src/jadawel/core/emails_context_types.py`                                                                                             | Changed the shared email logo URL from `logo.svg` to `logo.png`                                                    | Keep transactional email branding in sync with the product                                                | low        |
+| `web-frontend/modules/core/components/settings/McpEndpoint.vue`, `assets/scss/components/mcp_endpoint.scss`, `locales/{ar,en}.json`            | Replaced the client-specific setup tabs with one bilingual, copyable AI-agent prompt and made the prompt box wrap long lines | The setup flow is client-agnostic, and its secret URL and instructions must remain inside the visible box | low        |
+| `web-frontend/modules/database/utils/clipboard.js`                                                                                           | Restored the hidden-textarea copy fallback when the browser Clipboard API is unavailable                           | Keep copy actions working on the private HTTP test deployment and other non-secure browser contexts       | low        |
+| `web-frontend/test/unit/core/components/settings/mcpEndpoint.spec.js`, `web-frontend/test/unit/database/__snapshots__/publicView.spec.js.snap` | Covered the single-prompt setup, both copy paths, and the updated logo asset expectation                            | Prevent client tabs, broken HTTP clipboard support, and the retired logo path from returning              | low        |
+
 ## Table-scoped guest access — hidden field hook (2026-09-18)
 
 **Context:** `docs/TABLE_LEVEL_ACCESS_PLAN.md`. A GUEST workspace member only

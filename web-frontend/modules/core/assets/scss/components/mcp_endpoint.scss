@@ -64,7 +64,8 @@
   }
 }
 
-.mcp-endpoint__link-action {
+.mcp-endpoint__link-action,
+.mcp-endpoint__prompt-action {
   flex-shrink: 0;
   position: relative;
   inline-size: 32px;
@@ -83,9 +84,21 @@
   }
 }
 
+.mcp-endpoint__prompt-row {
+  display: flex;
+  align-items: flex-start;
+  inline-size: 100%;
+}
+
 .mcp-endpoint__warning {
   font-size: 11px;
   color: $palette-yellow-700;
+}
+
+.mcp-endpoint__setup-title {
+  margin-block: 20px 8px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .mcp-endpoint__instructions {
@@ -116,13 +129,27 @@
   }
 }
 
+.mcp-endpoint__prompt {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+  max-inline-size: 100%;
+  margin: 0 0 4px;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 .mcp-endpoint__code {
   display: block;
+  box-sizing: border-box;
   inline-size: 100%;
+  max-inline-size: 100%;
   padding: 6px;
   font-size: 12px;
   background-color: $color-neutral-100;
   line-height: 140%;
+  white-space: inherit;
+  overflow-wrap: inherit;
+  unicode-bidi: plaintext;
 
   @include rounded($rounded);
 }

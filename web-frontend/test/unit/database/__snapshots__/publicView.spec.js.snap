@@ -52,7 +52,7 @@ exports[`Public View Page Tests > Can see a publicly shared grid view 1`] = `
                 alt="جداول"
                 class="header__filter-logo header__filter-logo"
                 height="14"
-                src="/modules/core/static/img/logo.svg"
+                src="/modules/core/static/img/logo.png"
               />
             </div>
           </li>

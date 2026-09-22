@@ -1150,12 +1150,10 @@
     "endpointURLIntro": "The MCP (Model Context Protocol) server URL can be added to any client that supports MCP servers. It's a unique endpoint that gives the LLM direct access to perform actions in the workspace on your behalf.",
     "reveal": "Reveal full URL",
     "warning": "Treat your MCP URL like a password, as it has the ability to modify data in Jadawel.",
-    "claudeInstructions": "Three simple steps to get started with Claude Desktop and the Jadawel MCP.\n\n1. Open the Claude Desktop settings from the navigation bar. (⌘+,)\n1. Go to the \"Develop\" tab, and click on \"Edit Config\".\n1. Include the following JSON configuration in `claude_desktop_config.json`.",
-    "cursorInstructions": "Three simple steps to get started with Cursor and the Jadawel MCP.\n\n1. Open Cursor settings (⇧+⌘+J)\n1. Navigate to the \"MCP\" tab and click \"Add MCP Server\"\n1. Add the following JSON configuration.",
-    "codexInstructions": "Connect Codex to the Jadawel MCP in three steps.\n\n1. Open a terminal where the Codex CLI is installed.\n1. Run the command below to register the Jadawel MCP.\n1. Run `codex mcp list` to verify the server, then start a new Codex session.",
-    "otherClientsTitle": "Others",
-    "otherClientsInstructions": "Reveal the full URL first, then copy the prompt below and give it to any AI agent that can configure MCP servers.",
-    "otherClientsPrompt": "Set up the following Jadawel MCP server in this AI client. Use the client's official MCP configuration method. The server uses an SSE endpoint, so use an SSE-compatible configuration or the `mcp-remote` adapter when needed.\n\nServer name: Jadawel MCP\nServer URL: {endpointUrl}\n\nTreat this URL as a password: do not log, publish, or share it. After configuration, verify the connection by listing the available Jadawel MCP tools. If you cannot edit the configuration directly, give me exact platform-specific steps and the complete configuration snippet."
+    "copyPrompt": "Copy prompt",
+    "setupPromptTitle": "Paste this prompt to your AI agent",
+    "setupPromptInstructions": "Reveal the full URL first, then copy the prompt below.",
+    "setupPrompt": "Set up the following Jadawel MCP server in this AI client. Use the client's official MCP configuration method. The server uses an SSE endpoint, so use an SSE-compatible configuration or the `mcp-remote` adapter when needed.\n\nServer name: Jadawel MCP\nServer URL: {endpointUrl}\n\nTreat this URL as a password: do not log, publish, or share it. After configuration, verify the connection by listing the available Jadawel MCP tools. If you cannot edit the configuration directly, give me exact platform-specific steps and the complete configuration snippet."
   },
   "coreHTTPTriggerServiceForm": {
     "title": "Webhook URL",

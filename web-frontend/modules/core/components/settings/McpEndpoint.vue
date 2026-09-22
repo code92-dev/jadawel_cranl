@@ -87,66 +87,29 @@
         {{ $t('mcpEndpoint.warning') }}
       </div>
     </div>
-    <Tabs header-no-padding content-no-x-padding>
-      <Tab title="Claude">
-        <MarkdownIt
-          class="mcp-endpoint__instructions margin-bottom-1"
-          :content="$t('mcpEndpoint.claudeInstructions')"
-        ></MarkdownIt>
-        <pre><code class="mcp-endpoint__code">{
-  "mcpServers": {
-    "Jadawel MCP": {
-      "command": "npx",
-      "args": [
-        "mcp-remote",
-        "{{ endpointUrl }}"
-      ]
-    }
-  }
-}</code></pre>
-        <a v-if="!reveal" href="#" @click.prevent="reveal = true">{{
-          $t('mcpEndpoint.reveal')
-        }}</a>
-      </Tab>
-      <Tab title="Cursor">
-        <MarkdownIt
-          class="mcp-endpoint__instructions margin-bottom-1"
-          :content="$t('mcpEndpoint.cursorInstructions')"
-        ></MarkdownIt>
-        <pre><code class="mcp-endpoint__code">{
-  "mcpServers": {
-    "Jadawel MCP": {
-      "url": "{{ endpointUrl }}"
-    }
-  }
-}</code></pre>
-        <a v-if="!reveal" href="#" @click.prevent="reveal = true">{{
-          $t('mcpEndpoint.reveal')
-        }}</a>
-      </Tab>
-      <Tab title="Codex">
-        <MarkdownIt
-          class="mcp-endpoint__instructions margin-bottom-1"
-          :content="$t('mcpEndpoint.codexInstructions')"
-        ></MarkdownIt>
-        <pre><code class="mcp-endpoint__code">codex mcp add jadawel -- npx -y mcp-remote "{{ endpointUrl }}"</code></pre>
-        <a v-if="!reveal" href="#" @click.prevent="reveal = true">{{
-          $t('mcpEndpoint.reveal')
-        }}</a>
-      </Tab>
-      <Tab :title="$t('mcpEndpoint.otherClientsTitle')">
-        <MarkdownIt
-          class="mcp-endpoint__instructions margin-bottom-1"
-          :content="$t('mcpEndpoint.otherClientsInstructions')"
-        ></MarkdownIt>
-        <pre><code class="mcp-endpoint__code">{{
-          $t('mcpEndpoint.otherClientsPrompt', { endpointUrl })
+    <h3 class="mcp-endpoint__setup-title">
+      {{ $t('mcpEndpoint.setupPromptTitle') }}
+    </h3>
+    <MarkdownIt
+      class="mcp-endpoint__instructions margin-bottom-1"
+      :content="$t('mcpEndpoint.setupPromptInstructions')"
+    ></MarkdownIt>
+    <div class="mcp-endpoint__prompt-row">
+      <pre class="mcp-endpoint__prompt"><code class="mcp-endpoint__code">{{
+          $t('mcpEndpoint.setupPrompt', { endpointUrl })
         }}</code></pre>
-        <a v-if="!reveal" href="#" @click.prevent="reveal = true">{{
-          $t('mcpEndpoint.reveal')
-        }}</a>
-      </Tab>
-    </Tabs>
+      <a
+        v-tooltip="$t('mcpEndpoint.copyPrompt')"
+        class="mcp-endpoint__prompt-action"
+        @click.prevent="copyPromptToClipboard()"
+      >
+        <i class="iconoir-copy" />
+        <Copied ref="promptCopied"></Copied>
+      </a>
+    </div>
+    <a v-if="!reveal" href="#" @click.prevent="reveal = true">{{
+      $t('mcpEndpoint.reveal')
+    }}</a>
   </Expandable>
 </template>
 
@@ -190,6 +153,12 @@ export default {
     copyShareUrlToClipboard() {
       copyToClipboard(this.getEndpointUrl(this.endpoint.key))
       this.$refs.copied.show()
+    },
+    copyPromptToClipboard() {
+      const endpointUrl = this.getEndpointUrl(this.endpoint.key)
+      const prompt = this.$t('mcpEndpoint.setupPrompt', { endpointUrl })
+      copyToClipboard(prompt)
+      this.$refs.promptCopied.show()
     },
     enableRename() {
       this.$refs.context.hide()
