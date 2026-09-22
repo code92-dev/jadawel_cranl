@@ -17,16 +17,27 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-18 from commit da77d64d, tag 2.3.8-table-access.
+# Published 2026-09-22 from commit 053c7750, tag 2.3.9-logo-mcp-prompt.
+# Applies the approved transparent Jadawel logo to the shared product logo
+# component and to transactional email, and collapses the MCP settings tabs
+# (Claude, Cursor, Codex, Others) into the single bilingual AI-agent prompt
+# they all described. The prompt box wraps long lines so the secret endpoint
+# URL stays inside it, and every copy action falls back to a hidden textarea
+# when the browser Clipboard API is unavailable, as it is over plain HTTP.
+# **No migration.**
+# Previous deployment pin (2.3.8-table-access):
+# sha256:a8f8707b19a4b1d1ed1d50d6a223edf3a3df117c4ab3d33e3831e0c34c5acd8b.
+#
+# Previously published 2026-09-18 from commit da77d64d, tag 2.3.8-table-access.
 # Adds table-scoped guest access: a GUEST workspace member reaches only the
 # tables they were granted, invited through the standard workspace invitation
 # flow from the new "Table access" tab in the workspace settings.
 # Previous deployment pin (2.3.8-theme-boot-no-flash):
 # sha256:7b00d5320e4d2606054744516197b5c10b65945fd3217c61173b2b1a76d5c8c0.
 #
-# Previously published 2026-09-16 from commit 0fb12bbe, tag
-# 2.3.8-theme-boot-no-flash. Applies the interface theme before first paint to
-# prevent a flash of the previous palette during startup.
+# 2.3.8-theme-boot-no-flash was published 2026-09-16 from commit 0fb12bbe and
+# applies the interface theme before first paint to prevent a flash of the
+# previous palette during startup.
 # Previous deployment pin (2.3.7-white-theme-20260916):
 # sha256:1f89d8fe78f43f86c5ce987c7445f394d6db5b8de2925df4d49a604d406a5ec4.
 #
