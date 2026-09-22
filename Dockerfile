@@ -222,7 +222,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:a8f8707b19a4b1d1ed1d50d6a223edf3a3df117c4ab3d33e3831e0c34c5acd8b
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:76fd4dad292ca5e835d2278592dfb7f4946f0b42cb84470100ef47c701ec6899
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
