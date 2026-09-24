@@ -46,6 +46,8 @@
     "reloadAndCompare": "Reload and compare",
     "readOnly": "You no longer have permission to edit this policy. It is read-only.",
     "protectionSuspended": "Protection is paused until the reported issue is fixed.",
+    "notReadyTitle": "Field protection is not ready",
+    "notReadyDescription": "This server cannot protect fields right now, so the change was not saved. Ask an administrator to check the MCP protection status. Until then, create the endpoint without protected fields or leave the policy unchanged.",
     "reactivate": "Reactivate protection",
     "confirmRemoval": "I understand that removed fields will no longer be masked.",
     "saveChanges": "Save protection changes",

@@ -81,7 +81,9 @@ def test_empty_policy_requires_explicit_confirmation(api_client, data_fixture):
 
 @pytest.mark.django_db
 @override_settings(FEATURE_FLAGS=[])
-def test_non_empty_policy_admission_is_feature_gated(api_client, data_fixture):
+def test_non_empty_policy_admission_is_enabled_without_a_feature_flag(
+    api_client, data_fixture
+):
     user, token = data_fixture.create_user_and_token()
     workspace = data_fixture.create_workspace(user=user)
     database = data_fixture.create_database_application(workspace=workspace)
@@ -91,18 +93,18 @@ def test_non_empty_policy_admission_is_feature_gated(api_client, data_fixture):
     response = api_client.post(
         reverse("api:arabase:mcp_endpoint_protection_summaries"),
         {
-            "name": "Gated endpoint",
+            "name": "Default-on endpoint",
             "workspace_id": workspace.id,
             "protected_field_ids": [field.id],
             "confirm_empty_policy": False,
         },
         format="json",
         HTTP_AUTHORIZATION=f"JWT {token}",
-        HTTP_IDEMPOTENCY_KEY="gated-policy-creation-1",
+        HTTP_IDEMPOTENCY_KEY="default-on-policy-creation-1",
     )
 
-    assert response.status_code == HTTP_400_BAD_REQUEST
-    assert MCPEndpoint.objects.count() == 0
+    assert response.status_code == HTTP_201_CREATED
+    assert MCPProtectedField.objects.filter(field=field).count() == 1
 
 
 @pytest.mark.django_db

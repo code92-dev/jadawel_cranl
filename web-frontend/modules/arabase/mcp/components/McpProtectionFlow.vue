@@ -122,6 +122,7 @@ import error from '@jadawel/modules/core/mixins/error'
 import McpProtectionFieldSelector from '@jadawel/modules/arabase/mcp/components/McpProtectionFieldSelector'
 import McpProtectionReview from '@jadawel/modules/arabase/mcp/components/McpProtectionReview'
 import ProtectionPolicyService from '@jadawel/modules/arabase/mcp/services/protectionPolicy'
+import { protectionErrorMap } from '@jadawel/modules/arabase/mcp/protectionErrors'
 
 export default {
   name: 'McpProtectionFlow',
@@ -183,7 +184,7 @@ export default {
         )
         this.$emit('created', data)
       } catch (error) {
-        this.handleError(error, 'endpoint')
+        this.handleError(error, 'endpoint', protectionErrorMap(this.$t))
       } finally {
         this.loading = false
       }

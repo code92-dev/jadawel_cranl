@@ -2,6 +2,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { vi } from 'vitest'
 
 import McpProtectionPolicyEditor from '@jadawel/modules/arabase/mcp/components/McpProtectionPolicyEditor'
+import { ErrorHandler } from '@jadawel/modules/core/plugins/clientHandler'
 
 const fetchPolicy = vi.fn()
 const replacePolicy = vi.fn()
@@ -90,6 +91,46 @@ describe('McpProtectionPolicyEditor', () => {
       },
       expect.any(String)
     )
+  })
+
+  test('explains that the server cannot protect fields yet', async () => {
+    const policy = { revision: 4, lifecycle_status: 'active', fields: [] }
+    fetchPolicy.mockResolvedValue({ data: policy })
+    const response = {
+      status: 400,
+      data: {
+        error: 'ERROR_MCP_PROTECTION_NOT_READY',
+        detail: 'Field protection is not ready on this server.',
+      },
+    }
+    replacePolicy.mockRejectedValue({
+      response,
+      handler: new ErrorHandler(
+        null,
+        null,
+        { errorMap: {} },
+        response,
+        response.data.error,
+        response.data.detail
+      ),
+    })
+
+    const wrapper = await mountSuspended(McpProtectionPolicyEditor, {
+      props: { endpoint: { id: 9, workspace_id: 1 }, applications: [] },
+      global: {
+        mocks: { $client: {}, $t: (key) => key },
+        stubs: {
+          Error: true,
+          McpProtectionFieldSelector: true,
+        },
+      },
+    })
+
+    await wrapper.vm.save()
+
+    expect(wrapper.vm.error.title).toBe('mcpProtection.notReadyTitle')
+    expect(wrapper.vm.error.message).toBe('mcpProtection.notReadyDescription')
+    expect(wrapper.emitted('saved')).toBeUndefined()
   })
 
   test('keeps unavailable protected identities visible during review', async () => {

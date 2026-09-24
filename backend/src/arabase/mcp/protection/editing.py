@@ -6,7 +6,10 @@ from django.db import IntegrityError, transaction
 
 from rest_framework.exceptions import ValidationError
 
-from arabase.mcp.protection.admission import ensure_policy_admission_allowed
+from arabase.mcp.protection.admission import (
+    ensure_policy_admission_allowed,
+    ensure_protection_vault_ready,
+)
 from arabase.mcp.protection.creation import _load_and_validate_fields
 from arabase.mcp.protection.lifecycle import (
     record_mcp_protection_lifecycle_transition,
@@ -119,6 +122,8 @@ def _replace_mcp_protection_policy(
     requested_ids = set(protected_field_ids)
     if requested_ids or current_ids:
         ensure_policy_admission_allowed(user)
+    if requested_ids - current_ids:
+        ensure_protection_vault_ready()
     removed_ids = current_ids - requested_ids
     if removed_ids and set(confirm_remove_field_ids) != removed_ids:
         raise ValidationError(

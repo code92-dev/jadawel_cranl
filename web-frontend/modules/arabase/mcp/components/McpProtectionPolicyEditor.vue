@@ -129,6 +129,7 @@ import { uuid } from '@jadawel/modules/core/utils/string'
 import error from '@jadawel/modules/core/mixins/error'
 import McpProtectionFieldSelector from '@jadawel/modules/arabase/mcp/components/McpProtectionFieldSelector'
 import ProtectionPolicyService from '@jadawel/modules/arabase/mcp/services/protectionPolicy'
+import { protectionErrorMap } from '@jadawel/modules/arabase/mcp/protectionErrors'
 
 export default {
   name: 'McpProtectionPolicyEditor',
@@ -261,7 +262,7 @@ export default {
         } else if (status === 401 || status === 403) {
           this.readOnly = true
         } else {
-          this.handleError(saveError, 'endpoint')
+          this.handleError(saveError, 'endpoint', protectionErrorMap(this.$t))
         }
       } finally {
         this.saving = false
