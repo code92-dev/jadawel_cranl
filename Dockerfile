@@ -17,7 +17,19 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-22 from commit 053c7750, tag 2.3.9-logo-mcp-prompt.
+# Published 2026-09-24 from commit 180b3e21, tag 2.3.10-mcp-db-vault.
+# Makes MCP protected fields work with no setup: mask tokens are kept in the
+# app's PostgreSQL instead of a dedicated Redis that production never had, and
+# the fingerprint key is derived from SECRET_KEY unless a keyring is set. Every
+# protected row read had been failing with PROTECTION_UNAVAILABLE. Protecting
+# a field is now on by default and refused while the vault is not ready, and
+# MCP errors carry a fixed explanation for the calling model.
+# **Migration: arabase.0018** (additive: token table and reason choices).
+# No environment changes; existing MCP protection values keep working.
+# Previous deployment pin (2.3.9-logo-mcp-prompt):
+# sha256:76fd4dad292ca5e835d2278592dfb7f4946f0b42cb84470100ef47c701ec6899.
+#
+# Previously published 2026-09-22 from commit 053c7750, tag 2.3.9-logo-mcp-prompt.
 # Applies the approved transparent Jadawel logo to the shared product logo
 # component and to transactional email, and collapses the MCP settings tabs
 # (Claude, Cursor, Codex, Others) into the single bilingual AI-agent prompt
@@ -233,7 +245,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:76fd4dad292ca5e835d2278592dfb7f4946f0b42cb84470100ef47c701ec6899
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:2c0552658f9a7b8de8f44475197871420d21a387afb8ee1894082420e9bcf24d
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
