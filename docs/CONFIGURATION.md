@@ -42,8 +42,9 @@ keyring through Nuxt, API output, logs, or MCP model configuration.
 
 | Variable | Description | Default |
 |---|---|---|
-| `JADAWEL_MCP_PROTECTION_REDIS_URL` | Dedicated Redis URL for the digest-only 24-hour mask-token vault. Required in production when protected fields are enabled. | — |
-| `JADAWEL_MCP_PROTECTION_FINGERPRINT_KEYS` | JSON object mapping short key IDs to base64-encoded 32-byte HMAC keys. Retain previous verification keys for at least 24 hours during rotation. | `{}` |
+| `JADAWEL_MCP_PROTECTION_VAULT` | Where MCP mask tokens are kept: `database` (PostgreSQL, works on every deployment with no extra service), `redis` (the dedicated Redis below), or `auto` (Redis when `JADAWEL_MCP_PROTECTION_REDIS_URL` is set or shared Redis is allowed, otherwise the database). | `auto` |
+| `JADAWEL_MCP_PROTECTION_REDIS_URL` | Dedicated Redis URL for the digest-only 24-hour mask-token vault. Optional: without it the vault lives in PostgreSQL. | — |
+| `JADAWEL_MCP_PROTECTION_FINGERPRINT_KEYS` | JSON object mapping short key IDs to base64-encoded 32-byte HMAC keys. Retain previous verification keys for at least 24 hours during rotation. When empty, a dedicated key is derived from `SECRET_KEY`; it is never stored in the database, and rotating `SECRET_KEY` revokes outstanding tokens. | `{}` |
 | `JADAWEL_MCP_PROTECTION_ACTIVE_KEY_ID` | Key ID from the fingerprint keyring used for new mask tokens. | — |
 | `JADAWEL_MCP_PROTECTION_ALLOW_SHARED_REDIS` | Allows the vault to fall back to `REDIS_URL`. Use only for tests or local development; keep disabled in production. | `false` |
 | `JADAWEL_MCP_PROTECTION_REDIS_MEM_LIMIT` | Container memory limit for the dedicated protection Redis service in Compose. The service itself is capped at 128 MiB with `noeviction`. | `256m` |

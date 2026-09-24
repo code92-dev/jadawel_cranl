@@ -150,10 +150,10 @@ for the full working set and why each is needed.
 | `JADAWEL_PUBLIC_URL` | `https://jadawl.site` | Must exactly match the browser URL, scheme included, no trailing slash. |
 | `DATABASE_URL` | *from managed Postgres* | Or the `DATABASE_HOST` / `PORT` / `NAME` / `USER` / `PASSWORD` set. |
 | `REDIS_URL` | *from managed Redis* | Or the `REDIS_HOST` / `PORT` / `PASSWORD` set. |
-| `JADAWEL_MCP_PROTECTION_REDIS_URL` | *from a dedicated managed Redis* | Required before enabling MCP protected fields. Do not reuse `REDIS_URL` in production. |
-| `JADAWEL_MCP_PROTECTION_FINGERPRINT_KEYS` | *generated JSON keyring* | Private base64-encoded 32-byte HMAC keys; retain the previous key for at least 24 hours during rotation. |
-| `JADAWEL_MCP_PROTECTION_ACTIVE_KEY_ID` | *current key ID* | Must name one entry in the fingerprint keyring. |
-| `FEATURE_FLAGS` | `mcp-protected-fields` | Enables admission of non-empty endpoint protection policies after the dedicated Redis and fingerprint-key settings above are ready. Without it, enforcement remains fail-closed and policy writes are rejected. |
+| `JADAWEL_MCP_PROTECTION_REDIS_URL` | *leave unset* | Optional dedicated Redis vault. Unset, mask tokens live in the app's PostgreSQL and nothing else is needed. Never reuse `REDIS_URL`. |
+| `JADAWEL_MCP_PROTECTION_FINGERPRINT_KEYS` | *optional JSON keyring* | Unset, a key is derived from `SECRET_KEY`. Set private base64-encoded 32-byte HMAC keys only to rotate independently; retain the previous key for 24 hours. |
+| `JADAWEL_MCP_PROTECTION_ACTIVE_KEY_ID` | *with the keyring only* | Must name one entry in the fingerprint keyring. |
+| `FEATURE_FLAGS` | *not needed for MCP* | Field protection is on by default. `mcp-protected-fields-staff` on its own restricts it to staff; an existing `mcp-protected-fields` value is harmless. |
 | `DISABLE_EMBEDDED_PSQL` | `yes` | **Required on the lite image.** Without it the startup script runs `chown -R postgres:postgres` for a user that only exists in the full image, and a missing database silently becomes a confusing failure instead of a loud one. |
 | `DISABLE_EMBEDDED_REDIS` | `yes` | Same, for `chown -R redis:redis`. |
 | `AWS_ACCESS_KEY_ID` | | Uploads are lost on redeploy without S3. |
@@ -188,9 +188,57 @@ redirects to `/signup` permanently, with no way in through the UI.
 
 Skipping step 2 or 3 redeploys the same image.
 
+## MCP protected fields: the mask-token vault
+
+An MCP endpoint can protect fields (national ID, phone, email). A row read that
+touches one of them — the table holding it, or a table whose link, lookup or
+formula fields derive from it — swaps each protected cell for a mask token, and
+the vault remembers which cell each token stands for. With no working vault those
+reads fail closed with `PROTECTION_UNAVAILABLE` while listing databases, tables
+and schemas keeps working. That is the failure production hit in September 2026,
+when the vault was Redis-only and had never been provisioned.
+
+**Nothing needs configuring.** By default (`JADAWEL_MCP_PROTECTION_VAULT=auto`
+with no Redis URL) the vault is the `MCPMaskTokenRecord` table in the app's own
+PostgreSQL, shared by every worker and replica, and the fingerprint key is
+derived from `SECRET_KEY` with a fixed salt. The table holds token digests,
+bindings and keyed fingerprints — never a token, a value or a field name — and
+the key is never written to the database, so a backup of it cannot be brute-forced
+back to phone numbers or IDs. Rotating `SECRET_KEY` revokes every outstanding
+token, which is safe: callers simply read again. Expired records are purged hourly
+by Celery beat and in passing on issuance.
+
+Optional hardening, only if you want it:
+
+- **Independent key rotation** — set `JADAWEL_MCP_PROTECTION_FINGERPRINT_KEYS`
+  (`{"k2026-09":"<base64 32 bytes>"}`, generated with
+  `python3 -c "import os,base64;print(base64.b64encode(os.urandom(32)).decode())"`)
+  and `JADAWEL_MCP_PROTECTION_ACTIVE_KEY_ID`. Setting a keyring retires the
+  derived key. To rotate, add the new key beside the old, switch the active ID,
+  and remove the old key after 24 hours.
+- **A dedicated Redis vault** — set `JADAWEL_MCP_PROTECTION_REDIS_URL` to a Redis
+  with a bounded `maxmemory`, `maxmemory-policy noeviction`, and `CONFIG GET`
+  allowed (many managed offerings disable it). Never reuse `REDIS_URL`.
+
+**Verify** after a deploy:
+
+- `GET /api/arabase/mcp/protection/readiness/` returns `{"ready":true,"reason":""}`
+  (HTTP 200; 503 while not ready).
+- `manage.py mcp_protection_check --strict` in the container passes.
+- An MCP `list_table_rows` on a protected table returns rows whose protected
+  cells are `{"$jadawelProtected": {...}}` and whose other cells are plain.
+
+Readiness reasons: `PROTECTION_VAULT_UNAVAILABLE` (database vault unreachable or
+full), `PROTECTION_REDIS_UNAVAILABLE` (Redis selected but unreachable, unbounded,
+not `noeviction`, `CONFIG` refused, or at 60 % of its memory limit) and
+`PROTECTION_KEY_UNAVAILABLE` (a configured keyring does not contain a base64
+32-byte key for the active ID). Creating or extending a protection policy is
+refused while readiness fails; removing protection is always allowed.
+
 ## MCP protection load canary
 
-After provisioning the dedicated protection Redis, run the release canary from
+For the optional dedicated Redis vault only: after provisioning it, run the
+release canary from
 an application container that can resolve its private Redis hostname:
 
 ```bash
@@ -211,6 +259,12 @@ still require an operational drill with the deployment's normal database and
 logging capture. Do not interrupt the live service to manufacture that evidence.
 
 ## Troubleshooting
+
+**MCP lists tables and schemas but every row read returns
+`PROTECTION_UNAVAILABLE`** — the endpoint protects fields and the mask-token
+vault is not ready. Check `/api/arabase/mcp/protection/readiness/` and follow
+[MCP protected fields](#mcp-protected-fields-the-mask-token-vault). Search
+(`list_table_rows` with `search`) on a protected table fails closed by design.
 
 **`Railpack could not determine how to build the app`** — the app was created
 with the Railpack build type. It cannot be changed; recreate the app with
@@ -244,8 +298,8 @@ to the frontend. Add the extra host to `JADAWEL_EXTRA_PUBLIC_URLS`.
 
 **Saving an MCP protection policy shows a network error or a CORS failure** —
 confirm the running image allows `Idempotency-Key` in
-`Access-Control-Allow-Headers`, and set `FEATURE_FLAGS=mcp-protected-fields`
-before redeploying. A CranL environment save alone does not recreate the running
-container.
+`Access-Control-Allow-Headers`. Images up to 2.3.9 also need
+`FEATURE_FLAGS=mcp-protected-fields`; later images enable protection by default.
+A CranL environment save alone does not recreate the running container.
 
 **Uploaded files disappear after a deploy** — no S3 configured. See §4.

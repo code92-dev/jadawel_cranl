@@ -1567,3 +1567,37 @@ on every refresh.
 The client plugin `plugins/interfaceTheme.client.js` stays. It is now a
 correction rather than the primary path: it repairs storage that names a removed
 theme, and still applies the theme if the head script could not run.
+
+## MCP safe errors carry a fixed explanation (2026-09-23)
+
+**Context:** A protected endpoint on production returned `PROTECTION_UNAVAILABLE`
+for every row read because its mask-token vault was never configured. The calling
+model saw only a code and a correlation ID, so it could not tell the user whether
+to retry, change the call, or ask an administrator. A constant sentence per code
+closes that gap without letting anything caller- or data-derived cross the error
+boundary, and without saying which protection check failed (that would make the
+error an oracle for token validity).
+
+| File                                       | Change                                                                  | Reason                                                                                   | Merge risk |
+| ------------------------------------------ | ----------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------- |
+| `backend/src/jadawel/core/mcp/errors.py`   | Added `SAFE_MCP_ERROR_MESSAGES`, one constant explanation per error code | Give MCP clients an actionable, content-blind explanation of each fixed safe error       | low        |
+| `backend/src/jadawel/core/mcp/__init__.py` | `_safe_tool_error` adds the code's constant `message` to the payload     | Deliver that explanation; the payload is still built only from allowlisted constants    | low        |
+
+**Tests:** `backend/tests/jadawel/core/mcp/test_mcp_server.py` and
+`backend/tests/jadawel/contrib/database/mcp/test_mcp_rows_tools.py` now assert the
+payload is exactly `{code, correlation_id, message, retryable}` and that `message`
+equals the code's constant.
+
+## MCP protection vault defaults to PostgreSQL (2026-09-23)
+
+**Context:** Protected-field reads needed a hand-provisioned dedicated Redis and a
+fingerprint keyring; without them every protected read failed closed, which is
+how production broke. On-prem installs must work without that setup, so the vault
+now defaults to the application's PostgreSQL (additive, in `arabase`) and the
+fingerprint key defaults to one derived from `SECRET_KEY`. Redis stays available.
+
+| File                                          | Change                                                           | Reason                                                                     | Merge risk |
+| --------------------------------------------- | ---------------------------------------------------------------- | -------------------------------------------------------------------------- | ---------- |
+| `backend/src/jadawel/config/settings/base.py` | Added `MCP_PROTECTION_VAULT` (`JADAWEL_MCP_PROTECTION_VAULT`, `auto`) | Select the database or Redis mask-token vault; `auto` needs no configuration | low        |
+
+**Tests:** `backend/tests/arabase/mcp/protection/test_database_vault.py`.
