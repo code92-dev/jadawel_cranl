@@ -6,6 +6,7 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.request import Request
 from rest_framework.response import Response
+from rest_framework.status import HTTP_400_BAD_REQUEST
 from rest_framework.views import APIView
 
 from arabase.api.mcp_protection.serializers import (
@@ -16,6 +17,7 @@ from arabase.api.mcp_protection.serializers import (
     ReactivateMCPProtectionPolicySerializer,
     UpdateMCPProtectionPolicySerializer,
 )
+from arabase.mcp.protection.admission import MCPProtectionVaultNotReady
 from arabase.mcp.protection.creation import (
     create_protected_mcp_endpoint,
     validate_idempotency_key,
@@ -54,6 +56,14 @@ from jadawel.core.mcp.exceptions import (
 from jadawel.core.mcp.handler import MCPEndpointHandler
 from jadawel.core.mcp.models import MCPEndpoint
 from jadawel.core.models import WORKSPACE_USER_PERMISSION_ADMIN, WorkspaceUser
+
+ERROR_MCP_PROTECTION_NOT_READY = (
+    "ERROR_MCP_PROTECTION_NOT_READY",
+    HTTP_400_BAD_REQUEST,
+    "Field protection is not ready on this server ({e.safe_reason_code}), so no "
+    "field was protected. An administrator can see the cause at "
+    "/api/arabase/mcp/protection/readiness/.",
+)
 
 
 def _may_display_field_metadata(user, field) -> bool:
@@ -105,7 +115,10 @@ class MCPProtectionPolicyView(APIView):
     )
     @validate_body(UpdateMCPProtectionPolicySerializer)
     @map_exceptions(
-        {MCPProtectionPolicyConflict: ("MCP_PROTECTION_REVISION_CONFLICT", 409)}
+        {
+            MCPProtectionPolicyConflict: ("MCP_PROTECTION_REVISION_CONFLICT", 409),
+            MCPProtectionVaultNotReady: ERROR_MCP_PROTECTION_NOT_READY,
+        }
     )
     def patch(self, request: Request, endpoint_id: int, data: dict) -> Response:
         idempotency_key = validate_idempotency_key(
@@ -271,6 +284,7 @@ class MCPEndpointProtectionSummariesView(APIView):
             UserNotInWorkspace: ERROR_USER_NOT_IN_GROUP,
             WorkspaceDoesNotExist: ERROR_GROUP_DOES_NOT_EXIST,
             MaximumUniqueEndpointTriesError: ERROR_MAXIMUM_UNIQUE_ENDPOINT_TRIES,
+            MCPProtectionVaultNotReady: ERROR_MCP_PROTECTION_NOT_READY,
         }
     )
     def post(self, request: Request, data: dict) -> Response:

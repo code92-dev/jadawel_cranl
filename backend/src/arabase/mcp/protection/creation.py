@@ -7,7 +7,10 @@ from django.db import IntegrityError, transaction
 
 from rest_framework.exceptions import ValidationError
 
-from arabase.mcp.protection.admission import ensure_policy_admission_allowed
+from arabase.mcp.protection.admission import (
+    ensure_policy_admission_allowed,
+    ensure_protection_vault_ready,
+)
 from arabase.mcp.protection.lifecycle import record_policy_became_nonempty
 from arabase.mcp.protection.models import (
     MCPProtectedField,
@@ -55,6 +58,7 @@ def create_protected_mcp_endpoint(
         )
     if protected_field_ids:
         ensure_policy_admission_allowed(user)
+        ensure_protection_vault_ready()
 
     fingerprint = _request_fingerprint(
         name, workspace_id, protected_field_ids, confirm_empty_policy
