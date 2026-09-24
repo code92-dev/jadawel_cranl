@@ -138,6 +138,7 @@ Terms introduced by the Excel/ODS import and export features. Keep "Excel",
 | Endpoint protection policy | سياسة حماية الحقول | The protected fields selected for one MCP endpoint. |
 | Mask token | رمز إخفاء | An opaque reference returned through MCP instead of a protected value. |
 | Protected derivative | مشتق محمي | A value that would reproduce or expose information from a protected field. |
+| Fingerprint key | مفتاح البصمة | The server-side HMAC key that binds a mask token to the cell value it replaced. Derived from `SECRET_KEY` unless an operator configures a keyring; never user data. |
 
 ## Common actions (verbs)
 

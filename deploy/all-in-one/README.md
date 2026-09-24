@@ -55,11 +55,13 @@ docker run \
 * Optionally add `-e DATABASE_URL=postgresql://user:pwd@host:port/db` to use an external
   Postgresql.
 * Optionally add `-e REDIS_URL=redis://user:pwd@host:port` to use an external Redis.
-* MCP protected fields require a separate
-  `JADAWEL_MCP_PROTECTION_REDIS_URL`, a private
-  `JADAWEL_MCP_PROTECTION_FINGERPRINT_KEYS` JSON keyring, and a matching
-  `JADAWEL_MCP_PROTECTION_ACTIVE_KEY_ID`. Shared Redis is suitable only for explicit
-  local/test use with `JADAWEL_MCP_PROTECTION_ALLOW_SHARED_REDIS=true`.
+* MCP protected fields need no extra setup: mask tokens are kept in the same
+  PostgreSQL and the fingerprint key is derived from `SECRET_KEY`. Optionally set
+  `JADAWEL_MCP_PROTECTION_REDIS_URL` for a dedicated Redis vault, or an explicit
+  `JADAWEL_MCP_PROTECTION_FINGERPRINT_KEYS` keyring with
+  `JADAWEL_MCP_PROTECTION_ACTIVE_KEY_ID` to rotate keys independently of
+  `SECRET_KEY`. Protection is on by default (`FEATURE_FLAGS=mcp-protected-fields-staff`
+  restricts it to staff). `GET /api/arabase/mcp/protection/readiness/` reports the state.
 
 > There is a security flaw with docker and the ufw firewall.
 > By default docker when exposing ports on 0.0.0.0 will bypass any ufw firewall rules
