@@ -12,6 +12,7 @@ from mcp.shared.memory import (
 )
 
 from jadawel.core.mcp import JadawelMCPServer, current_key
+from jadawel.core.mcp.errors import SAFE_MCP_ERROR_MESSAGES
 
 
 def assert_safe_tool_error(result, code="MCP_TOOL_FAILED"):
@@ -20,7 +21,8 @@ def assert_safe_tool_error(result, code="MCP_TOOL_FAILED"):
     assert error["code"] == code
     assert error["retryable"] is False
     UUID(error["correlation_id"])
-    assert set(error) == {"code", "correlation_id", "retryable"}
+    assert set(error) == {"code", "correlation_id", "message", "retryable"}
+    assert error["message"] == SAFE_MCP_ERROR_MESSAGES[error["code"]]
 
 
 @pytest.mark.django_db
