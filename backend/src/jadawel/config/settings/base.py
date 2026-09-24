@@ -194,8 +194,10 @@ REDIS_URL = os.getenv(
     f"{REDIS_PROTOCOL}://{redis_auth}{REDIS_HOST}:{REDIS_PORT}/0{redis_url_suffix}",
 )
 
-# Private MCP protected-field storage. A dedicated Redis URL is required in
-# production; shared Redis is an explicit development/test-only opt-in.
+# Private MCP protected-field storage. `auto` keeps mask tokens in PostgreSQL,
+# which every deployment already has, unless a dedicated Redis vault is
+# configured below. Shared Redis is an explicit development/test-only opt-in.
+MCP_PROTECTION_VAULT = os.getenv("JADAWEL_MCP_PROTECTION_VAULT", "auto")
 MCP_PROTECTION_REDIS_URL = os.getenv("JADAWEL_MCP_PROTECTION_REDIS_URL", "")
 MCP_PROTECTION_ALLOW_SHARED_REDIS = str_to_bool(
     os.getenv("JADAWEL_MCP_PROTECTION_ALLOW_SHARED_REDIS", "false")

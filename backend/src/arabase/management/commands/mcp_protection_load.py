@@ -208,7 +208,10 @@ class Command(BaseCommand):
 
         redis_url = options["redis_url"] or settings.MCP_PROTECTION_REDIS_URL
         if not redis_url:
-            raise CommandError("A dedicated MCP protection Redis URL is required.")
+            raise CommandError(
+                "This canary exercises the optional Redis vault and needs its URL. "
+                "The default PostgreSQL vault needs no Redis."
+            )
 
         # The canary's values are synthetic and the key is process-local. This
         # avoids relying on a production fingerprint key while still exercising

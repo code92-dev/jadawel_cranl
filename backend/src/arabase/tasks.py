@@ -5,6 +5,7 @@ so this module needs no registration in ``ArabaseConfig.ready()``.
 """
 
 import logging
+from datetime import timedelta
 
 from django.conf import settings
 
@@ -131,4 +132,32 @@ def setup_periodic_backup_tasks(sender, **kwargs):
         parse_crontab(schedule_expression),
         backup_database.s(),
         name=BACKUP_TASK_NAME,
+    )
+
+
+MCP_MASK_TOKEN_PURGE_TASK_NAME = "arabase-purge-expired-mcp-mask-tokens"
+
+
+@app.task(name="arabase.tasks.purge_expired_mcp_mask_tokens")
+def purge_expired_mcp_mask_tokens():
+    """Remove expired records from the PostgreSQL mask-token vault.
+
+    Expired records are already ignored and issuance purges a batch on the way,
+    so this only keeps the table small on an instance that issues rarely.
+    """
+
+    from arabase.mcp.protection.vault import purge_expired_mask_tokens
+
+    deleted = purge_expired_mask_tokens()
+    if deleted:
+        logger.info("Purged %d expired MCP mask-token records.", deleted)
+
+
+# noinspection PyUnusedLocal
+@app.on_after_finalize.connect
+def setup_periodic_mcp_mask_token_purge(sender, **kwargs):
+    sender.add_periodic_task(
+        timedelta(hours=1),
+        purge_expired_mcp_mask_tokens.s(),
+        name=MCP_MASK_TOKEN_PURGE_TASK_NAME,
     )
