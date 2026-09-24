@@ -11,7 +11,11 @@ from mcp.shared.memory import (
 )
 
 from jadawel.core.mcp import JadawelMCPServer, current_key
-from jadawel.core.mcp.errors import MCPErrorCode, SafeMCPToolError
+from jadawel.core.mcp.errors import (
+    SAFE_MCP_ERROR_MESSAGES,
+    MCPErrorCode,
+    SafeMCPToolError,
+)
 from jadawel.core.mcp.registries import MCPTool, mcp_tool_registry
 
 
@@ -192,7 +196,8 @@ def test_call_tool_returns_a_content_blind_protocol_error(data_fixture):
                 assert error["code"] == "MCP_TOOL_FAILED"
                 assert error["retryable"] is False
                 UUID(error["correlation_id"])
-                assert set(error) == {"code", "correlation_id", "retryable"}
+                assert set(error) == {"code", "correlation_id", "message", "retryable"}
+                assert error["message"] == SAFE_MCP_ERROR_MESSAGES[error["code"]]
                 assert "PROTECTED-CANARY-VALUE" not in result.content[0].text
 
         with transaction.atomic():
@@ -226,7 +231,8 @@ def test_call_tool_validation_error_does_not_echo_arguments(data_fixture):
                 assert error["code"] == "MCP_TOOL_FAILED"
                 assert error["retryable"] is False
                 UUID(error["correlation_id"])
-                assert set(error) == {"code", "correlation_id", "retryable"}
+                assert set(error) == {"code", "correlation_id", "message", "retryable"}
+                assert error["message"] == SAFE_MCP_ERROR_MESSAGES[error["code"]]
                 assert argument_canary not in result.content[0].text
 
         with transaction.atomic():
@@ -255,7 +261,8 @@ def test_call_tool_returns_allowlisted_protection_error(data_fixture, monkeypatc
             assert error["code"] == "PROTECTION_UNAVAILABLE"
             assert error["retryable"] is False
             UUID(error["correlation_id"])
-            assert set(error) == {"code", "correlation_id", "retryable"}
+            assert set(error) == {"code", "correlation_id", "message", "retryable"}
+            assert error["message"] == SAFE_MCP_ERROR_MESSAGES[error["code"]]
 
         with transaction.atomic():
             async_to_sync(inner)()

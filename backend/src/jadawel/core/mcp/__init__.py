@@ -6,7 +6,11 @@ from uuid import UUID, uuid4
 from asgiref.sync import sync_to_async
 from loguru import logger
 
-from jadawel.core.mcp.errors import MCPErrorCode, SafeMCPToolError
+from jadawel.core.mcp.errors import (
+    SAFE_MCP_ERROR_MESSAGES,
+    MCPErrorCode,
+    SafeMCPToolError,
+)
 from jadawel.core.mcp.sse import DjangoChannelsSseServerTransport
 
 if TYPE_CHECKING:
@@ -23,6 +27,7 @@ def _safe_tool_error(code: MCPErrorCode, *, retryable: bool, correlation_id: UUI
         "error": {
             "code": code,
             "correlation_id": str(correlation_id),
+            "message": SAFE_MCP_ERROR_MESSAGES[code],
             "retryable": retryable,
         }
     }
