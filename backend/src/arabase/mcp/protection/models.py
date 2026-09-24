@@ -36,6 +36,14 @@ class MCPProtectionSafeReason(models.TextChoices):
         "PROTECTION_REDIS_UNAVAILABLE",
         "Protection Redis unavailable",
     )
+    PROTECTION_VAULT_UNAVAILABLE = (
+        "PROTECTION_VAULT_UNAVAILABLE",
+        "Protection vault unavailable",
+    )
+    PROTECTION_KEY_UNAVAILABLE = (
+        "PROTECTION_KEY_UNAVAILABLE",
+        "Protection fingerprint key unavailable",
+    )
 
 
 class MCPProtectionPolicy(CreatedAndUpdatedOnMixin, models.Model):
@@ -236,6 +244,34 @@ class MCPProtectionMutationAudit(CreatedAndUpdatedOnMixin, models.Model):
                 fields=("endpoint", "created_on"),
                 name="ara_mcp_audit_ep_created_idx",
             )
+        ]
+
+
+class MCPMaskTokenRecord(models.Model):
+    """One live mask token in the PostgreSQL vault.
+
+    Holds exactly what the Redis vault holds: the SHA-256 digest of the raw
+    handle, its binding, and a keyed fingerprint of the value. Never the handle,
+    the value or a field name. The fingerprint key is not stored in the database,
+    so a backup of this table cannot be brute-forced back to low-entropy values.
+    """
+
+    digest = models.CharField(max_length=64, primary_key=True)
+    endpoint = models.ForeignKey(
+        MCPEndpoint,
+        on_delete=models.CASCADE,
+        related_name="+",
+    )
+    expires_at = models.DateTimeField()
+    record = models.JSONField()
+
+    class Meta:
+        indexes = [
+            models.Index(fields=("expires_at",), name="ara_mcp_token_expiry_idx"),
+            models.Index(
+                fields=("endpoint", "expires_at"),
+                name="ara_mcp_token_ep_expiry_idx",
+            ),
         ]
 
 

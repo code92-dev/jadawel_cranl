@@ -2,7 +2,6 @@ import json
 from copy import deepcopy
 from typing import Any, Never
 
-from arabase.mcp.protection.capacity import issuance_lease
 from arabase.mcp.protection.models import (
     MCPProtectedFieldState,
     MCPProtectionLifecycleStatus,
@@ -94,7 +93,7 @@ def mask_direct_row_output(
         vault = get_mask_token_vault()
         issue_requests = []
         issue_targets = []
-        with issuance_lease(endpoint.id, vault):
+        with vault.issuance_lease(endpoint.id):
             for row in rows:
                 observed_row = observed_rows[row["id"]]
                 observed_state = observed_row.updated_on.isoformat()

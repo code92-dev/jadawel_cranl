@@ -10,6 +10,12 @@ from arabase.mcp.protection.models import (
     MCPProtectionPolicy,
 )
 from arabase.mcp.protection.readiness import check_mcp_protection_policy_readiness
+from arabase.mcp.protection.vault import (
+    VAULT_BACKEND_REDIS,
+    MaskTokenVaultUnavailable,
+    _load_active_fingerprint_key,
+    mask_token_vault_backend,
+)
 from jadawel.core.mcp.models import MCPEndpoint
 
 
@@ -74,11 +80,14 @@ class Command(BaseCommand):
             state=MCPProtectedFieldState.ACTIVE,
             policy__lifecycle_status=MCPProtectionLifecycleStatus.ACTIVE,
         ).exists():
-            key_id = settings.MCP_PROTECTION_ACTIVE_KEY_ID
-            if not settings.MCP_PROTECTION_FINGERPRINT_KEYS.get(key_id):
+            try:
+                _load_active_fingerprint_key()
+            except MaskTokenVaultUnavailable:
                 violations.append("FINGERPRINT_KEY_INVALID")
-            if not settings.MCP_PROTECTION_REDIS_URL and not (
-                settings.MCP_PROTECTION_ALLOW_SHARED_REDIS
+            if (
+                mask_token_vault_backend() == VAULT_BACKEND_REDIS
+                and not settings.MCP_PROTECTION_REDIS_URL
+                and not settings.MCP_PROTECTION_ALLOW_SHARED_REDIS
             ):
                 violations.append("DEDICATED_REDIS_REQUIRED")
             readiness = check_mcp_protection_policy_readiness()
