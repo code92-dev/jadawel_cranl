@@ -140,6 +140,18 @@ Terms introduced by the Excel/ODS import and export features. Keep "Excel",
 | Protected derivative | مشتق محمي | A value that would reproduce or expose information from a protected field. |
 | Fingerprint key | مفتاح البصمة | The server-side HMAC key that binds a mask token to the cell value it replaced. Derived from `SECRET_KEY` unless an operator configures a keyring; never user data. |
 
+## Sanad AI assistant
+
+| English | Arabic | Notes |
+|---------|--------|-------|
+| Sanad | سند | Product name of the in-app AI assistant. Never translated; in English UI it reads "Sanad". |
+| AI assistant | المساعد الذكي | Generic description of Sanad. |
+| Chat | محادثة | pl. محادثات. One conversation with Sanad. |
+| Model (AI) | النموذج | The generative AI model; keep the provider/model token (e.g. `openai/gpt-5`) in Latin script. |
+| Approve (an action) | الموافقة / وافق | Confirming a destructive action Sanad asked to run. |
+| Decline | رفض | |
+| Beta | بيتا | Badge on features still being introduced; matches the existing app-type badge. |
+
 ## Common actions (verbs)
 
 | English | Arabic |

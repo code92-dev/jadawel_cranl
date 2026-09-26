@@ -389,5 +389,82 @@
       "VIEWER": "مُشاهد",
       "EDITOR": "محرِّر"
     }
+  },
+  "sanad": {
+    "name": "سند",
+    "beta": "بيتا",
+    "history": "سجل المحادثات",
+    "newChat": "محادثة جديدة",
+    "noHistory": "لا توجد محادثات سابقة بعد.",
+    "untitled": "محادثة بلا عنوان",
+    "welcomeTitle": "مرحبًا، أنا سند",
+    "welcomeText": "اطلب مني إنشاء الجداول، وإضافة الحقول والصيغ، وتنظيم العروض، أو العمل على صفوفك. أعمل بصلاحياتك، وأستأذنك قبل حذف أي شيء.",
+    "noModel": "لم يُضبط أي مزوّد للذكاء الاصطناعي على هذا الخادم. اضبط JADAWEL_OPENAI_API_KEY أو JADAWEL_ANTHROPIC_API_KEY أو JADAWEL_OLLAMA_HOST أو مزوّدًا آخر مع قائمة نماذجه، ثم أعد التشغيل.",
+    "suggestions": {
+      "createTable": "أنشئ جدول مشاريع فيه الحالة والمسؤول وتاريخ التسليم",
+      "formula": "أضف حقل صيغة يحسب الإجمالي من السعر والكمية",
+      "summarize": "لخّص صفوف الجدول المفتوح أمامي"
+    },
+    "open": "فتح",
+    "approvalTitle": "يريد سند حذف شيء",
+    "approve": "حذف",
+    "decline": "إبقاء",
+    "approved": "وافقتَ على: {action}",
+    "declined": "رفضتَ: {action}",
+    "working": "سند يعمل…",
+    "placeholder": "اسأل سند…",
+    "model": "نموذج الذكاء الاصطناعي",
+    "send": "إرسال",
+    "disclaimer": "قد يخطئ سند. راجع ما يغيّره.",
+    "tools": {
+      "list_databases": "عرض قواعد البيانات",
+      "create_database": "إنشاء قاعدة بيانات",
+      "list_tables": "عرض الجداول",
+      "get_table_schema": "قراءة بنية الجدول",
+      "create_table": "إنشاء جدول",
+      "update_table": "إعادة تسمية جدول",
+      "delete_table": "حذف جدول",
+      "create_fields": "إضافة حقول",
+      "update_fields": "تعديل حقول",
+      "delete_fields": "حذف حقول",
+      "list_table_rows": "قراءة الصفوف",
+      "create_rows": "إضافة صفوف",
+      "update_rows": "تعديل صفوف",
+      "delete_rows": "حذف صفوف",
+      "list_views": "عرض العروض",
+      "create_view": "إنشاء عرض",
+      "delete_view": "حذف عرض",
+      "add_view_filter": "إضافة تصفية",
+      "add_view_sort": "إضافة ترتيب"
+    },
+    "errors": {
+      "generic": "لم يتمكن سند من إكمال هذه الإجابة.",
+      "SANAD_ERROR_MODEL_FAILED": "لم يستجب مزوّد الذكاء الاصطناعي بنجاح. تحقّق من إعداد المزوّد وحاول مرة أخرى.",
+      "SANAD_ERROR_TOO_MANY_STEPS": "توقّف سند لأن الطلب احتاج خطوات كثيرة جدًا. جرّب تقسيمه إلى طلبات أصغر.",
+      "SANAD_ERROR_TIMED_OUT": "لم يُنهِ سند العمل في الوقت المحدد. حاول مرة أخرى.",
+      "SANAD_ERROR_NOT_ALLOWED": "سند متاح لمسؤولي الخادم فقط."
+    },
+    "apiErrors": {
+      "ERROR_SANAD_NOT_ALLOWED": {
+        "title": "غير متاح",
+        "description": "سند متاح لمسؤولي الخادم فقط."
+      },
+      "ERROR_SANAD_NO_MODEL_AVAILABLE": {
+        "title": "لا يوجد مزوّد ذكاء اصطناعي",
+        "description": "لم يُضبط أي مزوّد للذكاء الاصطناعي على هذا الخادم."
+      },
+      "ERROR_SANAD_MODEL_NOT_AVAILABLE": {
+        "title": "النموذج غير متاح",
+        "description": "النموذج المختار لم يعد مفعّلًا. اختر نموذجًا آخر."
+      },
+      "ERROR_SANAD_CHAT_BUSY": {
+        "title": "سند مشغول",
+        "description": "انتظر انتهاء الإجابة الحالية، أو قرّر بشأن الإجراء المعلّق، قبل إرسال رسالة أخرى."
+      },
+      "ERROR_SANAD_NOTHING_TO_APPROVE": {
+        "title": "لا يوجد ما تتم الموافقة عليه",
+        "description": "تم البتّ في هذا الإجراء مسبقًا. حدّث المحادثة."
+      }
+    }
   }
 }

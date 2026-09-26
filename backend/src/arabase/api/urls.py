@@ -28,6 +28,13 @@ from arabase.api.mcp_protection.views import (
     MCPProtectionPolicyView,
     MCPProtectionReadinessView,
 )
+from arabase.api.sanad.views import (
+    SanadChatsView,
+    SanadChatView,
+    SanadDecisionsView,
+    SanadMessagesView,
+    SanadModelsView,
+)
 from arabase.api.table_access.views import TableAccessGuestView, TableAccessView
 from arabase.api.views import WorkspaceActivityView, WorkspaceDatabaseStatsView
 
@@ -144,5 +151,30 @@ urlpatterns = [
         r"^admin/backup/restore/$",
         AdminBackupRestoreView.as_view(),
         name="admin_backup_restore",
+    ),
+    re_path(
+        r"^sanad/workspace/(?P<workspace_id>[0-9]+)/models/$",
+        SanadModelsView.as_view(),
+        name="sanad_models",
+    ),
+    re_path(
+        r"^sanad/workspace/(?P<workspace_id>[0-9]+)/chats/$",
+        SanadChatsView.as_view(),
+        name="sanad_chats",
+    ),
+    re_path(
+        r"^sanad/chats/(?P<chat_id>[0-9]+)/$",
+        SanadChatView.as_view(),
+        name="sanad_chat",
+    ),
+    re_path(
+        r"^sanad/chats/(?P<chat_id>[0-9]+)/messages/$",
+        SanadMessagesView.as_view(),
+        name="sanad_messages",
+    ),
+    re_path(
+        r"^sanad/chats/(?P<chat_id>[0-9]+)/decisions/$",
+        SanadDecisionsView.as_view(),
+        name="sanad_decisions",
     ),
 ]

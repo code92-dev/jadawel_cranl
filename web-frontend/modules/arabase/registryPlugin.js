@@ -40,7 +40,22 @@ export default defineNuxtPlugin({
   name: 'arabase-registry',
   dependsOn: ['core', 'store', 'dashboard', 'database'],
   setup(nuxtApp) {
-    const { $registry, $store } = nuxtApp
+    const { $registry, $store, $clientErrorMap, $i18n } = nuxtApp
+
+    for (const code of [
+      'ERROR_SANAD_NOT_ALLOWED',
+      'ERROR_SANAD_NO_MODEL_AVAILABLE',
+      'ERROR_SANAD_MODEL_NOT_AVAILABLE',
+      'ERROR_SANAD_CHAT_BUSY',
+      'ERROR_SANAD_NOTHING_TO_APPROVE',
+    ]) {
+      $clientErrorMap.setError(
+        code,
+        $i18n.t(`sanad.apiErrors.${code}.title`),
+        $i18n.t(`sanad.apiErrors.${code}.description`)
+      )
+    }
+
     const context = { app: nuxtApp }
 
     // The page view's row feed, under both prefixes core uses: the plain one

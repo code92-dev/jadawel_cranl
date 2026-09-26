@@ -36,6 +36,12 @@ from arabase.mcp.protection.models import (
     MCPProtectionMutationAudit,
     MCPProtectionPolicy,
 )
+from arabase.sanad.models import (
+    SanadChat,
+    SanadMessage,
+    SanadMessageRole,
+    SanadMessageStatus,
+)
 from arabase.table_access.models import (
     PendingTableGrant,
     TableAccessLevel,
@@ -78,6 +84,10 @@ __all__ = [
     "HtmlPageViewFieldOptions",
     "HtmlPageViewRevision",
     "PendingTableGrant",
+    "SanadChat",
+    "SanadMessage",
+    "SanadMessageRole",
+    "SanadMessageStatus",
     "TableAccessLevel",
     "TableGrant",
 ]

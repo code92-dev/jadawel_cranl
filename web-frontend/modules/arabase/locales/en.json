@@ -389,5 +389,82 @@
       "VIEWER": "Viewer",
       "EDITOR": "Editor"
     }
+  },
+  "sanad": {
+    "name": "Sanad",
+    "beta": "Beta",
+    "history": "Chat history",
+    "newChat": "New chat",
+    "noHistory": "No previous chats yet.",
+    "untitled": "Untitled chat",
+    "welcomeTitle": "Hi, I'm Sanad",
+    "welcomeText": "Ask me to build tables, add fields and formulas, organise views, or work with your rows. I act with your permissions and ask before deleting anything.",
+    "noModel": "No AI provider is configured on this instance. Set JADAWEL_OPENAI_API_KEY, JADAWEL_ANTHROPIC_API_KEY, JADAWEL_OLLAMA_HOST or another provider with its model list, then restart.",
+    "suggestions": {
+      "createTable": "Create a projects table with a status, an owner and a due date",
+      "formula": "Add a formula field that calculates the total from price and quantity",
+      "summarize": "Summarise the rows of the table I have open"
+    },
+    "open": "Open",
+    "approvalTitle": "Sanad wants to delete something",
+    "approve": "Delete",
+    "decline": "Keep it",
+    "approved": "You approved: {action}",
+    "declined": "You declined: {action}",
+    "working": "Sanad is working…",
+    "placeholder": "Ask Sanad…",
+    "model": "AI model",
+    "send": "Send",
+    "disclaimer": "Sanad can make mistakes. Review what it changes.",
+    "tools": {
+      "list_databases": "Listed databases",
+      "create_database": "Created a database",
+      "list_tables": "Listed tables",
+      "get_table_schema": "Read the table structure",
+      "create_table": "Created a table",
+      "update_table": "Renamed a table",
+      "delete_table": "Delete a table",
+      "create_fields": "Added fields",
+      "update_fields": "Updated fields",
+      "delete_fields": "Delete fields",
+      "list_table_rows": "Read rows",
+      "create_rows": "Added rows",
+      "update_rows": "Updated rows",
+      "delete_rows": "Delete rows",
+      "list_views": "Listed views",
+      "create_view": "Created a view",
+      "delete_view": "Delete a view",
+      "add_view_filter": "Added a filter",
+      "add_view_sort": "Added a sort"
+    },
+    "errors": {
+      "generic": "Sanad could not finish this answer.",
+      "SANAD_ERROR_MODEL_FAILED": "The AI provider did not respond successfully. Check the provider configuration and try again.",
+      "SANAD_ERROR_TOO_MANY_STEPS": "Sanad stopped because the request needed too many steps. Try splitting it into smaller requests.",
+      "SANAD_ERROR_TIMED_OUT": "Sanad did not finish in time. Please try again.",
+      "SANAD_ERROR_NOT_ALLOWED": "Sanad is only available to instance administrators."
+    },
+    "apiErrors": {
+      "ERROR_SANAD_NOT_ALLOWED": {
+        "title": "Not available",
+        "description": "Sanad is only available to instance administrators."
+      },
+      "ERROR_SANAD_NO_MODEL_AVAILABLE": {
+        "title": "No AI provider",
+        "description": "No generative AI provider is configured on this instance."
+      },
+      "ERROR_SANAD_MODEL_NOT_AVAILABLE": {
+        "title": "Model not available",
+        "description": "The selected AI model is no longer enabled. Choose another model."
+      },
+      "ERROR_SANAD_CHAT_BUSY": {
+        "title": "Sanad is busy",
+        "description": "Wait for the current answer, or decide on the pending action, before sending another message."
+      },
+      "ERROR_SANAD_NOTHING_TO_APPROVE": {
+        "title": "Nothing to approve",
+        "description": "This action was already decided. Refresh the chat."
+      }
+    }
   }
 }
