@@ -6,6 +6,22 @@ import requests
 from jadawel_billing.errors import ProviderUnavailable
 
 
+def _payload(
+    response: requests.Response, ok_statuses: tuple[int, ...]
+) -> dict[str, Any]:
+    """Return the JSON object of an accepted provider response.
+
+    Any other status or a non-object body raises ProviderUnavailable. Invalid
+    JSON raises ValueError, which the caller's ``except`` maps the same way.
+    """
+    if response.status_code not in ok_statuses:
+        raise ProviderUnavailable()
+    payload = response.json()
+    if not isinstance(payload, dict):
+        raise ProviderUnavailable()
+    return payload
+
+
 class MoyasarClient:
     """Small server-only client for the Moyasar payment lookup endpoint."""
 
@@ -25,12 +41,7 @@ class MoyasarClient:
                 timeout=(5, 15),
                 allow_redirects=False,
             )
-            if response.status_code != 200:
-                raise ProviderUnavailable()
-            payment = response.json()
-            if not isinstance(payment, dict):
-                raise ProviderUnavailable()
-            return payment
+            return _payload(response, (200,))
         except (requests.RequestException, ValueError) as exc:
             raise ProviderUnavailable() from exc
 
@@ -66,10 +77,8 @@ class MoyasarClient:
                 timeout=(5, 15),
                 allow_redirects=False,
             )
-            if response.status_code != 200:
-                raise ProviderUnavailable()
-            token = response.json()
-            if not isinstance(token, dict) or token.get("id") != token_id:
+            token = _payload(response, (200,))
+            if token.get("id") != token_id:
                 raise ProviderUnavailable()
             return token
         except (requests.RequestException, ValueError) as exc:
@@ -98,12 +107,7 @@ class MoyasarClient:
                 timeout=(5, 15),
                 allow_redirects=False,
             )
-            if response.status_code not in (200, 201):
-                raise ProviderUnavailable()
-            payment = response.json()
-            if not isinstance(payment, dict):
-                raise ProviderUnavailable()
-            return payment
+            return _payload(response, (200, 201))
         except (requests.RequestException, ValueError) as exc:
             raise ProviderUnavailable() from exc
 
@@ -116,11 +120,6 @@ class MoyasarClient:
                 timeout=(5, 15),
                 allow_redirects=False,
             )
-            if response.status_code not in (200, 201):
-                raise ProviderUnavailable()
-            payload = response.json()
-            if not isinstance(payload, dict):
-                raise ProviderUnavailable()
-            return payload
+            return _payload(response, (200, 201))
         except (requests.RequestException, ValueError) as exc:
             raise ProviderUnavailable() from exc

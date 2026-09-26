@@ -2,6 +2,9 @@ from typing import Any
 
 from django.db.models import Q
 
+from jadawel_billing.entitlements import get_effective_entitlements
+
+from jadawel.contrib.database.tokens.subjects import TokenSubjectType
 from jadawel.core.exceptions import (
     OperationTypeDoesNotExist,
     PermissionDenied,
@@ -9,7 +12,6 @@ from jadawel.core.exceptions import (
 )
 from jadawel.core.registries import PermissionManagerType, operation_type_registry
 from jadawel.core.subjects import UserSubjectType
-from jadawel.contrib.database.tokens.subjects import TokenSubjectType
 
 from .models import Organization, OrganizationWorkspaceAccess
 
@@ -161,9 +163,11 @@ class OrganizationPermissionManagerType(PermissionManagerType):
             # workspace context for the core permission pipeline to inspect.
             # A restricted organization must still block creation while leaving
             # already existing personal workspaces untouched.
-            from jadawel_billing.entitlements import get_effective_entitlements
-
             result = {}
+            # The outcome depends only on the user, so it is computed once per
+            # user within this call. Nothing outlives the call: organization
+            # handlers change memberships in the middle of a request.
+            denied_by_user = {}
             for check in checks:
                 user = getattr(check.actor, "user", check.actor)
                 if getattr(user, "is_staff", False):
@@ -171,30 +175,39 @@ class OrganizationPermissionManagerType(PermissionManagerType):
                     continue
                 if check.operation_name != "create_workspace":
                     continue
-                organizations = Organization.objects.filter(
-                    memberships__user_id=getattr(user, "pk", None),
-                    memberships__suspended=False,
-                    status=Organization.Status.ACTIVE,
-                ).values_list("billing_account_id", flat=True)
-                if any(
-                    get_effective_entitlements(account_id)["source"]
-                    in {"restricted", "suspended"}
-                    for account_id in organizations
-                ):
+                user_id = getattr(user, "pk", None)
+                if user_id not in denied_by_user:
+                    organizations = Organization.objects.filter(
+                        memberships__user_id=user_id,
+                        memberships__suspended=False,
+                        status=Organization.Status.ACTIVE,
+                    ).values_list("billing_account_id", flat=True)
+                    denied_by_user[user_id] = any(
+                        get_effective_entitlements(account_id)["source"]
+                        in {"restricted", "suspended"}
+                        for account_id in organizations
+                    )
+                if denied_by_user[user_id]:
                     result[check] = PermissionDenied(check.actor)
             return result
         organization = self._binding(workspace)
         if organization is None:
             return {}
-        from jadawel_billing.entitlements import get_effective_entitlements
-
         source = get_effective_entitlements(organization.billing_account_id).get(
             "source"
         )
         restricted = source in {"restricted", "suspended"}
         result = {}
+        # A token is judged as its user, so the access row is read once per user
+        # within this call, a missing row (None) included.
+        access_by_user = {}
         for check in checks:
-            access = self._access(check.actor, organization, workspace)
+            user_id = getattr(check.actor, "user", check.actor).pk
+            if user_id not in access_by_user:
+                access_by_user[user_id] = self._access(
+                    check.actor, organization, workspace
+                )
+            access = access_by_user[user_id]
             if access is None:
                 result[check] = UserNotInWorkspace(check.actor, workspace)
             elif check.operation_name in self.LEGACY_MEMBERSHIP_MUTATIONS:
@@ -220,8 +233,6 @@ class OrganizationPermissionManagerType(PermissionManagerType):
         organization = self._binding(workspace)
         if organization is None:
             return None
-        from jadawel_billing.entitlements import get_effective_entitlements
-
         entitlements = get_effective_entitlements(organization.billing_account_id)
         return {
             "organization_id": str(organization.pk),

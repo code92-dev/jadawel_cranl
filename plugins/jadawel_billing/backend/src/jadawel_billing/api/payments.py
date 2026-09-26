@@ -12,26 +12,16 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jadawel_billing.api.checkout import VerifyInput
-from jadawel_billing.api.receipts import ReceiptSerializer
+from jadawel_billing.api.receipts import PaymentAttemptFieldsMixin, ReceiptSerializer
 from jadawel_billing.api.views import BillingPagination
 from jadawel_billing.models import BillingOrder, BillingRefund, ProviderEvent
 from jadawel_billing.payments import reconcile_order
 from jadawel_billing.providers.moyasar import MoyasarClient
 
 
-class AdminOrderSerializer(ReceiptSerializer):
-    given_id = serializers.UUIDField(source="payment_id", read_only=True)
+class AdminOrderSerializer(PaymentAttemptFieldsMixin, ReceiptSerializer):
     owner_email = serializers.EmailField(
         source="account.responsible_user.email", read_only=True
-    )
-    provider_payment_id = serializers.CharField(
-        source="payment_attempt.provider_payment_id", read_only=True, allow_null=True
-    )
-    attempt_status = serializers.CharField(
-        source="payment_attempt.status", read_only=True
-    )
-    failure_code = serializers.CharField(
-        source="payment_attempt.failure_code", read_only=True
     )
     refund_status = serializers.SerializerMethodField()
     refunded_amount = serializers.SerializerMethodField()

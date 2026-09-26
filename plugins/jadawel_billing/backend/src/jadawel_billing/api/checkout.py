@@ -11,7 +11,7 @@ from rest_framework.request import Request
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from jadawel_billing.api.receipts import ReceiptSerializer
+from jadawel_billing.api.receipts import PaymentAttemptFieldsMixin, ReceiptSerializer
 from jadawel_billing.api.views import BillingPagination
 from jadawel_billing.entitlements import (
     get_effective_entitlements,
@@ -35,18 +35,7 @@ class OrderInput(serializers.Serializer[Any]):
     seats = serializers.IntegerField(min_value=1, max_value=100000)
 
 
-class OrderSerializer(ReceiptSerializer):
-    given_id = serializers.UUIDField(source="payment_id", read_only=True)
-    provider_payment_id = serializers.CharField(
-        source="payment_attempt.provider_payment_id", read_only=True, allow_null=True
-    )
-    attempt_status = serializers.CharField(
-        source="payment_attempt.status", read_only=True
-    )
-    failure_code = serializers.CharField(
-        source="payment_attempt.failure_code", read_only=True
-    )
-
+class OrderSerializer(PaymentAttemptFieldsMixin, ReceiptSerializer):
     class Meta:
         model = BillingOrder
         fields = [

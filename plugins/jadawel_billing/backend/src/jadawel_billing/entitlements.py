@@ -8,7 +8,7 @@ from uuid import UUID
 
 from django.db import transaction
 from django.utils import timezone
-from rest_framework.exceptions import PermissionDenied, ValidationError
+from rest_framework.exceptions import ValidationError
 
 from jadawel_billing.models import BillingAccount, ManualEntitlementGrant, Subscription
 
@@ -106,7 +106,9 @@ def get_effective_entitlements(
             "revision": grant.revision,
             "restriction_reason": None,
         }
-    subscription = Subscription.objects.filter(account=account).first()
+    subscription = (
+        Subscription.objects.select_related("price").filter(account=account).first()
+    )
     if subscription and subscription.period_start <= at < subscription.period_end:
         return {
             **result,
@@ -137,11 +139,4 @@ def get_effective_entitlements(
             "revision": 0,
             "restriction_reason": "renewal_grace",
         }
-    return result
-
-
-def require_entitlement(account_id: UUID, capability: str) -> dict[str, Any]:
-    result = get_effective_entitlements(account_id)
-    if capability not in result["capabilities"]:
-        raise PermissionDenied("entitlement_required")
     return result

@@ -7,7 +7,6 @@ from django.db.models import F, Q
 from django.utils import timezone
 from rest_framework.exceptions import APIException, ValidationError
 
-from jadawel_billing.errors import ProviderUnavailable
 from jadawel_billing.models import BillingOrder, PaymentAttempt, ProviderEvent
 from jadawel_billing.payments import billing_mode, reconcile_order_system
 from jadawel_billing.subscriptions import renew_due_subscriptions
@@ -79,12 +78,6 @@ def reconcile_payments() -> None:
         except ValidationError as exc:
             ProviderEvent.objects.filter(pk=event.pk).update(
                 status="failed",
-                error_code=str(exc.default_code)[:80],
-                updated_at=timezone.now(),
-            )
-        except ProviderUnavailable as exc:
-            ProviderEvent.objects.filter(pk=event.pk).update(
-                status="pending",
                 error_code=str(exc.default_code)[:80],
                 updated_at=timezone.now(),
             )

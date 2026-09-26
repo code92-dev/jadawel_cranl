@@ -1,10 +1,5 @@
 # Jadawel Billing plugin
 
-Validated on the `payment-Orgteam-plugins` branch on 2026-09-08.
-The branch's documented core hooks in `PATCHES.md` are required for managed
-workspace membership enforcement; do not install this package against an older
-Jadawel revision without those hooks.
-
 This standalone plugin provides the billing account, plan and price catalogue,
 administrator-managed complimentary entitlements, and Moyasar payment
 verification for Jadawel. It supports Individual accounts on its own. When the
@@ -79,12 +74,13 @@ delete billing records. Disable customer billing traffic, preserve the database
 and payment evidence, and complete a backup before uninstalling the plugin from
 a deployment.
 
-Focused backend checks are run with:
+Backend tests are not run by CI. The Billing and Organizations suites import
+each other, so run them together from `backend/`, with the same `DATABASE_*`
+settings as the core suite. `JADAWEL_PLUGIN_DIR` must be exported before pytest
+starts, because the settings read it at import time to load both plugins:
 
 ```bash
-DATABASE_HOST=127.0.0.1 \
-PYTHONPATH=backend/src:backend/tests:plugins/jadawel_billing/backend/src \
-JADAWEL_PLUGIN_DIR="$PWD/plugins" \
-backend/.venv/bin/python -m pytest -c backend/pytest.ini \
-plugins/jadawel_billing/tests -q --reuse-db
+export JADAWEL_PLUGIN_DIR="$PWD/../plugins"
+export PYTHONPATH="tests:src:$JADAWEL_PLUGIN_DIR/jadawel_billing/backend/src:$JADAWEL_PLUGIN_DIR/jadawel_organizations/backend/src"
+.venv/bin/pytest -c pytest.ini ../plugins/jadawel_billing/tests ../plugins/jadawel_organizations/tests
 ```

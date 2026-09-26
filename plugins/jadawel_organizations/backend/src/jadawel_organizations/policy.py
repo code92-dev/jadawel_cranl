@@ -2,6 +2,8 @@
 
 from typing import Any
 
+from jadawel_billing.entitlements import get_effective_entitlements
+
 from .models import Organization, OrganizationWorkspace
 
 
@@ -23,8 +25,6 @@ def public_workspace_allowed(workspace: Any) -> bool:
         return True
     if binding.organization.status != Organization.Status.ACTIVE:
         return False
-    from jadawel_billing.entitlements import get_effective_entitlements
-
     source = get_effective_entitlements(binding.organization.billing_account_id)[
         "source"
     ]

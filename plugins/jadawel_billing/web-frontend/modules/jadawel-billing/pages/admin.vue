@@ -48,8 +48,8 @@
       >
         <button
           v-for="section in adminSections"
-          :key="section.id"
           :id="`billing-admin-tab-${section.id}`"
+          :key="section.id"
           type="button"
           role="tab"
           :aria-selected="adminSection === section.id"

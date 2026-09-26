@@ -67,7 +67,9 @@ class AdminAccountsView(generics.ListCreateAPIView[Any]):
     permission_classes = [IsAdminUser]
     serializer_class = AccountSerializer
     pagination_class = BillingPagination
-    queryset = BillingAccount.objects.order_by("-created_at", "id")
+    queryset = BillingAccount.objects.select_related("responsible_user").order_by(
+        "-created_at", "id"
+    )
 
 
 class PlanSerializer(serializers.ModelSerializer[Any]):

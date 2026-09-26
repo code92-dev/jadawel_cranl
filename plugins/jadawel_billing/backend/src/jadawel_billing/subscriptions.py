@@ -58,48 +58,45 @@ def create_seat_increase_order(
         raise ValidationError({"seats": "team_only"})
     mode = billing_mode()
     now = timezone.now()
-    with transaction.atomic():
-        account = BillingAccount.objects.select_for_update().get(
-            pk=subscription.account_id
-        )
-        current = (
-            Subscription.objects.select_for_update()
-            .select_related("price")
-            .get(pk=subscription.pk)
-        )
-        if current.status != Subscription.Status.ACTIVE:
-            raise ValidationError({"subscription": "not_active"})
-        if current.period_end <= now:
-            raise ValidationError({"subscription": "period_expired"})
-        if account.suspended:
-            raise ValidationError({"account": "account_suspended"})
-        if get_effective_entitlements(account.pk).get("source") != "paid":
-            raise ValidationError({"subscription": "paid_access_required"})
-        validate_capacity(account, seats)
-        pending = BillingOrder.objects.filter(account=account, status="pending").first()
-        if pending:
-            if (
-                pending.purpose != BillingOrder.Purpose.SEAT_INCREASE
-                or pending.subscription_id != current.pk
-                or pending.seats != seats
-            ):
-                raise ValidationError({"account": "resolve_pending_order"})
-            return pending, False
-        order = BillingOrder.objects.create(
-            account=account,
-            price=current.price,
-            subscription=current,
-            purpose=BillingOrder.Purpose.SEAT_INCREASE,
-            seats=seats,
-            amount=prorated_seat_increase_amount(current, seats, at=now),
-            currency=current.price.currency,
-            interval=current.price.interval,
-            mode=mode,
-        )
-        PaymentAttempt.objects.create(
-            order=order, given_id=order.payment_id, provider_mode=mode
-        )
-        return order, True
+    account = BillingAccount.objects.select_for_update().get(pk=subscription.account_id)
+    current = (
+        Subscription.objects.select_for_update()
+        .select_related("price")
+        .get(pk=subscription.pk)
+    )
+    if current.status != Subscription.Status.ACTIVE:
+        raise ValidationError({"subscription": "not_active"})
+    if current.period_end <= now:
+        raise ValidationError({"subscription": "period_expired"})
+    if account.suspended:
+        raise ValidationError({"account": "account_suspended"})
+    if get_effective_entitlements(account.pk).get("source") != "paid":
+        raise ValidationError({"subscription": "paid_access_required"})
+    validate_capacity(account, seats)
+    pending = BillingOrder.objects.filter(account=account, status="pending").first()
+    if pending:
+        if (
+            pending.purpose != BillingOrder.Purpose.SEAT_INCREASE
+            or pending.subscription_id != current.pk
+            or pending.seats != seats
+        ):
+            raise ValidationError({"account": "resolve_pending_order"})
+        return pending, False
+    order = BillingOrder.objects.create(
+        account=account,
+        price=current.price,
+        subscription=current,
+        purpose=BillingOrder.Purpose.SEAT_INCREASE,
+        seats=seats,
+        amount=prorated_seat_increase_amount(current, seats, at=now),
+        currency=current.price.currency,
+        interval=current.price.interval,
+        mode=mode,
+    )
+    PaymentAttempt.objects.create(
+        order=order, given_id=order.payment_id, provider_mode=mode
+    )
+    return order, True
 
 
 @transaction.atomic
@@ -119,28 +116,25 @@ def schedule_subscription_change(
 ) -> SubscriptionChange:
     if not actor.is_staff and subscription.account.responsible_user_id != actor.pk:
         raise ValidationError({"subscription": "not_owner"})
-    with transaction.atomic():
-        account = BillingAccount.objects.select_for_update().get(
-            pk=subscription.account_id
-        )
-        current = Subscription.objects.select_for_update().get(pk=subscription.pk)
-        if current.status in {Subscription.Status.CANCELED}:
-            raise ValidationError({"subscription": "not_active"})
-        if not price.available or not price.plan.available:
-            raise ValidationError({"price": "unavailable"})
-        if price.plan.kind != account.kind:
-            raise ValidationError({"price": "account_kind_mismatch"})
-        if seats > current.seats:
-            raise ValidationError({"seats": "seat_increase_requires_verified_payment"})
-        validate_capacity(account, seats)
-        return SubscriptionChange.objects.update_or_create(
-            subscription=current,
-            defaults={
-                "price": price,
-                "seats": seats,
-                "effective_at": current.period_end,
-            },
-        )[0]
+    account = BillingAccount.objects.select_for_update().get(pk=subscription.account_id)
+    current = Subscription.objects.select_for_update().get(pk=subscription.pk)
+    if current.status in {Subscription.Status.CANCELED}:
+        raise ValidationError({"subscription": "not_active"})
+    if not price.available or not price.plan.available:
+        raise ValidationError({"price": "unavailable"})
+    if price.plan.kind != account.kind:
+        raise ValidationError({"price": "account_kind_mismatch"})
+    if seats > current.seats:
+        raise ValidationError({"seats": "seat_increase_requires_verified_payment"})
+    validate_capacity(account, seats)
+    return SubscriptionChange.objects.update_or_create(
+        subscription=current,
+        defaults={
+            "price": price,
+            "seats": seats,
+            "effective_at": current.period_end,
+        },
+    )[0]
 
 
 def renew_due_subscriptions() -> int:

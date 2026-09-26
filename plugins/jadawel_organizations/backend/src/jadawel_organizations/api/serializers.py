@@ -1,10 +1,12 @@
 from typing import Any
 
 from django.contrib.auth import get_user_model
+
+from jadawel_billing.entitlements import get_effective_entitlements
+from jadawel_billing.models import Plan, Subscription
 from rest_framework import serializers
 
 from jadawel.core.models import Workspace
-from jadawel_billing.models import Plan
 
 from ..models import (
     Organization,
@@ -24,10 +26,20 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
     subscription_period_end = serializers.SerializerMethodField()
     subscription_cancel_at_period_end = serializers.SerializerMethodField()
 
-    def _effective(self, organization: Organization) -> dict[str, Any]:
-        from jadawel_billing.entitlements import get_effective_entitlements
+    def __init__(self, *args: Any, **kwargs: Any) -> None:
+        super().__init__(*args, **kwargs)
+        # Several fields read the same entitlements and subscription, so each is
+        # read once per organization. With many=True this child instance is
+        # shared by every row of the page.
+        self._effective_by_pk: dict[Any, dict[str, Any]] = {}
+        self._subscription_by_pk: dict[Any, Any] = {}
 
-        return get_effective_entitlements(organization.billing_account_id)
+    def _effective(self, organization: Organization) -> dict[str, Any]:
+        if organization.pk not in self._effective_by_pk:
+            self._effective_by_pk[organization.pk] = get_effective_entitlements(
+                organization.billing_account_id
+            )
+        return self._effective_by_pk[organization.pk]
 
     def get_effective_source(self, organization: Organization) -> str:
         return self._effective(organization)["source"]
@@ -44,13 +56,13 @@ class OrganizationSerializer(serializers.ModelSerializer[Any]):
         return invitation.email if invitation else None
 
     def _subscription(self, organization: Organization):
-        from jadawel_billing.models import Subscription
-
-        return (
-            Subscription.objects.filter(account_id=organization.billing_account_id)
-            .order_by("-period_start", "-id")
-            .first()
-        )
+        if organization.pk not in self._subscription_by_pk:
+            self._subscription_by_pk[organization.pk] = (
+                Subscription.objects.filter(account_id=organization.billing_account_id)
+                .order_by("-period_start", "-id")
+                .first()
+            )
+        return self._subscription_by_pk[organization.pk]
 
     def get_subscription_status(self, organization: Organization) -> str | None:
         subscription = self._subscription(organization)
