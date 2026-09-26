@@ -1,8 +1,10 @@
 """The Backup admin section: schedule, health and the guarded restore."""
 
+import socket
 from datetime import timedelta
 from unittest.mock import patch
 
+from django.db import connection
 from django.shortcuts import reverse
 from django.utils import timezone
 
@@ -30,7 +32,14 @@ from arabase.backup.models import (
     BackupRun,
     BackupSchedule,
 )
-from arabase.backup.restore import RestoreError, redact, validate_target
+from arabase.backup.restore import (
+    RestoreError,
+    ensure_not_live,
+    redact,
+    seal_target,
+    unseal_target,
+    validate_target,
+)
 
 
 def overview_url():
@@ -333,6 +342,43 @@ class TestRestoreTarget:
         with pytest.raises(RestoreError):
             validate_target(url)
 
+    def test_query_parameters_cannot_redirect_the_target_to_the_live_database(
+        self, settings
+    ):
+        # libpq lets the query string override the authority and the path, so
+        # this URL connects to the live database while *looking* like "decoy".
+        live = settings.DATABASES["default"]
+        url = (
+            "postgresql://u:p@decoy:5432/other"
+            f"?host={live.get('HOST') or 'localhost'}&dbname={live['NAME']}"
+        )
+
+        with pytest.raises(RestoreError, match="live database"):
+            validate_target(url)
+
+    @pytest.mark.parametrize(
+        "url",
+        [
+            "postgresql://u:p@scratch:5432/copy?hostaddr=10.0.0.5",
+            "postgresql://u:p@scratch:5432/copy?service=live",
+            "postgresql://u:p@scratch:5432/copy?options=-csearch_path%3Dx",
+            "postgresql://u:p@scratch,other:5432/copy",
+            "postgresql://%2Fvar%2Frun%2Fpostgresql/copy",
+        ],
+    )
+    def test_a_target_that_could_resolve_elsewhere_is_refused(self, url):
+        with pytest.raises(RestoreError):
+            validate_target(url)
+
+    def test_a_loopback_alias_of_the_live_host_is_refused(self, settings):
+        live = settings.DATABASES["default"]
+        if live.get("HOST") not in ("localhost", "127.0.0.1", "::1"):
+            pytest.skip("The test database is not on a loopback host.")
+
+        for host in ("localhost", "127.0.0.1", "LOCALHOST"):
+            with pytest.raises(RestoreError, match="live database"):
+                validate_target(f"postgresql://u:p@{host}:5432/{live['NAME']}")
+
     def test_the_password_never_leaves_the_server(self):
         assert (
             redact("postgresql://jadawel:hunter2@db:5432/x")
@@ -389,3 +435,46 @@ def test_a_restore_into_a_separate_database_is_queued_without_the_password(
     assert body["key"] == key
     assert "hunter2" not in body["target"]
     delay.assert_called_once()
+    # The task arguments sit in the broker, so the password is sealed there too.
+    queued_key, sealed_target = delay.call_args.args
+    assert queued_key == key
+    assert "hunter2" not in sealed_target
+    assert unseal_target(sealed_target) == "postgresql://u:hunter2@scratch:5432/copy"
+
+
+def test_a_tampered_sealed_target_is_refused():
+    sealed = seal_target("postgresql://u:p@scratch:5432/copy")
+
+    with pytest.raises(RestoreError, match="could not be read"):
+        unseal_target(sealed[:-4] + "AAAA")
+
+
+def _live_url(host: str, dbname: str) -> str:
+    live = connection.settings_dict
+    return (
+        f"postgresql://{live['USER']}:{live['PASSWORD']}@{host}:"
+        f"{live.get('PORT') or 5432}/{dbname}"
+    )
+
+
+@pytest.mark.django_db
+def test_the_live_database_is_refused_however_its_host_is_spelled():
+    live = connection.settings_dict
+    if not live.get("HOST"):
+        pytest.skip("The test database is not configured with a host.")
+
+    # An IP address for a hostname is invisible to the syntactic check; only
+    # asking the server who it is catches it.
+    address = socket.gethostbyname(live["HOST"])
+
+    with pytest.raises(RestoreError, match="live database"):
+        ensure_not_live(_live_url(address, live["NAME"]))
+
+
+@pytest.mark.django_db
+def test_another_database_on_the_live_server_is_allowed():
+    live = connection.settings_dict
+    if not live.get("HOST"):
+        pytest.skip("The test database is not configured with a host.")
+
+    ensure_not_live(_live_url(live["HOST"], "postgres"))

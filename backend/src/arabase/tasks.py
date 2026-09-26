@@ -87,16 +87,17 @@ def backup_database(trigger=None):
     soft_time_limit=3600,
     time_limit=3900,
 )
-def restore_backup_task(key: str, target_database_url: str):
+def restore_backup_task(key: str, sealed_target: str):
     """Restore ``key`` into a database that is not the live one.
 
     Deliberately takes an explicit target: there is no code path here that can
-    write over the running database.
+    write over the running database. The target arrives sealed
+    (``restore.seal_target``) so its password never sits in the broker.
     """
 
-    from arabase.backup.restore import restore_backup
+    from arabase.backup.restore import restore_backup, unseal_target
 
-    result = restore_backup(key, target_database_url)
+    result = restore_backup(key, unseal_target(sealed_target))
     return {"key": result.key, "target": result.target}
 
 

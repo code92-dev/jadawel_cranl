@@ -40,10 +40,12 @@ def build_page_csp(allow_external_resources: bool = False) -> str:
     """Return the policy for a page, as a single header-style string.
 
     ``connect-src 'none'`` is present in **both** modes and is the load-bearing
-    directive: the page is handed real row data, so the thing that actually
-    matters is that it cannot send that data anywhere. Blocking fetch, XHR,
-    WebSocket, EventSource and ``sendBeacon`` is what makes running untrusted
-    script in front of real data defensible at all.
+    directive: the page is handed real row data, and it blocks fetch, XHR,
+    WebSocket, EventSource and ``sendBeacon``. It does not stop the frame
+    navigating itself to a URL that carries the data, and WebRTC is outside
+    CSP, so it narrows the ways out rather than sealing them. What keeps that
+    safe is that a page only receives rows its author can already read, plus
+    protected values approved for its exact HTML.
 
     ``'unsafe-inline'`` and ``'unsafe-eval'`` are granted on purpose. The whole
     document is untrusted by construction, so nonces would protect nothing,

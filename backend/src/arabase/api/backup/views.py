@@ -150,7 +150,7 @@ class AdminBackupRestoreView(APIView):
     )
     @validate_body(RestoreBackupSerializer, return_validated=True)
     def post(self, request: Request, data: dict) -> Response:
-        from arabase.backup.restore import redact, validate_target
+        from arabase.backup.restore import redact, seal_target, validate_target
         from arabase.tasks import restore_backup_task
 
         # Validated synchronously so an unusable target is a 400 the operator
@@ -166,7 +166,7 @@ class AdminBackupRestoreView(APIView):
                 status=400,
             )
 
-        restore_backup_task.delay(data["key"], data["target_database_url"])
+        restore_backup_task.delay(data["key"], seal_target(data["target_database_url"]))
 
         return Response(
             status=202,
