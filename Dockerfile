@@ -17,7 +17,22 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-24 from commit 180b3e21, tag 2.3.10-mcp-db-vault.
+# Published 2026-09-26 from commit 35ac4472, tag 2.3.11-mcp-restructure.
+# Restructures MCP protection (one vault interface for Redis and PostgreSQL,
+# policy and artifact code split by responsibility; an approved page feed
+# drops from 60 to 35 queries) and fixes what it found. Changing page HTML
+# now requires permission to edit the view, a permission check no longer
+# fails open, an unknown endpoint is 404 instead of 500, a publish answers
+# 200 instead of 201, and protection failures on page paths answer 423
+# instead of 500. The endpoint wizard's select-all and review step are fixed.
+# Also: workspace stats no longer count tables a guest was never granted, a
+# restore can no longer be pointed at the live database through URL query
+# parameters, and the stale plugin build/lib copies are gone from the image.
+# **No migration.** No environment changes.
+# Previous deployment pin (2.3.10-mcp-db-vault):
+# sha256:2c0552658f9a7b8de8f44475197871420d21a387afb8ee1894082420e9bcf24d.
+#
+# Previously published 2026-09-24 from commit 180b3e21, tag 2.3.10-mcp-db-vault.
 # Makes MCP protected fields work with no setup: mask tokens are kept in the
 # app's PostgreSQL instead of a dedicated Redis that production never had, and
 # the fingerprint key is derived from SECRET_KEY unless a keyring is set. Every
@@ -245,7 +260,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:2c0552658f9a7b8de8f44475197871420d21a387afb8ee1894082420e9bcf24d
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:eb58ae8d44585de5b4f77743c131e50829a6f04778066d87aa03dbf4703b4b8a
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
