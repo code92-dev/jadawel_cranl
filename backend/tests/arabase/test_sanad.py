@@ -26,7 +26,7 @@ from rest_framework.status import (
 )
 
 from arabase.sanad.models import SanadChat, SanadMessage, SanadMessageStatus
-from arabase.sanad.tools import DESTRUCTIVE_TOOLS, get_sanad_tools
+from arabase.sanad.tools import APPROVAL_TOOLS, get_sanad_tools
 from jadawel.contrib.database.table.models import Table
 from jadawel.contrib.database.views.models import View, ViewFilter, ViewSort
 
@@ -449,14 +449,14 @@ def test_invalid_tool_arguments_are_reported_to_the_model(api_client, sanad):
 
 
 # ---------------------------------------------------------------------------
-# Approval of destructive actions
+# Approval of deletes and publishing
 # ---------------------------------------------------------------------------
 
 
 @pytest.mark.django_db
 def test_every_delete_tool_needs_approval():
     names = {tool.name for tool in get_sanad_tools()}
-    assert {name for name in names if name.startswith("delete_")} == DESTRUCTIVE_TOOLS
+    assert {name for name in names if name.startswith("delete_")} <= APPROVAL_TOOLS
 
 
 @pytest.mark.django_db(transaction=True)

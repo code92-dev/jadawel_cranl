@@ -103,9 +103,9 @@
                 ></i>
                 <span>{{ toolLabel(action.tool) }}</span>
                 <nuxt-link
-                  v-if="action.ok && tableLink(action)"
+                  v-if="action.ok && actionLink(action)"
                   class="sanad__action-link"
-                  :to="tableLink(action)"
+                  :to="actionLink(action)"
                 >
                   {{ $t('sanad.open') }}
                 </nuxt-link>
@@ -141,13 +141,13 @@
               class="sanad__approval-buttons"
             >
               <Button
-                type="danger"
+                :type="approvalLabels(message).type"
                 size="small"
                 :loading="deciding"
                 :disabled="deciding"
                 @click="decide(message, true)"
               >
-                {{ $t('sanad.approve') }}
+                {{ approvalLabels(message).approve }}
               </Button>
               <Button
                 type="secondary"
@@ -155,7 +155,7 @@
                 :disabled="deciding"
                 @click="decide(message, false)"
               >
-                {{ $t('sanad.decline') }}
+                {{ approvalLabels(message).decline }}
               </Button>
             </div>
 
@@ -257,6 +257,22 @@ const KNOWN_TOOLS = new Set([
   'delete_view',
   'add_view_filter',
   'add_view_sort',
+  'list_applications',
+  'create_automation',
+  'create_workflow',
+  'describe_automation_step',
+  'get_workflow',
+  'add_automation_step',
+  'update_automation_step',
+  'delete_automation_step',
+  'publish_workflow',
+  'create_builder_application',
+  'list_pages',
+  'create_page',
+  'delete_page',
+  'add_page_content',
+  'add_table_to_page',
+  'add_form_to_page',
 ])
 const KNOWN_ERRORS = new Set([
   'SANAD_ERROR_MODEL_FAILED',
@@ -499,8 +515,24 @@ export default {
         KNOWN_ERRORS.has(code) ? `sanad.errors.${code}` : 'sanad.errors.generic'
       )
     },
-    tableLink(action) {
+    /** Where "Open" goes for something an action created or changed. */
+    actionLink(action) {
       const refs = action.refs || {}
+      if (refs.automation_id && refs.workflow_id) {
+        return {
+          name: 'automation-workflow',
+          params: {
+            automationId: refs.automation_id,
+            workflowId: refs.workflow_id,
+          },
+        }
+      }
+      if (refs.application_id && refs.page_id) {
+        return {
+          name: 'builder-page',
+          params: { builderId: refs.application_id, pageId: refs.page_id },
+        }
+      }
       const tableId =
         refs.table_id ||
         (['create_table', 'update_table'].includes(action.tool) && refs.id)
@@ -512,6 +544,23 @@ export default {
         params.viewId = refs.id
       }
       return { name: 'database-table', params }
+    },
+    /** Publishing reads as "Publish / Not now"; everything else deletes. */
+    approvalLabels(message) {
+      const publishing = this.waitingApprovals(message).some(
+        (call) => call.tool === 'publish_workflow'
+      )
+      return publishing
+        ? {
+            type: 'primary',
+            approve: this.$t('sanad.approvePublish'),
+            decline: this.$t('sanad.declinePublish'),
+          }
+        : {
+            type: 'danger',
+            approve: this.$t('sanad.approve'),
+            decline: this.$t('sanad.decline'),
+          }
     },
   },
 }

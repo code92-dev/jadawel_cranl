@@ -406,7 +406,7 @@
       "summarize": "لخّص صفوف الجدول المفتوح أمامي"
     },
     "open": "فتح",
-    "approvalTitle": "يريد سند حذف شيء",
+    "approvalTitle": "يحتاج سند إلى موافقتك",
     "approve": "حذف",
     "decline": "إبقاء",
     "approved": "وافقتَ على: {action}",
@@ -435,7 +435,23 @@
       "create_view": "إنشاء عرض",
       "delete_view": "حذف عرض",
       "add_view_filter": "إضافة تصفية",
-      "add_view_sort": "إضافة ترتيب"
+      "add_view_sort": "إضافة ترتيب",
+      "list_applications": "عرض التطبيقات",
+      "create_automation": "إنشاء أتمتة",
+      "create_workflow": "إنشاء سير عمل",
+      "describe_automation_step": "مراجعة إعدادات الخطوة",
+      "get_workflow": "قراءة سير العمل",
+      "add_automation_step": "إضافة خطوة إلى سير العمل",
+      "update_automation_step": "تعديل خطوة في سير العمل",
+      "delete_automation_step": "حذف خطوة من سير العمل",
+      "publish_workflow": "نشر سير العمل",
+      "create_builder_application": "إنشاء تطبيق",
+      "list_pages": "عرض الصفحات",
+      "create_page": "إنشاء صفحة",
+      "delete_page": "حذف صفحة",
+      "add_page_content": "إضافة محتوى إلى الصفحة",
+      "add_table_to_page": "إضافة جدول إلى الصفحة",
+      "add_form_to_page": "إضافة نموذج إلى الصفحة"
     },
     "errors": {
       "generic": "لم يتمكن سند من إكمال هذه الإجابة.",
@@ -465,6 +481,8 @@
         "title": "لا يوجد ما تتم الموافقة عليه",
         "description": "تم البتّ في هذا الإجراء مسبقًا. حدّث المحادثة."
       }
-    }
+    },
+    "approvePublish": "نشر",
+    "declinePublish": "ليس الآن"
   }
 }

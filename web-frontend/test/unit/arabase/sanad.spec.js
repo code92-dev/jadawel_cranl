@@ -227,4 +227,79 @@ describe('SanadPanel', () => {
 
     expect(wrapper.find('.sanad__error').text()).toMatch(/^sanad\.errors\./)
   })
+
+  test('links built automations and pages to their editors', async () => {
+    localStorage.setItem('jadawel.sanad.chat.7', '3')
+    testApp.mock.onGet('/arabase/sanad/chats/3/').reply(
+      200,
+      chat([
+        message({
+          actions: [
+            {
+              tool: 'create_automation',
+              ok: true,
+              refs: { automation_id: 5, workflow_id: 9 },
+            },
+            {
+              tool: 'add_form_to_page',
+              ok: true,
+              refs: { application_id: 3, page_id: 4 },
+            },
+            {
+              tool: 'create_builder_application',
+              ok: true,
+              refs: { application_id: 3 },
+            },
+          ],
+        }),
+      ])
+    )
+
+    const wrapper = await mountPanel()
+
+    const actions = wrapper.findAll('.sanad__action')
+    expect(actions.map((a) => a.find('span').text())).toEqual([
+      'sanad.tools.create_automation',
+      'sanad.tools.add_form_to_page',
+      'sanad.tools.create_builder_application',
+    ])
+    expect(actions[0].find('.sanad__action-link').attributes('href')).toBe(
+      '/automation/5/workflow/9'
+    )
+    expect(actions[1].find('.sanad__action-link').attributes('href')).toBe(
+      '/builder/3/page/4'
+    )
+    // An app without a page yet has nothing to open.
+    expect(actions[2].find('.sanad__action-link').exists()).toBe(false)
+  })
+
+  test('asks to publish with publish wording, not delete wording', async () => {
+    localStorage.setItem('jadawel.sanad.chat.7', '3')
+    testApp.mock.onGet('/arabase/sanad/chats/3/').reply(
+      200,
+      chat([
+        message({
+          status: 'awaiting_approval',
+          approvals: [
+            {
+              tool_call_id: 'c-publish',
+              tool: 'publish_workflow',
+              arguments: { workflow_id: 9 },
+            },
+          ],
+        }),
+      ])
+    )
+
+    const wrapper = await mountPanel()
+
+    const buttons = wrapper.findAll('.sanad__approval-buttons button')
+    expect(buttons.map((button) => button.text())).toEqual([
+      'sanad.approvePublish',
+      'sanad.declinePublish',
+    ])
+    expect(wrapper.find('.sanad__approval-text').text()).toBe(
+      'sanad.tools.publish_workflow'
+    )
+  })
 })

@@ -55,6 +55,26 @@ formula in the field spec as {"type": "formula", "formula": "..."}.
 {"number_decimal_places": 2}, link_row {"link_row_table_id": 12}, \
 date {"date_include_time": false}.
 - Summarise data by reading rows with list_table_rows; do not invent values.
+
+Automations (workflows that run by themselves):
+- create_automation returns a first workflow; add its trigger with \
+add_automation_step (no after_step_id), then each action after the previous \
+step. Call describe_automation_step for a step's settings before using it, \
+and get_table_schema for field IDs.
+- Settings text is a formula: quote literal text ('Hello') and read earlier \
+steps with get('previous_node.<step id>.0.field_<field id>') after a row \
+trigger. Check the result with get_workflow.
+- Publishing makes a workflow act on real data; call publish_workflow only \
+when the user asked for it or agreed, and it pauses for their approval.
+
+Application builder (web pages and portals):
+- create_builder_application, then create_page (the home page's path is /), \
+then add_page_content for headings, text, links and images (plain text, not \
+formulas), add_table_to_page to list a table's rows, add_form_to_page for a \
+form that adds rows. Link pages to each other with to_page_id.
+- Tell the user the app is ready to preview in the editor; publishing it to a \
+domain is done by the user in the app's settings.
+
 - Keep answers short, clear and well structured. Use Markdown lists for steps.
 """
 
@@ -122,7 +142,16 @@ def _result_refs(result: Any) -> dict:
     if not isinstance(result, dict):
         return {}
     refs = {}
-    for key in ("id", "table_id", "database_id", "view_id"):
+    for key in (
+        "id",
+        "table_id",
+        "database_id",
+        "view_id",
+        "automation_id",
+        "workflow_id",
+        "application_id",
+        "page_id",
+    ):
         if isinstance(result.get(key), int):
             refs[key] = result[key]
     return refs
@@ -132,7 +161,7 @@ def _to_pydantic_ai_tool(tool: SanadTool):
     from pydantic_ai import ApprovalRequired, RunContext, Tool
 
     def run(ctx: RunContext[SanadDeps], **arguments):
-        if tool.destructive and not ctx.tool_call_approved:
+        if tool.needs_approval and not ctx.tool_call_approved:
             raise ApprovalRequired()
         action = {"tool": tool.name, "arguments": arguments, "ok": True}
         try:
@@ -214,7 +243,7 @@ def run_turn(
     """Run the model until it answers or pauses for an approval.
 
     Pass ``user_prompt`` for a new message, or ``decisions`` (tool call ID →
-    approved) to resume a turn that paused on destructive tool calls.
+    approved) to resume a turn that paused for the user's approval.
     """
 
     from pydantic_ai import (

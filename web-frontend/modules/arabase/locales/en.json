@@ -406,7 +406,7 @@
       "summarize": "Summarise the rows of the table I have open"
     },
     "open": "Open",
-    "approvalTitle": "Sanad wants to delete something",
+    "approvalTitle": "Sanad needs your approval",
     "approve": "Delete",
     "decline": "Keep it",
     "approved": "You approved: {action}",
@@ -435,7 +435,23 @@
       "create_view": "Created a view",
       "delete_view": "Delete a view",
       "add_view_filter": "Added a filter",
-      "add_view_sort": "Added a sort"
+      "add_view_sort": "Added a sort",
+      "list_applications": "Listed applications",
+      "create_automation": "Created an automation",
+      "create_workflow": "Created a workflow",
+      "describe_automation_step": "Checked step settings",
+      "get_workflow": "Read the workflow",
+      "add_automation_step": "Added a workflow step",
+      "update_automation_step": "Updated a workflow step",
+      "delete_automation_step": "Delete a workflow step",
+      "publish_workflow": "Publish the workflow",
+      "create_builder_application": "Created an application",
+      "list_pages": "Listed pages",
+      "create_page": "Created a page",
+      "delete_page": "Delete a page",
+      "add_page_content": "Added page content",
+      "add_table_to_page": "Added a table to the page",
+      "add_form_to_page": "Added a form to the page"
     },
     "errors": {
       "generic": "Sanad could not finish this answer.",
@@ -465,6 +481,8 @@
         "title": "Nothing to approve",
         "description": "This action was already decided. Refresh the chat."
       }
-    }
+    },
+    "approvePublish": "Publish",
+    "declinePublish": "Not now"
   }
 }

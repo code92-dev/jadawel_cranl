@@ -24,10 +24,19 @@ from pydantic import BaseModel, Field, ValidationError
 
 from jadawel.core.models import Workspace
 
-# Tools whose effect cannot be taken back from the chat. The model must get the
-# user's explicit approval in the panel before any of them runs.
-DESTRUCTIVE_TOOLS = frozenset(
-    {"delete_table", "delete_fields", "delete_rows", "delete_view"}
+# Tools that delete something, or put a workflow live so it acts on real data
+# unattended. The model must get the user's explicit approval in the panel
+# before any of them runs.
+APPROVAL_TOOLS = frozenset(
+    {
+        "delete_table",
+        "delete_fields",
+        "delete_rows",
+        "delete_view",
+        "delete_page",
+        "delete_automation_step",
+        "publish_workflow",
+    }
 )
 
 # MCP tools reused as-is. The page-authoring tools are left out on purpose:
@@ -66,8 +75,8 @@ class SanadTool:
     run: Callable[[SanadEndpoint, Any], Any]
 
     @property
-    def destructive(self) -> bool:
-        return self.name in DESTRUCTIVE_TOOLS
+    def needs_approval(self) -> bool:
+        return self.name in APPROVAL_TOOLS
 
     def json_schema(self) -> dict:
         return self.input_schema.model_json_schema()
@@ -240,6 +249,118 @@ def _describe(doc: str | None) -> str:
     return " ".join((doc or "").split())
 
 
+def get_app_tools() -> list[SanadTool]:
+    """Automation and application-builder tools (``arabase.sanad.app_tools``)."""
+
+    from arabase.sanad import app_tools as t
+
+    return [
+        SanadTool(
+            "list_applications",
+            "List the workspace's applications (databases, builder apps, "
+            "automations, dashboards) with their IDs.",
+            t.ListApplicationsInput,
+            t.list_applications,
+        ),
+        SanadTool(
+            "create_automation",
+            "Create an automation. It comes with a first, empty workflow and a "
+            "connection to this workspace's tables; add steps to that workflow.",
+            t.CreateAutomationInput,
+            t.create_automation,
+        ),
+        SanadTool(
+            "create_workflow",
+            "Add another workflow to an existing automation.",
+            t.CreateWorkflowInput,
+            t.create_workflow,
+        ),
+        SanadTool(
+            "describe_automation_step",
+            "List the automation step types, or describe one type's settings. "
+            "Call it before adding a step whose settings you do not know.",
+            t.DescribeAutomationStepInput,
+            t.describe_automation_step,
+        ),
+        SanadTool(
+            "get_workflow",
+            "Read a workflow: its steps, their settings and how they connect.",
+            t.GetWorkflowInput,
+            t.get_workflow,
+        ),
+        SanadTool(
+            "add_automation_step",
+            "Add a step to a workflow: first the trigger (no after_step_id), "
+            "then each action after the previous step.",
+            t.AddAutomationStepInput,
+            t.add_automation_step,
+        ),
+        SanadTool(
+            "update_automation_step",
+            "Change a step's label or settings.",
+            t.UpdateAutomationStepInput,
+            t.update_automation_step,
+        ),
+        SanadTool(
+            "delete_automation_step",
+            "Delete a workflow step. Needs the user's approval.",
+            t.DeleteAutomationStepInput,
+            t.delete_automation_step,
+        ),
+        SanadTool(
+            "publish_workflow",
+            "Publish a workflow so it runs on real data. Needs the user's "
+            "approval; build and review the steps first.",
+            t.PublishWorkflowInput,
+            t.publish_workflow,
+        ),
+        SanadTool(
+            "create_builder_application",
+            "Create an application-builder app (web pages, portals, forms). "
+            "It starts with no pages.",
+            t.CreateBuilderApplicationInput,
+            t.create_builder_application,
+        ),
+        SanadTool(
+            "list_pages",
+            "List a builder app's pages and the elements on each.",
+            t.ListPagesInput,
+            t.list_pages,
+        ),
+        SanadTool(
+            "create_page",
+            "Add a page to a builder app.",
+            t.CreatePageInput,
+            t.create_page,
+        ),
+        SanadTool(
+            "delete_page",
+            "Delete a builder page. Needs the user's approval.",
+            t.DeletePageInput,
+            t.delete_page,
+        ),
+        SanadTool(
+            "add_page_content",
+            "Append headings, paragraphs, links (to a page or URL, optionally "
+            "as buttons) and images to a page. Give plain text, not formulas.",
+            t.AddPageContentInput,
+            t.add_page_content,
+        ),
+        SanadTool(
+            "add_table_to_page",
+            "Show a database table's rows on a page as a table.",
+            t.AddTableToPageInput,
+            t.add_table_to_page,
+        ),
+        SanadTool(
+            "add_form_to_page",
+            "Add a form to a page; each submission creates a row in a table.",
+            t.AddFormToPageInput,
+            t.add_form_to_page,
+        ),
+    ]
+
+
 def get_sanad_tools() -> list[SanadTool]:
     """Every tool Sanad can call, built fresh so registry state is current."""
 
@@ -290,7 +411,7 @@ def get_sanad_tools() -> list[SanadTool]:
             add_view_sort,
         ),
     ]
-    return tools
+    return tools + get_app_tools()
 
 
 def safe_tool_error(exc: Exception) -> str:
