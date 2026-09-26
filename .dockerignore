@@ -29,3 +29,7 @@ backend/media/
 **/.gitignore
 **/Dockerfile
 **/docker-compose*.yml
+
+# setuptools in-tree build output of the bundled plugins
+plugins/*/backend/build/
+plugins/*/backend/src/*.egg-info

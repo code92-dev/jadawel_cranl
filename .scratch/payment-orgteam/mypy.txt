@@ -1,5 +1,0 @@
-4106662|2026-09-08 08:14:11.401|INFO|jadawel.core.telemetry.telemetry:setup_logging:60 - Logger setup.
-Loaded backend plugins: jadawel_billing
-plugins/jadawel_billing/backend/src/jadawel_billing/tasks.py:9: error: Untyped decorator makes function "reconcile_payments" untyped  [untyped-decorator]
-plugins/jadawel_billing/backend/src/jadawel_billing/api/webhooks.py:24: error: Incompatible types in assignment (expression has type "EventData", base class "Serializer" defined the type as "ReturnDict[Any, Any]")  [assignment]
-Found 2 errors in 2 files (checked 22 source files)
