@@ -11,13 +11,6 @@ export default (client) => {
         base_url: baseUrl,
       })
     },
-    /** Replaces the guest's tables; an empty list parks them without access. */
-    setTables(workspaceId, workspaceUserId, tables) {
-      return client.patch(
-        `/arabase/workspace/${workspaceId}/table-access/${workspaceUserId}/`,
-        { tables }
-      )
-    },
     revoke(workspaceId, workspaceUserId) {
       return client.delete(
         `/arabase/workspace/${workspaceId}/table-access/${workspaceUserId}/`

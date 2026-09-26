@@ -6,7 +6,7 @@ workspace admin controls does not change: only the *shape* of what an invited
 person ends up seeing does.
 """
 
-from typing import Any, Dict, List
+from typing import Any, Dict, Iterable, List, Union
 
 from drf_spectacular.types import OpenApiTypes
 from drf_spectacular.utils import OpenApiParameter, extend_schema
@@ -29,6 +29,7 @@ from arabase.table_access.exceptions import (
     TableNotInWorkspace,
 )
 from arabase.table_access.handler import TableAccessHandler
+from arabase.table_access.models import PendingTableGrant, TableGrant
 from jadawel.api.decorators import map_exceptions, validate_body
 from jadawel.api.errors import (
     ERROR_GROUP_DOES_NOT_EXIST,
@@ -46,7 +47,7 @@ from jadawel.core.exceptions import (
     WorkspaceUserAlreadyExists,
 )
 from jadawel.core.handler import CoreHandler
-from jadawel.core.models import WorkspaceUser
+from jadawel.core.models import WorkspaceInvitation, WorkspaceUser
 
 WORKSPACE_ID_PARAMETER = OpenApiParameter(
     name="workspace_id",
@@ -64,7 +65,9 @@ COMMON_ERRORS = {
 }
 
 
-def _serialize_tables(grants) -> List[Dict[str, Any]]:
+def _serialize_tables(
+    grants: Iterable[Union[TableGrant, PendingTableGrant]],
+) -> List[Dict[str, Any]]:
     return [
         {
             "table_id": grant.table_id,
@@ -74,6 +77,40 @@ def _serialize_tables(grants) -> List[Dict[str, Any]]:
         }
         for grant in grants
     ]
+
+
+def _guest_payload(
+    workspace_user: WorkspaceUser, grants: Iterable[TableGrant]
+) -> Dict[str, Any]:
+    """A table guest as the admin API answers it.
+
+    `grants` must already carry their table (prefetched or selected), because
+    each one reads its table's name and database.
+    """
+
+    return {
+        "workspace_user_id": workspace_user.id,
+        "user_id": workspace_user.user_id,
+        "email": workspace_user.user.email,
+        "name": workspace_user.user.first_name,
+        "tables": _serialize_tables(grants),
+    }
+
+
+def _invitation_payload(
+    invitation: WorkspaceInvitation, grants: Iterable[PendingTableGrant]
+) -> Dict[str, Any]:
+    """A pending guest invitation as the admin API answers it.
+
+    `grants` must already carry their table, as for `_guest_payload`.
+    """
+
+    return {
+        "id": invitation.id,
+        "email": invitation.email,
+        "created_on": invitation.created_on,
+        "tables": _serialize_tables(grants),
+    }
 
 
 class TableAccessView(APIView):
@@ -105,24 +142,13 @@ class TableAccessView(APIView):
         return Response(
             {
                 "guests": [
-                    {
-                        "workspace_user_id": workspace_user.id,
-                        "user_id": workspace_user.user_id,
-                        "email": workspace_user.user.email,
-                        "name": workspace_user.user.first_name,
-                        "tables": _serialize_tables(workspace_user.table_grants.all()),
-                    }
+                    _guest_payload(workspace_user, workspace_user.table_grants.all())
                     for workspace_user in guests
                 ],
                 "invitations": [
-                    {
-                        "id": invitation.id,
-                        "email": invitation.email,
-                        "created_on": invitation.created_on,
-                        "tables": _serialize_tables(
-                            invitation.pending_table_grants.all()
-                        ),
-                    }
+                    _invitation_payload(
+                        invitation, invitation.pending_table_grants.all()
+                    )
                     for invitation in invitations
                 ],
             }
@@ -170,12 +196,9 @@ class TableAccessView(APIView):
             base_url=data["base_url"],
         )
         return Response(
-            {
-                "id": invitation.id,
-                "email": invitation.email,
-                "created_on": invitation.created_on,
-                "tables": _serialize_tables(invitation.pending_table_grants.all()),
-            }
+            _invitation_payload(
+                invitation, invitation.pending_table_grants.select_related("table")
+            )
         )
 
 
@@ -214,15 +237,9 @@ class TableAccessGuestView(APIView):
         )
         workspace_user.refresh_from_db()
         return Response(
-            {
-                "workspace_user_id": workspace_user.id,
-                "user_id": workspace_user.user_id,
-                "email": workspace_user.user.email,
-                "name": workspace_user.user.first_name,
-                "tables": _serialize_tables(
-                    workspace_user.table_grants.select_related("table").all()
-                ),
-            }
+            _guest_payload(
+                workspace_user, workspace_user.table_grants.select_related("table")
+            )
         )
 
     @extend_schema(

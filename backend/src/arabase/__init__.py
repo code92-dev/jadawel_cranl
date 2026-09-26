@@ -6,13 +6,8 @@ that provenance stays legible: ``jadawel.*`` is inherited, ``arabase.*`` is ours
 Nothing proprietary from Jadawel's ``premium``/``enterprise`` plugins may ever be
 copied in here (see PATCHES.md).
 
-Planned sub-apps (created as their phase begins):
-
-* ``arabase.fields``   — Hijri date field type            (Phase 2)
-* ``arabase.search``   — Arabic search normalization + ICU (Phase 2)
-* ``arabase.sso``      — OIDC / auth-provider interface     (Phase 3)
-* ``arabase.audit``    — append-only audit log             (Phase 3)
-* ``arabase.rbac``     — role-based access control         (Phase 3)
+Planned sub-apps are created as their phase begins: ``arabase.fields`` (Hijri date
+field) and ``arabase.search`` (Arabic search normalization) in Phase 2, then
+``arabase.sso`` (OIDC), ``arabase.audit`` (append-only audit log) and
+``arabase.rbac`` (role-based access control) in Phase 3.
 """
-
-default_app_config = "arabase.apps.ArabaseConfig"

@@ -20,6 +20,7 @@ from arabase.integrations.local_jadawel.models import (
     LocalJadawelTableServiceAggregationGroupBy,
     LocalJadawelTableServiceAggregationSeries,
     LocalJadawelTableServiceAggregationSortBy,
+    remap_series_key,
     series_key,
 )
 from jadawel.contrib.database.fields.exceptions import IncompatibleField
@@ -53,6 +54,60 @@ MAX_AGGREGATION_SERIES = 5
 """How many series the API accepts on one service. The frontend offers fewer;
 this is the hard stop that keeps a hand-written request from asking the database
 for an unbounded number of annotations in a single query."""
+
+_RELATIONS = {
+    "service_aggregation_series": (
+        LocalJadawelTableServiceAggregationSeries,
+        ("field_id", "aggregation_type"),
+    ),
+    "service_aggregation_group_bys": (
+        LocalJadawelTableServiceAggregationGroupBy,
+        ("field_id",),
+    ),
+    "service_aggregation_sorts": (
+        LocalJadawelTableServiceAggregationSortBy,
+        ("sort_on", "reference", "direction"),
+    ),
+}
+"""
+The series, group bys and sorts, in the order they are written and exported.
+Each key names the values entry and the service's related manager; it maps to
+the relation's model and the fields one exported entry holds, in order.
+"""
+
+
+def _relation_payload(service, key: str) -> List[Dict]:
+    """One relation of the service as its exported list of plain dicts."""
+
+    _, fields = _RELATIONS[key]
+    return [
+        {name: getattr(entry, name) for name in fields}
+        for entry in getattr(service, key).all()
+    ]
+
+
+def _bulk_create_relation(service, key: str, entries: List[Dict]) -> None:
+    """Creates one relation's entries, numbered in the order they are given."""
+
+    model, _ = _RELATIONS[key]
+    model.objects.bulk_create(
+        [
+            model(service=service, order=index, **entry)
+            for index, entry in enumerate(entries)
+        ]
+    )
+
+
+def _field_of_table(field_id: int, table):
+    """Returns the field, which has to belong to `table`."""
+
+    field = FieldHandler().get_field(field_id)
+    if table is None or field.table_id != table.id:
+        raise DRFValidationError(
+            detail=f"The field with ID {field_id} is not related to the given table.",
+            code="invalid_field",
+        )
+    return field
 
 
 class LocalJadawelGroupedAggregateRowsUserServiceType(
@@ -181,13 +236,7 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
 
             field = None
             if field_id is not None:
-                field = FieldHandler().get_field(field_id)
-                if table is None or field.table_id != table.id:
-                    raise DRFValidationError(
-                        detail=f"The field with ID {field_id} is not related to the "
-                        "given table.",
-                        code="invalid_field",
-                    )
+                field = _field_of_table(field_id, table)
 
             if aggregation_type and field:
                 try:
@@ -233,13 +282,7 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
         for entry in group_bys:
             field_id = entry.get("field_id", None)
             if field_id is not None:
-                field = FieldHandler().get_field(field_id)
-                if table is None or field.table_id != table.id:
-                    raise DRFValidationError(
-                        detail=f"The field with ID {field_id} is not related to the "
-                        "given table.",
-                        code="invalid_field",
-                    )
+                _field_of_table(field_id, table)
             validated.append({"field_id": field_id})
 
         return validated
@@ -298,14 +341,11 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
         # dispatch ends up referencing a removed column.
         from_table, to_table = changes.get("table", (None, None))
         if from_table != to_table:
-            instance.service_aggregation_series.all().delete()
-            instance.service_aggregation_group_bys.all().delete()
-            instance.service_aggregation_sorts.all().delete()
-            # Series supplied in the same request describe the *new* table, so
-            # they are written back rather than discarded with the old ones.
-            self._write_relations(instance, values)
-            return
+            for key in _RELATIONS:
+                getattr(instance, key).all().delete()
 
+        # Series supplied in the same request describe the *new* table, so they
+        # are written back rather than discarded with the old ones.
         self._write_relations(instance, values)
 
     def _write_relations(
@@ -317,61 +357,17 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
         so a diff would not buy anything over a rewrite.
         """
 
-        if "service_aggregation_series" in values:
-            instance.service_aggregation_series.all().delete()
-            LocalJadawelTableServiceAggregationSeries.objects.bulk_create(
-                [
-                    LocalJadawelTableServiceAggregationSeries(
-                        service=instance, order=index, **entry
-                    )
-                    for index, entry in enumerate(values["service_aggregation_series"])
-                ]
-            )
-
-        if "service_aggregation_group_bys" in values:
-            instance.service_aggregation_group_bys.all().delete()
-            LocalJadawelTableServiceAggregationGroupBy.objects.bulk_create(
-                [
-                    LocalJadawelTableServiceAggregationGroupBy(
-                        service=instance, order=index, **entry
-                    )
-                    for index, entry in enumerate(
-                        values["service_aggregation_group_bys"]
-                    )
-                ]
-            )
-
-        if "service_aggregation_sorts" in values:
-            instance.service_aggregation_sorts.all().delete()
-            LocalJadawelTableServiceAggregationSortBy.objects.bulk_create(
-                [
-                    LocalJadawelTableServiceAggregationSortBy(
-                        service=instance, order=index, **entry
-                    )
-                    for index, entry in enumerate(values["service_aggregation_sorts"])
-                ]
-            )
+        for key in _RELATIONS:
+            if key in values:
+                getattr(instance, key).all().delete()
+                _bulk_create_relation(instance, key, values[key])
 
     def export_prepared_values(
         self, instance: LocalJadawelGroupedAggregateRows
     ) -> dict:
         values = super().export_prepared_values(instance)
-        values["service_aggregation_series"] = [
-            {"field_id": s.field_id, "aggregation_type": s.aggregation_type}
-            for s in instance.service_aggregation_series.all()
-        ]
-        values["service_aggregation_group_bys"] = [
-            {"field_id": g.field_id}
-            for g in instance.service_aggregation_group_bys.all()
-        ]
-        values["service_aggregation_sorts"] = [
-            {
-                "sort_on": s.sort_on,
-                "reference": s.reference,
-                "direction": s.direction,
-            }
-            for s in instance.service_aggregation_sorts.all()
-        ]
+        for key in _RELATIONS:
+            values[key] = _relation_payload(instance, key)
         return values
 
     # --- export / import ---------------------------------------------------
@@ -384,27 +380,8 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
         storage=None,
         cache=None,
     ):
-        if prop_name == "service_aggregation_series":
-            return [
-                {"field_id": s.field_id, "aggregation_type": s.aggregation_type}
-                for s in service.service_aggregation_series.all()
-            ]
-
-        if prop_name == "service_aggregation_group_bys":
-            return [
-                {"field_id": g.field_id}
-                for g in service.service_aggregation_group_bys.all()
-            ]
-
-        if prop_name == "service_aggregation_sorts":
-            return [
-                {
-                    "sort_on": s.sort_on,
-                    "reference": s.reference,
-                    "direction": s.direction,
-                }
-                for s in service.service_aggregation_sorts.all()
-            ]
+        if prop_name in _RELATIONS:
+            return _relation_payload(service, prop_name)
 
         return super().serialize_property(
             service, prop_name, files_zip=files_zip, storage=storage, cache=cache
@@ -429,11 +406,13 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
             ]
 
         if prop_name == "service_aggregation_sorts":
+            # A series sort's reference is a series key, so the field id in it
+            # follows the same remapping as the series themselves.
             sorts = []
             for entry in value or []:
                 reference = entry.get("reference", "")
                 if entry.get("sort_on") == SORT_ON_SERIES:
-                    reference = self._remap_series_reference(reference, field_mapping)
+                    reference = remap_series_key(reference, field_mapping)
                 sorts.append({**entry, "reference": reference})
             return sorts
 
@@ -447,21 +426,6 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
             **kwargs,
         )
 
-    @staticmethod
-    def _remap_series_reference(reference: str, field_mapping: Dict) -> str:
-        """
-        A series reference is `field_<id>_<aggregation_type>`, so the field id
-        inside it has to follow the same remapping as the series themselves.
-        """
-
-        parts = reference.split("_", 2)
-        if len(parts) != 3 or parts[0] != "field" or not parts[1].isdigit():
-            return reference
-        new_field_id = field_mapping.get(int(parts[1]), None)
-        if new_field_id is None:
-            return reference
-        return series_key(new_field_id, parts[2])
-
     def create_instance_from_serialized(
         self,
         serialized_values,
@@ -471,9 +435,7 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
         cache=None,
         **kwargs,
     ):
-        aggregation_series = serialized_values.pop("service_aggregation_series", [])
-        group_bys = serialized_values.pop("service_aggregation_group_bys", [])
-        sorts = serialized_values.pop("service_aggregation_sorts", [])
+        relations = {key: serialized_values.pop(key, []) for key in _RELATIONS}
 
         service = super().create_instance_from_serialized(
             serialized_values,
@@ -484,30 +446,9 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
             **kwargs,
         )
 
-        LocalJadawelTableServiceAggregationSeries.objects.bulk_create(
-            [
-                LocalJadawelTableServiceAggregationSeries(
-                    service=service, order=index, **entry
-                )
-                for index, entry in enumerate(aggregation_series)
-            ]
-        )
-        LocalJadawelTableServiceAggregationGroupBy.objects.bulk_create(
-            [
-                LocalJadawelTableServiceAggregationGroupBy(
-                    service=service, order=index, **entry
-                )
-                for index, entry in enumerate(group_bys)
-            ]
-        )
-        LocalJadawelTableServiceAggregationSortBy.objects.bulk_create(
-            [
-                LocalJadawelTableServiceAggregationSortBy(
-                    service=service, order=index, **entry
-                )
-                for index, entry in enumerate(sorts)
-            ]
-        )
+        # A new service has nothing to delete, so the relations are only created.
+        for key, entries in relations.items():
+            _bulk_create_relation(service, key, entries)
 
         return service
 
@@ -637,12 +578,13 @@ class LocalJadawelGroupedAggregateRowsUserServiceType(
         service: LocalJadawelGroupedAggregateRows,
         dispatch_context: DispatchContext,
     ) -> Dict[str, Any]:
-        if not self._untrashed_series(service):
+        series = self._untrashed_series(service)
+        if not series:
             raise ServiceImproperlyConfiguredDispatchException(
                 "There are no aggregation series."
             )
 
-        for s in self._untrashed_series(service):
+        for s in series:
             try:
                 field_aggregation_registry.get(s.aggregation_type)
             except AggregationTypeDoesNotExist as exc:

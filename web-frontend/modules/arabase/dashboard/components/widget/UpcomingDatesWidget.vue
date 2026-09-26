@@ -56,48 +56,15 @@
 import moment from '@jadawel/modules/core/moment'
 import RecordRows from '@jadawel/modules/arabase/dashboard/components/widget/RecordRows'
 import { resolveDisplayedFields } from '@jadawel/modules/arabase/dashboard/recordValues'
+import dashboardWidget from '@jadawel/modules/arabase/dashboard/mixins/dashboardWidget'
 import WidgetContextMenu from '@jadawel/modules/dashboard/components/widget/WidgetContextMenu'
 
 export default {
   name: 'UpcomingDatesWidget',
   components: { RecordRows, WidgetContextMenu },
-  props: {
-    dashboard: {
-      type: Object,
-      required: true,
-    },
-    widget: {
-      type: Object,
-      required: true,
-    },
-    storePrefix: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    loading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
+  mixins: [dashboardWidget],
   emits: ['delete-widget'],
   computed: {
-    dataSource() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/getDataSourceById`
-      ](this.widget.data_source_id)
-    },
-    dataForDataSource() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/getDataForDataSource`
-      ](this.dataSource?.id)
-    },
-    isEditMode() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/isEditMode`
-      ]
-    },
     rows() {
       return this.dataForDataSource?.results || []
     },
@@ -131,9 +98,6 @@ export default {
     },
     overdueCount() {
       return this.rows.filter((row) => this.isOverdue(row)).length
-    },
-    dataSourceMisconfigured() {
-      return !!this.dataForDataSource?._error
     },
   },
   methods: {

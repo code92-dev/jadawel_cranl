@@ -57,6 +57,30 @@ class KanbanLimitOffsetPagination(LimitOffsetPagination):
     max_limit = 100
 
 
+def _get_kanban_view(request: Request, view_id: int) -> KanbanView:
+    """Returns the kanban view once the user may list its rows.
+
+    Both endpoints start with the same two checks, in this order: the view
+    lookup (``ViewDoesNotExist``, ``UserNotInWorkspace``), then the row-list
+    permission with the view fallback the gallery rows endpoint uses.
+    """
+
+    view = ViewHandler().get_view_as_user(
+        request.user,
+        view_id,
+        KanbanView,
+        base_queryset=KanbanView.objects.prefetch_related("viewsort_set"),
+    )
+    check_permissions_with_view_fallback(
+        ListRowsDatabaseTableOperationType.type,
+        ListViewRowsOperationType.type,
+        request.user,
+        view.table,
+        view,
+    )
+    return view
+
+
 class KanbanViewView(APIView):
     permission_classes = ()
 
@@ -100,20 +124,7 @@ class KanbanViewView(APIView):
     def get(self, request: Request, view_id: int) -> Response:
         """Lists the stacks (columns) of a kanban view with their row counts."""
 
-        view_handler = ViewHandler()
-        view = view_handler.get_view_as_user(
-            request.user,
-            view_id,
-            KanbanView,
-            base_queryset=KanbanView.objects.prefetch_related("viewsort_set"),
-        )
-        check_permissions_with_view_fallback(
-            ListRowsDatabaseTableOperationType.type,
-            ListViewRowsOperationType.type,
-            request.user,
-            view.table,
-            view,
-        )
+        view = _get_kanban_view(request, view_id)
 
         search = request.GET.get("search")
         model = view.table.get_model()
@@ -130,7 +141,7 @@ class KanbanViewView(APIView):
             select_field = view.single_select_field.specific
             field_name = f"field_{select_field.id}"
 
-            queryset = view_handler.get_queryset(
+            queryset = ViewHandler().get_queryset(
                 request.user,
                 view,
                 search,
@@ -152,6 +163,10 @@ class KanbanViewView(APIView):
                 for option_id, total in counts_by_option_id.items()
                 if option_id is not None
             }
+            # The NULL stack keeps its own COUNT over distinct rows. A link row
+            # or multiple select filter or search can make the grouped query
+            # count a row once per match, or aggregate it per option, so its
+            # None bucket can differ from this count.
             null_count = queryset.filter(**{f"{field_name}__isnull": True}).count()
 
             stacks = [
@@ -248,20 +263,7 @@ class KanbanStackRowsView(APIView):
     def get(self, request: Request, view_id: int, select_option_id: str) -> Response:
         """Lists one page of rows of a single stack."""
 
-        view_handler = ViewHandler()
-        view = view_handler.get_view_as_user(
-            request.user,
-            view_id,
-            KanbanView,
-            base_queryset=KanbanView.objects.prefetch_related("viewsort_set"),
-        )
-        check_permissions_with_view_fallback(
-            ListRowsDatabaseTableOperationType.type,
-            ListViewRowsOperationType.type,
-            request.user,
-            view.table,
-            view,
-        )
+        view = _get_kanban_view(request, view_id)
 
         if view.single_select_field_id is None:
             raise KanbanViewHasNoSingleSelectField()
@@ -289,7 +291,7 @@ class KanbanStackRowsView(APIView):
                 if field_id not in hidden_field_ids
             ]
 
-        queryset = view_handler.get_queryset(
+        queryset = ViewHandler().get_queryset(
             request.user,
             view,
             search,
@@ -297,7 +299,8 @@ class KanbanStackRowsView(APIView):
             apply_sorts=True,
             apply_filters=True,
             only_search_by_field_ids=only_search_by_field_ids,
-        ).filter(**stack_filter)
+        )
+        queryset = queryset.filter(**stack_filter)
 
         paginator = KanbanLimitOffsetPagination()
         page = paginator.paginate_queryset(queryset, request, self)

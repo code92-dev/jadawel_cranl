@@ -62,15 +62,15 @@ uv_run := "uv run --active"
 # Repo root (parent of backend/) - clean() normalizes path (removes ..)
 repo_root := clean(justfile_directory() / "..")
 
-_set_pythonpath := 'export PYTHONPATH="' + repo_root / 'backend/src:' + repo_root / 'premium/backend/src:' + repo_root / 'enterprise/backend/src:' + repo_root / 'backend/tests:' + repo_root / 'premium/backend/tests:' + repo_root / 'enterprise/backend/tests${PYTHONPATH:+:$PYTHONPATH}"'
+_set_pythonpath := 'export PYTHONPATH="' + repo_root / 'backend/src:' + repo_root / 'backend/tests${PYTHONPATH:+:$PYTHONPATH}"'
 # Helper to load .env.local if present and set PYTHONPATH with absolute paths
 # Include this at the start of bash recipes that need env vars
 _load_env := 'if [ -f "../.env.local" ]; then set -a; source "../.env.local"; set +a; fi; ' + _set_pythonpath
 
 # Source directories
-backend_source_dirs := "src/ ../premium/backend/src/ ../enterprise/backend/src/"
-backend_tests_dirs := "tests/ ../premium/backend/tests/ ../enterprise/backend/tests/"
-backend_tests_dirs_from_root := "backend/tests/ premium/backend/tests/ enterprise/backend/tests/"
+backend_source_dirs := "src/"
+backend_tests_dirs := "tests/"
+backend_tests_dirs_from_root := "backend/tests/"
 
 # Django settings
 django_settings := env("DJANGO_SETTINGS_MODULE", "jadawel.config.settings.dev")
@@ -133,7 +133,7 @@ _create-venv:
         echo "Virtual environment already exists at {{ venv_dir }}"
     fi
 
-# Install dependencies (includes jadawel + premium + enterprise via workspace)
+# Install dependencies (the jadawel backend package and its dev tools)
 [group('1 - setup')]
 install: _create-venv
     uv sync
@@ -209,7 +209,7 @@ alias f := fix
 # =============================================================================
 
 # PYTHONPATH for test fixtures across all test directories
-test_pythonpath := "tests:../premium/backend/tests:../enterprise/backend/tests"
+test_pythonpath := "tests"
 _pytest := 'PYTHONPATH="' + test_pythonpath + ':${PYTHONPATH:-}" ' + uv_run + ' pytest -c pytest.ini'
 
 # Run tests. Pass -n=auto to run in parallel with pytest-xdist
@@ -334,7 +334,7 @@ make-translations: _check-dev
     #!/usr/bin/env bash
     set -euo pipefail
     {{ _load_env }}
-    for pkg_dir in ./ ../premium/backend/ ../enterprise/backend/; do
+    for pkg_dir in ./; do
         echo "Processing $pkg_dir"
         cd "$pkg_dir"
         {{ uv_run }} django-admin makemessages -l en --ignore 'tests/*' || true

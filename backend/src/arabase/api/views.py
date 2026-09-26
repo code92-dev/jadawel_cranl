@@ -6,13 +6,32 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from arabase.api.activity import DEFAULT_DAYS, MAX_DAYS, get_workspace_activity
-from arabase.api.database_stats import get_database_stats
+from arabase.api.database_stats import get_database_stats, visible_tables
 from jadawel.api.decorators import map_exceptions
 from jadawel.api.errors import ERROR_GROUP_DOES_NOT_EXIST, ERROR_USER_NOT_IN_GROUP
 from jadawel.api.schemas import get_error_schema
 from jadawel.contrib.database.models import Database
 from jadawel.core.exceptions import UserNotInWorkspace, WorkspaceDoesNotExist
 from jadawel.core.service import CoreService
+
+
+def _visible_workspace_databases(request: Request, workspace_id: int):
+    """`(workspace, databases)`: the workspace and the databases the user may see.
+
+    Raises `WorkspaceDoesNotExist` or `UserNotInWorkspace`, which both calling
+    views map to their API errors.
+    """
+
+    workspace = CoreService().get_workspace(request.user, workspace_id)
+
+    # `list_applications_in_workspace` applies the permission filtering, so a
+    # user only ever gets numbers for databases they are allowed to see. It
+    # returns specific instances by default, so the isinstance check is enough
+    # to drop the non-database application types.
+    applications = CoreService().list_applications_in_workspace(request.user, workspace)
+    databases = [a for a in applications if isinstance(a, Database)]
+
+    return workspace, databases
 
 
 class WorkspaceDatabaseStatsView(APIView):
@@ -55,18 +74,11 @@ class WorkspaceDatabaseStatsView(APIView):
         }
     )
     def get(self, request: Request, workspace_id: int) -> Response:
-        workspace = CoreService().get_workspace(request.user, workspace_id)
+        workspace, databases = _visible_workspace_databases(request, workspace_id)
 
-        # `list_applications_in_workspace` applies the permission filtering, so a
-        # user only ever gets counters for databases they are allowed to see. It
-        # returns specific instances by default, so the isinstance check is enough
-        # to drop the non-database application types.
-        applications = CoreService().list_applications_in_workspace(
-            request.user, workspace
-        )
-        databases = [a for a in applications if isinstance(a, Database)]
+        tables = visible_tables(request.user, workspace, databases)
 
-        return Response(get_database_stats(databases))
+        return Response(get_database_stats(databases, tables))
 
 
 class WorkspaceActivityView(APIView):
@@ -119,12 +131,7 @@ class WorkspaceActivityView(APIView):
         }
     )
     def get(self, request: Request, workspace_id: int) -> Response:
-        workspace = CoreService().get_workspace(request.user, workspace_id)
-
-        applications = CoreService().list_applications_in_workspace(
-            request.user, workspace
-        )
-        databases = [a for a in applications if isinstance(a, Database)]
+        workspace, databases = _visible_workspace_databases(request, workspace_id)
 
         # A non-numeric `days` is a malformed request, not a reason to 500; fall
         # back to the default and let `get_workspace_activity` clamp the range.
@@ -133,4 +140,6 @@ class WorkspaceActivityView(APIView):
         except (TypeError, ValueError):
             days = DEFAULT_DAYS
 
-        return Response(get_workspace_activity(databases, days))
+        tables = visible_tables(request.user, workspace, databases)
+
+        return Response(get_workspace_activity(tables, days))

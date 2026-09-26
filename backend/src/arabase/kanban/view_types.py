@@ -227,6 +227,9 @@ class KanbanViewType(ViewType):
         hidden_field_ids = set()
         fields = view.table.field_set.all()
         field_options = view.kanbanviewfieldoptions_set.all()
+        # Built on the first field that needs it, so a call that only meets the
+        # stacking and cover fields sends no field-options query.
+        field_options_by_field_id = None
 
         if field_ids_to_check is not None:
             fields = [f for f in fields if f.id in field_ids_to_check]
@@ -239,12 +242,14 @@ class KanbanViewType(ViewType):
             ):
                 continue
 
-            field_option_matching = None
-            for field_option in field_options:
-                if field_option.field_id == field.id:
-                    field_option_matching = field_option
+            if field_options_by_field_id is None:
+                field_options_by_field_id = {
+                    field_option.field_id: field_option
+                    for field_option in field_options
+                }
+            field_option = field_options_by_field_id.get(field.id)
 
-            if field_option_matching is None or field_option_matching.hidden:
+            if field_option is None or field_option.hidden:
                 hidden_field_ids.add(field.id)
 
         return hidden_field_ids

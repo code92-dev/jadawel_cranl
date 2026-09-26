@@ -12,6 +12,7 @@ from arabase.dashboard.widgets.models import (
     RecordsListWidget,
     UpcomingDatesWidget,
 )
+from arabase.integrations.local_jadawel.models import remap_series_key
 from arabase.integrations.local_jadawel.service_types import (
     LocalJadawelGroupedAggregateRowsUserServiceType,
 )
@@ -23,10 +24,6 @@ from jadawel.contrib.integrations.local_jadawel.service_types import (
     LocalJadawelAggregateRowsUserServiceType,
     LocalJadawelListRowsUserServiceType,
 )
-
-MAX_DISPLAYED_FIELDS = 6
-"""More columns than this stop being readable inside a dashboard widget, whatever
-the widget's width."""
 
 
 class ChartWidgetType(DataSourceBackedWidgetType):
@@ -50,16 +47,11 @@ class ChartWidgetType(DataSourceBackedWidgetType):
         "show_legend",
     ]
     request_serializer_field_names = ["chart_type", "series_config", "show_legend"]
-    request_serializer_field_overrides = {}
 
     class SerializedDict(DataSourceBackedWidgetType.SerializedDict):
         chart_type: str
         series_config: dict
         show_legend: bool
-
-    @property
-    def serializer_field_overrides(self):
-        return self.data_source_serializer_field_overrides
 
     def deserialize_property(
         self,
@@ -82,15 +74,10 @@ class ChartWidgetType(DataSourceBackedWidgetType):
         """
 
         field_mapping = id_mapping.get("database_fields", {})
-        remapped = {}
-        for key, config in series_config.items():
-            parts = key.split("_", 2)
-            if len(parts) == 3 and parts[0] == "field" and parts[1].isdigit():
-                new_field_id = field_mapping.get(int(parts[1]), None)
-                if new_field_id is not None:
-                    key = f"field_{new_field_id}_{parts[2]}"
-            remapped[key] = config
-        return remapped
+        return {
+            remap_series_key(key, field_mapping): config
+            for key, config in series_config.items()
+        }
 
 
 class RecordsListWidgetType(DisplayedFieldsWidgetTypeMixin, DataSourceBackedWidgetType):
@@ -102,23 +89,12 @@ class RecordsListWidgetType(DisplayedFieldsWidgetTypeMixin, DataSourceBackedWidg
     allowed_fields = WidgetType.allowed_fields + ["field_ids"]
     serializer_field_names = ["data_source_id", "field_ids"]
     request_serializer_field_names = ["field_ids"]
-    request_serializer_field_overrides = {}
+    field_ids_help_text = (
+        "Ids of the fields to show, in order. An empty list lets the widget choose."
+    )
 
     class SerializedDict(DataSourceBackedWidgetType.SerializedDict):
         field_ids: list
-
-    @property
-    def serializer_field_overrides(self):
-        return {
-            **self.data_source_serializer_field_overrides,
-            "field_ids": serializers.ListField(
-                child=serializers.IntegerField(),
-                required=False,
-                max_length=MAX_DISPLAYED_FIELDS,
-                help_text="Ids of the fields to show, in order. An empty list "
-                "lets the widget choose.",
-            ),
-        }
 
 
 class ProgressWidgetType(DataSourceBackedWidgetType):
@@ -146,17 +122,12 @@ class ProgressWidgetType(DataSourceBackedWidgetType):
         "warning_threshold",
         "success_threshold",
     ]
-    request_serializer_field_overrides = {}
 
     class SerializedDict(DataSourceBackedWidgetType.SerializedDict):
         target_value: str
         display_style: str
         warning_threshold: int
         success_threshold: int
-
-    @property
-    def serializer_field_overrides(self):
-        return self.data_source_serializer_field_overrides
 
     def prepare_value_for_db(self, values: dict, instance=None):
         values = super().prepare_value_for_db(values, instance)
@@ -202,19 +173,7 @@ class UpcomingDatesWidgetType(
     allowed_fields = WidgetType.allowed_fields + ["field_ids"]
     serializer_field_names = ["data_source_id", "field_ids"]
     request_serializer_field_names = ["field_ids"]
-    request_serializer_field_overrides = {}
+    field_ids_help_text = "Ids of the fields to show alongside the date, in order."
 
     class SerializedDict(DataSourceBackedWidgetType.SerializedDict):
         field_ids: list
-
-    @property
-    def serializer_field_overrides(self):
-        return {
-            **self.data_source_serializer_field_overrides,
-            "field_ids": serializers.ListField(
-                child=serializers.IntegerField(),
-                required=False,
-                max_length=MAX_DISPLAYED_FIELDS,
-                help_text="Ids of the fields to show alongside the date, in order.",
-            ),
-        }

@@ -3,6 +3,31 @@ import { ViewType } from '@jadawel/modules/database/viewTypes'
 import KanbanView from '@jadawel/modules/arabase/kanban/components/KanbanView'
 
 /**
+ * The id of the stack a row belongs to: the id of its option in the grouping
+ * field, or `null` for the stack of rows without a value.
+ */
+export function stackIdOfRow(row, groupingFieldId) {
+  const value = row[`field_${groupingFieldId}`]
+  return value && value.id !== undefined ? value.id : null
+}
+
+/**
+ * The selected view when it is a kanban view of the given table, otherwise
+ * `null`: realtime row events for any other view leave the board alone.
+ */
+function selectedKanbanView(store, tableId) {
+  const view = store.getters['view/getSelected']
+  if (
+    !view ||
+    view.table_id !== tableId ||
+    view.type !== KanbanViewType.getType()
+  ) {
+    return null
+  }
+  return view
+}
+
+/**
  * The kanban board view type (#35): one column per option of a single select
  * field. Rows are fetched per stack from the fork's own API, and cards are
  * rendered by the shared `RowCard`, so row colors (decorations) work on
@@ -58,8 +83,8 @@ export class KanbanViewType extends ViewType {
 
   rowCreated(context, tableId, fields, values, metadata, storePrefix) {
     const { store } = context
-    const view = store.getters['view/getSelected']
-    if (!view || view.table_id !== tableId || view.type !== this.getType()) {
+    const view = selectedKanbanView(store, tableId)
+    if (!view) {
       return
     }
     // The row may belong to any stack and shifts the counts; refetching the
@@ -78,8 +103,8 @@ export class KanbanViewType extends ViewType {
     storePrefix
   ) {
     const { store } = context
-    const view = store.getters['view/getSelected']
-    if (!view || view.table_id !== tableId || view.type !== this.getType()) {
+    const view = selectedKanbanView(store, tableId)
+    if (!view) {
       return
     }
     const groupingFieldId = view.single_select_field
@@ -87,13 +112,8 @@ export class KanbanViewType extends ViewType {
       return
     }
 
-    const stackIdOf = (aRow) => {
-      const value = aRow[`field_${groupingFieldId}`]
-      return value && value.id !== undefined ? value.id : null
-    }
-
-    const before = stackIdOf(rowBeforeUpdate)
-    const after = stackIdOf(row)
+    const before = stackIdOfRow(rowBeforeUpdate, groupingFieldId)
+    const after = stackIdOfRow(row, groupingFieldId)
 
     if (before !== after) {
       // The row moved stacks; refetch both so counts and pages are exact.
@@ -125,16 +145,15 @@ export class KanbanViewType extends ViewType {
 
   rowDeleted(context, tableId, fields, row, storePrefix) {
     const { store } = context
-    const view = store.getters['view/getSelected']
-    if (!view || view.table_id !== tableId || view.type !== this.getType()) {
+    const view = selectedKanbanView(store, tableId)
+    if (!view) {
       return
     }
     const groupingFieldId = view.single_select_field
     if (!groupingFieldId) {
       return
     }
-    const value = row[`field_${groupingFieldId}`]
-    const stackId = value && value.id !== undefined ? value.id : null
+    const stackId = stackIdOfRow(row, groupingFieldId)
     store.commit(`${storePrefix}view/kanban/REMOVE_ROW`, {
       stackId,
       rowId: row.id,

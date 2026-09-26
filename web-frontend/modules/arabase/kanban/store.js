@@ -1,4 +1,5 @@
 import KanbanService from '@jadawel/modules/arabase/kanban/service'
+import { stackIdOfRow } from '@jadawel/modules/arabase/kanban/viewType'
 
 /**
  * The kanban board's state: the stacks (one per select option of the view's
@@ -68,21 +69,6 @@ export const mutations = {
       }
     }
   },
-  UPDATE_STACK_COUNTS(state, countsByStackId) {
-    state.stacks = state.stacks.map((stack) => ({
-      ...stack,
-      count: countsByStackId[stack.id] ?? stack.count,
-    }))
-    for (const stack of state.stacks) {
-      const data = state.stacksData[stack.id]
-      if (data) {
-        state.stacksData = {
-          ...state.stacksData,
-          [stack.id]: { ...data, count: stack.count },
-        }
-      }
-    }
-  },
   MOVE_ROW(state, { fromStackId, toStackId, row, beforeId }) {
     const fromData = state.stacksData[fromStackId]
     const toData = state.stacksData[toStackId]
@@ -128,12 +114,6 @@ export const mutations = {
       }
     }
   },
-  RESET(state) {
-    state.loading = false
-    state.stacks = []
-    state.stacksData = {}
-    state.fieldOptions = {}
-  },
 }
 
 export const getters = {
@@ -148,9 +128,6 @@ export const getters = {
       nextOffset: 0,
       loading: false,
     },
-  getLoading(state) {
-    return state.loading
-  },
   getAllFieldOptions(state) {
     return state.fieldOptions
   },
@@ -218,12 +195,7 @@ export const actions = {
       return
     }
 
-    const stackIdOf = (aRow) => {
-      const value = aRow[`field_${groupingFieldId}`]
-      return value && value.id !== undefined ? value.id : null
-    }
-
-    const fromStackId = stackIdOf(row)
+    const fromStackId = stackIdOfRow(row, groupingFieldId)
 
     // Build the full option object for the optimistic update so badges and
     // colors render correctly before the refetch lands; the component passes
@@ -255,9 +227,6 @@ export const actions = {
       })
       throw error
     }
-  },
-  reset({ commit }) {
-    commit('RESET')
   },
 }
 

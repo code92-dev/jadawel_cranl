@@ -31,9 +31,6 @@ export const mutations = {
 
 export const actions = {
   ...core.actions,
-  setPublicSource({ commit }, { slug, authToken = null }) {
-    commit('SET_PUBLIC_SOURCE', { slug, authToken })
-  },
   /**
    * One request returns the dashboard, its widgets and its data sources, then
    * every data source is dispatched. The authenticated store needs three calls
@@ -81,12 +78,6 @@ export const actions = {
 
 export const getters = {
   ...core.getters,
-  getSlug(state) {
-    return state.slug
-  },
-  getAuthToken(state) {
-    return state.authToken
-  },
 }
 
 export default {

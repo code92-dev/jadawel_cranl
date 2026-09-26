@@ -178,16 +178,14 @@ export default {
     view: {
       handler(view, oldView) {
         // The board depends on the grouping field; a change of view or of
-        // the field must reload everything.
+        // the field must reload everything. `immediate` makes this the first
+        // load as well.
         if (!oldView || oldView.id !== view.id) {
           this.fetchBoard()
         }
       },
       immediate: true,
     },
-  },
-  mounted() {
-    this.fetchBoard()
   },
   beforeUnmount() {
     this.cancelDrag()

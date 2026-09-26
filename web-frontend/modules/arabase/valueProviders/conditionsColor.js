@@ -3,8 +3,7 @@ import { createFiltersTree } from '@jadawel/modules/database/utils/view'
 import { BackgroundColorDecoratorType } from '@jadawel/modules/arabase/decorators/backgroundColor'
 import { LeftBorderColorDecoratorType } from '@jadawel/modules/arabase/decorators/leftBorderColor'
 import ConditionalColorForm from '@jadawel/modules/arabase/components/ConditionalColorForm'
-
-const COLOR_PATTERN = /^[a-z-]+$/
+import { COLOR_PATTERN } from '@jadawel/modules/arabase/utils/rowColor'
 
 /**
  * Resolves a row color from the first matching list of conditions.

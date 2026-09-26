@@ -3,7 +3,7 @@
 </template>
 
 <script>
-const COLOR_PATTERN = /^[a-z-]+$/
+import { COLOR_PATTERN } from '@jadawel/modules/arabase/utils/rowColor'
 
 export default {
   name: 'BackgroundColorDecorator',

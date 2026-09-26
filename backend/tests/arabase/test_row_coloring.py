@@ -15,6 +15,7 @@ from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST
 from arabase.row_coloring.value_providers import (
     ConditionalColorValueProviderType,
     SingleSelectColorValueProviderType,
+    get_conditional_color_problems,
 )
 from jadawel.contrib.database.views.models import ViewDecoration
 from jadawel.contrib.database.views.registries import (
@@ -57,16 +58,6 @@ def coloring_setup(data_fixture):
 
 def auth(token):
     return {"HTTP_AUTHORIZATION": f"JWT {token}"}
-
-
-@pytest.mark.django_db
-def test_row_coloring_types_are_registered():
-    assert decorator_type_registry.get("background_color").type == "background_color"
-    provider = decorator_value_provider_type_registry.get("single_select_color")
-    assert isinstance(provider, SingleSelectColorValueProviderType)
-    assert provider.decorator_is_compatible(
-        decorator_type_registry.get("background_color")
-    )
 
 
 @pytest.mark.django_db
@@ -227,7 +218,7 @@ def test_type_change_away_from_single_select_cleans_up(data_fixture, coloring_se
 
 
 @pytest.mark.django_db
-def test_validate_conf_for_view_rejects_bad_fields(coloring_setup):
+def test_single_select_field_lookup_rejects_bad_fields(coloring_setup):
     from arabase.row_coloring.value_providers import get_single_select_field_or_raise
     from jadawel.contrib.database.views.exceptions import (
         DecoratorValueProviderTypeNotCompatible,
@@ -311,6 +302,12 @@ def conditional_conf(field_id, **overrides):
 def test_all_row_coloring_types_are_registered():
     assert decorator_type_registry.get("left_border_color").type == "left_border_color"
     assert decorator_type_registry.get("background_color").type == "background_color"
+
+    single_select = decorator_value_provider_type_registry.get("single_select_color")
+    assert isinstance(single_select, SingleSelectColorValueProviderType)
+    assert single_select.decorator_is_compatible(
+        decorator_type_registry.get("background_color")
+    )
 
     conditions = decorator_value_provider_type_registry.get("conditional_color")
     assert isinstance(conditions, ConditionalColorValueProviderType)
@@ -471,7 +468,7 @@ def test_conditional_update_backstops_stored_conf(coloring_setup):
         value_provider_conf=conditional_conf(999999),
         order=1,
     )
-    problems = provider.validate_conf_for_view(
+    problems = get_conditional_color_problems(
         setup["view"], decoration.value_provider_conf
     )
     assert "does not exist on the view's table" in problems[0]

@@ -25,8 +25,7 @@ from datetime import timedelta
 from django.db import connection
 from django.utils import timezone
 
-from jadawel.contrib.database.table.constants import USER_TABLE_DATABASE_NAME_PREFIX
-from jadawel.contrib.database.table.models import Table
+from arabase.api.user_table_sql import union_all_per_table
 
 # Matches `database_stats.MAX_TABLES_FOR_EXACT_COUNTS`. Kept as its own constant
 # because the two queries are not the same cost — this one groups as well as
@@ -37,54 +36,36 @@ DEFAULT_DAYS = 30
 MAX_DAYS = 365
 
 
-def _table_ids_for_databases(database_ids):
-    """Non-trashed table ids across the given databases, in one query."""
-
-    if not database_ids:
-        return []
-
-    return list(
-        Table.objects.filter(database_id__in=database_ids, trashed=False).values_list(
-            "id", flat=True
-        )
-    )
-
-
 def _rows_created_per_day(table_ids, since):
     """`{date: count}` of non-trashed rows created on or after `since`.
 
-    One round trip for every table, unioned. Table ids are forced through `int()`
-    before they reach the SQL string: the table *name* varies per row and cannot
-    be a bound parameter, so the name is concatenated, and the id is the only
-    interpolated value on either side of that concatenation. `since` is passed as
-    a real bound parameter.
+    One round trip for every table, unioned by `union_all_per_table`, which
+    explains why the table names are formatted rather than bound. `since` is the
+    only user-influenced value, and it is passed as a real bound parameter, once
+    per table.
     """
 
     if not table_ids:
         return {}
 
-    # noqa S608: see the docstring — the table name cannot be bound, the id is
-    # int()-coerced, and the only user-influenced value (`since`) is a parameter.
-    parts = [
-        f"SELECT created_on::date AS day, COUNT(*) AS c "  # noqa: S608
-        f"FROM {USER_TABLE_DATABASE_NAME_PREFIX}{int(table_id)} "
-        f"WHERE trashed = false AND created_on >= %s "
-        f"GROUP BY 1"
-        for table_id in table_ids
-    ]
-
+    per_table = union_all_per_table(
+        table_ids,
+        "SELECT created_on::date AS day, COUNT(*) AS c FROM {table} "
+        "WHERE trashed = false AND created_on >= %s GROUP BY 1",
+    )
+    # noqa S608: `per_table` holds only int()-coerced table names; see above.
     sql = (
         "SELECT day, SUM(c) FROM ("  # noqa: S608
-        + " UNION ALL ".join(parts)
+        + per_table
         + ") AS per_table GROUP BY day"
     )
 
     with connection.cursor() as cursor:
-        cursor.execute(sql, [since] * len(parts))
+        cursor.execute(sql, [since] * len(table_ids))
         return {row[0]: int(row[1]) for row in cursor.fetchall()}
 
 
-def get_workspace_activity(databases, days=DEFAULT_DAYS):
+def get_workspace_activity(tables, days=DEFAULT_DAYS):
     """Rows created per day over the last `days` days, oldest first.
 
     Returns a dense series — every day in the window is present, with `count: 0`
@@ -92,8 +73,9 @@ def get_workspace_activity(databases, days=DEFAULT_DAYS):
     straight line across a quiet week, which reads as steady activity rather than
     none.
 
-    `databases` must already be permission-filtered by the caller; this function
-    does no access control of its own.
+    `tables` must already be permission-filtered by the caller (see
+    `database_stats.visible_tables`); this function does no access control of
+    its own.
     """
 
     days = max(1, min(int(days), MAX_DAYS))
@@ -103,7 +85,7 @@ def get_workspace_activity(databases, days=DEFAULT_DAYS):
     today = timezone.localdate()
     start = today - timedelta(days=days - 1)
 
-    table_ids = _table_ids_for_databases([database.id for database in databases])
+    table_ids = list(tables.filter(trashed=False).values_list("id", flat=True))
     complete = len(table_ids) <= MAX_TABLES_FOR_ACTIVITY
 
     counts = _rows_created_per_day(table_ids, start) if complete else {}

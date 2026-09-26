@@ -21,7 +21,7 @@ TEXT_NS = "urn:oasis:names:tc:opendocument:xmlns:text:1.0"
 OFFICE_NS = "urn:oasis:names:tc:opendocument:xmlns:office:1.0"
 
 # Every value a spreadsheet application could treat as the start of a formula,
-# plus a non-ASCII formula.
+# plus a non-ASCII formula and a DDE payload (formula injection, CWE-1236).
 DANGEROUS_VALUES = [
     "=CMD",
     "+1",
@@ -33,6 +33,7 @@ DANGEROUS_VALUES = [
     "\rCR",
     "\nLF",
     "=ورقة",
+    "+cmd|'/C calc'!A0",
 ]
 
 
@@ -168,7 +169,9 @@ def test_xlsx_formula_like_text_is_a_plain_string_cell(single_value_setup, dange
     worksheet = load_workbook(BytesIO(payload)).active
     cell = worksheet.cell(row=2, column=2)
     assert cell.data_type == "s"
-    assert "'" not in cell.value
+    # No apostrophe escape is added: the cell holds exactly the apostrophes of
+    # the original text (none, except in the DDE payload).
+    assert cell.value.count("'") == dangerous.count("'")
     assert cell.value == dangerous
 
 

@@ -100,9 +100,13 @@ class PublicDashboardInfoView(APIView):
         )
         dashboard = share.dashboard
 
+        # Both handlers return lists, so they can be read again below after the
+        # allow-list is built from them.
         widgets = WidgetHandler().get_widgets(dashboard)
         data_sources = DashboardDataSourceHandler().get_data_sources(dashboard)
-        allowed_properties = get_public_allowed_properties(dashboard)
+        allowed_properties = get_public_allowed_properties(
+            dashboard, widgets=widgets, data_sources=data_sources
+        )
 
         return Response(
             {
@@ -194,11 +198,14 @@ class PublicDashboardDispatchView(APIView):
         # A visitor is authorised to read the dashboard, which is the fields its
         # widgets display — not every column of the tables behind them. The
         # private context places no such limit, so it must not be used here.
+        # Only this data source's entry is read, so only it is built.
         result = DashboardDataSourceHandler().dispatch_data_source(
             data_source,
             PublicDashboardDispatchContext(
                 request,
-                allowed_properties=get_public_allowed_properties(share.dashboard),
+                allowed_properties=get_public_allowed_properties(
+                    share.dashboard, data_sources=[data_source]
+                ),
             ),
         )
         return Response(result)

@@ -102,6 +102,7 @@
 </template>
 
 <script>
+import dashboardWidget from '@jadawel/modules/arabase/dashboard/mixins/dashboardWidget'
 import WidgetContextMenu from '@jadawel/modules/dashboard/components/widget/WidgetContextMenu'
 
 // r=15.9 in a 42-unit viewBox, so the ring's stroke fits inside without clipping.
@@ -110,43 +111,9 @@ const RING_CIRCUMFERENCE = 2 * Math.PI * 15.9
 export default {
   name: 'ProgressWidget',
   components: { WidgetContextMenu },
-  props: {
-    dashboard: {
-      type: Object,
-      required: true,
-    },
-    widget: {
-      type: Object,
-      required: true,
-    },
-    storePrefix: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    loading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
+  mixins: [dashboardWidget],
   emits: ['delete-widget'],
   computed: {
-    dataSource() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/getDataSourceById`
-      ](this.widget.data_source_id)
-    },
-    dataForDataSource() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/getDataForDataSource`
-      ](this.dataSource?.id)
-    },
-    isEditMode() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/isEditMode`
-      ]
-    },
     isRing() {
       return this.widget.display_style === 'ring'
     },
@@ -221,9 +188,6 @@ export default {
       // `toLocaleString` rather than vue-i18n's `$n`, which needs number formats
       // declared per locale; this only has to group thousands.
       return this.target.toLocaleString(this.$i18n.locale)
-    },
-    dataSourceMisconfigured() {
-      return !!this.dataForDataSource?._error
     },
   },
 }

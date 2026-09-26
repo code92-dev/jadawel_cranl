@@ -186,8 +186,7 @@
 <script>
 import { useVuelidate } from '@vuelidate/core'
 import { required } from '@vuelidate/validators'
-import form from '@jadawel/modules/core/mixins/form'
-import tableFields from '@jadawel/modules/database/mixins/tableFields'
+import dashboardTableSourceForm from '@jadawel/modules/arabase/dashboard/mixins/dashboardTableSourceForm'
 
 // The backend accepts more; three is what fits the settings panel and stays
 // readable in one chart.
@@ -197,26 +196,7 @@ const includes = (array) => (value) => array.includes(value)
 
 export default {
   name: 'GroupedAggregateRowsDataSourceForm',
-  mixins: [form, tableFields],
-  props: {
-    dashboard: {
-      type: Object,
-      required: true,
-    },
-    widget: {
-      type: Object,
-      required: true,
-    },
-    dataSource: {
-      type: Object,
-      required: true,
-    },
-    storePrefix: {
-      type: String,
-      required: false,
-      default: '',
-    },
-  },
+  mixins: [dashboardTableSourceForm],
   setup() {
     return { v$: useVuelidate({ $lazy: true }) }
   },
@@ -245,22 +225,6 @@ export default {
     canAddSeries() {
       return this.values.aggregation_series.length < MAX_SERIES
     },
-    computedTableId: {
-      get() {
-        return this.values.table_id
-      },
-      set(tableId) {
-        if (tableId !== this.values.table_id) {
-          this.values.table_id = tableId
-          this.tableIdHasChanged = true
-          // Views, series and group bys all reference fields on the table that
-          // was just replaced.
-          this.values.view_id = null
-          this.values.aggregation_series = []
-          this.values.aggregation_group_bys = []
-        }
-      },
-    },
     /**
      * The API models group bys as a list so a second level can be added later;
      * the form exposes the one v1 supports as a plain field id.
@@ -274,32 +238,6 @@ export default {
           fieldId === null ? [] : [{ field_id: fieldId }]
       },
     },
-    integration() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/getIntegrationById`
-      ](this.dataSource.integration_id)
-    },
-    databases() {
-      return this.integration.context_data.databases
-    },
-    databaseSelected() {
-      return this.databases.find((database) =>
-        database.tables.some((table) => table.id === this.values.table_id)
-      )
-    },
-    tables() {
-      return this.databases.map((database) => database.tables).flat()
-    },
-    tableIds() {
-      return this.tables.map((table) => table.id)
-    },
-    tableViews() {
-      return (
-        this.databaseSelected?.views.filter(
-          (view) => view.table_id === this.values.table_id
-        ) || []
-      )
-    },
     unsupportedAggregationTypes() {
       return this.$registry.get(
         'service',
@@ -308,16 +246,6 @@ export default {
     },
   },
   watch: {
-    dataSource: {
-      async handler() {
-        this.setEmitValues(false)
-        await this.reset(true)
-        this.v$.$touch()
-        await this.$nextTick()
-        this.setEmitValues(true)
-      },
-      deep: true,
-    },
     fieldsLoading(loading) {
       if (this.tableIdHasChanged && !loading) {
         // A chart with no series renders nothing, so picking a table seeds one
@@ -331,9 +259,6 @@ export default {
       }
     },
   },
-  mounted() {
-    this.v$.$validate()
-  },
   validations() {
     return {
       values: {
@@ -345,9 +270,13 @@ export default {
     }
   },
   methods: {
-    /* Overrides the method in the tableFields mixin */
-    getTableId() {
-      return this.values.table_id
+    onTableChanged() {
+      this.tableIdHasChanged = true
+      // Views, series and group bys all reference fields on the table that
+      // was just replaced.
+      this.values.view_id = null
+      this.values.aggregation_series = []
+      this.values.aggregation_group_bys = []
     },
     fieldIconClass(field) {
       return this.$registry.get('field', field.type).iconClass

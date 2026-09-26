@@ -3,8 +3,9 @@ Tests for the additive XLSX and ODS table exporters.
 
 These put a real table through the real export pipeline (export job, permission
 check, paginated writer, storage) and then read the produced workbook back, so
-they cover the row values, the header behaviour, the row-id/primary-field
-options and the formula-injection escaping together.
+they cover the row values, the header behaviour and the row-id/primary-field
+options together. Formula-like text is covered by
+``test_spreadsheet_export_text.py``.
 """
 
 import csv
@@ -143,57 +144,6 @@ def test_spreadsheet_export_row_id_and_primary_field_are_optional(
     )
     # No header and no columns at all: the sheet holds row placeholders but no values.
     assert all(not any(value for value in row) for row in rows)
-
-
-@pytest.mark.django_db
-@pytest.mark.parametrize(
-    ("exporter_type", "read_cell"),
-    [
-        ("xlsx", lambda payload: read_xlsx_rows(payload)[1][1]),
-        ("ods", lambda payload: read_ods_rows(payload)[1][1]),
-    ],
-)
-@pytest.mark.parametrize(
-    "dangerous",
-    ["=1+1", "+cmd|'/C calc'!A0", "-2+3", "@SUM(A1)"],
-)
-def test_spreadsheet_export_stores_formula_like_text_as_text(
-    data_fixture, exporter_type, read_cell, dangerous
-):
-    """
-    A cell whose text would be read as a formula must be stored inert and
-    round-trip exactly: the writers use explicitly string-typed cells, so no
-    apostrophe escape is needed and the stored value equals the original.
-    (Formula injection, CWE-1236.)
-    """
-
-    user = data_fixture.create_user()
-    table = data_fixture.create_database_table(user=user)
-    name_field = data_fixture.create_text_field(table=table, name="Name", primary=True)
-    table.get_model().objects.create(**{f"field_{name_field.id}": dangerous})
-
-    payload = run_export(table, user, {"exporter_type": exporter_type})
-
-    stored = read_cell(payload)
-    assert stored == dangerous
-
-
-@pytest.mark.django_db
-def test_xlsx_cell_beginning_with_equals_is_not_a_formula(data_fixture):
-    """The xlsx export must store the escaped value as a string cell, not a formula."""
-
-    from openpyxl import load_workbook
-
-    user = data_fixture.create_user()
-    table = data_fixture.create_database_table(user=user)
-    name_field = data_fixture.create_text_field(table=table, name="Name", primary=True)
-    table.get_model().objects.create(**{f"field_{name_field.id}": "=SUM(1)"})
-
-    payload = run_export(table, user, {"exporter_type": "xlsx"})
-    worksheet = load_workbook(BytesIO(payload)).active
-    cell = worksheet.cell(row=2, column=2)
-    assert cell.value == "=SUM(1)"
-    assert cell.data_type == "s"
 
 
 @pytest.mark.django_db

@@ -26,6 +26,151 @@ describe('kanban view type', () => {
   })
 })
 
+describe('kanban view type row events', () => {
+  const app = { $i18n: { t: (key) => key }, $registry: { get: () => ({}) } }
+  const viewType = new KanbanViewType({ app })
+  const board = { id: 10, table_id: 5, type: 'kanban', single_select_field: 50 }
+
+  // A store double: the selected view, one stack's loaded rows, and a record
+  // of every commit and dispatch the hooks make.
+  const contextFor = (selected, stackRows = {}) => {
+    const calls = []
+    const store = {
+      getters: {
+        'view/getSelected': selected,
+        'page/view/kanban/getStackData': (stackId) => ({
+          rows: stackRows[stackId] || [],
+          count: (stackRows[stackId] || []).length,
+        }),
+      },
+      commit: (name, payload) => calls.push(['commit', name, payload]),
+      dispatch: (name, payload) => {
+        calls.push(['dispatch', name, payload])
+        return Promise.resolve()
+      },
+    }
+    return { context: { store }, calls }
+  }
+
+  test('ignore events unless the selected view is a kanban of the table', async () => {
+    const others = [
+      null,
+      { ...board, table_id: 6 },
+      { ...board, type: 'grid' },
+      { ...board, single_select_field: null },
+    ]
+    for (const selected of others) {
+      const { context, calls } = contextFor(selected)
+      const row = { id: 1, field_50: { id: 1 } }
+      viewType.rowCreated(context, 5, [], row, {}, 'page/')
+      await viewType.rowUpdated(
+        context,
+        5,
+        [],
+        row,
+        { ...row, field_50: { id: 2 } },
+        {},
+        [50],
+        'page/'
+      )
+      viewType.rowDeleted(context, 5, [], row, 'page/')
+      if (selected && selected.single_select_field === null) {
+        // Without a grouping field only the create refetch happens.
+        expect(calls).toEqual([
+          ['dispatch', 'page/view/kanban/fetch', { view: selected }],
+        ])
+      } else {
+        expect(calls).toEqual([])
+      }
+    }
+  })
+
+  test('rowCreated refetches the board', () => {
+    const { context, calls } = contextFor(board)
+    viewType.rowCreated(context, 5, [], { id: 1 }, {}, 'page/')
+    expect(calls).toEqual([
+      ['dispatch', 'page/view/kanban/fetch', { view: board }],
+    ])
+  })
+
+  test('rowUpdated refetches both stacks when the row changed stack', async () => {
+    const { context, calls } = contextFor(board)
+    await viewType.rowUpdated(
+      context,
+      5,
+      [],
+      { id: 1, field_50: { id: 1 } },
+      { id: 1, field_50: null },
+      {},
+      [50],
+      'page/'
+    )
+    expect(calls).toEqual([
+      ['dispatch', 'page/view/kanban/fetchStack', { view: board, stackId: 1 }],
+      [
+        'dispatch',
+        'page/view/kanban/fetchStack',
+        { view: board, stackId: null },
+      ],
+      ['dispatch', 'page/view/kanban/fetch', { view: board }],
+    ])
+  })
+
+  test('rowUpdated replaces a loaded row in place when it kept its stack', async () => {
+    const other = { id: 2, field_50: { id: 1 } }
+    const { context, calls } = contextFor(board, {
+      1: [{ id: 1, field_50: { id: 1 }, name: 'old' }, other],
+    })
+    const updated = { id: 1, field_50: { id: 1 }, name: 'new' }
+    await viewType.rowUpdated(
+      context,
+      5,
+      [],
+      { id: 1, field_50: { id: 1 }, name: 'old' },
+      updated,
+      {},
+      [],
+      'page/'
+    )
+    expect(calls).toEqual([
+      [
+        'commit',
+        'page/view/kanban/SET_STACK_ROWS',
+        { stackId: 1, rows: [updated, other], count: 2, append: false },
+      ],
+    ])
+
+    // A row that is not loaded in its stack is left alone.
+    const unloaded = contextFor(board, { 1: [other] })
+    await viewType.rowUpdated(
+      unloaded.context,
+      5,
+      [],
+      { id: 1, field_50: { id: 1 } },
+      updated,
+      {},
+      [],
+      'page/'
+    )
+    expect(unloaded.calls).toEqual([])
+  })
+
+  test('rowDeleted removes the row from its stack and refetches the board', () => {
+    for (const [value, stackId] of [
+      [{ id: 3 }, 3],
+      [null, null],
+      [{}, null],
+    ]) {
+      const { context, calls } = contextFor(board)
+      viewType.rowDeleted(context, 5, [], { id: 7, field_50: value }, 'page/')
+      expect(calls).toEqual([
+        ['commit', 'page/view/kanban/REMOVE_ROW', { stackId, rowId: 7 }],
+        ['dispatch', 'page/view/kanban/fetch', { view: board }],
+      ])
+    }
+  })
+})
+
 describe('kanban store', () => {
   const createStore = (client) => {
     const state = kanbanStore.state()

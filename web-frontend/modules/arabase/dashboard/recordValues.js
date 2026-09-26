@@ -21,14 +21,8 @@ export function formatRecordValue(value) {
 
   if (typeof value === 'object') {
     // Single select and file objects use `value`; link rows and collaborators
-    // use `visible_name`; files fall back to their original name.
-    return String(
-      value.value ??
-        value.visible_name ??
-        value.visible_name ??
-        value.name ??
-        ''
-    )
+    // use `visible_name`; files fall back to `name`.
+    return String(value.value ?? value.visible_name ?? value.name ?? '')
   }
 
   if (typeof value === 'boolean') {

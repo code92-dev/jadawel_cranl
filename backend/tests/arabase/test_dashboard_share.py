@@ -8,8 +8,10 @@ never becomes a way to reach a *different* dashboard's data.
 
 from datetime import timedelta
 
+from django.db import connection
 from django.http import HttpRequest
 from django.shortcuts import reverse
+from django.test.utils import CaptureQueriesContext
 from django.utils import timezone
 
 import pytest
@@ -22,12 +24,19 @@ from rest_framework.status import (
     HTTP_404_NOT_FOUND,
 )
 
+from arabase.dashboard.share.dispatch_context import get_public_allowed_properties
 from arabase.dashboard.share.handler import DashboardShareHandler, token_lifetime
 from arabase.dashboard.share.models import DashboardShare
+from arabase.integrations.local_jadawel.service_types import (
+    LocalJadawelGroupedAggregateRowsUserServiceType,
+)
 from jadawel.contrib.dashboard.data_sources.dispatch_context import (
     DashboardDispatchContext,
 )
+from jadawel.contrib.dashboard.data_sources.handler import DashboardDataSourceHandler
+from jadawel.contrib.dashboard.data_sources.models import DashboardDataSource
 from jadawel.contrib.dashboard.data_sources.service import DashboardDataSourceService
+from jadawel.contrib.dashboard.widgets.handler import WidgetHandler
 from jadawel.contrib.dashboard.widgets.service import WidgetService
 from jadawel.contrib.database.rows.handler import RowHandler
 from jadawel.core.services.registries import service_type_registry
@@ -638,6 +647,164 @@ def test_an_empty_field_list_falls_back_to_the_first_columns(api_client, data_fi
     # `id` and `order` are row metadata rather than columns of the table.
     assert set(row) == {"id", "order", "First", "Second", "Third"}
     assert "Fourth" not in row
+
+
+# --- allow-list scope ------------------------------------------------------
+#
+# The dispatch view needs only the entry of the data source it dispatches, and
+# the info view already holds the dashboard's widgets and data sources. Either
+# way the entries must be exactly the ones the whole-dashboard map holds.
+
+
+def allowed(*fields):
+    return ["result"] + [
+        f"field_{field_id}" for field_id in sorted(f.id for f in fields)
+    ]
+
+
+@pytest.fixture
+def shared_three_sources(data_fixture):
+    """A shared dashboard with one data source of each allow-list shape: a
+    records list naming its fields, a records list falling back to the first
+    columns, and a chart whose service names the fields it aggregates."""
+
+    user = data_fixture.create_user()
+    workspace = data_fixture.create_workspace(user=user)
+    database = data_fixture.create_database_application(workspace=workspace)
+    table = data_fixture.create_database_table(database=database)
+    first = data_fixture.create_text_field(table=table, name="First", order=0)
+    second = data_fixture.create_text_field(table=table, name="Second", order=1)
+    third = data_fixture.create_text_field(table=table, name="Third", order=2)
+    fourth = data_fixture.create_text_field(table=table, name="Fourth", order=3)
+    amount = data_fixture.create_number_field(table=table, name="Amount", order=4)
+    RowHandler().create_rows(
+        user,
+        table,
+        [{f"field_{second.id}": "Riyadh", f"field_{amount.id}": 7}],
+    )
+
+    dashboard = data_fixture.create_dashboard_application(workspace=workspace)
+    data_fixture.create_local_jadawel_integration(
+        authorized_user=user, application=dashboard
+    )
+    list_rows = service_type_registry.get("local_jadawel_list_rows")
+
+    explicit = WidgetService().create_widget(
+        user,
+        "records_list",
+        dashboard.id,
+        title="Explicit",
+        description="",
+        field_ids=[fourth.id],
+    )
+    DashboardDataSourceService().update_data_source(
+        user, explicit.data_source_id, list_rows, table_id=table.id
+    )
+
+    fallback = WidgetService().create_widget(
+        user, "records_list", dashboard.id, title="Fallback", description=""
+    )
+    DashboardDataSourceService().update_data_source(
+        user, fallback.data_source_id, list_rows, table_id=table.id
+    )
+
+    chart = WidgetService().create_widget(
+        user, "chart", dashboard.id, title="Chart", description=""
+    )
+    DashboardDataSourceService().update_data_source(
+        user,
+        chart.data_source_id,
+        service_type_registry.get(LocalJadawelGroupedAggregateRowsUserServiceType.type),
+        table_id=table.id,
+        service_aggregation_series=[{"field_id": amount.id, "aggregation_type": "sum"}],
+        service_aggregation_group_bys=[{"field_id": second.id}],
+    )
+
+    def service_id(widget):
+        return DashboardDataSource.objects.get(id=widget.data_source_id).service_id
+
+    return {
+        "user": user,
+        "dashboard": dashboard,
+        "data_source_ids": [
+            explicit.data_source_id,
+            fallback.data_source_id,
+            chart.data_source_id,
+        ],
+        "chart_data_source_id": chart.data_source_id,
+        "expected": {
+            service_id(explicit): allowed(fourth),
+            service_id(fallback): allowed(first, second, third),
+            service_id(chart): allowed(second, amount),
+        },
+        "slug": DashboardShareHandler().create_share(dashboard).slug,
+    }
+
+
+@pytest.mark.django_db
+def test_the_whole_dashboard_allow_list_is_unchanged(shared_three_sources):
+    setup = shared_three_sources
+
+    assert get_public_allowed_properties(setup["dashboard"]) == setup["expected"]
+
+
+@pytest.mark.django_db
+def test_the_allow_list_of_one_data_source_matches_the_whole_dashboard(
+    shared_three_sources,
+):
+    setup = shared_three_sources
+    dashboard = setup["dashboard"]
+    full = get_public_allowed_properties(dashboard)
+
+    for data_source_id in setup["data_source_ids"]:
+        # Loaded the way the dispatch view loads it: the service is the generic
+        # row rather than the specific one the info view's list holds.
+        data_source = DashboardDataSourceHandler().get_data_source(data_source_id)
+
+        assert get_public_allowed_properties(dashboard, data_sources=[data_source]) == {
+            data_source.service_id: full[data_source.service_id]
+        }
+
+
+@pytest.mark.django_db
+def test_the_allow_list_from_already_fetched_lists_matches(shared_three_sources):
+    setup = shared_three_sources
+    dashboard = setup["dashboard"]
+
+    assert (
+        get_public_allowed_properties(
+            dashboard,
+            widgets=WidgetHandler().get_widgets(dashboard),
+            data_sources=DashboardDataSourceHandler().get_data_sources(dashboard),
+        )
+        == setup["expected"]
+    )
+
+
+@pytest.mark.django_db
+def test_public_dispatch_queries_do_not_grow_with_the_data_sources(
+    api_client, shared_three_sources
+):
+    setup = shared_three_sources
+    url = dispatch_url(setup["slug"], setup["chart_data_source_id"])
+    # Warm the table model and content type caches, so both measurements start
+    # from the same state.
+    assert api_client.post(url).status_code == HTTP_200_OK
+
+    with CaptureQueriesContext(connection) as fewer:
+        assert api_client.post(url).status_code == HTTP_200_OK
+
+    for title in ("More", "Even more"):
+        WidgetService().create_widget(
+            setup["user"], "chart", setup["dashboard"].id, title=title, description=""
+        )
+
+    with CaptureQueriesContext(connection) as more:
+        response = api_client.post(url)
+
+    assert response.status_code == HTTP_200_OK
+    assert response.json()["result"]["series"][0]["data"] == ["7"]
+    assert len(more.captured_queries) == len(fewer.captured_queries)
 
 
 # --- password and token hardening ------------------------------------------

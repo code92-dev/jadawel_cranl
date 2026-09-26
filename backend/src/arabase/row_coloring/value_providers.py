@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List
 
 from rest_framework import serializers
 
@@ -15,7 +15,6 @@ from jadawel.contrib.database.views.registries import (
 
 SINGLE_SELECT_FIELD_TYPE = "single_select"
 COLOR_NAME_PATTERN = r"^[a-z-]+$"
-FILTER_OPERATORS = ("AND", "OR")
 
 
 class SingleSelectColorConfSerializer(serializers.Serializer):
@@ -127,12 +126,6 @@ class SingleSelectColorValueProviderType(DecoratorValueProviderType):
         if conf.get("field_id") not in public_field_ids:
             return None
         return conf
-
-    def validate_conf_for_view(self, view, conf) -> Union[Field, None]:
-        """Public entry point used by tests and future callers."""
-        if not conf:
-            return None
-        return get_single_select_field_or_raise(view, conf)
 
 
 class ConditionalColorFilterSerializer(serializers.Serializer):
@@ -309,9 +302,3 @@ class ConditionalColorValueProviderType(DecoratorValueProviderType):
             )
         ]
         return {"colors": public_rules}
-
-    def validate_conf_for_view(self, view, conf) -> List[str]:
-        """Public entry point used by tests and future callers."""
-        if not conf:
-            return []
-        return get_conditional_color_problems(view, conf)

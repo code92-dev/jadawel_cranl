@@ -9,6 +9,10 @@ from jadawel.contrib.dashboard.widgets.models import Widget
 from jadawel.contrib.dashboard.widgets.registries import WidgetType
 from jadawel.core.services.registries import service_type_registry
 
+MAX_DISPLAYED_FIELDS = 6
+"""More columns than this stop being readable inside a dashboard widget, whatever
+the widget's width."""
+
 
 class DataSourceBackedWidgetType(WidgetType):
     """
@@ -23,6 +27,8 @@ class DataSourceBackedWidgetType(WidgetType):
     service_type_name: str = None
     """The service type the widget's data source is created with."""
 
+    request_serializer_field_overrides = {}
+
     class SerializedDict(WidgetDict):
         data_source_id: int
 
@@ -36,6 +42,10 @@ class DataSourceBackedWidgetType(WidgetType):
                 help_text="References a data source field for the widget.",
             )
         }
+
+    @property
+    def serializer_field_overrides(self):
+        return self.data_source_serializer_field_overrides
 
     def prepare_value_for_db(self, values: dict, instance: Widget | None = None):
         if instance is None:
@@ -112,6 +122,21 @@ class DisplayedFieldsWidgetTypeMixin:
     renders columns the dispatch refuses to return. Keep it equal to the
     `fallbackCount` the widget component passes to `resolveDisplayedFields`.
     """
+
+    field_ids_help_text: str = ""
+    """The OpenAPI help text of the widget's `field_ids`."""
+
+    @property
+    def serializer_field_overrides(self):
+        return {
+            **super().serializer_field_overrides,
+            "field_ids": serializers.ListField(
+                child=serializers.IntegerField(),
+                required=False,
+                max_length=MAX_DISPLAYED_FIELDS,
+                help_text=self.field_ids_help_text,
+            ),
+        }
 
     def deserialize_property(
         self,

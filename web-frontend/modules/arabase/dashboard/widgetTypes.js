@@ -42,13 +42,17 @@ const UpcomingDatesWidgetSettings = defineAsyncComponent(
 )
 
 /**
- * Widgets whose data arrives as one dispatch are loading until that dispatch
- * lands. The base class returns `false` unconditionally, which would show an
- * empty widget instead of a spinner on first paint.
+ * A widget whose data arrives as one dispatch of its data source.
+ *
+ * Such a widget is loading until that dispatch lands. The base class returns
+ * `false` unconditionally, which would show an empty widget instead of a
+ * spinner on first paint.
  */
-const loadingUntilDispatched = (widget, data) => {
-  const dataSourceId = widget.data_source_id
-  return !(data[dataSourceId] && Object.keys(data[dataSourceId]).length !== 0)
+export class DataSourceWidgetType extends WidgetType {
+  isLoading(widget, data) {
+    const dataSourceId = widget.data_source_id
+    return !(data[dataSourceId] && Object.keys(data[dataSourceId]).length !== 0)
+  }
 }
 
 /**
@@ -59,7 +63,7 @@ const loadingUntilDispatched = (widget, data) => {
  * than four types. A variation only decides which `chart_type` the widget is
  * created with; the settings panel can change it afterwards.
  */
-export class ChartWidgetType extends WidgetType {
+export class ChartWidgetType extends DataSourceWidgetType {
   static getType() {
     return 'chart'
   }
@@ -117,13 +121,9 @@ export class ChartWidgetType extends WidgetType {
   getOrder() {
     return 10
   }
-
-  isLoading(widget, data) {
-    return loadingUntilDispatched(widget, data)
-  }
 }
 
-export class RecordsListWidgetType extends WidgetType {
+export class RecordsListWidgetType extends DataSourceWidgetType {
   static getType() {
     return 'records_list'
   }
@@ -147,13 +147,9 @@ export class RecordsListWidgetType extends WidgetType {
   getOrder() {
     return 20
   }
-
-  isLoading(widget, data) {
-    return loadingUntilDispatched(widget, data)
-  }
 }
 
-export class ProgressWidgetType extends WidgetType {
+export class ProgressWidgetType extends DataSourceWidgetType {
   static getType() {
     return 'progress'
   }
@@ -177,13 +173,9 @@ export class ProgressWidgetType extends WidgetType {
   getOrder() {
     return 30
   }
-
-  isLoading(widget, data) {
-    return loadingUntilDispatched(widget, data)
-  }
 }
 
-export class UpcomingDatesWidgetType extends WidgetType {
+export class UpcomingDatesWidgetType extends DataSourceWidgetType {
   static getType() {
     return 'upcoming_dates'
   }
@@ -206,9 +198,5 @@ export class UpcomingDatesWidgetType extends WidgetType {
 
   getOrder() {
     return 40
-  }
-
-  isLoading(widget, data) {
-    return loadingUntilDispatched(widget, data)
   }
 }

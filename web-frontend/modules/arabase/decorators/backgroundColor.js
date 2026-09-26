@@ -1,4 +1,4 @@
-import { ViewDecoratorType } from '@jadawel/modules/database/viewDecorators'
+import { ColorRowDecoratorType } from '@jadawel/modules/arabase/decorators/colorRowDecorator'
 import BackgroundColorDecorator from '@jadawel/modules/arabase/components/BackgroundColorDecorator'
 
 const IMAGE =
@@ -16,7 +16,7 @@ const IMAGE =
  * registered in `arabase.row_coloring`. Works on every decorating view:
  * the grid paints the whole row, gallery cards paint the whole card.
  */
-export class BackgroundColorDecoratorType extends ViewDecoratorType {
+export class BackgroundColorDecoratorType extends ColorRowDecoratorType {
   static getType() {
     return 'background_color'
   }
@@ -33,18 +33,8 @@ export class BackgroundColorDecoratorType extends ViewDecoratorType {
     return IMAGE
   }
 
-  isCompatible(view) {
-    return ['grid', 'gallery', 'kanban'].includes(view?.type)
-  }
-
-  canAdd({ view }) {
-    const exists = (view?.decorations || []).some(
-      (decoration) => decoration.type === this.getType()
-    )
-    if (exists) {
-      return [false, this.$t('rowColoring.backgroundAlreadyAdded')]
-    }
-    return [true, '']
+  getAlreadyAddedKey() {
+    return 'rowColoring.backgroundAlreadyAdded'
   }
 
   getComponent() {

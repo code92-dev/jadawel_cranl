@@ -9,9 +9,6 @@ from django.http import HttpRequest
 import pytest
 from rest_framework.exceptions import ValidationError as DRFValidationError
 
-from arabase.integrations.local_jadawel.models import (
-    LocalJadawelGroupedAggregateRows,
-)
 from arabase.integrations.local_jadawel.service_types import (
     LocalJadawelGroupedAggregateRowsUserServiceType,
 )
@@ -88,11 +85,6 @@ def dispatch(setup):
     return DashboardDataSourceService().dispatch_data_source(
         setup["user"], setup["widget"].data_source_id, dispatch_context
     )
-
-
-@pytest.mark.django_db
-def test_chart_widget_data_source_uses_the_grouped_service(chart_setup):
-    assert isinstance(reload_service(chart_setup), LocalJadawelGroupedAggregateRows)
 
 
 @pytest.mark.django_db

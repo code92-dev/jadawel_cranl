@@ -1,4 +1,4 @@
-import { ViewDecoratorType } from '@jadawel/modules/database/viewDecorators'
+import { ColorRowDecoratorType } from '@jadawel/modules/arabase/decorators/colorRowDecorator'
 import LeftBorderColorDecorator from '@jadawel/modules/arabase/components/LeftBorderColorDecorator'
 
 const IMAGE =
@@ -17,7 +17,7 @@ const IMAGE =
  * the `first_cell` place with core's decoration renderer: the grid draws it
  * inside the row details cell, cards pin it to their start edge.
  */
-export class LeftBorderColorDecoratorType extends ViewDecoratorType {
+export class LeftBorderColorDecoratorType extends ColorRowDecoratorType {
   static getType() {
     return 'left_border_color'
   }
@@ -34,18 +34,8 @@ export class LeftBorderColorDecoratorType extends ViewDecoratorType {
     return IMAGE
   }
 
-  isCompatible(view) {
-    return ['grid', 'gallery', 'kanban'].includes(view?.type)
-  }
-
-  canAdd({ view }) {
-    const exists = (view?.decorations || []).some(
-      (decoration) => decoration.type === this.getType()
-    )
-    if (exists) {
-      return [false, this.$t('rowColoring.leftBorderAlreadyAdded')]
-    }
-    return [true, '']
+  getAlreadyAddedKey() {
+    return 'rowColoring.leftBorderAlreadyAdded'
   }
 
   getComponent() {

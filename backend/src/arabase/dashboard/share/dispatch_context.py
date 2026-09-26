@@ -29,6 +29,7 @@ from jadawel.contrib.dashboard.data_sources.handler import DashboardDataSourceHa
 from jadawel.contrib.dashboard.widgets.handler import WidgetHandler
 
 if TYPE_CHECKING:
+    from jadawel.contrib.dashboard.data_sources.models import DashboardDataSource
     from jadawel.contrib.dashboard.models import Dashboard
     from jadawel.contrib.dashboard.widgets.models import Widget
     from jadawel.core.services.models import Service
@@ -43,6 +44,9 @@ FIELD_PROPERTY_PREFIX = "field_"
 
 def get_public_allowed_properties(
     dashboard: "Dashboard",
+    *,
+    widgets: Optional[Iterable["Widget"]] = None,
+    data_sources: Optional[Iterable["DashboardDataSource"]] = None,
 ) -> Dict[int, List[str]]:
     """
     The property names each of a dashboard's services may expose publicly,
@@ -53,18 +57,33 @@ def get_public_allowed_properties(
     and both fail closed. That is the intended outcome — an orphaned data
     source has no widget to justify any field.
 
+    Each entry depends only on its own data source and the widgets rendering
+    it, so the entries built for some of the data sources are exactly the ones
+    the whole dashboard's map holds for them.
+
     :param dashboard: The dashboard being shared.
+    :param widgets: The dashboard's specific widgets, when the caller already
+        fetched them. Fetched here when omitted.
+    :param data_sources: The dashboard's data sources to build entries for.
+        Every data source of the dashboard when omitted.
     :return: A mapping of service id to allowed property names.
     """
 
+    if widgets is None:
+        widgets = WidgetHandler().get_widgets(dashboard)
+    if data_sources is None:
+        data_sources = DashboardDataSourceHandler().get_data_sources(dashboard)
+    widgets = list(widgets)
+    data_sources = list(data_sources)
+
     widgets_by_data_source: Dict[int, List["Widget"]] = {}
-    for widget in WidgetHandler().get_widgets(dashboard):
+    for widget in widgets:
         data_source_id = getattr(widget, "data_source_id", None)
         if data_source_id is not None:
             widgets_by_data_source.setdefault(data_source_id, []).append(widget)
 
     allowed: Dict[int, List[str]] = {}
-    for data_source in DashboardDataSourceHandler().get_data_sources(dashboard):
+    for data_source in data_sources:
         service = data_source.service.specific
 
         field_ids: Set[int] = set()

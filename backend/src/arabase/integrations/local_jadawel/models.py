@@ -81,6 +81,22 @@ def series_key(field_id: int | None, aggregation_type: str) -> str:
     return f"field_{field_id}_{aggregation_type}"
 
 
+def remap_series_key(key: str, field_mapping: dict) -> str:
+    """
+    Follows a field id remapping inside a series key, the way an import remaps
+    the series themselves. A key that is not `field_<digits>_<rest>`, or whose
+    field has no mapping, is returned unchanged.
+    """
+
+    parts = key.split("_", 2)
+    if len(parts) != 3 or parts[0] != "field" or not parts[1].isdigit():
+        return key
+    new_field_id = field_mapping.get(int(parts[1]), None)
+    if new_field_id is None:
+        return key
+    return series_key(new_field_id, parts[2])
+
+
 class LocalJadawelTableServiceAggregationGroupBy(models.Model):
     """The field whose distinct values become the buckets."""
 

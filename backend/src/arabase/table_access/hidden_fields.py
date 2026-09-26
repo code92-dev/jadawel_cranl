@@ -14,26 +14,22 @@ decides how much of the graph a guest sees by choosing the tables.
 
 from typing import Any, Set
 
+from arabase.permissions.table_grants import table_grants_for, workspace_roles
 from arabase.table_access.constants import WORKSPACE_USER_PERMISSION_GUEST
 
 
 def granted_table_ids(user: Any, workspace_id: int) -> Set[int]:
-    from arabase.table_access.models import TableGrant
-    from jadawel.core.models import WorkspaceUser
+    """The tables `user` was granted, or none when they are not a guest.
 
-    workspace_user = WorkspaceUser.objects.filter(
-        workspace_id=workspace_id, user_id=user.id
-    ).first()
-    if (
-        workspace_user is None
-        or workspace_user.permissions != WORKSPACE_USER_PERMISSION_GUEST
-    ):
+    Reads the guest manager's request-scoped role and grant cache, which the
+    permission check in front of every field listing and row payload has
+    usually filled already.
+    """
+
+    role = workspace_roles(workspace_id, [user.id])[user.id]
+    if role != WORKSPACE_USER_PERMISSION_GUEST:
         return set()
-    return set(
-        TableGrant.objects.filter(workspace_user=workspace_user).values_list(
-            "table_id", flat=True
-        )
-    )
+    return set(table_grants_for(workspace_id, [user.id])[user.id])
 
 
 def hidden_field_ids_for_guest(user: Any, table: Any) -> Set[int]:

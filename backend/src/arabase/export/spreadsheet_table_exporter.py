@@ -329,12 +329,12 @@ class OdsQuerysetSerializer(SpreadsheetQuerysetSerializer):
                 content.write(self._CONTENT_TAIL.encode("utf-8"))
 
 
-class XlsxTableExporter(TableExporter):
-    type = "xlsx"
-
-    @property
-    def option_serializer_class(self) -> Type[BaseExporterOptionsSerializer]:
-        return ExcelExporterOptionsSerializer
+class SpreadsheetTableExporter(TableExporter):
+    """
+    Shared by the workbook exporters: both export a whole table or a grid view.
+    Never registered itself; the subclasses supply the type, option serializer,
+    file extension and queryset serializer.
+    """
 
     @property
     def can_export_table(self) -> bool:
@@ -343,6 +343,14 @@ class XlsxTableExporter(TableExporter):
     @property
     def supported_views(self) -> List[str]:
         return [GridViewType.type]
+
+
+class XlsxTableExporter(SpreadsheetTableExporter):
+    type = "xlsx"
+
+    @property
+    def option_serializer_class(self) -> Type[BaseExporterOptionsSerializer]:
+        return ExcelExporterOptionsSerializer
 
     @property
     def file_extension(self) -> str:
@@ -353,20 +361,12 @@ class XlsxTableExporter(TableExporter):
         return XlsxQuerysetSerializer
 
 
-class OdsTableExporter(TableExporter):
+class OdsTableExporter(SpreadsheetTableExporter):
     type = "ods"
 
     @property
     def option_serializer_class(self) -> Type[BaseExporterOptionsSerializer]:
         return OdsExporterOptionsSerializer
-
-    @property
-    def can_export_table(self) -> bool:
-        return True
-
-    @property
-    def supported_views(self) -> List[str]:
-        return [GridViewType.type]
 
     @property
     def file_extension(self) -> str:

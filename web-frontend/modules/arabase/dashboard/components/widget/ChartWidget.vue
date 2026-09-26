@@ -72,6 +72,7 @@ import {
 } from 'chart.js'
 import colorStyles from '@jadawel/modules/core/assets/scss/colors.module.scss'
 import { getBaseColors } from '@jadawel/modules/core/utils/colors'
+import dashboardWidget from '@jadawel/modules/arabase/dashboard/mixins/dashboardWidget'
 import WidgetContextMenu from '@jadawel/modules/dashboard/components/widget/WidgetContextMenu'
 
 Chart.register(
@@ -119,43 +120,9 @@ export default {
     PieChart,
     DoughnutChart,
   },
-  props: {
-    dashboard: {
-      type: Object,
-      required: true,
-    },
-    widget: {
-      type: Object,
-      required: true,
-    },
-    storePrefix: {
-      type: String,
-      required: false,
-      default: '',
-    },
-    loading: {
-      type: Boolean,
-      required: false,
-      default: false,
-    },
-  },
+  mixins: [dashboardWidget],
   emits: ['delete-widget'],
   computed: {
-    dataSource() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/getDataSourceById`
-      ](this.widget.data_source_id)
-    },
-    dataForDataSource() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/getDataForDataSource`
-      ](this.dataSource?.id)
-    },
-    isEditMode() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/isEditMode`
-      ]
-    },
     result() {
       return this.dataForDataSource?.result || null
     },
@@ -296,9 +263,6 @@ export default {
               y: { beginAtZero: true, position: rtl ? 'right' : 'left' },
             },
       }
-    },
-    dataSourceMisconfigured() {
-      return !!this.dataForDataSource?._error
     },
   },
   methods: {

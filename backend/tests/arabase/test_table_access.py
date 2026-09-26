@@ -73,6 +73,62 @@ def test_guest_sees_only_the_granted_table_in_the_sidebar(api_client, data_fixtu
     assert [table["id"] for table in applications[0]["tables"]] == [granted.id]
 
 
+def _database_with_a_granted_and_a_secret_table(data_fixture):
+    admin = data_fixture.create_user()
+    workspace = data_fixture.create_workspace(user=admin)
+    database = data_fixture.create_database_application(workspace=workspace)
+    granted = data_fixture.create_database_table(database=database)
+    secret = data_fixture.create_database_table(database=database)
+    data_fixture.create_text_field(table=secret, name="Name", primary=True)
+    data_fixture.create_text_field(table=secret, name="Salary")
+    granted.get_model().objects.create()
+    secret_model = secret.get_model()
+    for _ in range(3):
+        secret_model.objects.create()
+    return workspace, database, granted
+
+
+@pytest.mark.django_db
+def test_guest_database_stats_count_only_the_granted_table(api_client, data_fixture):
+    workspace, database, granted = _database_with_a_granted_and_a_secret_table(
+        data_fixture
+    )
+    _, token, _ = make_guest(data_fixture, workspace, granted)
+
+    response = api_client.get(
+        reverse(
+            "api:arabase:workspace_database_stats",
+            kwargs={"workspace_id": workspace.id},
+        ),
+        HTTP_AUTHORIZATION=f"JWT {token}",
+    )
+
+    assert response.status_code == HTTP_200_OK
+    assert response.json() == {
+        str(database.id): {
+            "table_count": 1,
+            "field_count": 0,
+            "row_count": 1,
+            "rows_exact": True,
+        }
+    }
+
+
+@pytest.mark.django_db
+def test_guest_activity_counts_only_the_granted_table(api_client, data_fixture):
+    workspace, _, granted = _database_with_a_granted_and_a_secret_table(data_fixture)
+    _, token, _ = make_guest(data_fixture, workspace, granted)
+
+    response = api_client.get(
+        reverse("api:arabase:workspace_activity", kwargs={"workspace_id": workspace.id})
+        + "?days=1",
+        HTTP_AUTHORIZATION=f"JWT {token}",
+    )
+
+    assert response.status_code == HTTP_200_OK
+    assert response.json()["total"] == 1
+
+
 @pytest.mark.django_db
 def test_guest_can_read_rows_of_the_granted_table(api_client, data_fixture):
     admin = data_fixture.create_user()

@@ -9,6 +9,7 @@ import pytest
 from rest_framework.status import HTTP_200_OK, HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 
 from arabase.api.activity import MAX_DAYS, get_workspace_activity
+from jadawel.contrib.database.table.models import Table
 
 
 def _set_created_on(model, row, when):
@@ -33,7 +34,7 @@ def test_series_is_dense_and_ordered_oldest_first(data_fixture):
     row = model.objects.create()
     _set_created_on(model, row, timezone.now() - timedelta(days=2))
 
-    result = get_workspace_activity([database], days=5)
+    result = get_workspace_activity(Table.objects.filter(database=database), days=5)
 
     assert result["days"] == 5
     assert result["complete"] is True
@@ -67,7 +68,9 @@ def test_counts_span_tables_and_databases_but_skip_trashed_rows(data_fixture):
     model_b.objects.create()
     model_b.objects.create(trashed=True)
 
-    result = get_workspace_activity([first, second], days=1)
+    result = get_workspace_activity(
+        Table.objects.filter(database__in=[first, second]), days=1
+    )
 
     assert result["total"] == 3, "trashed rows must not count as activity"
 
@@ -85,7 +88,7 @@ def test_rows_outside_the_window_are_excluded(data_fixture):
     _set_created_on(model, inside, timezone.now() - timedelta(days=1))
     _set_created_on(model, outside, timezone.now() - timedelta(days=40))
 
-    result = get_workspace_activity([database], days=7)
+    result = get_workspace_activity(Table.objects.filter(database=database), days=7)
 
     assert result["total"] == 1
 
@@ -96,12 +99,20 @@ def test_window_is_clamped_and_empty_workspace_is_not_an_error(data_fixture):
     workspace = data_fixture.create_workspace(user=user)
     database = data_fixture.create_database_application(workspace=workspace)
 
-    assert get_workspace_activity([database], days=0)["days"] == 1
-    assert get_workspace_activity([database], days=10_000)["days"] == MAX_DAYS
+    assert (
+        get_workspace_activity(Table.objects.filter(database=database), days=0)["days"]
+        == 1
+    )
+    assert (
+        get_workspace_activity(Table.objects.filter(database=database), days=10_000)[
+            "days"
+        ]
+        == MAX_DAYS
+    )
 
     # No databases at all still has to produce a drawable series rather than an
     # empty response the chart would have to special-case.
-    empty = get_workspace_activity([], days=3)
+    empty = get_workspace_activity(Table.objects.none(), days=3)
     assert empty["complete"] is True
     assert empty["total"] == 0
     assert len(empty["series"]) == 3

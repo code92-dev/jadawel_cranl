@@ -20,10 +20,10 @@ The manager is inserted before core's ``basic`` in
 denial is the first definitive answer and no core file is edited.
 """
 
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, Iterable, List, Optional, Set
 
 from arabase.table_access.constants import WORKSPACE_USER_PERMISSION_GUEST
-from arabase.table_access.models import TableAccessLevel
+from arabase.table_access.models import TableAccessLevel, TableGrant
 from jadawel.core.cache import local_cache
 from jadawel.core.exceptions import UserInvalidWorkspacePermissionsError
 from jadawel.core.models import WorkspaceUser
@@ -92,6 +92,75 @@ ALLOWED_BY_LEVEL: Dict[str, Set[str]] = {
 }
 
 
+# -- request-scoped lookups ----------------------------------------------------
+#
+# Shared by the manager below and by the hidden-field hook
+# (`arabase.table_access.hidden_fields`), which runs for every field listing and
+# row payload right after the permission check that filled these caches.
+
+
+def workspace_roles(
+    workspace_id: int, user_ids: Iterable[int], include_trash: bool = False
+) -> Dict[int, Any]:
+    """Map of user id -> workspace role, covering at least `user_ids`.
+
+    Request-scoped, because the manager sits in front of every check and every
+    listing: without the cache a single request pays one query per call site,
+    which showed up as a doubled query count in core's workspace search budget.
+    `None` is cached too — it is the answer for a user who is not in the
+    workspace at all, and it must not be re-queried either.
+    """
+
+    cached = local_cache.get(f"arabase_table_access_roles_{workspace_id}", dict)
+
+    missing = [user_id for user_id in user_ids if user_id not in cached]
+    if missing:
+        manager = (
+            WorkspaceUser.objects_and_trash if include_trash else WorkspaceUser.objects
+        )
+        found = dict(
+            manager.filter(workspace_id=workspace_id, user_id__in=missing).values_list(
+                "user_id", "permissions"
+            )
+        )
+        for user_id in missing:
+            cached[user_id] = found.get(user_id)
+
+    return cached
+
+
+def table_grants_for(
+    workspace_id: int, user_ids: Iterable[int], include_trash: bool = False
+) -> Dict[int, Dict[int, str]]:
+    """Map of user id -> {table id: level} for the given guests.
+
+    Cached per request for the same reason as `workspace_roles`, and only ever
+    reached for a user already known to be a guest.
+    """
+
+    cached = local_cache.get(f"arabase_table_access_grants_{workspace_id}", dict)
+
+    missing = [user_id for user_id in user_ids if user_id not in cached]
+    if missing:
+        manager = (
+            WorkspaceUser.objects_and_trash if include_trash else WorkspaceUser.objects
+        )
+        workspace_user_ids = dict(
+            manager.filter(workspace_id=workspace_id, user_id__in=missing).values_list(
+                "id", "user_id"
+            )
+        )
+        for user_id in missing:
+            cached[user_id] = {}
+        rows = TableGrant.objects.filter(
+            workspace_user_id__in=workspace_user_ids.keys()
+        ).values_list("workspace_user_id", "table_id", "level")
+        for workspace_user_id, table_id, level in rows:
+            cached[workspace_user_ids[workspace_user_id]][table_id] = level
+
+    return {user_id: cached[user_id] for user_id in user_ids}
+
+
 class TableGrantPermissionManagerType(PermissionManagerType):
     """Narrows a GUEST member's workspace down to the tables they were granted."""
 
@@ -101,33 +170,11 @@ class TableGrantPermissionManagerType(PermissionManagerType):
     # -- lookups ---------------------------------------------------------
 
     def _roles(self, workspace, actors, include_trash=False) -> Dict[int, Any]:
-        """Map of user id -> workspace role, for the given actors.
+        """Map of user id -> workspace role; see `workspace_roles`."""
 
-        Request-scoped, because this manager sits in front of every check and
-        every listing: without the cache a single request pays one query per
-        call site, which showed up as a doubled query count in core's workspace
-        search budget. `None` is cached too — it is the answer for a user who is
-        not in the workspace at all, and it must not be re-queried either.
-        """
-
-        cached = local_cache.get(f"arabase_table_access_roles_{workspace.id}", dict)
-
-        missing = [actor for actor in actors if actor.id not in cached]
-        if missing:
-            manager = (
-                WorkspaceUser.objects_and_trash
-                if include_trash
-                else WorkspaceUser.objects
-            )
-            found = dict(
-                manager.filter(
-                    workspace=workspace, user_id__in=[actor.id for actor in missing]
-                ).values_list("user_id", "permissions")
-            )
-            for actor in missing:
-                cached[actor.id] = found.get(actor.id)
-
-        return cached
+        return workspace_roles(
+            workspace.id, [actor.id for actor in actors], include_trash
+        )
 
     def _guest_user_ids(self, workspace, actors, include_trash=False) -> Set[int]:
         """The subset of `actors` that hold the GUEST role in this workspace."""
@@ -140,37 +187,9 @@ class TableGrantPermissionManagerType(PermissionManagerType):
         }
 
     def _grants(self, workspace, user_ids, include_trash=False):
-        """Map of user id -> {table id: level} for the given guests.
+        """Map of user id -> {table id: level}; see `table_grants_for`."""
 
-        Cached per request for the same reason as `_roles`, and only ever
-        reached for an actor already known to be a guest.
-        """
-
-        from arabase.table_access.models import TableGrant
-
-        cached = local_cache.get(f"arabase_table_access_grants_{workspace.id}", dict)
-
-        missing = [user_id for user_id in user_ids if user_id not in cached]
-        if missing:
-            manager = (
-                WorkspaceUser.objects_and_trash
-                if include_trash
-                else WorkspaceUser.objects
-            )
-            workspace_user_ids = dict(
-                manager.filter(workspace=workspace, user_id__in=missing).values_list(
-                    "id", "user_id"
-                )
-            )
-            for user_id in missing:
-                cached[user_id] = {}
-            rows = TableGrant.objects.filter(
-                workspace_user_id__in=workspace_user_ids.keys()
-            ).values_list("workspace_user_id", "table_id", "level")
-            for workspace_user_id, table_id, level in rows:
-                cached[workspace_user_ids[workspace_user_id]][table_id] = level
-
-        return {user_id: cached[user_id] for user_id in user_ids}
+        return table_grants_for(workspace.id, user_ids, include_trash)
 
     def _scope_of(self, context: Any, cache: Dict[Any, Any]):
         """Resolve a check context to ``(table_id, database_id)``.
@@ -232,20 +251,37 @@ class TableGrantPermissionManagerType(PermissionManagerType):
             # A database-scoped operation is only allowed for a database that
             # actually holds one of the guest's tables, otherwise `application
             # .read` would expose every database in the workspace.
-            return database_id in self._granted_database_ids(grants)
+            return database_id in self._granted_database_ids(grants, cache)
 
         return True
 
-    def _granted_database_ids(self, grants: Dict[int, str]) -> Set[int]:
+    def _granted_database_ids(
+        self, grants: Dict[int, str], cache: Optional[Dict[Any, Any]] = None
+    ) -> Set[int]:
+        """The databases holding at least one of the granted tables.
+
+        With `cache` — the per-call dict of `check_multiple_permissions` — the
+        answer is memoised per set of granted tables, so a batch of
+        database-scoped checks pays one query instead of one per check.
+        """
+
         from jadawel.contrib.database.models import Table
 
         if not grants:
             return set()
-        return set(
+
+        key = ("granted_database_ids", frozenset(grants))
+        if cache is not None and key in cache:
+            return cache[key]
+
+        database_ids = set(
             Table.objects.filter(id__in=grants.keys()).values_list(
                 "database_id", flat=True
             )
         )
+        if cache is not None:
+            cache[key] = database_ids
+        return database_ids
 
     def check_multiple_permissions(self, checks, workspace=None, include_trash=False):
         if workspace is None or not checks:

@@ -8,17 +8,13 @@ actionable error instead of streaming a file a spreadsheet application would
 silently truncate, and a failed job must not leave a partial downloadable
 file behind.
 
-These are the RED phase of the remediation plan: they capture behaviour that
-does not exist yet. The module imports the named limit constants at the top,
-so today the whole file fails at *collection* with:
-
-    ImportError: cannot import name 'XLSX_MAX_ROWS' ... from
-    'arabase.export.spreadsheet_table_exporter'
-
-That ImportError is the expected, documented failure. Once the constants
-land, every test below must hold. All tests stay fast: limits are
-monkeypatched down to 2, at most 3 rows/fields are created, and storage is a
-MagicMock backed by an in-memory buffer.
+The limits are the module globals XLSX_MAX_ROWS, XLSX_MAX_COLUMNS,
+ODS_MAX_ROWS and ODS_MAX_COLUMNS of
+``arabase.export.spreadsheet_table_exporter``. The exporters read them at call
+time, which is what lets these tests monkeypatch them on that module. All
+tests stay fast: limits are monkeypatched down to 2 or 3, at most 3
+rows/fields are created, and storage is a MagicMock backed by an in-memory
+buffer.
 """
 
 import zipfile

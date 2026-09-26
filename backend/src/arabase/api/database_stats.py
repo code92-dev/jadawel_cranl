@@ -24,10 +24,12 @@ whether the row numbers are exact, rather than silently returning a wrong total.
 """
 
 from django.db import connection
-from django.db.models import Count, Q
+from django.db.models import Count, Q, QuerySet
 
-from jadawel.contrib.database.table.constants import USER_TABLE_DATABASE_NAME_PREFIX
+from arabase.api.user_table_sql import union_all_per_table
+from jadawel.contrib.database.operations import ListTablesDatabaseTableOperationType
 from jadawel.contrib.database.table.models import Table
+from jadawel.core.handler import CoreHandler
 
 # Above this many tables in a single workspace the UNION ALL stops being a cheap
 # query. Callers get `rows_exact: false` and no row numbers rather than a slow
@@ -35,13 +37,28 @@ from jadawel.contrib.database.table.models import Table
 MAX_TABLES_FOR_EXACT_COUNTS = 200
 
 
-def _tables_by_database(database_ids):
-    """`{database_id: [table_id, ...]}` for non-trashed tables, in one query."""
+def visible_tables(user, workspace, databases) -> QuerySet:
+    """The non-trashed tables in `databases` that `user` may list.
+
+    Filtered through the same permission check as the sidebar's table list. A
+    database being visible does not make every table in it visible: a GUEST
+    member sees a database because it holds one granted table, and must not be
+    handed counts for the tables beside it.
+    """
+
+    return CoreHandler().filter_queryset(
+        user,
+        ListTablesDatabaseTableOperationType.type,
+        Table.objects.filter(database__in=databases, trashed=False),
+        workspace=workspace,
+    )
+
+
+def _tables_by_database(database_ids, tables):
+    """`{database_id: [table_id, ...]}` for `tables`, in one query."""
 
     tables_by_database = {database_id: [] for database_id in database_ids}
-    rows = Table.objects.filter(
-        database_id__in=database_ids, trashed=False
-    ).values_list("id", "database_id")
+    rows = tables.filter(database_id__in=database_ids).values_list("id", "database_id")
     for table_id, database_id in rows:
         tables_by_database[database_id].append(table_id)
     return tables_by_database
@@ -64,42 +81,37 @@ def _field_counts(table_ids):
 def _row_counts(table_ids):
     """Exact non-trashed row count per table id, in one round trip.
 
-    Table ids are coerced with `int()` before they reach the SQL string. They come
-    from our own database, but they are the only interpolated values here and a
-    stray non-integer would be an injection point.
+    The statement comes from `union_all_per_table`, which explains why it is
+    formatted rather than bound and why that is safe.
     """
 
     if not table_ids:
         return {}
 
-    # noqa S608: the query is built by string concatenation because the *table
-    # name* varies per row, and a table name cannot be a bound parameter in SQL.
-    # The only interpolated value is `table_id`, forced through `int()` on both
-    # sides, so nothing user-controlled can reach the statement.
-    parts = [
-        f"SELECT {int(table_id)} AS table_id, COUNT(*) AS row_count "  # noqa: S608
-        f"FROM {USER_TABLE_DATABASE_NAME_PREFIX}{int(table_id)} "
-        f"WHERE trashed = false"
-        for table_id in table_ids
-    ]
+    sql = union_all_per_table(
+        table_ids,
+        "SELECT {table_id} AS table_id, COUNT(*) AS row_count "
+        "FROM {table} WHERE trashed = false",
+    )
 
     with connection.cursor() as cursor:
-        cursor.execute(" UNION ALL ".join(parts))
+        cursor.execute(sql)
         return {row[0]: row[1] for row in cursor.fetchall()}
 
 
-def get_database_stats(databases):
+def get_database_stats(databases, tables):
     """Build `{database_id: {...counters}}` for the given database applications.
 
-    `databases` must already be permission-filtered by the caller — this function
-    does no access control of its own.
+    `databases` and `tables` must already be permission-filtered by the caller —
+    this function does no access control of its own. Only `tables` are counted;
+    see `visible_tables`.
     """
 
     database_ids = [database.id for database in databases]
     if not database_ids:
         return {}
 
-    tables_by_database = _tables_by_database(database_ids)
+    tables_by_database = _tables_by_database(database_ids, tables)
     all_table_ids = [tid for ids in tables_by_database.values() for tid in ids]
 
     field_counts = _field_counts(all_table_ids)

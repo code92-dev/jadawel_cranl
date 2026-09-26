@@ -34,30 +34,3 @@ class SetGrantsSerializer(serializers.Serializer):
     # removing them, and it leaves them with an empty workspace rather than a
     # half-open one.
     tables = TableGrantEntrySerializer(many=True, allow_empty=True)
-
-
-class GrantedTableSerializer(serializers.Serializer):
-    table_id = serializers.IntegerField()
-    name = serializers.CharField()
-    database_id = serializers.IntegerField()
-    level = serializers.CharField()
-
-
-class GuestSerializer(serializers.Serializer):
-    workspace_user_id = serializers.IntegerField()
-    user_id = serializers.IntegerField()
-    email = serializers.EmailField()
-    name = serializers.CharField()
-    tables = GrantedTableSerializer(many=True)
-
-
-class GuestInvitationSerializer(serializers.Serializer):
-    id = serializers.IntegerField()
-    email = serializers.EmailField()
-    created_on = serializers.DateTimeField()
-    tables = GrantedTableSerializer(many=True)
-
-
-class TableAccessOverviewSerializer(serializers.Serializer):
-    guests = GuestSerializer(many=True)
-    invitations = GuestInvitationSerializer(many=True)

@@ -298,6 +298,9 @@ references and one runtime dependency on a setting the enterprise plugin used to
 | `docker-compose.dev.yml`                              | Removed the premium/enterprise backend & web-frontend bind-mount volume lines (7 services)                                                                                                                                                       | Dirs gone; bind mounts would create empty dirs / error                                                                                 | med        |
 | `.github/workflows/ci.yml`                            | Removed premium/enterprise from `paths-filter` and from the `ruff check`/`format` args                                                                                                                                                           | Paths gone (CI is reworked in Task 4)                                                                                                  | med        |
 | `config/vscode/.vscode/launch.json`, `settings.json`  | Removed premium/enterprise test paths and mypy/analysis extra paths                                                                                                                                                                              | Dev-editor convenience only                                                                                                            | low        |
+| `backend/justfile`                                    | Follow-up (2026-09-25): removed the `premium/backend` and `enterprise/backend` paths from `_set_pythonpath`, `backend_source_dirs`, `backend_tests_dirs`, `backend_tests_dirs_from_root`, `test_pythonpath` and the `make-translations` loop     | Paths gone; ruff and pytest fail on a missing path and the `make-translations` loop could not `cd` into them. Recipe names unchanged   | med        |
+| `e2e-tests/tests/enterprise/regressions.spec.ts`      | Follow-up (2026-09-25): deleted, with its now-empty `enterprise/` directory. Its only test was a `test.skip` that set up an enterprise licence through the `licenses/` API                                                                       | No URLconf defines `licenses/` since `enterprise/` was stripped, so the spec was dead                                                  | low        |
+| `e2e-tests/fixtures/licence.ts`                       | Follow-up (2026-09-25): deleted the enterprise licence fixture (`ENTERPRISE_LICENSE`, `createLicense`, `deleteLicense`)                                                                                                                          | Its only importer was the deleted enterprise spec                                                                                      | low        |
 
 ### Known remaining upstream references (intentionally left)
 
@@ -1526,6 +1529,17 @@ updater then read.
 | File                                  | Change                                                                                        | Reason                                                                                                                                                                 | Risk                                                              |
 | ------------------------------------- | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
 | `backend/src/jadawel/core/handler.py` | Invoke an optional plugin callback before creating or accepting a legacy workspace invitation | Bound organization workspaces must use organization invitations so seat locking, roles and audit records cannot be bypassed; unmanaged workspaces retain the core flow | Low; callback is optional and only installed plugins implement it |
+
+## Phase — Bundled plugin install (f8bc73de)
+
+Logged after the fact: commit `f8bc73de` (2026-09-10) edited three upstream
+Dockerfiles so the release image ships the two standalone plugins behind the hooks
+above. It also added the missing final newline after `EXPOSE 80` in the all-in-one
+Dockerfile.
+
+| File | Change | Reason | Risk |
+| ---- | ------ | ------ | ---- |
+| `backend/Dockerfile` (159-165), `web-frontend/Dockerfile` (72-74), `deploy/all-in-one/Dockerfile` (116-123) | Backend: copy both plugins' `backend/` folders and `uv pip install --no-deps` them into `/jadawel/venv`. Web-frontend: copy both plugins' `web-frontend/` folders to `bundled-plugins/` and point `ADDITIONAL_MODULES` at their Nuxt modules. All-in-one: copy both `backend/` folders to `/jadawel/data/plugins/` and touch their `*.backend-built` markers so `install_plugin.sh` does not reinstall them at startup | Committing the plugin sources installs nothing: the backend needs the packages, Django discovery needs the folders under `JADAWEL_PLUGIN_DIR`, and the Nuxt modules must be compiled on the GitHub runner because CranL cannot build the frontend (`docs/DEPLOY_CRANL.md`) | Low; additive `COPY`/`RUN`/`ENV` lines only, but every release image now carries both plugins |
 
 ## Follow-up remediation — translatable export errors and cancel cleanup (2026-09-14)
 

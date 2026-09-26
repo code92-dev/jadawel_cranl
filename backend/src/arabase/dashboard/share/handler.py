@@ -57,12 +57,6 @@ class DashboardShareHandler:
                 "The dashboard is not shared publicly."
             ) from exc
 
-    def get_share_or_none(self, dashboard: Dashboard) -> Optional[DashboardShare]:
-        try:
-            return self.get_share(dashboard)
-        except DashboardShareDoesNotExist:
-            return None
-
     def create_share(self, dashboard: Dashboard) -> DashboardShare:
         """Shares the dashboard, or returns the existing link if there is one."""
 
