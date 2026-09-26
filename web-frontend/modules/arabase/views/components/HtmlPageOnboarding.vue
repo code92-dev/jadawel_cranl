@@ -74,17 +74,9 @@
           <p class="html-page-onboarding__hint">
             {{ $t('htmlPageOnboarding.noKeyHint') }}
           </p>
-          <Button
-            type="primary"
-            :loading="creating"
-            :disabled="creating"
-            @click="createEndpoint"
-          >
+          <Button type="primary" @click="openSettings">
             {{ $t('htmlPageOnboarding.createKey') }}
           </Button>
-          <p v-if="error" class="html-page-onboarding__warning">
-            {{ error }}
-          </p>
         </template>
       </div>
     </section>
@@ -183,10 +175,8 @@ export default {
   data() {
     return {
       loading: true,
-      creating: false,
       reveal: false,
       endpoints: [],
-      error: null,
       settingsMounted: false,
     }
   },
@@ -257,13 +247,11 @@ export default {
         this.loading = false
       }
     },
-    async createEndpoint() {
-      // Do not mint a legacy empty endpoint from this onboarding shortcut.
-      // Every creation path must use the protected three-step flow, including
-      // the explicit zero-policy confirmation and field review.
-      await this.openSettings()
-    },
     async openSettings() {
+      // Also the "no key yet" button: do not mint a legacy empty endpoint from
+      // this onboarding shortcut. Every creation path must use the protected
+      // three-step flow, including the explicit zero-policy confirmation and
+      // field review.
       this.settingsMounted = true
       await this.$nextTick()
       this.$refs.settingsModal.show('mcp-endpoint')

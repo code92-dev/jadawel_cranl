@@ -4,16 +4,14 @@ from django.core.exceptions import ImproperlyConfigured
 
 import pytest
 
-from arabase.mcp.protection.contracts import (
-    MCPToolInputContract,
-    MCPToolOperationClass,
-    MCPToolOutputContract,
+from arabase.mcp.protection.interceptor import (
+    MCPToolContract,
     get_mcp_tool_protection_contract,
+    intercept_mcp_tool_call,
     validate_mcp_tool_protection_contracts,
 )
-from arabase.mcp.protection.interceptor import intercept_mcp_tool_call
 from arabase.mcp.protection.policy_state import (
-    EMPTY_MCP_PROTECTION_POLICY,
+    MCPProtectedFieldBinding,
     MCPProtectionPolicyState,
 )
 from jadawel.core.action.registries import action_type_registry
@@ -25,9 +23,7 @@ def test_every_registered_mcp_tool_uses_the_base_call_and_has_a_contract():
     for tool in mcp_tool_registry.get_all():
         assert tool.__class__.call is MCPTool.call, tool.type
         contract = get_mcp_tool_protection_contract(tool.type)
-        assert isinstance(contract.input, MCPToolInputContract), tool.type
-        assert isinstance(contract.output, MCPToolOutputContract), tool.type
-        assert isinstance(contract.operation_class, MCPToolOperationClass), tool.type
+        assert isinstance(contract, MCPToolContract), tool.type
 
 
 def test_arabase_registers_the_protection_interceptor():
@@ -45,7 +41,7 @@ def test_registered_mcp_actions_never_carry_endpoint_keys():
 def test_empty_policy_preserves_existing_tool_behavior(monkeypatch):
     monkeypatch.setattr(
         "arabase.mcp.protection.interceptor.get_mcp_protection_policy_state",
-        lambda endpoint: EMPTY_MCP_PROTECTION_POLICY,
+        lambda endpoint: MCPProtectionPolicyState(),
     )
     executed = False
 
@@ -63,7 +59,7 @@ def test_empty_policy_preserves_existing_tool_behavior(monkeypatch):
 def test_empty_policy_preserves_an_additive_tool_without_a_contract(monkeypatch):
     monkeypatch.setattr(
         "arabase.mcp.protection.interceptor.get_mcp_protection_policy_state",
-        lambda endpoint: EMPTY_MCP_PROTECTION_POLICY,
+        lambda endpoint: MCPProtectionPolicyState(),
     )
     executed = False
 
@@ -81,7 +77,13 @@ def test_empty_policy_preserves_an_additive_tool_without_a_contract(monkeypatch)
 def test_non_empty_policy_rejects_an_additive_tool_without_a_contract(monkeypatch):
     monkeypatch.setattr(
         "arabase.mcp.protection.interceptor.get_mcp_protection_policy_state",
-        lambda endpoint: MCPProtectionPolicyState(has_protected_fields=True),
+        lambda endpoint: MCPProtectionPolicyState(
+            protected_fields=(
+                MCPProtectedFieldBinding(
+                    field_id=1, table_id=1, field_name="x", field_type="text"
+                ),
+            )
+        ),
     )
     executed = False
 
@@ -91,25 +93,6 @@ def test_non_empty_policy_rejects_an_additive_tool_without_a_contract(monkeypatc
 
     with pytest.raises(SafeMCPToolError) as exc_info:
         intercept_mcp_tool_call(object(), _UndeclaredTestTool(), {}, execute)
-
-    assert exc_info.value.code is MCPErrorCode.PROTECTION_UNAVAILABLE
-    assert exc_info.value.retryable is False
-    assert executed is False
-
-
-def test_non_empty_policy_fails_closed_until_enforcement_is_available(monkeypatch):
-    monkeypatch.setattr(
-        "arabase.mcp.protection.interceptor.get_mcp_protection_policy_state",
-        lambda endpoint: MCPProtectionPolicyState(has_protected_fields=True),
-    )
-    executed = False
-
-    def execute():
-        nonlocal executed
-        executed = True
-
-    with pytest.raises(SafeMCPToolError) as exc_info:
-        intercept_mcp_tool_call(object(), _DeclaredTestTool(), {}, execute)
 
     assert exc_info.value.code is MCPErrorCode.PROTECTION_UNAVAILABLE
     assert exc_info.value.retryable is False

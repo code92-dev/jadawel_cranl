@@ -23,13 +23,14 @@ from django.core.management.base import BaseCommand, CommandError
 from redis import Redis
 from redis.exceptions import RedisError
 
-from arabase.mcp.protection.capacity import ISSUER_LEASE_SECONDS, issuance_lease
+from arabase.mcp.protection.limits import ISSUER_LEASE_SECONDS
 from arabase.mcp.protection.vault import (
     MASK_TOKEN_REDIS_PREFIX,
     MaskTokenBinding,
     MaskTokenVaultUnavailable,
     RedisMaskTokenVault,
 )
+from arabase.mcp.protection.vault.redis_backend import issuance_lease
 
 TOKEN_MEMORY_ESTIMATE_BYTES = 50_000 * 1_536
 MEMORY_ESTIMATE_TOLERANCE = 1.5

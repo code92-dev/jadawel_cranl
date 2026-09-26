@@ -6,10 +6,9 @@ import { existsSync, readFileSync } from 'node:fs'
 import { resolve } from 'node:path'
 
 const fetchAll = vi.fn()
-const create = vi.fn()
 
 vi.mock('@jadawel/modules/core/services/mcpEndpoint', () => ({
-  default: () => ({ fetchAll, create }),
+  default: () => ({ fetchAll }),
 }))
 
 /**
@@ -52,7 +51,6 @@ describe('HtmlPageOnboarding', () => {
 
   beforeEach(() => {
     fetchAll.mockReset()
-    create.mockReset()
     translated.length = 0
   })
 

@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from arabase.mcp.protection.artifact_commands import SAFE_PENDING_VIEW_KEYS
 from arabase.mcp.protection.models import (
     ArtifactAudience,
     MCPProtectedField,
@@ -8,6 +9,14 @@ from arabase.mcp.protection.models import (
 )
 from jadawel.api.mcp.serializers import MCPEndpointSerializer
 from jadawel.core.mcp.models import MCPEndpoint
+
+
+def _require_unique_ids(serializer, value):
+    """Reject a list of field ids that names any id twice."""
+
+    if len(value) != len(set(value)):
+        raise serializers.ValidationError("Field IDs must be unique.")
+    return value
 
 
 class MCPProtectedFieldSerializer(serializers.ModelSerializer):
@@ -82,9 +91,10 @@ class MCPProtectionPolicySerializer(serializers.ModelSerializer):
 
     @staticmethod
     def get_protected_field_count(instance) -> int:
-        return instance.protected_fields.filter(
-            state=MCPProtectedFieldState.ACTIVE
-        ).count()
+        return sum(
+            relation.state == MCPProtectedFieldState.ACTIVE
+            for relation in instance.protected_fields.all()
+        )
 
 
 class MCPEndpointProtectionSummarySerializer(serializers.ModelSerializer):
@@ -120,10 +130,7 @@ class CreateProtectedMCPEndpointSerializer(serializers.Serializer):
     )
     confirm_empty_policy = serializers.BooleanField(default=False)
 
-    def validate_protected_field_ids(self, value):
-        if len(value) != len(set(value)):
-            raise serializers.ValidationError("Field IDs must be unique.")
-        return value
+    validate_protected_field_ids = _require_unique_ids
 
 
 class UpdateMCPProtectionPolicySerializer(serializers.Serializer):
@@ -135,15 +142,9 @@ class UpdateMCPProtectionPolicySerializer(serializers.Serializer):
         child=serializers.IntegerField(min_value=1), allow_empty=True, default=list
     )
 
-    def validate_protected_field_ids(self, value):
-        if len(value) != len(set(value)):
-            raise serializers.ValidationError("Field IDs must be unique.")
-        return value
+    validate_protected_field_ids = _require_unique_ids
 
-    def validate_confirm_remove_field_ids(self, value):
-        if len(value) != len(set(value)):
-            raise serializers.ValidationError("Field IDs must be unique.")
-        return value
+    validate_confirm_remove_field_ids = _require_unique_ids
 
 
 class ReactivateMCPProtectionPolicySerializer(serializers.Serializer):
@@ -173,14 +174,10 @@ class ArtifactDraftRequestSerializer(serializers.Serializer):
         allow_empty=True,
     )
 
-    def validate_protected_field_ids(self, value):
-        if len(value) != len(set(value)):
-            raise serializers.ValidationError("Field IDs must be unique.")
-        return value
+    validate_protected_field_ids = _require_unique_ids
 
     def validate_pending_view_values(self, value):
-        allowed = {"name", "allow_external_resources", "row_limit"}
-        unsupported = set(value) - allowed
+        unsupported = set(value) - SAFE_PENDING_VIEW_KEYS
         if unsupported:
             raise serializers.ValidationError(
                 "Only safe view configuration fields may be submitted."

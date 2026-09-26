@@ -5,12 +5,12 @@ import pytest
 from rest_framework.exceptions import ValidationError
 from rest_framework.status import HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
-from arabase.mcp.protection.creation import create_protected_mcp_endpoint
 from arabase.mcp.protection.models import (
     MCPProtectedField,
     MCPProtectionCommand,
     MCPProtectionLifecycleAudit,
 )
+from arabase.mcp.protection.policy_commands import create_protected_mcp_endpoint
 from jadawel.core.mcp.models import MCPEndpoint
 
 

@@ -11,9 +11,3 @@ ERROR_HTML_PAGE_TOO_LARGE = (
     HTTP_400_BAD_REQUEST,
     "{e}",
 )
-
-ERROR_HTML_PAGE_REVISION_DOES_NOT_EXIST = (
-    "ERROR_HTML_PAGE_REVISION_DOES_NOT_EXIST",
-    HTTP_404_NOT_FOUND,
-    "The requested revision does not exist for this page view.",
-)

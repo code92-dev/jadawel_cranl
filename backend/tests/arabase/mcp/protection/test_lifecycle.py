@@ -5,14 +5,16 @@ from django.db.models.deletion import ProtectedError
 import pytest
 from rest_framework.exceptions import PermissionDenied
 
-from arabase.mcp.protection.editing import reactivate_mcp_protection_policy
-from arabase.mcp.protection.lifecycle import delete_ownerless_suspended_endpoint
 from arabase.mcp.protection.models import (
     MCPProtectedField,
     MCPProtectedFieldState,
     MCPProtectionLifecycleAudit,
     MCPProtectionLifecycleStatus,
     MCPProtectionSafeReason,
+)
+from arabase.mcp.protection.policy_commands import (
+    delete_ownerless_suspended_endpoint,
+    reactivate_mcp_protection_policy,
 )
 from jadawel.contrib.database.fields.constants import DeleteFieldStrategyEnum
 from jadawel.contrib.database.fields.handler import FieldHandler

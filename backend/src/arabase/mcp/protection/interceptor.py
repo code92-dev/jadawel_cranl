@@ -1,28 +1,23 @@
-from collections.abc import Callable
+from collections.abc import Callable, Iterable
+from enum import StrEnum
 from typing import Any
 
 from django.core.exceptions import ImproperlyConfigured
 from django.db import transaction
 
+from arabase.mcp.protection import limits
 from arabase.mcp.protection.audit import content_blind_mcp_mutation
-from arabase.mcp.protection.contracts import (
-    MCPToolOutputContract,
-    get_mcp_tool_protection_contract,
-)
-from arabase.mcp.protection.egress import (
-    MAX_ISSUED_OR_REDEEMED_PER_CALL,
-    MAX_ROWS_PER_CALL,
-    mask_direct_row_output,
+from arabase.mcp.protection.egress import mask_table_rows
+from arabase.mcp.protection.policy_state import (
+    get_mcp_protection_policy_state,
+    protection_unavailable,
     table_has_protected_output,
+    verify_policy_snapshot,
 )
-from arabase.mcp.protection.models import (
-    MCPProtectedFieldState,
-    MCPProtectionLifecycleStatus,
-    MCPProtectionPolicy,
-    MCPProtectionSafeReason,
+from arabase.mcp.protection.tokens import (
+    contains_mask_token_marker,
+    extract_mask_token_handle,
 )
-from arabase.mcp.protection.policy_state import get_mcp_protection_policy_state
-from arabase.mcp.protection.tokens import extract_mask_token_handle
 from arabase.mcp.protection.vault import (
     MaskTokenBinding,
     MaskTokenVaultUnavailable,
@@ -31,9 +26,62 @@ from arabase.mcp.protection.vault import (
 from jadawel.contrib.database.api.rows.serializers import serialize_rows_for_response
 from jadawel.contrib.database.fields.models import Field
 from jadawel.contrib.database.mcp import services
-from jadawel.core.mcp.errors import MCPErrorCode, SafeMCPToolError
+from jadawel.core.mcp.errors import SafeMCPToolError
 from jadawel.core.mcp.models import MCPEndpoint
 from jadawel.core.mcp.registries import MCPTool
+
+
+class MCPToolContract(StrEnum):
+    """How the protection boundary treats one MCP tool's call."""
+
+    # Returns only schema metadata or a mutation receipt, never cell values.
+    METADATA = "metadata"
+    # A page tool that owns its artifact draft, approval and runtime checks.
+    PAGE_ARTIFACT = "page_artifact"
+    # Reads or writes row values, so protected cells are masked or redeemed.
+    PROTECTED_ROWS = "protected_rows"
+
+
+MCP_TOOL_PROTECTION_CONTRACTS = {
+    "list_databases": MCPToolContract.METADATA,
+    "create_database": MCPToolContract.METADATA,
+    "list_tables": MCPToolContract.METADATA,
+    "create_table": MCPToolContract.METADATA,
+    "update_table": MCPToolContract.METADATA,
+    "delete_table": MCPToolContract.METADATA,
+    "get_table_schema": MCPToolContract.METADATA,
+    "create_fields": MCPToolContract.METADATA,
+    "update_fields": MCPToolContract.METADATA,
+    "delete_fields": MCPToolContract.METADATA,
+    "list_table_rows": MCPToolContract.PROTECTED_ROWS,
+    "create_rows": MCPToolContract.PROTECTED_ROWS,
+    "update_rows": MCPToolContract.PROTECTED_ROWS,
+    "delete_rows": MCPToolContract.METADATA,
+    "list_page_views": MCPToolContract.METADATA,
+    "get_page_view": MCPToolContract.PAGE_ARTIFACT,
+    "create_page_view": MCPToolContract.PAGE_ARTIFACT,
+    "update_page_view": MCPToolContract.PAGE_ARTIFACT,
+    "list_page_view_revisions": MCPToolContract.PAGE_ARTIFACT,
+    "restore_page_view_revision": MCPToolContract.PAGE_ARTIFACT,
+}
+
+
+def get_mcp_tool_protection_contract(tool_name: str) -> MCPToolContract:
+    try:
+        return MCP_TOOL_PROTECTION_CONTRACTS[tool_name]
+    except KeyError as exc:
+        raise ImproperlyConfigured(
+            f"MCP tool '{tool_name}' has no protection contract."
+        ) from exc
+
+
+def validate_mcp_tool_protection_contracts(tools: Iterable[MCPTool]) -> None:
+    for tool in tools:
+        if tool.__class__.call is not MCPTool.call:
+            raise ImproperlyConfigured(
+                f"MCP tool '{tool.type}' bypasses the protected call boundary."
+            )
+        get_mcp_tool_protection_contract(tool.type)
 
 
 def intercept_mcp_tool_call(
@@ -61,7 +109,7 @@ def intercept_mcp_tool_call(
     # validated below.
     if (
         tool.type == "update_rows"
-        and any(_contains_token_marker(_row_payload(row)) for row in args.rows)
+        and any(contains_mask_token_marker(row.__pydantic_extra__) for row in args.rows)
         and (
             not policy.has_protected_fields
             or not any(
@@ -69,38 +117,19 @@ def intercept_mcp_tool_call(
             )
         )
     ):
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
+        raise protection_unavailable()
+    if not policy.has_protected_fields:
+        return execute()
     try:
         contract = get_mcp_tool_protection_contract(tool.type)
     except ImproperlyConfigured as exc:
-        if not policy.has_protected_fields:
-            return execute()
-        raise SafeMCPToolError(
-            MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-        ) from exc
-    if not policy.has_protected_fields:
+        raise protection_unavailable() from exc
+    # Metadata tools never return cell values.  Page tools own their artifact
+    # draft/approval and runtime projection checks; they must not be treated as
+    # ordinary row tools, which would reject every protected page call before
+    # the service can return safe metadata or create a draft.
+    if contract is not MCPToolContract.PROTECTED_ROWS:
         return execute()
-    if not policy.protected_fields:
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
-    if contract.output in (
-        MCPToolOutputContract.PUBLIC_METADATA,
-        MCPToolOutputContract.MUTATION_RECEIPT,
-    ):
-        return execute()
-    # Page tools own their artifact draft/approval and runtime projection
-    # checks.  They must not be treated as ordinary row tools (which would
-    # incorrectly reject every protected page call before the service can
-    # return safe metadata or create a draft).
-    if tool.type in {
-        "get_page_view",
-        "create_page_view",
-        "update_page_view",
-        "list_page_view_revisions",
-        "restore_page_view_revision",
-    }:
-        return execute()
-    if tool.type not in ("list_table_rows", "create_rows", "update_rows"):
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
     if tool.type == "list_table_rows" and not table_has_protected_output(
         args.table_id, policy.protected_fields, endpoint.workspace_id
     ):
@@ -109,26 +138,22 @@ def intercept_mcp_tool_call(
         field.table_id == args.table_id for field in policy.protected_fields
     ):
         return execute()
-    if tool.type == "list_table_rows" and args.size > MAX_ROWS_PER_CALL:
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
+    if tool.type == "list_table_rows" and args.size > limits.MAX_ROWS_PER_CALL:
+        raise protection_unavailable()
     if (
         tool.type in ("create_rows", "update_rows")
-        and len(args.rows) > MAX_ROWS_PER_CALL
+        and len(args.rows) > limits.MAX_ROWS_PER_CALL
     ):
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
+        raise protection_unavailable()
     if tool.type == "list_table_rows" and getattr(args, "search", ""):
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
+        raise protection_unavailable()
 
     with transaction.atomic():
-        _lock_policy_snapshot(endpoint, policy)
+        # Keep policy identity stable through the mutation and response masking.
+        verify_policy_snapshot(endpoint, policy, lock=True)
         restore = None
         try:
-            if tool.type == "create_rows":
-                # The global check above also covers unprotected tables.  Keep
-                # this local check for clarity if the interceptor is changed to
-                # admit another create path later.
-                _reject_token_envelopes(args.rows)
-            elif tool.type == "update_rows":
+            if tool.type == "update_rows":
                 restore = _prepare_update_for_protected_cells(endpoint, args, policy)
             if tool.type in ("create_rows", "update_rows"):
                 with content_blind_mcp_mutation(
@@ -147,46 +172,17 @@ def intercept_mcp_tool_call(
                     result = execute()
             else:
                 result = execute()
-            return mask_direct_row_output(endpoint, args, result, policy)
+            return mask_table_rows(endpoint, args.table_id, result, policy)
         finally:
             if restore is not None:
                 restore()
 
 
-def _lock_policy_snapshot(endpoint: MCPEndpoint, snapshot) -> None:
-    """Keep policy identity stable through the mutation and response masking."""
-
-    try:
-        current = MCPProtectionPolicy.objects.select_for_update().get(
-            id=snapshot.policy_id,
-            endpoint=endpoint,
-            revision=snapshot.revision,
-            access_generation=snapshot.access_generation,
-            lifecycle_status=MCPProtectionLifecycleStatus.ACTIVE,
-            safe_reason_code=MCPProtectionSafeReason.NONE,
-        )
-    except MCPProtectionPolicy.DoesNotExist:
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
-    active_ids = set(
-        current.protected_fields.filter(
-            state=MCPProtectedFieldState.ACTIVE
-        ).values_list("field_id", flat=True)
-    )
-    if active_ids != {field.field_id for field in snapshot.protected_fields}:
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
-
-
 def _reject_token_envelopes(value: Any) -> None:
     """Reject handles on create and in every non-redemption input position."""
 
-    if isinstance(value, dict):
-        if "$jadawelProtected" in value:
-            raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
-        for nested in value.values():
-            _reject_token_envelopes(nested)
-    elif isinstance(value, (list, tuple)):
-        for nested in value:
-            _reject_token_envelopes(nested)
+    if contains_mask_token_marker(value):
+        raise protection_unavailable()
 
 
 def _prepare_update_for_protected_cells(endpoint, args, policy):
@@ -201,11 +197,11 @@ def _prepare_update_for_protected_cells(endpoint, args, policy):
     }
     row_ids = [row.id for row in args.rows]
     if len(set(row_ids)) != len(row_ids):
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
+        raise protection_unavailable()
     locked_rows = model.objects.select_for_update().filter(id__in=row_ids)
     locked_by_id = {row.id: row for row in locked_rows}
     if len(locked_by_id) != len(row_ids):
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
+        raise protection_unavailable()
     serialized_rows = serialize_rows_for_response(
         list(locked_by_id.values()), model, user_field_names=True
     )
@@ -231,9 +227,6 @@ def _prepare_update_for_protected_cells(endpoint, args, policy):
     try:
         for spec in args.rows:
             extras = spec.__pydantic_extra__
-            if extras is None:
-                extras = {}
-                spec.__pydantic_extra__ = extras
             observed_row = locked_by_id[spec.id]
             for name, protected_field in fields.items():
                 if name in extras:
@@ -242,51 +235,32 @@ def _prepare_update_for_protected_cells(endpoint, args, policy):
                     protected_field.field_id
                 )
                 if protected_field_model is None:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    )
-                try:
-                    field_type = protected_field_model.get_type()
-                    # Derived/read-only fields are recomputed by the row
-                    # service and must not be sent back as write inputs.
-                    if field_type.read_only:
-                        continue
-                    extras[name] = field_type.get_internal_value_from_db(
-                        observed_row, protected_field_model.db_column
-                    )
-                except SafeMCPToolError:
-                    raise
-                except Exception as exc:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    ) from exc
+                    raise protection_unavailable()
+                value = _field_value(protected_field_model, observed_row)
+                # Derived/read-only fields are recomputed by the row service
+                # and must not be sent back as write inputs.
+                if value is _READ_ONLY:
+                    continue
+                extras[name] = value
                 originals.append((spec, name, None, True))
             for name, value in list(extras.items()):
                 protected_field = fields.get(name)
-                has_marker = _contains_token_marker(value)
+                has_marker = contains_mask_token_marker(value)
                 if not has_marker:
                     continue
                 if protected_field is None:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    )
+                    raise protection_unavailable()
                 protected_field_model = protected_field_models.get(
                     protected_field.field_id
                 )
                 if protected_field_model is None:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    )
+                    raise protection_unavailable()
                 handle = extract_mask_token_handle(value)
                 if handle is None:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    )
+                    raise protection_unavailable()
                 current = serialized_by_id[spec.id]
                 if name not in current:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    )
+                    raise protection_unavailable()
                 vault = vault or get_mask_token_vault()
                 valid = vault.redeem(
                     handle,
@@ -305,68 +279,46 @@ def _prepare_update_for_protected_cells(endpoint, args, policy):
                     current[name],
                 )
                 if not valid:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    )
+                    raise protection_unavailable()
                 redeemed_count += 1
-                if redeemed_count > MAX_ISSUED_OR_REDEEMED_PER_CALL:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    )
+                if redeemed_count > limits.MAX_ISSUED_OR_REDEEMED_PER_CALL:
+                    raise protection_unavailable()
                 originals.append((spec, name, value, False))
-                try:
-                    field_type = protected_field_model.get_type()
-                    if field_type.read_only:
-                        raise SafeMCPToolError(
-                            MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                        )
-                    # The response serializer may intentionally expose a richer
-                    # shape than the row write serializer (for example, a
-                    # single-select response is an option object while updates
-                    # accept the option id).  Use the field adapter's internal
-                    # value so same-cell redemption preserves every writable
-                    # field type without forwarding response-only structures.
-                    spec.__pydantic_extra__[name] = (
-                        field_type.get_internal_value_from_db(
-                            observed_row, protected_field_model.db_column
-                        )
-                    )
-                except SafeMCPToolError:
-                    raise
-                except Exception as exc:
-                    raise SafeMCPToolError(
-                        MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False
-                    ) from exc
+                # The response serializer may intentionally expose a richer
+                # shape than the row write serializer (for example, a
+                # single-select response is an option object while updates
+                # accept the option id).  Use the field adapter's internal
+                # value so same-cell redemption preserves every writable field
+                # type without forwarding response-only structures.
+                internal_value = _field_value(protected_field_model, observed_row)
+                if internal_value is _READ_ONLY:
+                    raise protection_unavailable()
+                spec.__pydantic_extra__[name] = internal_value
     except MaskTokenVaultUnavailable:
-        raise SafeMCPToolError(MCPErrorCode.PROTECTION_UNAVAILABLE, retryable=False)
+        raise protection_unavailable()
 
     def restore() -> None:
         for spec, name, value, was_missing in originals:
-            if spec.__pydantic_extra__ is not None:
-                if was_missing:
-                    spec.__pydantic_extra__.pop(name, None)
-                else:
-                    spec.__pydantic_extra__[name] = value
+            if was_missing:
+                spec.__pydantic_extra__.pop(name, None)
+            else:
+                spec.__pydantic_extra__[name] = value
 
     return restore
 
 
-def _contains_token_marker(value: Any) -> bool:
-    if isinstance(value, dict):
-        return "$jadawelProtected" in value or any(
-            _contains_token_marker(nested) for nested in value.values()
-        )
-    if isinstance(value, (list, tuple)):
-        return any(_contains_token_marker(nested) for nested in value)
-    return False
+_READ_ONLY = object()
 
 
-def _row_payload(row: Any) -> Any:
-    """Return a row-update payload without trusting arbitrary model objects."""
+def _field_value(field_model, row):
+    """Return the writable internal value of one cell, or ``_READ_ONLY``."""
 
-    extras = getattr(row, "__pydantic_extra__", None)
-    if extras is not None:
-        return {"id": getattr(row, "id", None), **extras}
-    if isinstance(row, dict):
-        return row
-    return None
+    try:
+        field_type = field_model.get_type()
+        if field_type.read_only:
+            return _READ_ONLY
+        return field_type.get_internal_value_from_db(row, field_model.db_column)
+    except SafeMCPToolError:
+        raise
+    except Exception as exc:
+        raise protection_unavailable() from exc

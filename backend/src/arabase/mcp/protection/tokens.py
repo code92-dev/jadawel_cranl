@@ -29,8 +29,24 @@ def generate_mask_token() -> GeneratedMaskToken:
     raw_handle = base64.urlsafe_b64encode(raw_bytes).rstrip(b"=").decode("ascii")
     return GeneratedMaskToken(
         raw_handle=raw_handle,
-        digest=hashlib.sha256(raw_handle.encode("ascii")).hexdigest(),
+        digest=mask_token_digest(raw_handle),
     )
+
+
+def mask_token_digest(handle: str) -> str:
+    """Return the vault lookup digest of a raw mask-token handle."""
+
+    return hashlib.sha256(handle.encode("ascii")).hexdigest()
+
+
+def contains_mask_token_marker(value: Any) -> bool:
+    if isinstance(value, dict):
+        return MASK_TOKEN_RESERVED_KEY in value or any(
+            contains_mask_token_marker(nested) for nested in value.values()
+        )
+    if isinstance(value, (list, tuple)):
+        return any(contains_mask_token_marker(nested) for nested in value)
+    return False
 
 
 def extract_mask_token_handle(value: Any) -> str | None:

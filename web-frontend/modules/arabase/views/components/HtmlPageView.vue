@@ -32,7 +32,7 @@
       :srcdoc="document"
       sandbox="allow-scripts"
       referrerpolicy="no-referrer"
-      @load="handshake"
+      @load="send"
     ></iframe>
   </div>
 </template>
@@ -49,11 +49,16 @@ import HtmlPageOnboarding from '@jadawel/modules/arabase/views/components/HtmlPa
  * to `allow-scripts` and deliberately *not* `allow-same-origin` — the two
  * together would hand the document our origin back, and with it the viewer's
  * session token. Without `allow-same-origin` the frame gets an opaque origin,
- * and `postMessage` becomes the only way in or out.
+ * and `postMessage` is the only channel back to this page.
  *
  * Data therefore reaches the page by message rather than by the page calling
  * the API itself, which is also why the backend's CSP can set
- * `connect-src 'none'` and cut off every route the rows could leave by.
+ * `connect-src 'none'`. That closes fetch, XHR, WebSocket and beacons, but not
+ * every way out: the frame may still navigate itself to a URL carrying the
+ * rows, and WebRTC is outside CSP. So the page must only ever be handed rows
+ * its author could already read. Protected MCP values meet that bar only
+ * through an approval bound to the exact HTML (`artifact_boundary.py`); do not
+ * widen this payload on the assumption that CSP contains it.
  */
 export default {
   name: 'HtmlPageView',
@@ -65,11 +70,6 @@ export default {
     fields: { type: Array, required: true },
     readOnly: { type: Boolean, required: false, default: false },
     storePrefix: { type: String, required: false, default: '' },
-  },
-  data() {
-    return {
-      frameReady: false,
-    }
   },
   computed: {
     storeKey() {
@@ -134,10 +134,6 @@ export default {
     payload() {
       this.send()
     },
-    document() {
-      // A new document means a new frame; wait for it to say hello again.
-      this.frameReady = false
-    },
   },
   mounted() {
     window.addEventListener('message', this.onMessage)
@@ -168,10 +164,6 @@ export default {
       })
       return { id: row.id, order: row.order, values, raw }
     },
-    handshake() {
-      // Covers the case where the frame loaded before we started listening.
-      this.send()
-    },
     onMessage(event) {
       const frame = this.$refs.frame
       // The frame's origin is opaque, so identity is established by comparing
@@ -186,7 +178,6 @@ export default {
       }
 
       if (message.type === 'jadawel:ready') {
-        this.frameReady = true
         this.send()
       } else if (message.type === 'jadawel:height') {
         this.applyHeight(message.height)
@@ -201,6 +192,10 @@ export default {
       // stretch the app's layout indefinitely.
       frame.style.height = `${Math.min(Math.max(height, 120), 20000)}px`
     },
+    /**
+     * Also bound to the frame's `load` event, which covers the case where the
+     * frame loaded before we started listening.
+     */
     send() {
       const frame = this.$refs.frame
       if (!frame || !frame.contentWindow) {

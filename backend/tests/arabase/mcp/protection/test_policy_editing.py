@@ -70,7 +70,7 @@ def test_first_non_empty_policy_edit_records_forward_only_rollout_boundary(
     field = data_fixture.create_text_field(table=table, name="First")
     endpoint = data_fixture.create_mcp_endpoint(user=user, workspace=workspace)
 
-    from arabase.mcp.protection.editing import replace_mcp_protection_policy
+    from arabase.mcp.protection.policy_commands import replace_mcp_protection_policy
 
     replace_mcp_protection_policy(
         user=user,

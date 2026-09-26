@@ -69,8 +69,8 @@ export class HtmlPageViewType extends ViewType {
     await store.dispatch(storePrefix + 'view/html_page/fetch', { view })
   }
 
-  async refresh({ store }, database, view, fields, storePrefix = '') {
-    await store.dispatch(storePrefix + 'view/html_page/fetch', { view })
+  async refresh(context, database, view, fields, storePrefix = '') {
+    await this.fetch(context, database, view, fields, storePrefix)
   }
 
   async afterFieldDeleted(context, field, fieldType, storePrefix = '') {
@@ -140,7 +140,7 @@ export class HtmlPageViewType extends ViewType {
    * actually on screen — a page nobody is looking at costs nothing to leave
    * stale, and it reloads when it is opened.
    */
-  async _refetchIfCurrent({ store, app }, tableId, storePrefix) {
+  async _refetchIfCurrent({ store }, tableId, storePrefix) {
     if (!this.isCurrentView(store, tableId)) {
       return
     }

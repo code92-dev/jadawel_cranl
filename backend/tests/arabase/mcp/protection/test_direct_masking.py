@@ -1,5 +1,6 @@
 import base64
 import json
+from contextlib import nullcontext
 
 from django.db import transaction
 from django.test import override_settings
@@ -16,7 +17,7 @@ from arabase.mcp.protection.models import (
     MCPProtectionMutationAudit,
     MCPProtectionPolicy,
 )
-from arabase.mcp.protection.policy_state import _safe_field_type_name
+from arabase.mcp.protection.policy_state import safe_field_type_name
 from arabase.mcp.protection.vault import (
     MASK_TOKEN_REDIS_PREFIX,
     MaskTokenVaultUnavailable,
@@ -38,6 +39,47 @@ def _token_record_count(redis):
         len(key) == len(MASK_TOKEN_REDIS_PREFIX) + 64
         for key in redis.scan_iter(match=f"{MASK_TOKEN_REDIS_PREFIX}*")
     )
+
+
+def _patch_vault(monkeypatch, vault, *, interceptor=False):
+    """Serve ``vault`` from the egress seam, and the interceptor seam if asked."""
+
+    monkeypatch.setattr(
+        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    )
+    if interceptor:
+        monkeypatch.setattr(
+            "arabase.mcp.protection.interceptor.get_mask_token_vault", lambda: vault
+        )
+
+
+def _in_session(endpoint, script, *, atomic):
+    """Run ``await script(client)`` in one MCP client session as ``endpoint``.
+
+    ``atomic`` wraps the whole session in ``transaction.atomic()``.
+    """
+
+    mcp = JadawelMCPServer()
+    key_token = current_key.set(endpoint.key)
+    try:
+
+        async def inner():
+            async with client_session(mcp._mcp_server) as client:
+                return await script(client)
+
+        with transaction.atomic() if atomic else nullcontext():
+            return async_to_sync(inner)()
+    finally:
+        current_key.reset(key_token)
+
+
+def _call_tool(endpoint, tool_name, arguments, *, atomic):
+    """Call one MCP tool as ``endpoint`` and return its result."""
+
+    async def script(client):
+        return await client.call_tool(tool_name, arguments)
+
+    return _in_session(endpoint, script, atomic=atomic)
 
 
 @pytest.mark.django_db
@@ -67,22 +109,10 @@ def test_list_rows_masks_direct_values_but_preserves_true_empty_values(
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    _patch_vault(monkeypatch, vault)
+    result = _call_tool(
+        endpoint, "list_table_rows", {"table_id": table.id}, atomic=True
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool("list_table_rows", {"table_id": table.id})
-
-        with transaction.atomic():
-            result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
 
     assert result.isError is False
     serialized = result.content[0].text
@@ -115,18 +145,9 @@ def test_vault_configuration_failure_returns_only_safe_error_and_never_plaintext
     monkeypatch.setattr(
         "arabase.mcp.protection.egress.get_mask_token_vault", unavailable_vault
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool("list_table_rows", {"table_id": table.id})
-
-        with transaction.atomic():
-            result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    result = _call_tool(
+        endpoint, "list_table_rows", {"table_id": table.id}, atomic=True
+    )
 
     assert result.isError is True
     assert "vault outage canary" not in result.content[0].text
@@ -161,21 +182,10 @@ def test_policy_revision_change_before_release_discards_complete_response(
             return issued
 
     vault = RacingVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    _patch_vault(monkeypatch, vault)
+    result = _call_tool(
+        endpoint, "list_table_rows", {"table_id": table.id}, atomic=True
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool("list_table_rows", {"table_id": table.id})
-
-        with transaction.atomic():
-            result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
 
     assert result.isError is True
     assert "revision race canary" not in result.content[0].text
@@ -199,41 +209,31 @@ def test_create_and_update_rows_mask_every_direct_protected_value(
     )
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
-    )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
+    _patch_vault(monkeypatch, vault)
 
-    try:
+    async def script(client):
+        created = await client.call_tool(
+            "create_rows",
+            {"table_id": table.id, "rows": [{"Secret": "created canary"}]},
+        )
+        created_row = json.loads(created.content[0].text)[0]
+        assert created.isError is False
+        assert "created canary" not in created.content[0].text
+        assert _is_mask_token(created_row["Secret"])
 
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                created = await client.call_tool(
-                    "create_rows",
-                    {"table_id": table.id, "rows": [{"Secret": "created canary"}]},
-                )
-                created_row = json.loads(created.content[0].text)[0]
-                assert created.isError is False
-                assert "created canary" not in created.content[0].text
-                assert _is_mask_token(created_row["Secret"])
+        updated = await client.call_tool(
+            "update_rows",
+            {
+                "table_id": table.id,
+                "rows": [{"id": created_row["id"], "Secret": "updated canary"}],
+            },
+        )
+        updated_row = json.loads(updated.content[0].text)[0]
+        assert updated.isError is False
+        assert "updated canary" not in updated.content[0].text
+        assert _is_mask_token(updated_row["Secret"])
 
-                updated = await client.call_tool(
-                    "update_rows",
-                    {
-                        "table_id": table.id,
-                        "rows": [{"id": created_row["id"], "Secret": "updated canary"}],
-                    },
-                )
-                updated_row = json.loads(updated.content[0].text)[0]
-                assert updated.isError is False
-                assert "updated canary" not in updated.content[0].text
-                assert _is_mask_token(updated_row["Secret"])
-
-        with transaction.atomic():
-            async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    _in_session(endpoint, script, atomic=True)
 
     assert _token_record_count(redis) == 2
 
@@ -260,29 +260,19 @@ def test_redis_interruption_rolls_back_a_protected_create_batch(
             raise MaskTokenVaultUnavailable
 
     vault = InterruptedVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    _patch_vault(monkeypatch, vault)
+    result = _call_tool(
+        endpoint,
+        "create_rows",
+        {
+            "table_id": table.id,
+            "rows": [
+                {"Secret": "first interruption canary"},
+                {"Secret": "second interruption canary"},
+            ],
+        },
+        atomic=False,
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool(
-                    "create_rows",
-                    {
-                        "table_id": table.id,
-                        "rows": [
-                            {"Secret": "first interruption canary"},
-                            {"Secret": "second interruption canary"},
-                        ],
-                    },
-                )
-
-        result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
 
     assert result.isError is True
     assert json.loads(result.content[0].text)["error"]["code"] == (
@@ -318,29 +308,19 @@ def test_redis_interruption_rolls_back_a_two_hundred_row_update(
             raise MaskTokenVaultUnavailable
 
     vault = InterruptedVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    _patch_vault(monkeypatch, vault)
+    result = _call_tool(
+        endpoint,
+        "update_rows",
+        {
+            "table_id": table.id,
+            "rows": [
+                {"id": row.id, "Secret": f"after interruption {index}"}
+                for index, row in enumerate(rows)
+            ],
+        },
+        atomic=False,
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool(
-                    "update_rows",
-                    {
-                        "table_id": table.id,
-                        "rows": [
-                            {"id": row.id, "Secret": f"after interruption {index}"}
-                            for index, row in enumerate(rows)
-                        ],
-                    },
-                )
-
-        result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
 
     assert result.isError is True
     assert json.loads(result.content[0].text)["error"]["code"] == (
@@ -369,40 +349,23 @@ def test_update_accepts_only_a_same_cell_preservation_token(data_fixture, monkey
     )
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
-    )
-    monkeypatch.setattr(
-        "arabase.mcp.protection.interceptor.get_mask_token_vault", lambda: vault
-    )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
+    _patch_vault(monkeypatch, vault, interceptor=True)
 
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                created = await client.call_tool(
-                    "create_rows", {"table_id": table.id, "rows": [{"Secret": "keep"}]}
-                )
-                created_row = json.loads(created.content[0].text)[0]
-                preserved = await client.call_tool(
-                    "update_rows",
-                    {
-                        "table_id": table.id,
-                        "rows": [
-                            {
-                                "id": created_row["id"],
-                                "Secret": created_row["Secret"],
-                            }
-                        ],
-                    },
-                )
-                return created_row, preserved
+    async def script(client):
+        created = await client.call_tool(
+            "create_rows", {"table_id": table.id, "rows": [{"Secret": "keep"}]}
+        )
+        created_row = json.loads(created.content[0].text)[0]
+        preserved = await client.call_tool(
+            "update_rows",
+            {
+                "table_id": table.id,
+                "rows": [{"id": created_row["id"], "Secret": created_row["Secret"]}],
+            },
+        )
+        return created_row, preserved
 
-        with transaction.atomic():
-            created_row, preserved = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    created_row, preserved = _in_session(endpoint, script, atomic=True)
 
     assert preserved.isError is False
     assert json.loads(preserved.content[0].text)[0]["Secret"] != "keep"
@@ -436,36 +399,23 @@ def test_same_cell_preservation_uses_write_value_for_single_select(
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
-    )
-    monkeypatch.setattr(
-        "arabase.mcp.protection.interceptor.get_mask_token_vault", lambda: vault
-    )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
+    _patch_vault(monkeypatch, vault, interceptor=True)
 
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                listed = await client.call_tool(
-                    "list_table_rows", {"table_id": table.id, "size": 1}
-                )
-                listed_row = json.loads(listed.content[0].text)["results"][0]
-                preserved = await client.call_tool(
-                    "update_rows",
-                    {
-                        "table_id": table.id,
-                        "rows": [
-                            {"id": listed_row["id"], "Status": listed_row["Status"]}
-                        ],
-                    },
-                )
-                return listed_row, preserved
+    async def script(client):
+        listed = await client.call_tool(
+            "list_table_rows", {"table_id": table.id, "size": 1}
+        )
+        listed_row = json.loads(listed.content[0].text)["results"][0]
+        preserved = await client.call_tool(
+            "update_rows",
+            {
+                "table_id": table.id,
+                "rows": [{"id": listed_row["id"], "Status": listed_row["Status"]}],
+            },
+        )
+        return listed_row, preserved
 
-        listed_row, preserved = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    listed_row, preserved = _in_session(endpoint, script, atomic=False)
 
     assert preserved.isError is False
     preserved_row = json.loads(preserved.content[0].text)[0]
@@ -494,12 +444,7 @@ def test_update_omission_and_empty_values_follow_field_semantics(
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
-    )
-    monkeypatch.setattr(
-        "arabase.mcp.protection.interceptor.get_mask_token_vault", lambda: vault
-    )
+    _patch_vault(monkeypatch, vault, interceptor=True)
     captured_updates = []
     from jadawel.contrib.database.mcp import services as mcp_services
 
@@ -510,33 +455,20 @@ def test_update_omission_and_empty_values_follow_field_semantics(
         return original_update_rows(*args, **kwargs)
 
     monkeypatch.setattr(mcp_services, "update_rows", capture_update_rows)
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
 
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                omitted = await client.call_tool(
-                    "update_rows", {"table_id": table.id, "rows": [{"id": row.id}]}
-                )
-                return omitted
-
-        omitted = async_to_sync(inner)()
-        omitted_value = model.objects.get(id=row.id).secret
-
-        async def clear_inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool(
-                    "update_rows",
-                    {
-                        "table_id": table.id,
-                        "rows": [{"id": row.id, "Secret": ""}],
-                    },
-                )
-
-        cleared = async_to_sync(clear_inner)()
-    finally:
-        current_key.reset(key_token)
+    omitted = _call_tool(
+        endpoint,
+        "update_rows",
+        {"table_id": table.id, "rows": [{"id": row.id}]},
+        atomic=False,
+    )
+    omitted_value = model.objects.get(id=row.id).secret
+    cleared = _call_tool(
+        endpoint,
+        "update_rows",
+        {"table_id": table.id, "rows": [{"id": row.id, "Secret": ""}]},
+        atomic=False,
+    )
 
     assert omitted.isError is False
     omitted_row = json.loads(omitted.content[0].text)[0]
@@ -569,37 +501,25 @@ def test_copied_token_rejects_the_entire_update_batch(data_fixture, monkeypatch)
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
-    )
-    monkeypatch.setattr(
-        "arabase.mcp.protection.interceptor.get_mask_token_vault", lambda: vault
-    )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
+    _patch_vault(monkeypatch, vault, interceptor=True)
 
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                listed = await client.call_tool(
-                    "list_table_rows", {"table_id": table.id, "size": 2}
-                )
-                rows = json.loads(listed.content[0].text)["results"]
-                source = next(item for item in rows if item["id"] == first.id)
-                copied = await client.call_tool(
-                    "update_rows",
-                    {
-                        "table_id": table.id,
-                        "rows": [
-                            {"id": second.id, "Secret": source["Secret"]},
-                        ],
-                    },
-                )
-                return copied
+    async def script(client):
+        listed = await client.call_tool(
+            "list_table_rows", {"table_id": table.id, "size": 2}
+        )
+        rows = json.loads(listed.content[0].text)["results"]
+        source = next(item for item in rows if item["id"] == first.id)
+        return await client.call_tool(
+            "update_rows",
+            {
+                "table_id": table.id,
+                "rows": [
+                    {"id": second.id, "Secret": source["Secret"]},
+                ],
+            },
+        )
 
-        copied = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    copied = _in_session(endpoint, script, atomic=False)
 
     assert copied.isError is True
     assert json.loads(copied.content[0].text)["error"]["code"] == (
@@ -647,47 +567,37 @@ def test_tokens_reject_cross_endpoint_cross_field_and_malformed_reuse(
     row = model.objects.create(secret="secret", other="other")
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
-    )
-    monkeypatch.setattr(
-        "arabase.mcp.protection.interceptor.get_mask_token_vault", lambda: vault
-    )
-    mcp = JadawelMCPServer()
+    _patch_vault(monkeypatch, vault, interceptor=True)
 
-    async def call(endpoint_to_use, tool, arguments):
-        key_token = current_key.set(endpoint_to_use.key)
-        try:
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool(tool, arguments)
-        finally:
-            current_key.reset(key_token)
-
-    listed = async_to_sync(call)(
+    listed = _call_tool(
         endpoint,
         "list_table_rows",
         {"table_id": table.id, "size": 1},
+        atomic=False,
     )
     listed_row = json.loads(listed.content[0].text)["results"][0]
     source_token = listed_row["Secret"]
 
-    foreign = async_to_sync(call)(
+    foreign = _call_tool(
         foreign_endpoint,
         "update_rows",
         {"table_id": table.id, "rows": [{"id": row.id, "Secret": source_token}]},
+        atomic=False,
     )
-    copied_to_other_field = async_to_sync(call)(
+    copied_to_other_field = _call_tool(
         endpoint,
         "update_rows",
         {"table_id": table.id, "rows": [{"id": row.id, "Other": source_token}]},
+        atomic=False,
     )
-    malformed_create = async_to_sync(call)(
+    malformed_create = _call_tool(
         endpoint,
         "create_rows",
         {
             "table_id": table.id,
             "rows": [{"Secret": {"$jadawelProtected": {"v": 1, "token": "malformed"}}}],
         },
+        atomic=False,
     )
 
     for result in (foreign, copied_to_other_field, malformed_create):
@@ -717,20 +627,12 @@ def test_protected_search_is_rejected_before_row_query(data_fixture, monkeypatch
     monkeypatch.setattr(
         "jadawel.contrib.database.mcp.services.list_rows", query_must_not_run
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool(
-                    "list_table_rows",
-                    {"table_id": table.id, "search": "sensitive"},
-                )
-
-        result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    result = _call_tool(
+        endpoint,
+        "list_table_rows",
+        {"table_id": table.id, "search": "sensitive"},
+        atomic=False,
+    )
 
     assert result.isError is True
     assert json.loads(result.content[0].text)["error"]["code"] == (
@@ -761,21 +663,12 @@ def test_protection_on_another_table_leaves_unprotected_search_unchanged(
     monkeypatch.setattr(
         "arabase.mcp.protection.egress.get_mask_token_vault", vault_must_not_be_used
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool(
-                    "list_table_rows",
-                    {"table_id": public_table.id, "search": "search canary"},
-                )
-
-        with transaction.atomic():
-            result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    result = _call_tool(
+        endpoint,
+        "list_table_rows",
+        {"table_id": public_table.id, "search": "search canary"},
+        atomic=True,
+    )
 
     assert result.isError is False
     assert json.loads(result.content[0].text)["results"][0]["Name"] == "search canary"
@@ -794,35 +687,28 @@ def test_token_envelopes_are_rejected_on_unprotected_table_mutations(data_fixtur
     )
     public_table = data_fixture.create_database_table(database=database)
     data_fixture.create_text_field(name="Payload", table=public_table, primary=True)
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-
     envelope = {"$jadawelProtected": {"v": 1, "token": "not-a-valid-handle"}}
-    try:
 
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                created = await client.call_tool(
-                    "create_rows",
-                    {"table_id": public_table.id, "rows": [{"Payload": envelope}]},
-                )
-                ordinary = await client.call_tool(
-                    "create_rows",
-                    {"table_id": public_table.id, "rows": [{"Payload": "plain"}]},
-                )
-                ordinary_row = json.loads(ordinary.content[0].text)[0]
-                updated = await client.call_tool(
-                    "update_rows",
-                    {
-                        "table_id": public_table.id,
-                        "rows": [{"id": ordinary_row["id"], "Payload": envelope}],
-                    },
-                )
-                return created, updated
+    async def script(client):
+        created = await client.call_tool(
+            "create_rows",
+            {"table_id": public_table.id, "rows": [{"Payload": envelope}]},
+        )
+        ordinary = await client.call_tool(
+            "create_rows",
+            {"table_id": public_table.id, "rows": [{"Payload": "plain"}]},
+        )
+        ordinary_row = json.loads(ordinary.content[0].text)[0]
+        updated = await client.call_tool(
+            "update_rows",
+            {
+                "table_id": public_table.id,
+                "rows": [{"id": ordinary_row["id"], "Payload": envelope}],
+            },
+        )
+        return created, updated
 
-        created, updated = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    created, updated = _in_session(endpoint, script, atomic=False)
 
     for result in (created, updated):
         assert result.isError is True
@@ -858,21 +744,10 @@ def test_unrelated_broken_dependency_does_not_block_protected_rows(
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    _patch_vault(monkeypatch, vault)
+    result = _call_tool(
+        endpoint, "list_table_rows", {"table_id": table.id}, atomic=True
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool("list_table_rows", {"table_id": table.id})
-
-        with transaction.atomic():
-            result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
 
     assert result.isError is False
     serialized = result.content[0].text
@@ -902,20 +777,10 @@ def test_cross_table_dependant_is_not_added_to_target_row_output(
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    _patch_vault(monkeypatch, vault)
+    result = _call_tool(
+        endpoint, "list_table_rows", {"table_id": table.id}, atomic=False
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool("list_table_rows", {"table_id": table.id})
-
-        result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
 
     assert result.isError is False
     row = json.loads(result.content[0].text)["results"][0]
@@ -947,21 +812,10 @@ def test_broken_dependency_on_a_protected_field_still_fails_closed(
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    _patch_vault(monkeypatch, vault)
+    result = _call_tool(
+        endpoint, "list_table_rows", {"table_id": table.id}, atomic=True
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool("list_table_rows", {"table_id": table.id})
-
-        with transaction.atomic():
-            result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
 
     assert result.isError is True
     assert "protected canary" not in result.content[0].text
@@ -993,36 +847,23 @@ def test_derived_protected_leaf_is_masked_and_display_token_cannot_mutate(
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
-    )
-    monkeypatch.setattr(
-        "arabase.mcp.protection.interceptor.get_mask_token_vault", lambda: vault
-    )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
+    _patch_vault(monkeypatch, vault, interceptor=True)
 
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                listed = await client.call_tool(
-                    "list_table_rows", {"table_id": table.id, "size": 1}
-                )
-                row = json.loads(listed.content[0].text)["results"][0]
-                rejected = await client.call_tool(
-                    "update_rows",
-                    {
-                        "table_id": table.id,
-                        "rows": [
-                            {"id": row["id"], "Derived label": row["Derived label"]}
-                        ],
-                    },
-                )
-                return listed, row, rejected
+    async def script(client):
+        listed = await client.call_tool(
+            "list_table_rows", {"table_id": table.id, "size": 1}
+        )
+        row = json.loads(listed.content[0].text)["results"][0]
+        rejected = await client.call_tool(
+            "update_rows",
+            {
+                "table_id": table.id,
+                "rows": [{"id": row["id"], "Derived label": row["Derived label"]}],
+            },
+        )
+        return listed, row, rejected
 
-        listed, row, rejected = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    listed, row, rejected = _in_session(endpoint, script, atomic=False)
 
     assert listed.isError is False
     serialized = listed.content[0].text
@@ -1052,20 +893,10 @@ def test_cycle_in_protected_provenance_fails_closed(data_fixture, monkeypatch):
 
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
+    _patch_vault(monkeypatch, vault)
+    result = _call_tool(
+        endpoint, "list_table_rows", {"table_id": table.id}, atomic=False
     )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                return await client.call_tool("list_table_rows", {"table_id": table.id})
-
-        result = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
 
     assert result.isError is True
     assert "cycle canary" not in result.content[0].text
@@ -1092,7 +923,7 @@ def test_unknown_protected_field_adapter_fails_closed_with_safe_error(
     monkeypatch.setattr(type(protected), "get_type", broken_adapter)
 
     with pytest.raises(SafeMCPToolError) as exc_info:
-        _safe_field_type_name(protected)
+        safe_field_type_name(protected)
 
     assert exc_info.value.code.name == "PROTECTION_UNAVAILABLE"
     assert exc_info.value.retryable is False
@@ -1115,52 +946,37 @@ def test_two_hundred_row_update_is_all_or_nothing_on_invalid_token(
     )
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(
-        "arabase.mcp.protection.egress.get_mask_token_vault", lambda: vault
-    )
-    monkeypatch.setattr(
-        "arabase.mcp.protection.interceptor.get_mask_token_vault", lambda: vault
-    )
-    mcp = JadawelMCPServer()
-    key_token = current_key.set(endpoint.key)
+    _patch_vault(monkeypatch, vault, interceptor=True)
 
-    try:
-
-        async def inner():
-            async with client_session(mcp._mcp_server) as client:
-                created = await client.call_tool(
-                    "create_rows",
+    async def script(client):
+        created = await client.call_tool(
+            "create_rows",
+            {
+                "table_id": table.id,
+                "rows": [{"Secret": f"batch-{index}"} for index in range(200)],
+            },
+        )
+        assert created.isError is False
+        created_rows = json.loads(created.content[0].text)
+        failed = await client.call_tool(
+            "update_rows",
+            {
+                "table_id": table.id,
+                "rows": [
                     {
-                        "table_id": table.id,
-                        "rows": [{"Secret": f"batch-{index}"} for index in range(200)],
+                        "id": created_rows[0]["id"],
+                        "Secret": created_rows[0]["Secret"],
                     },
-                )
-                assert created.isError is False
-                created_rows = json.loads(created.content[0].text)
-                failed = await client.call_tool(
-                    "update_rows",
                     {
-                        "table_id": table.id,
-                        "rows": [
-                            {
-                                "id": created_rows[0]["id"],
-                                "Secret": created_rows[0]["Secret"],
-                            },
-                            {
-                                "id": created_rows[1]["id"],
-                                "Secret": {
-                                    "$jadawelProtected": {"v": 1, "token": "invalid"}
-                                },
-                            },
-                        ],
+                        "id": created_rows[1]["id"],
+                        "Secret": {"$jadawelProtected": {"v": 1, "token": "invalid"}},
                     },
-                )
-                return created_rows, failed
+                ],
+            },
+        )
+        return created_rows, failed
 
-        with transaction.atomic():
-            created_rows, failed = async_to_sync(inner)()
-    finally:
-        current_key.reset(key_token)
+    created_rows, failed = _in_session(endpoint, script, atomic=True)
 
     assert failed.isError is True
     assert json.loads(failed.content[0].text)["error"]["code"] == (

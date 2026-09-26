@@ -12,12 +12,12 @@ from mcp.shared.memory import (
     create_connected_server_and_client_session as client_session,
 )
 
-import arabase.mcp.protection.vault as vault_module
+import arabase.mcp.protection.vault.records as vault_records
+from arabase.mcp.protection import limits
 from arabase.mcp.protection.models import MCPMaskTokenRecord, MCPProtectedField
 from arabase.mcp.protection.readiness import check_mask_token_vault_readiness
 from arabase.mcp.protection.tokens import extract_mask_token_handle
 from arabase.mcp.protection.vault import (
-    DERIVED_FINGERPRINT_KEY_ID,
     DatabaseMaskTokenVault,
     MaskTokenBinding,
     MaskTokenVaultUnavailable,
@@ -25,6 +25,8 @@ from arabase.mcp.protection.vault import (
     get_mask_token_vault,
     purge_expired_mask_tokens,
 )
+from arabase.mcp.protection.vault.database_backend import _ISSUER_ENDPOINT_LOCK_BASE
+from arabase.mcp.protection.vault.records import DERIVED_FINGERPRINT_KEY_ID
 from jadawel.core.mcp import JadawelMCPServer, current_key
 
 EXPLICIT_KEY = base64.b64encode(b"e" * 32).decode()
@@ -45,6 +47,10 @@ def _binding(endpoint, **overrides):
     }
     values.update(overrides)
     return MaskTokenBinding(**values)
+
+
+def _issue(vault, binding, value):
+    return vault.issue_many([(binding, value)])[0]
 
 
 @override_settings(
@@ -76,7 +82,7 @@ def test_database_vault_stores_only_digests_and_redeems_only_the_same_cell(
     vault = DatabaseMaskTokenVault()
     binding = _binding(endpoint)
 
-    issued = vault.issue(binding, "national id canary")
+    issued = _issue(vault, binding, "national id canary")
 
     record = MCPMaskTokenRecord.objects.get()
     stored = json.dumps(record.record)
@@ -107,7 +113,7 @@ def test_database_vault_ignores_and_purges_expired_tokens(data_fixture):
     endpoint = data_fixture.create_mcp_endpoint()
     vault = DatabaseMaskTokenVault()
     binding = _binding(endpoint)
-    issued = vault.issue(binding, "value")
+    issued = _issue(vault, binding, "value")
     MCPMaskTokenRecord.objects.update(
         expires_at=datetime.now(UTC) - timedelta(seconds=1)
     )
@@ -124,8 +130,8 @@ def test_database_vault_rejects_an_over_capacity_batch_without_partial_records(
 ):
     endpoint = data_fixture.create_mcp_endpoint()
     vault = DatabaseMaskTokenVault()
-    monkeypatch.setattr(vault_module, "MAX_ENDPOINT_TOKENS", 2)
-    vault.issue(_binding(endpoint), "first")
+    monkeypatch.setattr(limits, "MAX_ENDPOINT_TOKENS", 2)
+    _issue(vault, _binding(endpoint), "first")
 
     with pytest.raises(MaskTokenVaultUnavailable):
         vault.issue_many(
@@ -146,7 +152,7 @@ def test_configuring_an_explicit_keyring_revokes_derived_tokens(data_fixture):
     with override_settings(
         MCP_PROTECTION_FINGERPRINT_KEYS={}, MCP_PROTECTION_ACTIVE_KEY_ID=""
     ):
-        issued = vault.issue(binding, "value")
+        issued = _issue(vault, binding, "value")
     handle = extract_mask_token_handle(issued.envelope)
 
     with override_settings(
@@ -154,7 +160,7 @@ def test_configuring_an_explicit_keyring_revokes_derived_tokens(data_fixture):
         MCP_PROTECTION_ACTIVE_KEY_ID="current",
     ):
         assert vault.redeem(handle, binding, "value") is False
-        explicit = vault.issue(replace(binding, row_id=8), "value")
+        explicit = _issue(vault, replace(binding, row_id=8), "value")
         assert (
             vault.redeem(
                 extract_mask_token_handle(explicit.envelope),
@@ -167,9 +173,9 @@ def test_configuring_an_explicit_keyring_revokes_derived_tokens(data_fixture):
 
 @override_settings(SECRET_KEY="first-secret")
 def test_derived_key_changes_with_secret_key():
-    first = vault_module._derived_fingerprint_key()
+    first = vault_records._derived_fingerprint_key()
     with override_settings(SECRET_KEY="second-secret"):
-        second = vault_module._derived_fingerprint_key()
+        second = vault_records._derived_fingerprint_key()
 
     assert len(first) == 32
     assert first != second
@@ -189,19 +195,17 @@ def test_database_vault_is_ready_with_no_configuration():
 def test_database_issuer_admission_fails_closed_while_the_endpoint_is_saturated(
     data_fixture, monkeypatch
 ):
-    from arabase.mcp.protection import capacity
-
-    monkeypatch.setattr(capacity, "ISSUER_WAIT_SECONDS", 0.05)
+    monkeypatch.setattr(limits, "ISSUER_WAIT_SECONDS", 0.05)
     endpoint = data_fixture.create_mcp_endpoint()
     vault = DatabaseMaskTokenVault()
     other = connections.create_connection("default")
     try:
         other.set_autocommit(False)
         with other.cursor() as cursor:
-            for slot in range(capacity.MAX_ACTIVE_ISSUERS_PER_ENDPOINT):
+            for slot in range(limits.MAX_ACTIVE_ISSUERS_PER_ENDPOINT):
                 cursor.execute(
                     "SELECT pg_try_advisory_xact_lock(%s)",
-                    [vault_module._ISSUER_ENDPOINT_LOCK_BASE + endpoint.id * 4 + slot],
+                    [_ISSUER_ENDPOINT_LOCK_BASE + endpoint.id * 4 + slot],
                 )
                 assert cursor.fetchone()[0] is True
 
@@ -261,3 +265,79 @@ def test_list_rows_masks_protected_values_with_no_vault_configuration(data_fixtu
     assert set(row["Secret"]) == {"$jadawelProtected"}
     assert row["Public"] == "shown"
     assert MCPMaskTokenRecord.objects.filter(endpoint=endpoint).count() == 1
+
+
+@pytest.mark.django_db
+@override_settings(MCP_PROTECTION_FINGERPRINT_KEYS={}, MCP_PROTECTION_ACTIVE_KEY_ID="")
+def test_database_vault_issue_many_query_count_on_a_fresh_endpoint(
+    data_fixture, django_assert_num_queries
+):
+    endpoint = data_fixture.create_mcp_endpoint()
+    vault = DatabaseMaskTokenVault()
+
+    # Before the limits were read with one aggregate this was 6 queries: the
+    # savepoint, the purge, a global count, an endpoint count, the insert and
+    # the savepoint release. Both counts now come from a single aggregate.
+    with django_assert_num_queries(5):
+        vault.issue_many(
+            [
+                (_binding(endpoint), "first"),
+                (_binding(endpoint, row_id=8), "second"),
+            ]
+        )
+
+    assert MCPMaskTokenRecord.objects.filter(endpoint=endpoint).count() == 2
+
+
+@pytest.mark.django_db
+@override_settings(MCP_PROTECTION_FINGERPRINT_KEYS={}, MCP_PROTECTION_ACTIVE_KEY_ID="")
+def test_database_vault_endpoint_limit_admits_up_to_and_rejects_past_it(
+    data_fixture, monkeypatch
+):
+    endpoint = data_fixture.create_mcp_endpoint()
+    other = data_fixture.create_mcp_endpoint()
+    vault = DatabaseMaskTokenVault()
+    monkeypatch.setattr(limits, "MAX_ENDPOINT_TOKENS", 3)
+    _issue(vault, _binding(other), "other endpoint")
+    _issue(vault, _binding(endpoint), "first")
+
+    # Reaching the limit exactly is allowed; the other endpoint does not count.
+    vault.issue_many(
+        [
+            (_binding(endpoint, row_id=8), "second"),
+            (_binding(endpoint, row_id=9), "third"),
+        ]
+    )
+    with pytest.raises(MaskTokenVaultUnavailable):
+        _issue(vault, _binding(endpoint, row_id=10), "fourth")
+    # Expired records do not count against the limit.
+    MCPMaskTokenRecord.objects.filter(endpoint=endpoint).update(
+        expires_at=datetime.now(UTC) - timedelta(seconds=1)
+    )
+    _issue(vault, _binding(endpoint, row_id=11), "after expiry")
+
+    assert MCPMaskTokenRecord.objects.filter(endpoint=endpoint).count() == 1
+    assert MCPMaskTokenRecord.objects.filter(endpoint=other).count() == 1
+
+
+@pytest.mark.django_db
+@override_settings(MCP_PROTECTION_FINGERPRINT_KEYS={}, MCP_PROTECTION_ACTIVE_KEY_ID="")
+def test_database_vault_global_limit_counts_every_endpoint(data_fixture, monkeypatch):
+    endpoint = data_fixture.create_mcp_endpoint()
+    other = data_fixture.create_mcp_endpoint()
+    vault = DatabaseMaskTokenVault()
+    monkeypatch.setattr(limits, "MAX_GLOBAL_TOKENS", 3)
+    vault.issue_many(
+        [
+            (_binding(other), "other first"),
+            (_binding(other, row_id=8), "other second"),
+        ]
+    )
+    # Reaching the global limit exactly is allowed.
+    _issue(vault, _binding(endpoint), "first")
+
+    with pytest.raises(MaskTokenVaultUnavailable):
+        _issue(vault, _binding(endpoint, row_id=9), "past the global limit")
+
+    assert MCPMaskTokenRecord.objects.filter(endpoint=endpoint).count() == 1
+    assert MCPMaskTokenRecord.objects.count() == 3

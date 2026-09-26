@@ -10,6 +10,17 @@ from typing import Any, Optional
 from django.contrib.auth.models import AbstractUser
 from django.db import transaction
 
+from arabase.mcp.page.contract import RUNTIME_CONTRACT
+from arabase.mcp.protection.artifact_boundary import (
+    artifact_status_for_view,
+    page_feed_field_ids,
+    protected_output_for_view,
+    request_scope,
+    view_query_uses_protected_fields,
+)
+from arabase.mcp.protection.artifact_commands import submit_mcp_page_change
+from arabase.mcp.protection.egress import mask_table_rows
+from arabase.mcp.protection.policy_state import get_mcp_protection_policy_state
 from arabase.views.exceptions import HtmlPageViewDoesNotExist
 from arabase.views.handler import HtmlPageRevisionHandler
 from arabase.views.models import HtmlPageView
@@ -78,15 +89,41 @@ def list_page_views(
     return [_view_summary(view) for view in views]
 
 
+def _submit_page_change(
+    user: AbstractUser,
+    endpoint,
+    view: HtmlPageView,
+    html: str,
+    protected_field_ids: Optional[list[int]],
+    audience: str,
+    pending_view_values: Optional[dict[str, Any]] = None,
+) -> dict:
+    """
+    Route an MCP page write through the artifact boundary and merge the view
+    summary over its result. The summary is read after the submit, so it shows
+    the view as the submit left it.
+    """
+
+    submit = submit_mcp_page_change(
+        user=user,
+        endpoint=endpoint,
+        view=view,
+        html=html,
+        protected_field_ids=protected_field_ids or [],
+        audience=audience,
+        pending_view_values=pending_view_values,
+    )
+    return {**submit, **_view_summary(view)}
+
+
 def get_page_view(
     user: AbstractUser,
     workspace: Workspace,
     view_id: int,
     include_rows: bool = True,
-    endpoint=None,
+    *,
+    endpoint,
 ) -> dict:
-    from arabase.mcp.page.contract import RUNTIME_CONTRACT
-
     view = _get_page_view(user, workspace, view_id)
     view_type = HtmlPageViewType()
 
@@ -101,20 +138,14 @@ def get_page_view(
         for field_option in visible_field_options.select_related("field")
     ]
 
-    artifact_status = None
-    protected_output = False
-    protected_query_dependency = False
-    if endpoint is not None:
-        from arabase.mcp.protection.artifact_boundary import (
-            artifact_status_for_view,
-            protected_output_for_view,
-            view_query_uses_protected_fields,
-        )
-
+    # Only this pre-read block shares one artifact memo.  The sample read,
+    # its masking and the post-read projection below all run after the
+    # scope has exited, so they recompute from fresh state.
+    with request_scope():
         artifact_status = artifact_status_for_view(view)
-        # A protected MCP read may describe the template and schema, but must
-        # never hand the model raw HTML or an unmasked row sample.  The page
-        # runtime has a separate approval boundary for materialization.
+        # A protected MCP read may describe the template and schema, but
+        # must never hand the model raw HTML or an unmasked row sample.  The
+        # page runtime has a separate approval boundary for materialization.
         try:
             protected_output = bool(protected_output_for_view(view, endpoint))
             protected_query_dependency = view_query_uses_protected_fields(
@@ -129,9 +160,8 @@ def get_page_view(
         "html": None if protected_output else view.html,
         "fields": fields,
         "runtime_contract": RUNTIME_CONTRACT,
+        "artifact": artifact_status,
     }
-    if artifact_status is not None:
-        result["artifact"] = artifact_status
 
     if include_rows and protected_query_dependency:
         # Do not execute the view queryset at all: even a masked sample or
@@ -148,47 +178,35 @@ def get_page_view(
                 list(queryset[:SAMPLE_ROW_COUNT]), model, user_field_names=True
             )
         )
-        if endpoint is not None:
-            from types import SimpleNamespace
-
-            from arabase.mcp.protection.artifact_boundary import page_feed_field_ids
-            from arabase.mcp.protection.egress import mask_direct_row_output
-            from arabase.mcp.protection.policy_state import (
-                get_mcp_protection_policy_state,
-            )
-
-            # The MCP sample follows the same final egress gateway as row
-            # tools.  For a protected artifact, an approval is not needed to
-            # show the model a schema/sample; protected cells remain tokens.
-            policy = get_mcp_protection_policy_state(endpoint)
-            row_sample = mask_direct_row_output(
-                endpoint,
-                SimpleNamespace(table_id=view.table_id),
-                {"results": row_sample},
-                policy,
-            )["results"]
-            try:
-                allowed_ids = page_feed_field_ids(
-                    view, audience="authenticated", user=user
-                )
-            except Exception:
-                # A pending/revoked artifact is still inspectable by the MCP
-                # author as safe metadata and masked sample data; materialized
-                # page feeds remain blocked until approval.
-                allowed_ids = None
-            if allowed_ids is not None:
-                allowed_names = {
-                    field.name
-                    for field in view.table.field_set.filter(id__in=allowed_ids)
+        # The MCP sample follows the same final egress gateway as row
+        # tools.  For a protected artifact, an approval is not needed to
+        # show the model a schema/sample; protected cells remain tokens.
+        policy = get_mcp_protection_policy_state(endpoint)
+        row_sample = mask_table_rows(
+            endpoint,
+            view.table_id,
+            {"results": row_sample},
+            policy,
+        )["results"]
+        try:
+            allowed_ids = page_feed_field_ids(view, audience="authenticated", user=user)
+        except Exception:
+            # A pending/revoked artifact is still inspectable by the MCP
+            # author as safe metadata and masked sample data; materialized
+            # page feeds remain blocked until approval.
+            allowed_ids = None
+        if allowed_ids is not None:
+            allowed_names = {
+                field.name for field in view.table.field_set.filter(id__in=allowed_ids)
+            }
+            row_sample = [
+                {
+                    key: value
+                    for key, value in row.items()
+                    if key in {"id", "order"} or key in allowed_names
                 }
-                row_sample = [
-                    {
-                        key: value
-                        for key, value in row.items()
-                        if key in {"id", "order"} or key in allowed_names
-                    }
-                    for row in row_sample
-                ]
+                for row in row_sample
+            ]
         result["row_count"] = queryset.count()
         result["row_sample"] = row_sample
 
@@ -202,7 +220,8 @@ def create_page_view(
     table_id: int,
     name: str,
     html: Optional[str] = None,
-    endpoint=None,
+    *,
+    endpoint,
     protected_field_ids: Optional[list[int]] = None,
     audience: str = "authenticated",
 ) -> dict:
@@ -214,23 +233,10 @@ def create_page_view(
         name=name,
         html="",
     )
-    if endpoint is not None and html is not None:
-        from arabase.mcp.protection.artifact_boundary import submit_mcp_page_change
-
-        return {
-            **submit_mcp_page_change(
-                user=user,
-                endpoint=endpoint,
-                view=view,
-                html=html,
-                protected_field_ids=protected_field_ids or [],
-                audience=audience,
-            ),
-            **_view_summary(view),
-        }
-    if html:
-        updated = ViewHandler().update_view(user, view, html=html)
-        view = updated.updated_view_instance
+    if html is not None:
+        return _submit_page_change(
+            user, endpoint, view, html, protected_field_ids, audience
+        )
     return _view_summary(view)
 
 
@@ -243,7 +249,8 @@ def update_page_view(
     name: Optional[str] = None,
     allow_external_resources: Optional[bool] = None,
     row_limit: Optional[int] = None,
-    endpoint=None,
+    *,
+    endpoint,
     protected_field_ids: Optional[list[int]] = None,
     audience: str = "authenticated",
 ) -> dict:
@@ -262,28 +269,18 @@ def update_page_view(
     if not values:
         return _view_summary(view)
 
-    if endpoint is not None and html is not None:
-        from arabase.mcp.protection.artifact_boundary import submit_mcp_page_change
-
-        return {
-            **submit_mcp_page_change(
-                user=user,
-                endpoint=endpoint,
-                view=view,
-                html=html,
-                protected_field_ids=protected_field_ids or [],
-                audience=audience,
-                pending_view_values={
-                    key: value for key, value in values.items() if key != "html"
-                },
-            ),
-            **_view_summary(view),
-        }
-
-    # Snapshot before the write, and only when the html is actually changing —
-    # a rename should not push a version out of the history.
-    if html is not None and html != view.html:
-        HtmlPageRevisionHandler().snapshot(view, user)
+    if html is not None:
+        return _submit_page_change(
+            user,
+            endpoint,
+            view,
+            html,
+            protected_field_ids,
+            audience,
+            pending_view_values={
+                key: value for key, value in values.items() if key != "html"
+            },
+        )
 
     updated = ViewHandler().update_view(user, view, **values)
     return _view_summary(updated.updated_view_instance)
@@ -312,7 +309,8 @@ def restore_page_revision(
     workspace: Workspace,
     view_id: int,
     revision_id: int,
-    endpoint=None,
+    *,
+    endpoint,
     protected_field_ids: Optional[list[int]] = None,
     audience: str = "authenticated",
 ) -> dict:
@@ -320,22 +318,6 @@ def restore_page_revision(
     handler = HtmlPageRevisionHandler()
     revision = handler.get_revision(view, revision_id)
 
-    if endpoint is not None:
-        from arabase.mcp.protection.artifact_boundary import submit_mcp_page_change
-
-        return {
-            **submit_mcp_page_change(
-                user=user,
-                endpoint=endpoint,
-                view=view,
-                html=revision.html,
-                protected_field_ids=protected_field_ids or [],
-                audience=audience,
-            ),
-            **_view_summary(view),
-        }
-
-    # Restoring is itself a change worth being able to undo.
-    handler.snapshot(view, user)
-    updated = ViewHandler().update_view(user, view, html=revision.html)
-    return _view_summary(updated.updated_view_instance)
+    return _submit_page_change(
+        user, endpoint, view, revision.html, protected_field_ids, audience
+    )

@@ -130,6 +130,7 @@ import error from '@jadawel/modules/core/mixins/error'
 import McpProtectionFieldSelector from '@jadawel/modules/arabase/mcp/components/McpProtectionFieldSelector'
 import ProtectionPolicyService from '@jadawel/modules/arabase/mcp/services/protectionPolicy'
 import { protectionErrorMap } from '@jadawel/modules/arabase/mcp/protectionErrors'
+import { databasesInWorkspace } from '@jadawel/modules/arabase/mcp/selection'
 
 export default {
   name: 'McpProtectionPolicyEditor',
@@ -155,12 +156,7 @@ export default {
   },
   computed: {
     databases() {
-      return this.applications.filter(
-        (application) =>
-          application.type === 'database' &&
-          (application.workspace?.id || application.workspace_id) ===
-            this.endpoint.workspace_id
-      )
+      return databasesInWorkspace(this.applications, this.endpoint.workspace_id)
     },
     removedFieldIds() {
       const selected = new Set(this.selectedFields.map((field) => field.id))
@@ -256,14 +252,7 @@ export default {
         this.conflict = false
         this.$emit('saved', data)
       } catch (saveError) {
-        const status = saveError?.response?.status
-        if (status === 409) {
-          this.conflict = true
-        } else if (status === 401 || status === 403) {
-          this.readOnly = true
-        } else {
-          this.handleError(saveError, 'endpoint', protectionErrorMap(this.$t))
-        }
+        this.policyWriteFailed(saveError, protectionErrorMap(this.$t))
       } finally {
         this.saving = false
       }
@@ -278,16 +267,28 @@ export default {
         ).reactivatePolicy(this.endpoint.id, this.policy.revision)
         this.$emit('saved', data)
       } catch (reactivationError) {
-        const status = reactivationError?.response?.status
-        if (status === 401 || status === 403) {
-          this.readOnly = true
-        } else if (status === 409) {
-          this.conflict = true
-        } else {
-          this.handleError(reactivationError, 'endpoint')
-        }
+        this.policyWriteFailed(reactivationError, protectionErrorMap(this.$t))
       } finally {
         this.saving = false
+      }
+    },
+    /**
+     * Shared failure handling for save and reactivate: a 409 revision
+     * conflict shows the conflict notice, lost permission switches to
+     * read-only and anything else goes through the error mixin with the
+     * optional map. A 409 `MCP_PROTECTION_NOT_READY` from reactivation is not
+     * a conflict: reloading would not help, so it goes to the error mixin,
+     * which explains why protection stays paused.
+     */
+    policyWriteFailed(error, errorMap = null) {
+      const status = error?.response?.status
+      const code = error?.response?.data?.error
+      if (status === 409 && code !== 'MCP_PROTECTION_NOT_READY') {
+        this.conflict = true
+      } else if (status === 401 || status === 403) {
+        this.readOnly = true
+      } else {
+        this.handleError(error, 'endpoint', errorMap)
       }
     },
     async reloadPolicy() {

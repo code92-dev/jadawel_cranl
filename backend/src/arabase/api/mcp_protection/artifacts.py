@@ -10,8 +10,11 @@ from arabase.api.mcp_protection.serializers import (
     ArtifactRevokeSerializer,
 )
 from arabase.mcp.protection.artifact_boundary import (
-    approve_artifact_draft,
+    artifact_rest_boundary,
     artifact_status_for_view,
+)
+from arabase.mcp.protection.artifact_commands import (
+    approve_artifact_draft,
     revoke_artifact,
     submit_mcp_page_change,
 )
@@ -21,8 +24,10 @@ from arabase.mcp.protection.models import (
 )
 from arabase.views.models import HtmlPageView
 from jadawel.api.decorators import map_exceptions, validate_body
+from jadawel.api.mcp.errors import ERROR_MCP_ENDPOINT_DOES_NOT_EXIST
 from jadawel.contrib.database.views.exceptions import ViewDoesNotExist
 from jadawel.contrib.database.views.handler import ViewHandler
+from jadawel.core.mcp.exceptions import MCPEndpointDoesNotExist
 from jadawel.core.mcp.handler import MCPEndpointHandler
 
 
@@ -40,8 +45,14 @@ def _get_endpoint_and_view(request, endpoint_id: int, view_id: int):
 class ArtifactDraftView(APIView):
     permission_classes = (IsAuthenticated,)
 
-    @map_exceptions({ViewDoesNotExist: ERROR_HTML_PAGE_DOES_NOT_EXIST})
+    @map_exceptions(
+        {
+            ViewDoesNotExist: ERROR_HTML_PAGE_DOES_NOT_EXIST,
+            MCPEndpointDoesNotExist: ERROR_MCP_ENDPOINT_DOES_NOT_EXIST,
+        }
+    )
     @validate_body(ArtifactDraftRequestSerializer, return_validated=True)
+    @artifact_rest_boundary()
     def post(self, request, data):
         endpoint, view = _get_endpoint_and_view(
             request, data["endpoint_id"], data["view_id"]
@@ -55,7 +66,10 @@ class ArtifactDraftView(APIView):
             audience=data["audience"],
             pending_view_values=data["pending_view_values"],
         )
-        return Response(result, status=201 if result.get("draft_id") else 200)
+        # 201 only when this request created a pending draft. A publish answers
+        # 200, although its summary may still carry another pending draft id.
+        created = result.get("status") == "pending_approval"
+        return Response(result, status=201 if created else 200)
 
 
 class ArtifactDraftApprovalView(APIView):
@@ -66,6 +80,7 @@ class ArtifactDraftApprovalView(APIView):
             ArtifactDraft.DoesNotExist: ERROR_HTML_PAGE_DOES_NOT_EXIST,
         }
     )
+    @artifact_rest_boundary()
     def post(self, request, draft_id: int):
         return Response(approve_artifact_draft(user=request.user, draft_id=draft_id))
 
@@ -80,6 +95,7 @@ class ArtifactRevokeView(APIView):
         }
     )
     @validate_body(ArtifactRevokeSerializer, return_validated=True)
+    @artifact_rest_boundary()
     def post(self, request, view_id: int, data):
         return Response(
             revoke_artifact(
@@ -94,6 +110,7 @@ class ArtifactStateView(APIView):
     permission_classes = (IsAuthenticated,)
 
     @map_exceptions({ViewDoesNotExist: ERROR_HTML_PAGE_DOES_NOT_EXIST})
+    @artifact_rest_boundary()
     def get(self, request, view_id: int):
         view = ViewHandler().get_view_as_user(request.user, view_id, HtmlPageView)
         return Response(artifact_status_for_view(view))

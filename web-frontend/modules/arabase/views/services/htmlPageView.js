@@ -14,31 +14,11 @@ export default (client) => {
      * @param {number|string} viewId The view's id, or its slug on a public page
      *   (the public serializer exposes the slug as the view's id).
      */
-    fetchRows({
-      viewId,
-      search = '',
-      searchMode = '',
-      publicUrl = false,
-      publicAuthToken = null,
-      signal = null,
-    }) {
-      const params = new URLSearchParams()
-
-      if (search) {
-        params.append('search', search)
-        if (searchMode) {
-          params.append('search_mode', searchMode)
-        }
-      }
-
-      const config = { params }
+    fetchRows({ viewId, publicUrl = false, publicAuthToken = null }) {
+      const config = { params: new URLSearchParams() }
 
       if (publicAuthToken) {
         addPublicAuthTokenHeader(config, publicAuthToken)
-      }
-
-      if (signal !== null) {
-        config.signal = signal
       }
 
       const suffix = publicUrl ? 'public/rows/' : ''

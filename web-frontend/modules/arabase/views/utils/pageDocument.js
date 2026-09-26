@@ -129,15 +129,13 @@ const BASE_STYLE = `
  * A page can add its own CSP meta and cannot loosen ours by doing so: multiple
  * policies combine restrictively, every one of them has to allow a request.
  */
-function injectedHead(contentSecurityPolicy, includeCharset = false) {
-  const meta = contentSecurityPolicy
-    ? `<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(
-        contentSecurityPolicy
-      )}">`
-    : ''
+function injectedHead(contentSecurityPolicy) {
+  const meta = `<meta http-equiv="Content-Security-Policy" content="${escapeAttribute(
+    contentSecurityPolicy
+  )}">`
   // Charset sits directly behind the policy so it stays inside the first 1024
   // bytes the parser looks at, rather than behind the bootstrap script.
-  const charset = includeCharset ? '<meta charset="utf-8">' : ''
+  const charset = '<meta charset="utf-8">'
   return `${meta}${charset}<style>${BASE_STYLE}</style><script>${BOOTSTRAP_SCRIPT}</script>`
 }
 
@@ -168,10 +166,5 @@ export function buildPageDocument(html, contentSecurityPolicy) {
   // or fragment after this prefix, including merging html/body attributes.
   // Leave the head open so authored titles, styles and metadata still belong
   // to it until the parser encounters the author's body content.
-  return `<!doctype html><html><head>${injectedHead(
-    contentSecurityPolicy,
-    true
-  )}${body}</html>`
+  return `<!doctype html><html><head>${injectedHead(contentSecurityPolicy)}${body}</html>`
 }
-
-export default buildPageDocument

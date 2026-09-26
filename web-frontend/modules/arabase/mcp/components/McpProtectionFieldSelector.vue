@@ -81,7 +81,7 @@
         </button>
       </div>
       <div
-        v-for="table in visibleTables(database)"
+        v-for="table in visibleTablesByDatabase.get(database)"
         :key="table.id"
         class="mcp-protection-selector__table"
       >
@@ -126,7 +126,7 @@
                 :checked="tableSelectionState(table) === 'all'"
                 :indeterminate="tableSelectionState(table) === 'some'"
                 :disabled="disabled || !fieldsByTable[table.id].length"
-                @change="toggleAllFields(table)"
+                @change="toggleAllFields(database, table)"
               />
               {{ $t('mcpProtection.selectAllFields') }}
             </label>
@@ -155,6 +155,7 @@
 
 <script>
 import FieldService from '@jadawel/modules/database/services/field'
+import { selectionEntry } from '@jadawel/modules/arabase/mcp/selection'
 
 export default {
   name: 'McpProtectionFieldSelector',
@@ -187,10 +188,54 @@ export default {
     metadataError() {
       return Object.values(this.errors).some(Boolean)
     },
+    selectedIds() {
+      return new Set(this.modelValue.map((field) => field.id))
+    },
+    visibleTablesByDatabase() {
+      const normalizedQuery = this.query.trim()
+      const query =
+        normalizedQuery.length >= 2 ? normalizedQuery.toLocaleLowerCase() : ''
+      const tablesByDatabase = new Map()
+      for (const database of this.databases) {
+        tablesByDatabase.set(
+          database,
+          database.tables.filter((table) => {
+            if (!query) return true
+            if (
+              `${database.name} ${table.name}`
+                .toLocaleLowerCase()
+                .includes(query)
+            ) {
+              return true
+            }
+            return (this.fieldsByTable[table.id] || []).some((field) =>
+              field.name.toLocaleLowerCase().includes(query)
+            )
+          })
+        )
+      }
+      return tablesByDatabase
+    },
     visibleDatabases() {
       return this.databases.filter(
-        (database) => this.visibleTables(database).length
+        (database) => this.visibleTablesByDatabase.get(database).length
       )
+    },
+    tableSelectionStates() {
+      const states = {}
+      for (const [tableId, tableFields] of Object.entries(this.fieldsByTable)) {
+        const fields = tableFields || []
+        if (!fields.length) {
+          states[tableId] = 'none'
+          continue
+        }
+        const selected = fields.filter((field) =>
+          this.selectedIds.has(field.id)
+        ).length
+        states[tableId] =
+          selected === 0 ? 'none' : selected === fields.length ? 'all' : 'some'
+      }
+      return states
     },
   },
   watch: {
@@ -208,73 +253,33 @@ export default {
         error: this.metadataError,
       })
     },
-    visibleTables(database) {
-      const normalizedQuery = this.query.trim()
-      const query =
-        normalizedQuery.length >= 2 ? normalizedQuery.toLocaleLowerCase() : ''
-      return database.tables.filter((table) => {
-        if (!query) return true
-        if (
-          `${database.name} ${table.name}`.toLocaleLowerCase().includes(query)
-        ) {
-          return true
-        }
-        return (this.fieldsByTable[table.id] || []).some((field) =>
-          field.name.toLocaleLowerCase().includes(query)
-        )
-      })
-    },
     fieldPath(database, table, field) {
       return `${database.name} / ${table.name} / ${field.name}`
     },
     tableSelectionState(table) {
-      const fields = this.fieldsByTable[table.id] || []
-      if (!fields.length) return 'none'
-      const selected = fields.filter((field) =>
-        this.isSelected(field.id)
-      ).length
-      return selected === 0
-        ? 'none'
-        : selected === fields.length
-          ? 'all'
-          : 'some'
+      return this.tableSelectionStates[table.id] || 'none'
     },
-    toggleAllFields(table) {
+    toggleAllFields(database, table) {
       if (this.disabled) return
       const fields = this.fieldsByTable[table.id] || []
-      const selected = new Set(this.modelValue.map((field) => field.id))
-      if (this.tableSelectionState(table) === 'all') {
-        fields.forEach((field) => selected.delete(field.id))
-      } else {
-        fields.forEach((field) => selected.add(field.id))
+      const isAll = this.tableSelectionState(table) === 'all'
+      const tableIds = new Set(fields.map((field) => field.id))
+      const firstById = new Map()
+      for (const entry of this.modelValue) {
+        if (!firstById.has(entry.id)) firstById.set(entry.id, entry)
       }
-      this.$emit(
-        'update:modelValue',
-        fields
-          .filter((field) => selected.has(field.id))
-          .reduce(
-            (result, field) => {
-              const existing = this.modelValue.find(
-                (item) => item.id === field.id
-              )
-              return [
-                ...result,
-                existing || {
-                  id: field.id,
-                  name: field.name,
-                  type: field.type,
-                  table: { id: table.id, name: table.name },
-                },
-              ]
-            },
-            this.modelValue.filter(
-              (field) => !fields.some((item) => item.id === field.id)
-            )
+      const next = this.modelValue.filter((entry) => !tableIds.has(entry.id))
+      if (!isAll) {
+        for (const field of fields) {
+          next.push(
+            firstById.get(field.id) || selectionEntry(field, table, database)
           )
-      )
+        }
+      }
+      this.$emit('update:modelValue', next)
     },
     isSelected(fieldId) {
-      return this.modelValue.some((field) => field.id === fieldId)
+      return this.selectedIds.has(fieldId)
     },
     async toggleTable(database, table) {
       if (this.fieldsByTable[table.id]) {
@@ -330,7 +335,6 @@ export default {
     async selectDatabaseFields(database) {
       if (this.disabled || !this.confirmDatabaseScope) return
       this.databaseLoadingId = database.id
-      this.errors = { ...this.errors }
       this.emitStatus()
       try {
         for (const table of database.tables) {
@@ -346,13 +350,7 @@ export default {
         )
         for (const table of database.tables) {
           for (const field of this.fieldsByTable[table.id] || []) {
-            selected.set(field.id, {
-              id: field.id,
-              name: field.name,
-              type: field.type,
-              table: { id: table.id, name: table.name },
-              database: { id: database.id, name: database.name },
-            })
+            selected.set(field.id, selectionEntry(field, table, database))
           }
         }
         this.$emit('update:modelValue', Array.from(selected.values()))
@@ -377,13 +375,7 @@ export default {
       }
       this.$emit('update:modelValue', [
         ...this.modelValue,
-        {
-          id: field.id,
-          name: field.name,
-          type: field.type,
-          table: { id: table.id, name: table.name },
-          database: { id: database.id, name: database.name },
-        },
+        selectionEntry(field, table, database),
       ])
     },
   },

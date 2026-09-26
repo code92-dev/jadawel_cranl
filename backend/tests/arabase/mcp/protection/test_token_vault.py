@@ -8,18 +8,40 @@ from django.test import override_settings
 import fakeredis
 import pytest
 
-import arabase.mcp.protection.vault as vault_module
-from arabase.mcp.protection.tokens import extract_mask_token_handle
+import arabase.mcp.protection.vault.records as vault_records
+from arabase.mcp.protection import limits
+from arabase.mcp.protection.tokens import GeneratedMaskToken, extract_mask_token_handle
 from arabase.mcp.protection.vault import (
-    MASK_TOKEN_ENDPOINT_INDEX_PREFIX,
     MASK_TOKEN_EXPIRY_INDEX,
-    MASK_TOKEN_TTL_SECONDS,
     MaskTokenBinding,
     MaskTokenVaultUnavailable,
     RedisMaskTokenVault,
+    redis_backend,
 )
+from arabase.mcp.protection.vault.redis_backend import MASK_TOKEN_ENDPOINT_INDEX_PREFIX
 
 FINGERPRINT_KEY = base64.b64encode(b"k" * 32).decode()
+
+
+def _binding(**overrides):
+    values = {
+        "endpoint_id": 7,
+        "workspace_id": 11,
+        "table_id": 13,
+        "row_id": 17,
+        "field_id": 19,
+        "policy_revision": 2,
+        "access_generation": 3,
+        "operation_class": "preserve_cell",
+        "observed_row_state": "2026-08-30T12:00:00+00:00",
+        "field_type": "text",
+    }
+    values.update(overrides)
+    return MaskTokenBinding(**values)
+
+
+def _issue(vault, binding, value):
+    return vault.issue_many([(binding, value)])[0]
 
 
 @override_settings(
@@ -29,21 +51,10 @@ FINGERPRINT_KEY = base64.b64encode(b"k" * 32).decode()
 def test_vault_issues_fresh_digest_only_tokens_with_fixed_ttl():
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    binding = MaskTokenBinding(
-        endpoint_id=7,
-        workspace_id=11,
-        table_id=13,
-        row_id=17,
-        field_id=19,
-        policy_revision=2,
-        access_generation=3,
-        operation_class="preserve_cell",
-        observed_row_state="2026-08-30T12:00:00+00:00",
-        field_type="text",
-    )
+    binding = _binding()
 
-    first = vault.issue(binding, "Saudi national identifier")
-    second = vault.issue(binding, "Saudi national identifier")
+    first = _issue(vault, binding, "Saudi national identifier")
+    second = _issue(vault, binding, "Saudi national identifier")
 
     assert first.envelope != second.envelope
     assert first.envelope == {"$jadawelProtected": {"v": 1, "token": first.raw_handle}}
@@ -59,7 +70,10 @@ def test_vault_issues_fresh_digest_only_tokens_with_fixed_ttl():
     assert record["operation_class"] == "preserve_cell"
     assert record["fingerprint_key_id"] == "current"
     assert len(record["value_fingerprint"]) == 64
-    assert redis.ttl(f"jadawel:mcp-protection:v1:{digest}") == MASK_TOKEN_TTL_SECONDS
+    assert (
+        redis.ttl(f"jadawel:mcp-protection:v1:{digest}")
+        == limits.MASK_TOKEN_TTL_SECONDS
+    )
 
 
 @override_settings(
@@ -69,18 +83,7 @@ def test_vault_issues_fresh_digest_only_tokens_with_fixed_ttl():
 def test_vault_issues_one_atomic_batch_with_one_redis_script(monkeypatch):
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    binding = MaskTokenBinding(
-        endpoint_id=7,
-        workspace_id=11,
-        table_id=13,
-        row_id=17,
-        field_id=19,
-        policy_revision=2,
-        access_generation=3,
-        operation_class="preserve_cell",
-        observed_row_state="2026-08-30T12:00:00+00:00",
-        field_type="text",
-    )
+    binding = _binding()
     script_calls = 0
     original_register_script = redis.register_script
 
@@ -118,19 +121,8 @@ def test_vault_issues_one_atomic_batch_with_one_redis_script(monkeypatch):
 def test_vault_rejects_an_over_capacity_batch_without_partial_records(monkeypatch):
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(vault_module, "MAX_GLOBAL_TOKENS", 1)
-    binding = MaskTokenBinding(
-        endpoint_id=7,
-        workspace_id=11,
-        table_id=13,
-        row_id=17,
-        field_id=19,
-        policy_revision=2,
-        access_generation=3,
-        operation_class="preserve_cell",
-        observed_row_state="2026-08-30T12:00:00+00:00",
-        field_type="text",
-    )
+    monkeypatch.setattr(limits, "MAX_GLOBAL_TOKENS", 1)
+    binding = _binding()
 
     with pytest.raises(MaskTokenVaultUnavailable):
         vault.issue_many(
@@ -150,30 +142,19 @@ def test_vault_rejects_an_over_capacity_batch_without_partial_records(monkeypatc
 def test_vault_collision_does_not_overwrite_or_release_the_existing_token(monkeypatch):
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    binding = MaskTokenBinding(
-        endpoint_id=7,
-        workspace_id=11,
-        table_id=13,
-        row_id=17,
-        field_id=19,
-        policy_revision=2,
-        access_generation=3,
-        operation_class="preserve_cell",
-        observed_row_state="2026-08-30T12:00:00+00:00",
-        field_type="text",
-    )
-    first = vault.issue(binding, "first value")
+    binding = _binding()
+    first = _issue(vault, binding, "first value")
     key = f"jadawel:mcp-protection:v1:{first.digest}"
     original_record = redis.get(key)
 
     monkeypatch.setattr(
-        vault_module,
+        vault_records,
         "generate_mask_token",
-        lambda: vault_module.GeneratedMaskToken(first.raw_handle, first.digest),
+        lambda: GeneratedMaskToken(first.raw_handle, first.digest),
     )
 
     with pytest.raises(MaskTokenVaultUnavailable):
-        vault.issue(replace(binding, row_id=18), "second value")
+        _issue(vault, replace(binding, row_id=18), "second value")
 
     assert redis.get(key) == original_record
     assert redis.zcard(MASK_TOKEN_EXPIRY_INDEX) == 1
@@ -187,19 +168,8 @@ def test_vault_collision_does_not_overwrite_or_release_the_existing_token(monkey
 def test_vault_redeems_only_the_same_cell_and_current_value():
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    binding = MaskTokenBinding(
-        endpoint_id=7,
-        workspace_id=11,
-        table_id=13,
-        row_id=17,
-        field_id=19,
-        policy_revision=2,
-        access_generation=3,
-        operation_class="preserve_cell",
-        observed_row_state="2026-08-30T12:00:00+00:00",
-        field_type="text",
-    )
-    issued = vault.issue(binding, "same cell")
+    binding = _binding()
+    issued = _issue(vault, binding, "same cell")
     handle = extract_mask_token_handle(issued.envelope)
 
     assert handle == issued.raw_handle
@@ -235,19 +205,8 @@ def test_vault_redeems_only_the_same_cell_and_current_value():
 def test_vault_rejects_foreign_stale_and_display_only_bindings(variant):
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    binding = MaskTokenBinding(
-        endpoint_id=7,
-        workspace_id=11,
-        table_id=13,
-        row_id=17,
-        field_id=19,
-        policy_revision=2,
-        access_generation=3,
-        operation_class="preserve_cell",
-        observed_row_state="2026-08-30T12:00:00+00:00",
-        field_type="text",
-    )
-    issued = vault.issue(binding, "same cell")
+    binding = _binding()
+    issued = _issue(vault, binding, "same cell")
 
     assert (
         vault.redeem(
@@ -266,19 +225,8 @@ def test_vault_rejects_foreign_stale_and_display_only_bindings(variant):
 def test_vault_expiry_revokes_a_token_without_plaintext_fallback():
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    binding = MaskTokenBinding(
-        endpoint_id=7,
-        workspace_id=11,
-        table_id=13,
-        row_id=17,
-        field_id=19,
-        policy_revision=2,
-        access_generation=3,
-        operation_class="preserve_cell",
-        observed_row_state="2026-08-30T12:00:00+00:00",
-        field_type="text",
-    )
-    issued = vault.issue(binding, "same cell")
+    binding = _binding()
+    issued = _issue(vault, binding, "same cell")
     digest_key = f"jadawel:mcp-protection:v1:{issued.digest}"
     redis.expire(digest_key, -1)
 
@@ -292,26 +240,15 @@ def test_vault_expiry_revokes_a_token_without_plaintext_fallback():
 def test_vault_capacity_is_reserved_atomically_and_released_on_cleanup(monkeypatch):
     redis = fakeredis.FakeRedis(decode_responses=True)
     vault = RedisMaskTokenVault(redis_client=redis)
-    monkeypatch.setattr(vault_module, "MAX_GLOBAL_TOKENS", 1)
-    binding = MaskTokenBinding(
-        endpoint_id=7,
-        workspace_id=11,
-        table_id=13,
-        row_id=17,
-        field_id=19,
-        policy_revision=2,
-        access_generation=3,
-        operation_class="preserve_cell",
-        observed_row_state="2026-08-30T12:00:00+00:00",
-        field_type="text",
-    )
+    monkeypatch.setattr(limits, "MAX_GLOBAL_TOKENS", 1)
+    binding = _binding()
 
-    first = vault.issue(binding, "first")
+    first = _issue(vault, binding, "first")
     with pytest.raises(MaskTokenVaultUnavailable):
-        vault.issue(binding, "second")
+        _issue(vault, binding, "second")
 
     vault.delete([first.digest])
-    second = vault.issue(binding, "second")
+    second = _issue(vault, binding, "second")
     assert second.digest != first.digest
 
 
@@ -334,18 +271,102 @@ def test_production_vault_stops_issuance_at_memory_safety_floor(monkeypatch):
     )
     monkeypatch.setattr(redis, "info", lambda section: {"used_memory": 60})
     with pytest.raises(MaskTokenVaultUnavailable):
-        vault.issue(
-            MaskTokenBinding(
-                endpoint_id=7,
-                workspace_id=11,
-                table_id=13,
-                row_id=17,
-                field_id=19,
-                policy_revision=2,
-                access_generation=3,
-                operation_class="preserve_cell",
-                observed_row_state="2026-08-30T12:00:00+00:00",
-                field_type="text",
-            ),
-            "blocked at floor",
-        )
+        _issue(vault, _binding(), "blocked at floor")
+
+
+def _recording_from_url(monkeypatch):
+    """Patch Redis.from_url with a fakeredis factory that records each call."""
+
+    calls = []
+
+    def from_url(url, **kwargs):
+        calls.append((url, kwargs))
+        return fakeredis.FakeRedis(decode_responses=kwargs["decode_responses"])
+
+    monkeypatch.setattr(redis_backend.Redis, "from_url", from_url)
+    return calls
+
+
+@override_settings(
+    MCP_PROTECTION_REDIS_URL="redis://m08-share-a/0",
+    MCP_PROTECTION_ALLOW_SHARED_REDIS=False,
+)
+def test_vaults_share_one_redis_client_per_url(monkeypatch):
+    monkeypatch.setattr(redis_backend, "_CLIENTS", {})
+    calls = _recording_from_url(monkeypatch)
+
+    first = RedisMaskTokenVault()
+    second = RedisMaskTokenVault()
+    with override_settings(MCP_PROTECTION_REDIS_URL="redis://m08-share-b/0"):
+        other = RedisMaskTokenVault()
+
+    assert first.redis is second.redis
+    assert other.redis is not first.redis
+    assert calls == [
+        (
+            "redis://m08-share-a/0",
+            {
+                "decode_responses": True,
+                "socket_connect_timeout": 0.25,
+                "socket_timeout": 0.5,
+            },
+        ),
+        (
+            "redis://m08-share-b/0",
+            {
+                "decode_responses": True,
+                "socket_connect_timeout": 0.25,
+                "socket_timeout": 0.5,
+            },
+        ),
+    ]
+
+
+@override_settings(
+    MCP_PROTECTION_REDIS_URL="redis://m08-fork/0",
+    MCP_PROTECTION_ALLOW_SHARED_REDIS=False,
+)
+def test_a_forked_process_gets_its_own_redis_client(monkeypatch):
+    monkeypatch.setattr(redis_backend, "_CLIENTS", {})
+    calls = _recording_from_url(monkeypatch)
+
+    parent = RedisMaskTokenVault()
+    monkeypatch.setattr(redis_backend.os, "getpid", lambda: -1)
+    child = RedisMaskTokenVault()
+
+    assert child.redis is not parent.redis
+    assert len(calls) == 2
+
+
+@override_settings(
+    MCP_PROTECTION_REDIS_URL="redis://m08-rejected/0",
+    MCP_PROTECTION_ALLOW_SHARED_REDIS=False,
+)
+@pytest.mark.parametrize("error", [TypeError, ValueError])
+def test_a_rejected_redis_url_fails_closed_and_is_not_cached(monkeypatch, error):
+    monkeypatch.setattr(redis_backend, "_CLIENTS", {})
+    calls = []
+
+    def from_url(url, **kwargs):
+        calls.append(url)
+        raise error("bad url")
+
+    monkeypatch.setattr(redis_backend.Redis, "from_url", from_url)
+
+    for _attempt in range(2):
+        with pytest.raises(MaskTokenVaultUnavailable) as raised:
+            RedisMaskTokenVault()
+        assert isinstance(raised.value.__cause__, error)
+
+    assert calls == ["redis://m08-rejected/0", "redis://m08-rejected/0"]
+    assert redis_backend._CLIENTS == {}
+
+
+def test_an_injected_redis_client_bypasses_the_shared_clients(monkeypatch):
+    monkeypatch.setattr(redis_backend, "_CLIENTS", {})
+    calls = _recording_from_url(monkeypatch)
+    redis = fakeredis.FakeRedis(decode_responses=True)
+
+    assert RedisMaskTokenVault(redis_client=redis).redis is redis
+    assert calls == []
+    assert redis_backend._CLIENTS == {}

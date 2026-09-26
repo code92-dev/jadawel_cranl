@@ -93,18 +93,25 @@ class HtmlPageViewType(ViewType):
     def before_public_info(self, view: HtmlPageView, user) -> None:
         """Enforce the artifact binding before the generic public serializer runs."""
 
-        from arabase.mcp.protection.artifact_boundary import page_runtime_access
+        from arabase.mcp.protection.artifact_boundary import (
+            artifact_rest_boundary,
+            page_runtime_access,
+        )
 
-        page_runtime_access(view, audience="public", user=user)
+        with artifact_rest_boundary():
+            page_runtime_access(view, audience="public", user=user)
 
     def handle_view_update(self, values: dict, view: HtmlPageView, user):
         """Return a safe pending result for direct REST source edits."""
 
-        from arabase.mcp.protection.artifact_boundary import (
+        from arabase.mcp.protection.artifact_boundary import artifact_rest_boundary
+        from arabase.mcp.protection.artifact_commands import (
             human_page_update_as_artifact,
         )
 
-        return human_page_update_as_artifact(user=user, view=view, values=values)
+        # Core PATCH runs this hook inside a transaction, so the 423 rolls it back.
+        with artifact_rest_boundary():
+            return human_page_update_as_artifact(user=user, view=view, values=values)
 
     def get_api_urls(self):
         from arabase.api.html_page import urls as api_urls

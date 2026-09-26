@@ -10,10 +10,4 @@ export default (client) => ({
       `/arabase/mcp/protection/artifacts/drafts/${draftId}/approve/`
     )
   },
-  revoke(viewId, reason = 'manual_revocation') {
-    return client.post(
-      `/arabase/mcp/protection/artifacts/views/${viewId}/revoke/`,
-      { reason }
-    )
-  },
 })

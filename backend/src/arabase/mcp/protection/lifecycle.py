@@ -5,8 +5,6 @@ from django.db import transaction
 from django.db.models import F
 from django.db.models.signals import post_delete, post_save, pre_delete, pre_save
 
-from rest_framework.exceptions import PermissionDenied
-
 from arabase.mcp.protection.models import (
     MCPProtectedField,
     MCPProtectedFieldState,
@@ -19,10 +17,8 @@ from jadawel.contrib.database.fields.models import Field
 from jadawel.contrib.database.fields.registries import field_type_registry
 from jadawel.contrib.database.models import Database
 from jadawel.contrib.database.table.models import Table
-from jadawel.core.mcp.exceptions import MCPEndpointDoesNotExist
 from jadawel.core.mcp.models import MCPEndpoint
 from jadawel.core.models import (
-    WORKSPACE_USER_PERMISSION_ADMIN,
     UserProfile,
     Workspace,
     WorkspaceUser,
@@ -77,79 +73,6 @@ def record_policy_became_nonempty(*, policy: MCPProtectionPolicy, actor=None) ->
         access_generation=policy.access_generation,
         metadata={"protected_field_count": policy.protected_fields.count()},
     )
-
-
-@transaction.atomic
-def delete_ownerless_suspended_endpoint(*, user, endpoint_id: int) -> None:
-    """Let a workspace admin remove only an endpoint with no viable owner.
-
-    The owner-only core MCP delete path remains unchanged.  This additive path is
-    intentionally narrower: an admin must be an active workspace administrator,
-    the endpoint must be suspended or protection-blocked, and the original owner
-    must no longer be an active workspace member/account.  The audit is written
-    before deletion and survives through its nullable endpoint foreign key.
-    """
-
-    try:
-        endpoint = (
-            MCPEndpoint.objects.select_for_update(of=("self",))
-            .select_related("workspace", "user__profile", "arabase_protection_policy")
-            .get(id=endpoint_id)
-        )
-    except MCPEndpoint.DoesNotExist as exc:
-        raise MCPEndpointDoesNotExist from exc
-
-    if not getattr(user, "is_authenticated", False) or not user.is_active:
-        raise PermissionDenied(
-            "Only an active workspace administrator may delete this endpoint."
-        )
-    if (
-        endpoint.workspace.trashed
-        or not WorkspaceUser.objects.filter(
-            user_id=user.id,
-            workspace_id=endpoint.workspace_id,
-            permissions=WORKSPACE_USER_PERMISSION_ADMIN,
-        ).exists()
-    ):
-        raise PermissionDenied(
-            "Only a workspace administrator may delete this endpoint."
-        )
-
-    policy = endpoint.arabase_protection_policy
-    if policy.lifecycle_status not in (
-        MCPProtectionLifecycleStatus.SUSPENDED,
-        MCPProtectionLifecycleStatus.PROTECTION_BLOCKED,
-    ):
-        raise PermissionDenied(
-            "Only a suspended or blocked ownerless endpoint may be deleted."
-        )
-
-    owner_active_member = (
-        endpoint.user is not None
-        and endpoint.user.is_active
-        and not getattr(getattr(endpoint.user, "profile", None), "to_be_deleted", False)
-        and WorkspaceUser.objects.filter(
-            user_id=endpoint.user_id,
-            workspace_id=endpoint.workspace_id,
-        ).exists()
-    )
-    if owner_active_member:
-        raise PermissionDenied(
-            "The endpoint owner must be inactive or absent from the workspace."
-        )
-
-    MCPProtectionLifecycleAudit.objects.create(
-        endpoint=endpoint,
-        actor=user,
-        event_type="ownerless_admin_delete",
-        from_lifecycle_status=policy.lifecycle_status,
-        to_lifecycle_status="deleted",
-        reason_code=policy.safe_reason_code,
-        policy_revision=policy.revision,
-        access_generation=policy.access_generation,
-        metadata={"endpoint_id": endpoint.id},
-    )
-    endpoint.delete()
 
 
 def _bump_policies(endpoint_ids, *, reason=None, lifecycle_status=None):
@@ -243,45 +166,27 @@ def _suspend_workspace_policies(workspace_id: int, suspended: bool) -> None:
             )
 
 
-def _set_hierarchy_protection_state(
-    *, table_ids=None, database_ids=None, trashed: bool
-):
-    relation_filter = {}
-    if table_ids is not None:
-        relation_filter["field__table_id__in"] = table_ids
-    if database_ids is not None:
-        relation_filter["field__table__database_id__in"] = database_ids
-    relations = MCPProtectedField.objects.filter(**relation_filter)
-    if not relations.exists():
-        return
-    endpoint_ids = list(
-        relations.values_list("policy__endpoint_id", flat=True).distinct()
-    )
-    if trashed:
-        relations.filter(state=MCPProtectedFieldState.ACTIVE).update(
-            state=MCPProtectedFieldState.SUSPENDED,
-            safe_reason_code=MCPProtectionSafeReason.POLICY_RELATION_INVALID,
-        )
-        _bump_policies(
-            endpoint_ids,
-            reason=MCPProtectionSafeReason.POLICY_RELATION_INVALID,
-            lifecycle_status=MCPProtectionLifecycleStatus.PROTECTION_BLOCKED,
-        )
-        return
+def _block_relations(relations, endpoint_ids, reason) -> None:
+    """Suspend the active relations and block their policies for ``reason``.
 
-    # A parent can be restored before all of its children. Keep the policy
-    # blocked until every stable field identity is usable again.
-    relations.filter(
+    ``endpoint_ids`` may be a lazy queryset; ``_bump_policies`` evaluates it
+    after the relation update, exactly where the callers used to.
+    """
+
+    relations.filter(state=MCPProtectedFieldState.ACTIVE).update(
         state=MCPProtectedFieldState.SUSPENDED,
-        safe_reason_code=MCPProtectionSafeReason.POLICY_RELATION_INVALID,
-        field__trashed=False,
-        field__table__trashed=False,
-        field__table__database__trashed=False,
-    ).update(
-        state=MCPProtectedFieldState.ACTIVE,
-        safe_reason_code=MCPProtectionSafeReason.NONE,
+        safe_reason_code=reason,
     )
-    _bump_policies(endpoint_ids)
+    _bump_policies(
+        endpoint_ids,
+        reason=reason,
+        lifecycle_status=MCPProtectionLifecycleStatus.PROTECTION_BLOCKED,
+    )
+
+
+def _reactivate_policies_without_suspended_fields(endpoint_ids) -> None:
+    """Return each policy with no suspended relation to ``ACTIVE``."""
+
     for policy in MCPProtectionPolicy.objects.filter(endpoint_id__in=endpoint_ids):
         if policy.protected_fields.filter(
             state=MCPProtectedFieldState.SUSPENDED
@@ -302,6 +207,67 @@ def _set_hierarchy_protection_state(
         )
 
 
+def _set_hierarchy_protection_state(
+    *, table_ids=None, database_ids=None, trashed: bool
+):
+    relation_filter = {}
+    if table_ids is not None:
+        relation_filter["field__table_id__in"] = table_ids
+    if database_ids is not None:
+        relation_filter["field__table__database_id__in"] = database_ids
+    relations = MCPProtectedField.objects.filter(**relation_filter)
+    if not relations.exists():
+        return
+    endpoint_ids = list(
+        relations.values_list("policy__endpoint_id", flat=True).distinct()
+    )
+    if trashed:
+        _block_relations(
+            relations, endpoint_ids, MCPProtectionSafeReason.POLICY_RELATION_INVALID
+        )
+        return
+
+    # A parent can be restored before all of its children. Keep the policy
+    # blocked until every stable field identity is usable again.
+    relations.filter(
+        state=MCPProtectedFieldState.SUSPENDED,
+        safe_reason_code=MCPProtectionSafeReason.POLICY_RELATION_INVALID,
+        field__trashed=False,
+        field__table__trashed=False,
+        field__table__database__trashed=False,
+    ).update(
+        state=MCPProtectedFieldState.ACTIVE,
+        safe_reason_code=MCPProtectionSafeReason.NONE,
+    )
+    _bump_policies(endpoint_ids)
+    _reactivate_policies_without_suspended_fields(endpoint_ids)
+
+
+def _snapshot_field_state(pk) -> dict | None:
+    """Return the stored content-blind field state, or ``None`` if absent.
+
+    An adapter that cannot be resolved is itself an unprovable conversion. Keep
+    the ``None`` field-type sentinel so the post-save hook blocks the policy
+    rather than allowing a potentially lossy value through.
+    """
+
+    previous = (
+        Field.objects_and_trash.filter(pk=pk)
+        .values("content_type_id", "trashed", "name")
+        .first()
+    )
+    if previous is None:
+        return None
+    try:
+        previous_model = ContentType.objects.get_for_id(
+            previous["content_type_id"]
+        ).model_class()
+        previous["field_type"] = field_type_registry.get_by_model(previous_model).type
+    except Exception:
+        previous["field_type"] = None
+    return previous
+
+
 def _capture_field_state(sender, instance: Field, **kwargs):
     if not isinstance(instance, Field):
         return
@@ -313,25 +279,7 @@ def _capture_field_state(sender, instance: Field, **kwargs):
         if not hasattr(instance, "_mcp_protection_previous_state"):
             instance._mcp_protection_previous_state = None
         return
-    previous = (
-        Field.objects_and_trash.filter(pk=instance.pk)
-        .values("content_type_id", "trashed", "name")
-        .first()
-    )
-    if previous is not None:
-        try:
-            previous_model = ContentType.objects.get_for_id(
-                previous["content_type_id"]
-            ).model_class()
-            previous["field_type"] = field_type_registry.get_by_model(
-                previous_model
-            ).type
-        except Exception:
-            # An adapter that cannot be resolved is itself an unprovable
-            # conversion. Keep the sentinel so the post-save hook blocks the
-            # policy rather than allowing a potentially lossy value through.
-            previous["field_type"] = None
-    instance._mcp_protection_previous_state = previous
+    instance._mcp_protection_previous_state = _snapshot_field_state(instance.pk)
 
 
 def _capture_field_delete_state(sender, instance: Field, **kwargs):
@@ -345,20 +293,9 @@ def _capture_field_delete_state(sender, instance: Field, **kwargs):
 
     if not isinstance(instance, Field) or not instance.pk:
         return
-    previous = (
-        Field.objects_and_trash.filter(pk=instance.pk)
-        .values("content_type_id", "trashed", "name")
-        .first()
-    )
+    previous = _snapshot_field_state(instance.pk)
     if previous is None:
         return
-    try:
-        previous_model = ContentType.objects.get_for_id(
-            previous["content_type_id"]
-        ).model_class()
-        previous["field_type"] = field_type_registry.get_by_model(previous_model).type
-    except Exception:
-        previous["field_type"] = None
     instance._mcp_protection_previous_state = previous
     instance._mcp_protection_relation_exists = MCPProtectedField.objects.filter(
         field_id=instance.pk
@@ -429,36 +366,24 @@ def _field_changed(sender, instance: Field, created: bool, **kwargs):
             or instance.table.database.trashed
         )
         if hierarchy_trashed:
-            active_relations = relations.filter(state=MCPProtectedFieldState.ACTIVE)
-            active_relations.update(
-                state=MCPProtectedFieldState.SUSPENDED,
-                safe_reason_code=MCPProtectionSafeReason.POLICY_RELATION_INVALID,
-            )
-            _bump_policies(
+            _block_relations(
+                relations,
                 relations.values_list("policy__endpoint_id", flat=True),
-                reason=MCPProtectionSafeReason.POLICY_RELATION_INVALID,
-                lifecycle_status=MCPProtectionLifecycleStatus.PROTECTION_BLOCKED,
+                MCPProtectionSafeReason.POLICY_RELATION_INVALID,
             )
         elif changed_type and not _supported_protected_field_conversion(
             previous.get("field_type"),
             _safe_current_field_type(instance),
         ):
-            active_relations = relations.filter(state=MCPProtectedFieldState.ACTIVE)
-            active_relations.update(
-                state=MCPProtectedFieldState.SUSPENDED,
-                safe_reason_code=MCPProtectionSafeReason.FIELD_TYPE_CONVERSION_UNSUPPORTED,
-            )
-            _bump_policies(
+            _block_relations(
+                relations,
                 relations.values_list("policy__endpoint_id", flat=True),
-                reason=MCPProtectionSafeReason.FIELD_TYPE_CONVERSION_UNSUPPORTED,
-                lifecycle_status=MCPProtectionLifecycleStatus.PROTECTION_BLOCKED,
+                MCPProtectionSafeReason.FIELD_TYPE_CONVERSION_UNSUPPORTED,
             )
         elif changed_type or changed_trash or changed_name:
-            if changed_trash and not (
-                instance.trashed
-                or instance.table.trashed
-                or instance.table.database.trashed
-            ):
+            # Only reached when ``hierarchy_trashed`` is false, so the field,
+            # its table and its database are all untrashed here.
+            if changed_trash:
                 relations.filter(
                     state=MCPProtectedFieldState.SUSPENDED,
                     safe_reason_code=MCPProtectionSafeReason.POLICY_RELATION_INVALID,
@@ -470,30 +395,8 @@ def _field_changed(sender, instance: Field, created: bool, **kwargs):
                 relations.values_list("policy__endpoint_id", flat=True).distinct()
             )
             _bump_policies(endpoint_ids)
-            if changed_trash and not instance.trashed:
-                for policy in MCPProtectionPolicy.objects.filter(
-                    endpoint_id__in=endpoint_ids
-                ):
-                    if not policy.protected_fields.filter(
-                        state=MCPProtectedFieldState.SUSPENDED
-                    ).exists():
-                        previous_status = policy.lifecycle_status
-                        policy.lifecycle_status = MCPProtectionLifecycleStatus.ACTIVE
-                        policy.safe_reason_code = MCPProtectionSafeReason.NONE
-                        policy.save(
-                            update_fields=[
-                                "lifecycle_status",
-                                "safe_reason_code",
-                                "updated_on",
-                            ]
-                        )
-                        record_mcp_protection_lifecycle_transition(
-                            policy=policy,
-                            from_lifecycle_status=previous_status,
-                            to_lifecycle_status=policy.lifecycle_status,
-                            reason_code=MCPProtectionSafeReason.NONE,
-                            metadata={"trigger": "hierarchy_restored"},
-                        )
+            if changed_trash:
+                _reactivate_policies_without_suspended_fields(endpoint_ids)
 
 
 def _reject_unsupported_protected_field_conversion(
@@ -537,17 +440,6 @@ def _workspace_changed(sender, instance: Workspace, created: bool, **kwargs):
     previous = getattr(instance, "_mcp_protection_previous_trash_state", None)
     if not created and previous is not None and previous != instance.trashed:
         _suspend_workspace_policies(instance.id, instance.trashed)
-
-
-def _capture_workspace_state(sender, instance: Workspace, **kwargs):
-    if not instance.pk:
-        instance._mcp_protection_previous_trash_state = None
-        return
-    instance._mcp_protection_previous_trash_state = (
-        Workspace.objects_and_trash.filter(pk=instance.pk)
-        .values_list("trashed", flat=True)
-        .first()
-    )
 
 
 def _capture_hierarchy_state(sender, instance, **kwargs):
@@ -702,7 +594,7 @@ def connect_mcp_protection_lifecycle() -> None:
         dispatch_uid="arabase_mcp_protection_field_changed",
     )
     pre_save.connect(
-        _capture_workspace_state,
+        _capture_hierarchy_state,
         sender=Workspace,
         dispatch_uid="arabase_capture_mcp_protection_workspace_state",
     )

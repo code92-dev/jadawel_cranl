@@ -13,7 +13,7 @@ from arabase.mcp.protection.readiness import check_mcp_protection_policy_readine
 from arabase.mcp.protection.vault import (
     VAULT_BACKEND_REDIS,
     MaskTokenVaultUnavailable,
-    _load_active_fingerprint_key,
+    load_active_fingerprint_key,
     mask_token_vault_backend,
 )
 from jadawel.core.mcp.models import MCPEndpoint
@@ -81,7 +81,7 @@ class Command(BaseCommand):
             policy__lifecycle_status=MCPProtectionLifecycleStatus.ACTIVE,
         ).exists():
             try:
-                _load_active_fingerprint_key()
+                load_active_fingerprint_key()
             except MaskTokenVaultUnavailable:
                 violations.append("FINGERPRINT_KEY_INVALID")
             if (

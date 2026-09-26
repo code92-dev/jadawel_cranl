@@ -23,7 +23,7 @@ FINGERPRINT_KEY = base64.b64encode(b"f" * 32).decode()
 def vault_not_ready(monkeypatch):
     # The database vault is ready in tests; simulate a vault that is not.
     monkeypatch.setattr(
-        "arabase.mcp.protection.admission.check_mask_token_vault_readiness",
+        "arabase.mcp.protection.readiness.check_mask_token_vault_readiness",
         lambda: MCPProtectionReadiness(
             False, MCPProtectionSafeReason.PROTECTION_REDIS_UNAVAILABLE
         ),

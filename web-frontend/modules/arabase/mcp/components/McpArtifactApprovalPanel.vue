@@ -90,7 +90,7 @@ export default {
     readOnly: { type: Boolean, required: true },
     canUpdate: { type: Boolean, required: true },
   },
-  emits: ['approved', 'state'],
+  emits: ['approved'],
   data() {
     return {
       state: null,
@@ -127,7 +127,6 @@ export default {
           this.view.id
         )
         this.state = data
-        this.$emit('state', data)
       } catch {
         // A page without an MCP artifact is the normal path. Keep this panel
         // silent when the state endpoint is unavailable to a read-only user.
@@ -144,7 +143,6 @@ export default {
           this.$client
         ).approveDraft(this.state.draft_id)
         this.state = data
-        this.$emit('state', data)
         this.$emit('approved')
       } finally {
         this.saving = false

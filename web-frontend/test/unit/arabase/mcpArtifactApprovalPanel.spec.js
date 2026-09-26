@@ -2,7 +2,7 @@ import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { vi } from 'vitest'
 import flushPromises from 'flush-promises'
 
-import McpArtifactApprovalPanel from '@jadawel/modules/arabase/views/components/McpArtifactApprovalPanel'
+import McpArtifactApprovalPanel from '@jadawel/modules/arabase/mcp/components/McpArtifactApprovalPanel'
 
 const fetchState = vi.fn()
 const approveDraft = vi.fn()

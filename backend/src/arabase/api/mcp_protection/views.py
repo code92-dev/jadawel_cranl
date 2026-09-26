@@ -1,5 +1,12 @@
 from django.db import transaction
-from django.db.models import Count, Exists, OuterRef, Q
+from django.db.models import (
+    Count,
+    Exists,
+    OuterRef,
+    Prefetch,
+    Q,
+    prefetch_related_objects,
+)
 
 from drf_spectacular.utils import extend_schema
 from rest_framework import status
@@ -17,24 +24,25 @@ from arabase.api.mcp_protection.serializers import (
     ReactivateMCPProtectionPolicySerializer,
     UpdateMCPProtectionPolicySerializer,
 )
-from arabase.mcp.protection.admission import MCPProtectionVaultNotReady
-from arabase.mcp.protection.creation import (
-    create_protected_mcp_endpoint,
-    validate_idempotency_key,
-)
-from arabase.mcp.protection.editing import (
-    MCPProtectionPolicyConflict,
-    MCPProtectionPolicyNotReady,
-    reactivate_mcp_protection_policy,
-    replace_mcp_protection_policy,
-)
-from arabase.mcp.protection.lifecycle import delete_ownerless_suspended_endpoint
 from arabase.mcp.protection.models import (
+    MCPProtectedField,
     MCPProtectedFieldState,
     MCPProtectionLifecycleStatus,
     MCPProtectionPolicy,
 )
-from arabase.mcp.protection.readiness import check_mcp_protection_policy_readiness
+from arabase.mcp.protection.policy_commands import (
+    MCPProtectionPolicyConflict,
+    MCPProtectionPolicyNotReady,
+    create_protected_mcp_endpoint,
+    delete_ownerless_suspended_endpoint,
+    reactivate_mcp_protection_policy,
+    replace_mcp_protection_policy,
+    validate_idempotency_key,
+)
+from arabase.mcp.protection.readiness import (
+    MCPProtectionVaultNotReady,
+    check_mcp_protection_policy_readiness,
+)
 from jadawel.api.decorators import map_exceptions, validate_body
 from jadawel.api.errors import ERROR_GROUP_DOES_NOT_EXIST, ERROR_USER_NOT_IN_GROUP
 from jadawel.api.mcp.errors import (
@@ -79,6 +87,30 @@ def _may_display_field_metadata(user, field) -> bool:
     return True
 
 
+def _policy_response(user, policy: MCPProtectionPolicy) -> Response:
+    """Serialize ``policy`` with the field metadata ``user`` may see."""
+
+    prefetch_related_objects(
+        [policy],
+        Prefetch(
+            "protected_fields",
+            queryset=MCPProtectedField.objects.select_related(
+                "field__table__database__workspace"
+            ),
+        ),
+    )
+    display_field_ids = {
+        relation.field_id
+        for relation in policy.protected_fields.all()
+        if _may_display_field_metadata(user, relation.field)
+    }
+    return Response(
+        MCPProtectionPolicySerializer(
+            policy, context={"display_field_ids": display_field_ids}
+        ).data
+    )
+
+
 class MCPProtectionPolicyView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -93,29 +125,22 @@ class MCPProtectionPolicyView(APIView):
     @map_exceptions({MCPEndpointDoesNotExist: ERROR_MCP_ENDPOINT_DOES_NOT_EXIST})
     def get(self, request: Request, endpoint_id: int) -> Response:
         endpoint = MCPEndpointHandler().get_endpoint(request.user, endpoint_id)
-        policy = MCPProtectionPolicy.objects.prefetch_related(
-            "protected_fields__field__table__database__workspace"
-        ).get(endpoint=endpoint)
-        display_field_ids = {
-            relation.field_id
-            for relation in policy.protected_fields.all()
-            if _may_display_field_metadata(request.user, relation.field)
-        }
-        return Response(
-            MCPProtectionPolicySerializer(
-                policy, context={"display_field_ids": display_field_ids}
-            ).data
-        )
+        policy = MCPProtectionPolicy.objects.get(endpoint=endpoint)
+        return _policy_response(request.user, policy)
 
     @extend_schema(
         tags=["Arabase MCP protection"],
         operation_id="replace_mcp_protection_policy",
         request=UpdateMCPProtectionPolicySerializer,
-        responses={200: MCPProtectionPolicySerializer},
+        responses={
+            200: MCPProtectionPolicySerializer,
+            404: get_error_schema(["ERROR_MCP_ENDPOINT_DOES_NOT_EXIST"]),
+        },
     )
     @validate_body(UpdateMCPProtectionPolicySerializer)
     @map_exceptions(
         {
+            MCPEndpointDoesNotExist: ERROR_MCP_ENDPOINT_DOES_NOT_EXIST,
             MCPProtectionPolicyConflict: ("MCP_PROTECTION_REVISION_CONFLICT", 409),
             MCPProtectionVaultNotReady: ERROR_MCP_PROTECTION_NOT_READY,
         }
@@ -130,19 +155,7 @@ class MCPProtectionPolicyView(APIView):
             idempotency_key=idempotency_key,
             **data,
         )
-        policy = result.policy
-        display_field_ids = {
-            relation.field_id
-            for relation in policy.protected_fields.select_related(
-                "field__table__database__workspace"
-            ).all()
-            if _may_display_field_metadata(request.user, relation.field)
-        }
-        return Response(
-            MCPProtectionPolicySerializer(
-                policy, context={"display_field_ids": display_field_ids}
-            ).data
-        )
+        return _policy_response(request.user, result.policy)
 
     # The policy is a full-set replacement; keep PATCH for existing clients and
     # accept PUT for clients that model replacement semantics explicitly.
@@ -152,11 +165,15 @@ class MCPProtectionPolicyView(APIView):
         tags=["Arabase MCP protection"],
         operation_id="reactivate_mcp_protection_policy",
         request=ReactivateMCPProtectionPolicySerializer,
-        responses={200: MCPProtectionPolicySerializer},
+        responses={
+            200: MCPProtectionPolicySerializer,
+            404: get_error_schema(["ERROR_MCP_ENDPOINT_DOES_NOT_EXIST"]),
+        },
     )
     @validate_body(ReactivateMCPProtectionPolicySerializer)
     @map_exceptions(
         {
+            MCPEndpointDoesNotExist: ERROR_MCP_ENDPOINT_DOES_NOT_EXIST,
             MCPProtectionPolicyConflict: ("MCP_PROTECTION_REVISION_CONFLICT", 409),
             MCPProtectionPolicyNotReady: ("MCP_PROTECTION_NOT_READY", 409),
         }
@@ -165,18 +182,7 @@ class MCPProtectionPolicyView(APIView):
         policy = reactivate_mcp_protection_policy(
             user=request.user, endpoint_id=endpoint_id, **data
         )
-        display_field_ids = {
-            relation.field_id
-            for relation in policy.protected_fields.select_related(
-                "field__table__database__workspace"
-            ).all()
-            if _may_display_field_metadata(request.user, relation.field)
-        }
-        return Response(
-            MCPProtectionPolicySerializer(
-                policy, context={"display_field_ids": display_field_ids}
-            ).data
-        )
+        return _policy_response(request.user, policy)
 
     @extend_schema(
         tags=["Arabase MCP protection"],

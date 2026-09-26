@@ -13,13 +13,15 @@ from rest_framework.status import (
 from arabase.mcp.page import services
 from arabase.mcp.protection.artifact_boundary import (
     ArtifactExposureBlocked,
-    approve_artifact_draft,
     page_feed_field_ids,
     page_runtime_access,
+)
+from arabase.mcp.protection.artifact_commands import (
+    approve_artifact_draft,
     revoke_artifact,
     submit_mcp_page_change,
-    validate_artifact_html,
 )
+from arabase.mcp.protection.artifact_fingerprints import validate_artifact_html
 from arabase.mcp.protection.models import (
     ArtifactApproval,
     ArtifactAudience,
@@ -29,8 +31,11 @@ from arabase.mcp.protection.models import (
     ArtifactProvenance,
     MCPProtectedField,
 )
+from arabase.views.models import HtmlPageView
 from arabase.views.view_types import HtmlPageViewType
 from jadawel.contrib.database.views.handler import ViewHandler
+from jadawel.contrib.database.views.operations import UpdateViewOperationType
+from jadawel.core.handler import CoreHandler
 
 PAGE_V1 = "<!doctype html><body><h1>v1</h1></body>"
 PAGE_V2 = "<!doctype html><body><h1>v2</h1></body>"
@@ -294,6 +299,67 @@ def test_manual_artifact_revocation_blocks_document_and_row_projection(protected
         page_runtime_access(view, user=user)
     with pytest.raises(ArtifactExposureBlocked):
         page_feed_field_ids(view, user=user)
+
+
+def _approved_authenticated_page(protected_page):
+    user, _workspace, _table, secret, _visible, endpoint, view = protected_page
+    pending = submit_mcp_page_change(
+        user=user,
+        endpoint=endpoint,
+        view=view,
+        html=PAGE_V2,
+        protected_field_ids=[secret.id],
+    )
+    approve_artifact_draft(user=user, draft_id=pending["draft_id"])
+    view = HtmlPageView.objects.get(id=view.id)
+    assert page_runtime_access(view, user=user).allowed_protected_field_ids == {
+        secret.id
+    }
+    return user, view
+
+
+def _patch_update_view_permission(monkeypatch, outcome):
+    original = CoreHandler.check_permissions
+
+    def check_permissions(self, actor, operation_name, *args, **kwargs):
+        if (
+            operation_name == UpdateViewOperationType.type
+            and "raise_permission_exceptions" in kwargs
+        ):
+            return outcome()
+        return original(self, actor, operation_name, *args, **kwargs)
+
+    monkeypatch.setattr(CoreHandler, "check_permissions", check_permissions)
+
+
+@pytest.mark.django_db
+def test_authenticated_access_never_fails_open_on_a_permission_error(
+    protected_page, monkeypatch
+):
+    user, view = _approved_authenticated_page(protected_page)
+
+    def older_manager():
+        raise TypeError("older manager")
+
+    _patch_update_view_permission(monkeypatch, older_manager)
+
+    with pytest.raises(TypeError):
+        page_runtime_access(HtmlPageView.objects.get(id=view.id), user=user)
+    with pytest.raises(TypeError):
+        page_feed_field_ids(HtmlPageView.objects.get(id=view.id), user=user)
+
+
+@pytest.mark.django_db
+def test_authenticated_access_is_blocked_without_view_update_permission(
+    protected_page, monkeypatch
+):
+    user, view = _approved_authenticated_page(protected_page)
+    _patch_update_view_permission(monkeypatch, lambda: False)
+
+    with pytest.raises(ArtifactExposureBlocked):
+        page_runtime_access(HtmlPageView.objects.get(id=view.id), user=user)
+    with pytest.raises(ArtifactExposureBlocked):
+        page_feed_field_ids(HtmlPageView.objects.get(id=view.id), user=user)
 
 
 @pytest.mark.django_db

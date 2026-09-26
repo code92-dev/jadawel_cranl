@@ -30,26 +30,19 @@ export const mutations = {
     state.truncated = truncated
     state.loaded = true
   },
-  RESET(state) {
-    state.loading = false
-    state.loaded = false
-    state.rows = []
-    state.count = 0
-    state.rowLimit = 0
-    state.truncated = false
+  RESET(current) {
+    Object.assign(current, state())
   },
 }
 
 export const actions = {
-  async fetch({ commit, rootGetters }, { view, search = '', searchMode = '' }) {
+  async fetch({ commit, rootGetters }, { view }) {
     const isPublic = rootGetters['page/view/public/getIsPublic']
     commit('SET_LOADING', true)
 
     try {
       const { data } = await HtmlPageViewService(this.$client).fetchRows({
         viewId: view.id,
-        search,
-        searchMode,
         publicUrl: isPublic,
         publicAuthToken: isPublic
           ? rootGetters['page/view/public/getAuthToken']

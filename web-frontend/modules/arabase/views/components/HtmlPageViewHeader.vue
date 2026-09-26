@@ -18,7 +18,7 @@
       <HtmlPageSourceModal
         ref="sourceModal"
         :view="view"
-        :read-only="readOnly || !canUpdate"
+        :read-only="sourceReadOnly"
         @save="updateHtml"
       ></HtmlPageSourceModal>
     </li>
@@ -38,7 +38,7 @@
       <HtmlPageSettingsContext
         ref="settingsContext"
         :view="view"
-        :read-only="readOnly || !canUpdate"
+        :read-only="sourceReadOnly"
         @update="updateSettings"
       ></HtmlPageSettingsContext>
     </li>
@@ -53,18 +53,17 @@
     :read-only="readOnly"
     :can-update="canUpdate"
     @approved="refresh"
-    @state="artifactState = $event"
   ></McpArtifactApprovalPanel>
 </template>
 
 <script>
 import { mapState } from 'vuex'
 
-import ArtifactApprovalService from '@jadawel/modules/arabase/mcp/services/artifactApproval'
+import { submitSourceEditAsDraft } from '@jadawel/modules/arabase/mcp/artifactDrafts'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
 import HtmlPageSettingsContext from '@jadawel/modules/arabase/views/components/HtmlPageSettingsContext'
 import HtmlPageSourceModal from '@jadawel/modules/arabase/views/components/HtmlPageSourceModal'
-import McpArtifactApprovalPanel from '@jadawel/modules/arabase/views/components/McpArtifactApprovalPanel'
+import McpArtifactApprovalPanel from '@jadawel/modules/arabase/mcp/components/McpArtifactApprovalPanel'
 
 export default {
   name: 'HtmlPageViewHeader',
@@ -82,11 +81,6 @@ export default {
     storePrefix: { type: String, required: true },
   },
   emits: ['refresh'],
-  data() {
-    return {
-      artifactState: null,
-    }
-  },
   computed: {
     ...mapState({
       tableLoading: (state) => state.table.loading,
@@ -111,6 +105,9 @@ export default {
         this.database.workspace.id
       )
     },
+    sourceReadOnly() {
+      return this.readOnly || !this.canUpdate
+    },
   },
   methods: {
     refresh() {
@@ -124,30 +121,11 @@ export default {
     },
     async update(values) {
       try {
-        // A source edit on a managed MCP page is a new candidate, never a
-        // direct write. The state endpoint is content-blind and provides only
-        // the stable endpoint/manifest needed to submit the draft.
-        if (values.html !== undefined) {
-          const { data: state } = await ArtifactApprovalService(
-            this.$client
-          ).fetchState(this.view.id)
-          this.artifactState = state
-          if (
-            state.artifact_state !== 'unmanaged' &&
-            state.endpoint_id !== null
-          ) {
-            await ArtifactApprovalService(this.$client).createDraft({
-              endpoint_id: state.endpoint_id,
-              view_id: this.view.id,
-              html: values.html,
-              protected_field_ids: state.protected_field_ids || [],
-              audience: state.audience || 'authenticated',
-              pending_view_values: Object.fromEntries(
-                Object.entries(values).filter(([key]) => key !== 'html')
-              ),
-            })
-            return
-          }
+        if (
+          values.html !== undefined &&
+          (await submitSourceEditAsDraft(this.$client, this.view, values))
+        ) {
+          return
         }
         await this.$store.dispatch('view/update', {
           view: this.view,

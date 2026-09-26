@@ -1,5 +1,5 @@
 <template>
-  <form class="mcp-protection-flow" @submit.prevent="create">
+  <form class="mcp-protection-flow" @submit.prevent="submit">
     <ol
       class="mcp-protection-flow__steps"
       :aria-label="$t('mcpProtection.steps')"
@@ -101,12 +101,7 @@
           type="button"
           class="button button--primary"
           data-test-id="create-protected-endpoint"
-          :disabled="
-            loading ||
-            metadataStatus.loading ||
-            metadataStatus.error ||
-            (!selectedFields.length && !confirmEmptyPolicy)
-          "
+          :disabled="!canCreate"
           @click="create"
         >
           {{ $t('mcpEndpointSettings.createEndpoint') }}
@@ -123,6 +118,7 @@ import McpProtectionFieldSelector from '@jadawel/modules/arabase/mcp/components/
 import McpProtectionReview from '@jadawel/modules/arabase/mcp/components/McpProtectionReview'
 import ProtectionPolicyService from '@jadawel/modules/arabase/mcp/services/protectionPolicy'
 import { protectionErrorMap } from '@jadawel/modules/arabase/mcp/protectionErrors'
+import { databasesInWorkspace } from '@jadawel/modules/arabase/mcp/selection'
 
 export default {
   name: 'McpProtectionFlow',
@@ -147,12 +143,7 @@ export default {
   },
   computed: {
     databases() {
-      return this.applications.filter(
-        (application) =>
-          application.type === 'database' &&
-          (application.workspace?.id || application.workspace_id) ===
-            this.workspaceId
-      )
+      return databasesInWorkspace(this.applications, this.workspaceId)
     },
     workspaceName() {
       return (
@@ -160,8 +151,21 @@ export default {
           ?.name || ''
       )
     },
+    canCreate() {
+      return !(
+        this.loading ||
+        this.metadataStatus.loading ||
+        this.metadataStatus.error ||
+        (!this.selectedFields.length && !this.confirmEmptyPolicy)
+      )
+    },
   },
   methods: {
+    /** Implicit submission (Enter in an input) may only create from the review step. */
+    submit() {
+      if (this.step !== 3 || !this.canCreate) return
+      return this.create()
+    },
     resetPolicySelection() {
       this.selectedFields = []
       this.confirmEmptyPolicy = false
