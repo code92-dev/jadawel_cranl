@@ -51,12 +51,13 @@ export class AutomationApplicationType extends ApplicationType {
   }
 
   /**
-   * Jadawel fork: automations are hidden from the "add new" context until the
-   * feature is ready for our users. Existing automations keep working — this
-   * only removes it as a creation option.
+   * Jadawel fork: automations are offered in the "add new" context to instance
+   * administrators (staff) only, while the feature is prepared for everyone.
+   * Existing automations keep working for every member — this only gates
+   * creation.
    */
   canBeCreated() {
-    return false
+    return this.app.$store.getters['auth/isStaff']
   }
 
   getApplicationContextComponent() {

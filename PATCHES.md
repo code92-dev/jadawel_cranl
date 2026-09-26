@@ -1615,3 +1615,22 @@ fingerprint key defaults to one derived from `SECRET_KEY`. Redis stays available
 | `backend/src/jadawel/config/settings/base.py` | Added `MCP_PROTECTION_VAULT` (`JADAWEL_MCP_PROTECTION_VAULT`, `auto`) | Select the database or Redis mask-token vault; `auto` needs no configuration | low        |
 
 **Tests:** `backend/tests/arabase/mcp/protection/test_database_vault.py`.
+
+## Admin-only builder and automation creation (2026-09-26)
+
+**Context:** The application builder ("تطبيق") and automation ("أتمتة") were hidden
+from the "add new" context for everyone (see _Arabic terminology pass + hide
+unfinished app types_ above). They are now offered to instance administrators
+(staff) only, so they can be exercised on a real instance before every member gets
+them. It is still a creation gate, not authorization: existing applications of both
+kinds keep loading for every member, and the backend create endpoint is unchanged.
+The Sanad assistant that ships alongside is entirely additive
+(`backend/src/arabase/sanad/`, `web-frontend/modules/arabase/sanad/`) and is
+described in `docs/SANAD_AI_ASSISTANT.md`.
+
+| File                                                  | Change                                                                       | Reason                                        | Merge risk |
+| ----------------------------------------------------- | ---------------------------------------------------------------------------- | --------------------------------------------- | ---------- |
+| `web-frontend/modules/builder/applicationTypes.js`    | `canBeCreated()` returns `$store.getters['auth/isStaff']` instead of `false` | Offer "تطبيق" to instance administrators only | low        |
+| `web-frontend/modules/automation/applicationTypes.js` | Same                                                                         | Offer "أتمتة" to instance administrators only | low        |
+
+**Tests:** `web-frontend/test/unit/arabase/sanad.spec.js` (`admin-only features`).

@@ -44,12 +44,13 @@ export class BuilderApplicationType extends ApplicationType {
   }
 
   /**
-   * Jadawel fork: the application builder is hidden from the "add new" context
-   * until the feature is ready for our users. Existing builder applications
-   * keep working — this only removes it as a creation option.
+   * Jadawel fork: the application builder is offered in the "add new" context
+   * to instance administrators (staff) only, while the feature is prepared for
+   * everyone. Existing builder applications keep working for every member —
+   * this only gates creation.
    */
   canBeCreated() {
-    return false
+    return this.app.$store.getters['auth/isStaff']
   }
 
   getApplicationFormComponent() {
