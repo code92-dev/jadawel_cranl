@@ -35,6 +35,12 @@ class ArabaseConfig(AppConfig):
         # page, and Mistral is switched off for now (arabase.generative_ai).
         apply_provider_policy()
 
+        from arabase.generative_ai.usage import install as keep_token_counts
+
+        # pydantic-ai records zero tokens for models that report reasoning
+        # tokens, which Sanad's budget counts (arabase.generative_ai.usage).
+        keep_token_counts()
+
         from arabase.integrations.local_jadawel.service_types import (
             LocalJadawelGroupedAggregateRowsUserServiceType,
         )

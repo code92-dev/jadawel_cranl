@@ -304,6 +304,10 @@ kept in `SanadUsage` (one row per workspace and month) and enforced by
   `UsageLimits.total_tokens_limit`, so it overshoots by at most one response.
   Turns running at the same moment in one workspace each see the same remainder,
   so together they can overshoot by up to one turn's worth each.
+  Token counts depend on `arabase.generative_ai.usage`: pydantic-ai 1.106 with
+  genai-prices 0.1.6 records **zero** tokens for any model that reports
+  reasoning tokens (DeepSeek through OpenRouter, for one), and that wrapper
+  keeps the counts. `test_generative_ai_usage.py` says when it can go.
 
 A used-up allowance refuses a new message with `ERROR_SANAD_BUDGET_EXCEEDED`
 (HTTP 429) and stops a running turn with `SANAD_ERROR_BUDGET_EXCEEDED`; the
