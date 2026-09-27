@@ -140,6 +140,18 @@ Terms introduced by the Excel/ODS import and export features. Keep "Excel",
 | Protected derivative | مشتق محمي | A value that would reproduce or expose information from a protected field. |
 | Fingerprint key | مفتاح البصمة | The server-side HMAC key that binds a mask token to the cell value it replaced. Derived from `SECRET_KEY` unless an operator configures a keyring; never user data. |
 
+## Application builder and automation
+
+Terms core's builder and automation modules already use; recorded here because
+Sanad's tool labels and skills repeat them.
+
+| English | Arabic | Notes |
+|---------|--------|-------|
+| Element (builder) | عنصر | pl. عناصر. A piece of an application page (heading, table, form…). Same word as a dashboard Widget; the surrounding screen tells them apart. |
+| Theme (application) | سمة | An application's colours, fonts and styles. The user's interface theme is also سمة. |
+| Data source | مصدر البيانات | What feeds a page element or widget with rows. |
+| Workflow | سير العمل | One automation flow: a trigger followed by its steps. |
+
 ## Sanad AI assistant
 
 | English | Arabic | Notes |
@@ -149,8 +161,10 @@ Terms introduced by the Excel/ODS import and export features. Keep "Excel",
 | AI provider | مزوّد الذكاء الاصطناعي | OpenAI, Claude (Anthropic), Ollama, OpenRouter. Provider and product names stay in Latin script. |
 | Chat | محادثة | pl. محادثات. One conversation with Sanad. |
 | Model (AI) | النموذج | The generative AI model; keep the provider/model token (e.g. `openai/gpt-5`) in Latin script. |
-| Approve (an action) | الموافقة / وافق | Confirming a destructive action Sanad asked to run. |
+| Approve (an action) | الموافقة / وافق | Confirming a destructive action Sanad asked to run. The approval buttons name the action itself: حذف / إبقاء (Delete / Keep) for a deletion, نشر / ليس الآن (Publish / Not now) for publishing a workflow. |
 | Decline | رفض | |
+| Instance administrator | مسؤول الخادم | pl. مسؤولو الخادم (مسؤولي الخادم after a preposition). Staff users: the only ones who can use Sanad and manage AI provider keys. |
+| Ask Sanad | الاستعانة بسند | Button that hands a task to Sanad; verbal noun, like الاستعانة بمهارة. |
 | Beta | بيتا | Badge on features still being introduced; matches the existing app-type badge. |
 | Skill (Sanad) | مهارة | pl. مهارات. Expert guidance Sanad loads for one kind of work; "consulted a skill" = الاستعانة بمهارة. |
 | Revision (Page view) | نسخة سابقة | pl. النسخ السابقة. A page's earlier document, kept on every rewrite; restore = استعادة نسخة سابقة. |
