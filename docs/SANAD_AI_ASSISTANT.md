@@ -103,13 +103,13 @@ keys_), so there is deliberately no per-workspace setting.
 ## How it works
 
 ```
-panel ──POST message──▶ API ──on commit──▶ Celery `arabase.sanad.run_turn`
+panel ──POST message──▶ API ──on commit──▶ runner thread (web process)
   ▲                                                │ pydantic-ai agent + tools
   └──── polls GET chat every 1.5 s ◀──── message status / actions saved per tool
 ```
 
 - **Backend** — `backend/src/arabase/sanad/`: `models.py` (`SanadChat`,
-  `SanadMessage`), `tools.py`, `agent.py`, `handler.py`, `tasks.py`; API in
+  `SanadMessage`), `tools.py`, `agent.py`, `handler.py`, `runner.py`; API in
   `backend/src/arabase/api/sanad/` under `/api/arabase/sanad/`; migration
   `arabase/0019_sanad_chat`.
 - **Model** — core's `generative_ai_model_type_registry` returns a pydantic-ai model
@@ -119,9 +119,22 @@ panel ──POST message──▶ API ──on commit──▶ Celery `arabase.s
   directly, not through the MCP registry's interceptor, because protected-field
   policies belong to an MCP endpoint and a chat has none. View, filter and sort
   tools use the same action types as the UI, so undo works.
-- **Turns run in Celery** (`celery` queue, 5-minute limit, at most 25 model
-  requests per turn). A turn stuck `pending` for 10 minutes is marked failed so the
-  chat is usable again.
+- **Turns run on a background thread in the web process, not in Celery**
+  (`runner.py`, at most 4 at once per web process). A turn is mostly waiting on
+  the provider, often for a minute or more. The small-plan deployment runs one
+  Celery worker with a concurrency of 1 (`JADAWEL_RUN_MINIMAL`), which also runs
+  automation workflows, publish jobs and realtime updates. When turns were a
+  Celery task they held that only slot, so the rows Sanad added could not trigger
+  their automations, and its own publish job could not run, until the turn ended.
+  Sanad then read an empty result and concluded the trigger was broken.
+  A turn stops itself after 5 minutes (checked before each tool call), each model
+  request times out after 2 minutes, and a turn is capped at 25 model requests.
+  A turn still `pending` after 10 minutes (its process restarted) is marked failed
+  so the chat is usable again.
+- **Checking automations** — `get_workflow_runs` returns a workflow's latest runs
+  with each failed step's error, and every step result names the field behind
+  each field mapping, so Sanad can see a wrong field or a select value that is not
+  an option instead of guessing.
 - **Frontend** — `web-frontend/modules/arabase/sanad/`: an item in the workspace
   tools window and a panel
   rendered in core's right sidebar through `ArabasePlugin`'s

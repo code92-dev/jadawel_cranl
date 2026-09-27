@@ -6,6 +6,7 @@ workspace, so the tool wiring, permissions and approval pause are exercised
 end to end without a provider.
 """
 
+import threading
 from datetime import timedelta
 from unittest.mock import patch
 
@@ -25,12 +26,20 @@ from rest_framework.status import (
     HTTP_409_CONFLICT,
 )
 
+from arabase.sanad import runner
 from arabase.sanad.models import SanadChat, SanadMessage, SanadMessageStatus
 from arabase.sanad.tools import APPROVAL_TOOLS, get_sanad_tools
 from jadawel.contrib.database.table.models import Table
 from jadawel.contrib.database.views.models import View, ViewFilter, ViewSort
 
 MODEL = "openai/test-model"
+
+
+@pytest.fixture(autouse=True)
+def turns_run_inline(monkeypatch):
+    """Run each turn inside the request, so a test can assert on its outcome."""
+
+    monkeypatch.setattr(runner, "RUN_INLINE", True)
 
 
 def scripted_model(steps):
@@ -580,3 +589,65 @@ def test_a_turn_whose_worker_died_is_released(api_client, sanad):
 
     assert response.json()["messages"][0]["status"] == SanadMessageStatus.ERROR
     assert response.json()["messages"][0]["error"] == "SANAD_ERROR_TIMED_OUT"
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_turn_runs_in_the_background_not_on_the_celery_worker(
+    api_client, sanad, monkeypatch
+):
+    """Regression: turns used to be a Celery task. On the single-worker
+    deployment that held the only slot for the whole turn, so the automations
+    triggered by rows Sanad added, and its own publish job, waited for it."""
+
+    from jadawel.config.celery import app
+
+    assert "arabase.sanad.run_turn" not in app.tasks
+    monkeypatch.setattr(runner, "RUN_INLINE", False)
+    thinking, answer, finished = threading.Event(), threading.Event(), threading.Event()
+    run = runner._run
+    monkeypatch.setattr(runner, "_run", lambda *args: (run(*args), finished.set()))
+
+    def respond(messages, info):
+        thinking.set()
+        assert answer.wait(10)
+        return ModelResponse(parts=[TextPart("done")])
+
+    chat_id = new_chat(api_client, sanad)
+    with (
+        patch("arabase.sanad.agent.get_available_models", return_value=[MODEL]),
+        patch(
+            "arabase.sanad.agent.build_ai_model", return_value=FunctionModel(respond)
+        ),
+    ):
+        response = api_client.post(
+            reverse("api:arabase:sanad_messages", kwargs={"chat_id": chat_id}),
+            {"content": "hi"},
+            format="json",
+            **auth(sanad["token"]),
+        )
+        assert response.status_code == HTTP_202_ACCEPTED
+        assert thinking.wait(10)
+        # The request has returned while the model is still working.
+        reply = SanadMessage.objects.get(role="assistant")
+        assert reply.status == SanadMessageStatus.PENDING
+
+        answer.set()
+        assert finished.wait(10)
+
+    reply.refresh_from_db()
+    assert reply.status == SanadMessageStatus.DONE
+    assert reply.content == "done"
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_turn_past_its_time_limit_stops(api_client, sanad, monkeypatch):
+    monkeypatch.setattr("arabase.sanad.agent.TURN_TIME_LIMIT", -1)
+    chat_id = new_chat(api_client, sanad)
+    model = scripted_model([[("list_databases", {})], "never reached"])
+
+    send(api_client, sanad["token"], chat_id, "hi", model)
+
+    reply = SanadMessage.objects.get(role="assistant")
+    assert reply.status == SanadMessageStatus.ERROR
+    assert reply.error == "SANAD_ERROR_TIMED_OUT"
+    assert reply.actions == []

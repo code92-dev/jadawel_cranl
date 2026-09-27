@@ -267,6 +267,7 @@ const KNOWN_TOOLS = new Set([
   'create_workflow',
   'describe_automation_step',
   'get_workflow',
+  'get_workflow_runs',
   'add_automation_step',
   'update_automation_step',
   'delete_automation_step',

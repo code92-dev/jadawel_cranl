@@ -441,6 +441,7 @@
       "create_workflow": "Created a workflow",
       "describe_automation_step": "Checked step settings",
       "get_workflow": "Read the workflow",
+      "get_workflow_runs": "Check the workflow runs",
       "add_automation_step": "Added a workflow step",
       "update_automation_step": "Updated a workflow step",
       "delete_automation_step": "Delete a workflow step",

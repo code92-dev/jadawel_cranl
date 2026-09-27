@@ -441,6 +441,7 @@
       "create_workflow": "إنشاء سير عمل",
       "describe_automation_step": "مراجعة إعدادات الخطوة",
       "get_workflow": "قراءة سير العمل",
+      "get_workflow_runs": "مراجعة سجل سير العمل",
       "add_automation_step": "إضافة خطوة إلى سير العمل",
       "update_automation_step": "تعديل خطوة في سير العمل",
       "delete_automation_step": "حذف خطوة من سير العمل",

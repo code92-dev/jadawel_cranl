@@ -8,12 +8,14 @@ pydantic-ai drives the tool-calling loop.
 """
 
 import logging
+import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
 from arabase.sanad.exceptions import (
     SanadModelNotAvailable,
     SanadNoModelAvailable,
+    SanadTurnTooLong,
 )
 from arabase.sanad.tools import (
     SanadEndpoint,
@@ -64,8 +66,15 @@ and get_table_schema for field IDs.
 - Settings text is a formula: quote literal text ('Hello') and read earlier \
 steps with get('previous_node.<step id>.0.field_<field id>') after a row \
 trigger. Check the result with get_workflow.
+- Map values to the right fields: each mapping you get back names its \
+field. A single select takes an existing option's exact text, a link field \
+takes row IDs.
 - Publishing makes a workflow act on real data; call publish_workflow only \
 when the user asked for it or agreed, and it pauses for their approval.
+- Only the published version runs, a few seconds after its trigger. To check \
+an automation, call get_workflow_runs and read each run's status and error; \
+a missing result right after the trigger usually means the run has not \
+finished yet, not that the trigger failed.
 
 Application builder (web pages and portals):
 - create_builder_application, then create_page (the home page's path is /), \
@@ -81,6 +90,14 @@ domain is done by the user in the app's settings.
 MAX_MODEL_REQUESTS = 25
 """Upper bound on model round-trips for one turn, so a confused model that
 keeps calling tools cannot run up an unbounded provider bill."""
+
+TURN_TIME_LIMIT = 300
+"""Seconds. A turn runs in a thread (``runner``), which nothing can kill, so it
+checks this itself before each tool call."""
+
+MODEL_REQUEST_TIMEOUT = 120
+"""Seconds one model request may take, so a hung provider cannot hold a turn
+past ``handler.STALE_AFTER``."""
 
 
 def get_available_models(workspace: Optional[Workspace] = None) -> list[str]:
@@ -134,6 +151,7 @@ class SanadDeps:
     endpoint: SanadEndpoint
     on_action: Callable[[dict], None]
     actions: list = field(default_factory=list)
+    deadline: float = field(default_factory=lambda: time.monotonic() + TURN_TIME_LIMIT)
 
 
 def _result_refs(result: Any) -> dict:
@@ -161,6 +179,8 @@ def _to_pydantic_ai_tool(tool: SanadTool):
     from pydantic_ai import ApprovalRequired, RunContext, Tool
 
     def run(ctx: RunContext[SanadDeps], **arguments):
+        if time.monotonic() > ctx.deps.deadline:
+            raise SanadTurnTooLong()
         if tool.needs_approval and not ctx.tool_call_approved:
             raise ApprovalRequired()
         action = {"tool": tool.name, "arguments": arguments, "ok": True}
@@ -196,6 +216,7 @@ def build_agent(model):
         deps_type=SanadDeps,
         tools=[_to_pydantic_ai_tool(tool) for tool in get_sanad_tools()],
         output_type=[str, DeferredToolRequests],
+        model_settings={"timeout": MODEL_REQUEST_TIMEOUT},
     )
 
 

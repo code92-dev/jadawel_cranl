@@ -20,3 +20,7 @@ class SanadChatBusy(Exception):
 
 class SanadNothingToApprove(Exception):
     """The chat has no tool call waiting for a decision."""
+
+
+class SanadTurnTooLong(Exception):
+    """The turn ran past ``agent.TURN_TIME_LIMIT``."""

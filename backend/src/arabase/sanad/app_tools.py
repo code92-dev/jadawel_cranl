@@ -128,6 +128,10 @@ AUTOMATION_FORMULA_NOTES = [
     "reads a field of the first changed row; single steps such as get_row "
     "output one object: get('previous_node.<id>.field_<field id>').",
     "field_mappings items are {field_id, value, enabled: true}; value is a formula.",
+    "Match each field_id to the field you mean: the step you get back names the "
+    "field behind every mapping. A single select takes an existing option's "
+    "exact text ('High'), a link to another table takes row IDs "
+    "(get('previous_node.<trigger id>.0.id')).",
     "integration_id is filled in automatically when the automation has exactly "
     "one connection of the needed kind.",
 ]
@@ -149,12 +153,44 @@ def _serialize_step(node) -> dict:
         for key, value in dict(data["service"] or {}).items()
         if key not in ("schema", "context_data", "context_data_schema", "sample_data")
     }
+    _name_mapped_fields(service)
     return {
         "id": data["id"],
         "type": data["type"],
         "label": data["label"],
         "settings": service,
     }
+
+
+def _name_mapped_fields(settings: dict) -> None:
+    """Add each mapped field's name and type (and options) to its mapping.
+
+    A mapping names its field by ID alone, so a model that picks the wrong ID
+    (Priority for Assignee) could not see the mistake in the result.
+    """
+
+    mappings = settings.get("field_mappings") or []
+    if not mappings:
+        return
+
+    from jadawel.contrib.database.fields.models import Field
+    from jadawel.contrib.database.fields.registries import field_type_registry
+
+    fields = Field.objects.filter(
+        id__in=[mapping["field_id"] for mapping in mappings]
+    ).prefetch_related("select_options")
+    fields = {field.id: field for field in fields}
+    for mapping in mappings:
+        field = fields.get(mapping["field_id"])
+        if field is None:
+            continue
+        field_type = field_type_registry.get_by_model(field.specific_class)
+        mapping["field_name"] = field.name
+        mapping["field_type"] = field_type.type
+        if field_type.can_have_select_options:
+            mapping["select_options"] = [
+                option.value for option in field.select_options.all()
+            ]
 
 
 def _describe_field(field) -> dict:
@@ -471,6 +507,51 @@ def delete_automation_step(endpoint: SanadEndpoint, args: DeleteAutomationStepIn
     node = _get_step(endpoint, args.step_id)
     DeleteAutomationNodeActionType.do(endpoint.user, node.id)
     return {"deleted_step_id": args.step_id}
+
+
+class GetWorkflowRunsInput(BaseModel):
+    workflow_id: int = Field(
+        ..., description="The workflow you built (not a published copy)."
+    )
+    limit: int = Field(5, ge=1, le=20, description="How many recent runs.")
+
+
+def get_workflow_runs(endpoint: SanadEndpoint, args: GetWorkflowRunsInput) -> dict:
+    from jadawel.contrib.automation.history.service import AutomationHistoryService
+    from jadawel.contrib.automation.nodes.registries import (
+        automation_node_type_registry,
+    )
+
+    workflow = _get_workflow(endpoint, args.workflow_id)
+    runs = AutomationHistoryService().get_workflow_histories(
+        endpoint.user, workflow.id
+    )[: args.limit]
+    return {
+        "workflow_id": workflow.id,
+        "automation_id": workflow.automation_id,
+        "note": "started means queued or still running; check again shortly.",
+        "runs": [
+            {
+                "status": run.status,
+                "test_run": run.is_test_run,
+                "started_on": run.started_on.isoformat(),
+                "completed_on": run.completed_on and run.completed_on.isoformat(),
+                "error": run.message,
+                "steps": [
+                    {
+                        "type": automation_node_type_registry.get_by_model(
+                            step.node.specific_class
+                        ).type,
+                        "label": step.node.label,
+                        "status": step.status,
+                        "error": step.message,
+                    }
+                    for step in run.node_histories.all()
+                ],
+            }
+            for run in runs
+        ],
+    }
 
 
 class PublishWorkflowInput(BaseModel):

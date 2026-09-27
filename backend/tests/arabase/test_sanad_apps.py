@@ -16,6 +16,7 @@ from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart
 from pydantic_ai.models.function import FunctionModel
 from rest_framework.status import HTTP_200_OK, HTTP_202_ACCEPTED
 
+from arabase.sanad import runner
 from arabase.sanad.models import SanadMessage, SanadMessageStatus
 from arabase.sanad.tools import APPROVAL_TOOLS, SanadEndpoint, get_sanad_tools
 from jadawel.contrib.automation.models import Automation, AutomationWorkflow
@@ -38,6 +39,13 @@ from jadawel.contrib.database.rows.handler import RowHandler
 from jadawel.core.integrations.models import Integration
 
 MODEL = "openai/test-model"
+
+
+@pytest.fixture(autouse=True)
+def turns_run_inline(monkeypatch):
+    """Run each turn inside the request, so a test can assert on its outcome."""
+
+    monkeypatch.setattr(runner, "RUN_INLINE", True)
 
 
 @pytest.fixture
@@ -142,6 +150,99 @@ def test_steps_are_created_with_validated_settings(ws, data_fixture):
     assert "schema" not in workflow["steps"][0]["settings"]
 
 
+def build_copy_workflow(ws, data_fixture, value_for_tier):
+    """New customer -> a row in Leads, whose Tier select is set from a formula."""
+
+    leads = data_fixture.create_database_table(
+        database=ws["table"].database, name="Leads"
+    )
+    data_fixture.create_text_field(table=leads, name="Lead", primary=True)
+    tier = data_fixture.create_single_select_field(table=leads, name="Tier")
+    data_fixture.create_select_option(field=tier, value="High", order=0)
+    data_fixture.create_select_option(field=tier, value="Low", order=1)
+    created = run("create_automation", ws["endpoint"], name="Leads")
+    trigger = run(
+        "add_automation_step",
+        ws["endpoint"],
+        workflow_id=created["workflow_id"],
+        type="local_jadawel_rows_created",
+        settings={"table_id": ws["table"].id},
+    )
+    action = run(
+        "add_automation_step",
+        ws["endpoint"],
+        workflow_id=created["workflow_id"],
+        type="local_jadawel_create_row",
+        after_step_id=trigger["id"],
+        settings={
+            "table_id": leads.id,
+            "field_mappings": [
+                {
+                    "field_id": tier.id,
+                    "enabled": True,
+                    "value": value_for_tier(trigger["id"]),
+                }
+            ],
+        },
+    )
+    return created, action, leads, tier
+
+
+@pytest.mark.django_db
+def test_step_results_name_the_field_behind_each_mapping(ws, data_fixture):
+    _, action, _, tier = build_copy_workflow(ws, data_fixture, lambda _: "'High'")
+
+    [mapping] = action["settings"]["field_mappings"]
+    assert mapping["field_id"] == tier.id
+    assert mapping["field_name"] == "Tier"
+    assert mapping["field_type"] == "single_select"
+    assert mapping["select_options"] == ["High", "Low"]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_workflow_runs_report_why_a_step_failed(ws, data_fixture):
+    """The mistake a live chat made: a select field given the new row's ID."""
+
+    created, _, leads, _ = build_copy_workflow(
+        ws, data_fixture, lambda trigger_id: f"get('previous_node.{trigger_id}.0.id')"
+    )
+    run("publish_workflow", ws["endpoint"], workflow_id=created["workflow_id"])
+    assert (
+        run("get_workflow_runs", ws["endpoint"], workflow_id=created["workflow_id"])[
+            "runs"
+        ]
+        == []
+    )
+
+    name_id = ws["fields"]["name"].id
+    RowHandler().create_rows(ws["user"], ws["table"], [{f"field_{name_id}": "Noura"}])
+
+    runs = run("get_workflow_runs", ws["endpoint"], workflow_id=created["workflow_id"])
+    [latest] = runs["runs"]
+    assert latest["status"] == "error"
+    assert "Tier" in latest["error"]
+    assert "not a valid select option" in latest["error"]
+    failed = [step for step in latest["steps"] if step["status"] == "error"]
+    assert [step["type"] for step in failed] == ["local_jadawel_create_row"]
+    assert leads.get_model().objects.count() == 0
+
+
+@pytest.mark.django_db(transaction=True)
+def test_workflow_runs_show_a_successful_run(ws, data_fixture):
+    created, _, leads, tier = build_copy_workflow(ws, data_fixture, lambda _: "'High'")
+    run("publish_workflow", ws["endpoint"], workflow_id=created["workflow_id"])
+    name_id = ws["fields"]["name"].id
+    RowHandler().create_rows(ws["user"], ws["table"], [{f"field_{name_id}": "Noura"}])
+
+    [latest] = run(
+        "get_workflow_runs", ws["endpoint"], workflow_id=created["workflow_id"]
+    )["runs"]
+    assert latest["status"] == "success"
+    assert latest["error"] == ""
+    [lead] = leads.get_model().objects.all()
+    assert getattr(lead, f"field_{tier.id}").value == "High"
+
+
 @pytest.mark.django_db
 def test_invalid_step_settings_are_rejected_like_the_editor_does(ws):
     created = run("create_automation", ws["endpoint"], name="Schedule")
@@ -197,6 +298,7 @@ def test_automation_tools_stay_in_the_chat_workspace(ws, data_fixture):
 
     for tool, arguments in [
         ("get_workflow", {"workflow_id": foreign["workflow_id"]}),
+        ("get_workflow_runs", {"workflow_id": foreign["workflow_id"]}),
         (
             "add_automation_step",
             {"workflow_id": foreign["workflow_id"], "type": "periodic"},

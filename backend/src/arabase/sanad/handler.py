@@ -13,6 +13,7 @@ from arabase.sanad.exceptions import (
     SanadChatDoesNotExist,
     SanadNotAllowed,
     SanadNothingToApprove,
+    SanadTurnTooLong,
 )
 from arabase.sanad.models import (
     SanadChat,
@@ -28,8 +29,9 @@ logger = logging.getLogger(__name__)
 TITLE_LENGTH = 80
 
 STALE_AFTER = timedelta(minutes=10)
-"""A turn still pending after this long lost its worker (restart, OOM); it is
-shown as failed so the chat is usable again. Longer than the task time limit."""
+"""A turn still pending after this long lost its process (restart, OOM); it is
+shown as failed so the chat is usable again. Longer than a turn can last
+(``agent.TURN_TIME_LIMIT`` plus one model request)."""
 
 BUSY_STATUSES = (SanadMessageStatus.PENDING, SanadMessageStatus.AWAITING_APPROVAL)
 
@@ -176,14 +178,14 @@ class SanadHandler:
         return message
 
     def _queue(self, message: SanadMessage, decisions=None) -> None:
-        from arabase.sanad.tasks import run_sanad_turn
+        from arabase.sanad.runner import start_turn
 
         transaction.on_commit(
-            lambda: run_sanad_turn.delay(message.id, decisions)  # noqa: B023
+            lambda: start_turn(message.id, decisions)  # noqa: B023
         )
 
     def run(self, message_id: int, decisions: Optional[dict] = None) -> None:
-        """The Celery side: run the model and store what it did and said."""
+        """The background side: run the model and store what it did and said."""
 
         from arabase.sanad.agent import build_ai_model, run_turn
         from arabase.sanad.tools import SanadEndpoint
@@ -250,4 +252,6 @@ def _turn_error(exc: Exception) -> str:
         return "SANAD_ERROR_TOO_MANY_STEPS"
     if isinstance(exc, SanadNotAllowed):
         return "SANAD_ERROR_NOT_ALLOWED"
+    if isinstance(exc, SanadTurnTooLong):
+        return "SANAD_ERROR_TIMED_OUT"
     return "SANAD_ERROR_MODEL_FAILED"

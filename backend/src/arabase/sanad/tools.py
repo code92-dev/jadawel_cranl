@@ -289,6 +289,13 @@ def get_app_tools() -> list[SanadTool]:
             t.get_workflow,
         ),
         SanadTool(
+            "get_workflow_runs",
+            "Read a workflow's latest runs: whether each succeeded and, if not, "
+            "which step failed and why. Use it to check an automation works.",
+            t.GetWorkflowRunsInput,
+            t.get_workflow_runs,
+        ),
+        SanadTool(
             "add_automation_step",
             "Add a step to a workflow: first the trigger (no after_step_id), "
             "then each action after the previous step.",
