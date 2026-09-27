@@ -236,6 +236,7 @@
 import MarkdownIt from '@jadawel/modules/core/components/MarkdownIt'
 import SanadService from '@jadawel/modules/arabase/services/sanad'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
+import { takeSanadDraft } from '@jadawel/modules/arabase/sanad/utils/askSanad'
 
 const POLL_INTERVAL = 1500
 const MODEL_STORAGE_KEY = 'jadawel.sanad.model'
@@ -279,6 +280,27 @@ const KNOWN_TOOLS = new Set([
   'add_page_content',
   'add_table_to_page',
   'add_form_to_page',
+  'add_fields_to_form',
+  'load_skill',
+  'list_page_elements',
+  'describe_page_element',
+  'add_page_element',
+  'update_page_element',
+  'delete_page_element',
+  'add_page_data_source',
+  'get_app_theme',
+  'update_app_theme',
+  'create_dashboard',
+  'get_dashboard',
+  'add_dashboard_widget',
+  'update_dashboard_widget',
+  'delete_dashboard_widget',
+  'create_page_view',
+  'get_page_view',
+  'write_page_view',
+  'edit_page_view',
+  'list_page_view_revisions',
+  'restore_page_view_revision',
 ])
 const KNOWN_ERRORS = new Set([
   'SANAD_ERROR_MODEL_FAILED',
@@ -340,9 +362,11 @@ export default {
     },
   },
   mounted() {
+    this.$bus.$on('sanad-draft', this.useDraft)
     this.load()
   },
   beforeUnmount() {
+    this.$bus.$off('sanad-draft', this.useDraft)
     this.stopPolling()
   },
   methods: {
@@ -373,6 +397,30 @@ export default {
       } catch (error) {
         notifyIf(error, 'sanad')
       }
+      // After the remembered chat, so a new request does not land in it.
+      this.useDraft()
+    },
+    /**
+     * Text another screen typed for the user (see askSanad): it starts a new
+     * chat, since it is a new request, and waits in the composer to be
+     * finished and sent.
+     */
+    useDraft() {
+      const text = takeSanadDraft()
+      if (!text) {
+        return
+      }
+      if (this.hasMessages && !this.busy) {
+        this.startNewChat()
+      }
+      this.draft = text
+      this.$nextTick(() => {
+        const input = this.$refs.input
+        if (input) {
+          input.focus()
+          input.setSelectionRange(text.length, text.length)
+        }
+      })
     },
     remember(chatId) {
       const key = `${CHAT_STORAGE_KEY}.${this.workspace.id}`
@@ -533,6 +581,12 @@ export default {
           },
         }
       }
+      if (refs.dashboard_id) {
+        return {
+          name: 'dashboard-application',
+          params: { dashboardId: refs.dashboard_id },
+        }
+      }
       if (refs.application_id && refs.page_id) {
         return {
           name: 'builder-page',
@@ -546,7 +600,9 @@ export default {
         return null
       }
       const params = { databaseId: refs.database_id, tableId }
-      if (action.tool === 'create_view' && refs.id) {
+      if (refs.view_id) {
+        params.viewId = refs.view_id
+      } else if (action.tool === 'create_view' && refs.id) {
         params.viewId = refs.id
       }
       return { name: 'database-table', params }

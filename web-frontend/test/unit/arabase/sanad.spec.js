@@ -8,6 +8,10 @@ import AppUtilities from '@jadawel/modules/core/components/AppUtilities'
 import { ArabasePlugin } from '@jadawel/modules/arabase/plugins'
 import { AutomationApplicationType } from '@jadawel/modules/automation/applicationTypes'
 import { BuilderApplicationType } from '@jadawel/modules/builder/applicationTypes'
+import {
+  askSanad,
+  takeSanadDraft,
+} from '@jadawel/modules/arabase/sanad/utils/askSanad'
 
 /**
  * Sanad (سند) and the admin-only app types (docs/SANAD_AI_ASSISTANT.md): who
@@ -265,6 +269,12 @@ describe('SanadPanel', () => {
               ok: true,
               refs: { application_id: 3 },
             },
+            {
+              tool: 'add_dashboard_widget',
+              ok: true,
+              refs: { dashboard_id: 8, application_id: 8 },
+            },
+            { tool: 'load_skill', ok: true, refs: {} },
           ],
         }),
       ])
@@ -277,7 +287,12 @@ describe('SanadPanel', () => {
       'sanad.tools.create_automation',
       'sanad.tools.add_form_to_page',
       'sanad.tools.create_builder_application',
+      'sanad.tools.add_dashboard_widget',
+      'sanad.tools.load_skill',
     ])
+    expect(actions[3].find('.sanad__action-link').attributes('href')).toBe(
+      '/dashboard/8'
+    )
     expect(actions[0].find('.sanad__action-link').attributes('href')).toBe(
       '/automation/5/workflow/9'
     )
@@ -286,6 +301,52 @@ describe('SanadPanel', () => {
     )
     // An app without a page yet has nothing to open.
     expect(actions[2].find('.sanad__action-link').exists()).toBe(false)
+  })
+
+  test('links a written page to its table view', async () => {
+    localStorage.setItem('jadawel.sanad.chat.7', '3')
+    testApp.mock.onGet('/arabase/sanad/chats/3/').reply(
+      200,
+      chat([
+        message({
+          actions: [
+            {
+              tool: 'write_page_view',
+              ok: true,
+              refs: { view_id: 91, table_id: 47, database_id: 19 },
+            },
+          ],
+        }),
+      ])
+    )
+
+    const wrapper = await mountPanel()
+
+    const action = wrapper.find('.sanad__action')
+    expect(action.find('span').text()).toBe('sanad.tools.write_page_view')
+    expect(action.find('.sanad__action-link').attributes('href')).toBe(
+      '/database/19/table/47/91'
+    )
+  })
+
+  test('a request typed elsewhere waits in a new chat', async () => {
+    localStorage.setItem('jadawel.sanad.chat.7', '3')
+    testApp.mock
+      .onGet('/arabase/sanad/chats/3/')
+      .reply(200, chat([message({ content: 'Earlier answer' })]))
+    askSanad(testApp.getApp().$bus, 'Design page 91: ')
+
+    const wrapper = await mountPanel()
+
+    expect(wrapper.find('.sanad__input').element.value).toBe('Design page 91: ')
+    // A new request, so the remembered chat is set aside, not appended to.
+    expect(wrapper.vm.chat).toBeNull()
+    expect(takeSanadDraft()).toBeNull()
+
+    // Once open, the panel takes the next one straight from the event.
+    askSanad(testApp.getApp().$bus, 'Design page 92: ')
+    await flushPromises()
+    expect(wrapper.find('.sanad__input').element.value).toBe('Design page 92: ')
   })
 
   test('asks to publish with publish wording, not delete wording', async () => {

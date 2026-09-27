@@ -5,9 +5,37 @@
         {{ $t('htmlPageOnboarding.title') }}
       </h2>
       <p class="html-page-onboarding__lead">
-        {{ $t('htmlPageOnboarding.lead') }}
+        {{
+          $t(
+            canAskSanad
+              ? 'htmlPageOnboarding.leadWithSanad'
+              : 'htmlPageOnboarding.lead'
+          )
+        }}
       </p>
     </div>
+
+    <!--
+      Sanad writes a page from inside Jadawel, with nothing to connect. Only
+      staff can use Sanad (see ArabasePlugin), so only they see the offer.
+    -->
+    <section v-if="canAskSanad" class="html-page-onboarding__sanad">
+      <div class="html-page-onboarding__sanad-text">
+        <h3 class="html-page-onboarding__step-title">
+          <i class="iconoir-sparks" aria-hidden="true"></i>
+          {{ $t('htmlPageOnboarding.sanadTitle') }}
+        </h3>
+        <p class="html-page-onboarding__sanad-hint">
+          {{ $t('htmlPageOnboarding.sanadHint') }}
+        </p>
+      </div>
+      <Button type="primary" icon="iconoir-sparks" @click="openSanad">
+        {{ $t('htmlPageOnboarding.sanadButton') }}
+      </Button>
+    </section>
+    <p v-if="canAskSanad" class="html-page-onboarding__hint">
+      {{ $t('htmlPageOnboarding.sanadOr') }}
+    </p>
 
     <!-- 1. Connect ------------------------------------------------------- -->
     <section class="html-page-onboarding__step">
@@ -155,6 +183,7 @@
 import McpEndpointService from '@jadawel/modules/core/services/mcpEndpoint'
 import SettingsModal from '@jadawel/modules/core/components/settings/SettingsModal'
 import { copyToClipboard } from '@jadawel/modules/database/utils/clipboard'
+import { askSanad } from '@jadawel/modules/arabase/sanad/utils/askSanad'
 
 /**
  * What a Page view shows before anything has been written into it.
@@ -204,6 +233,9 @@ export default {
     },
     realClientConfig() {
       return this.buildConfig(this.endpointUrl)
+    },
+    canAskSanad() {
+      return this.$store.getters['auth/isStaff']
     },
     prompt() {
       return this.$t('htmlPageOnboarding.promptTemplate', {
@@ -255,6 +287,12 @@ export default {
       this.settingsMounted = true
       await this.$nextTick()
       this.$refs.settingsModal.show('mcp-endpoint')
+    },
+    openSanad() {
+      askSanad(
+        this.$bus,
+        this.$t('htmlPageOnboarding.sanadDraft', { viewId: this.view.id })
+      )
     },
     copy(value, ref) {
       copyToClipboard(value)

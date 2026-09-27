@@ -693,3 +693,269 @@ def test_a_chat_builds_a_portal_whose_form_saves_rows(api_client, ws):
     assert response.status_code == HTTP_200_OK, response.json()
     row = table.get_model().objects.get(**{f"field_{fields['name'].id}": "Salem"})
     assert getattr(row, f"field_{fields['tier'].id}").value == "Gold"
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_form_links_rows_through_a_dropdown_of_the_linked_table(
+    api_client, ws, data_fixture
+):
+    """A link-to-table field is asked for with a dropdown of the linked table's
+    rows; it used to be skipped, so forms could not set a task's project."""
+
+    table, fields = ws["table"], ws["fields"]
+    projects = data_fixture.create_database_table(
+        database=table.database, name="Projects"
+    )
+    title = data_fixture.create_text_field(table=projects, name="Title", primary=True)
+    alpha, beta = (
+        RowHandler()
+        .create_rows(
+            ws["user"],
+            projects,
+            [{f"field_{title.id}": "Alpha"}, {f"field_{title.id}": "Beta"}],
+        )
+        .created_rows
+    )
+    link = data_fixture.create_link_row_field(
+        table=table, link_row_table=projects, name="Project"
+    )
+    app = run("create_builder_application", ws["endpoint"], name="Portal")
+    page = run(
+        "create_page",
+        ws["endpoint"],
+        application_id=app["application_id"],
+        name="New",
+        path="/",
+    )
+    # A table of the same name on the page must not clash with the dropdown's source.
+    run(
+        "add_table_to_page",
+        ws["endpoint"],
+        page_id=page["page_id"],
+        table_id=projects.id,
+    )
+
+    result = run(
+        "add_form_to_page",
+        ws["endpoint"],
+        page_id=page["page_id"],
+        table_id=table.id,
+        field_ids=[fields["name"].id, link.id],
+    )
+
+    assert [item["field"] for item in result["inputs"]] == ["Name", "Project"]
+    assert result["skipped_fields"] == []
+    choice = ChoiceElement.objects.get(id=result["inputs"][1]["id"])
+    assert choice.option_type == ChoiceElement.OPTION_TYPE.FORMULAS
+    assert choice.multiple is True
+    source = DataSource.objects.get(page_id=page["page_id"], name="Project (Projects)")
+    assert source.service.specific.table_id == projects.id
+    assert source.service.specific.default_result_count == 200
+    assert choice.formula_value["formula"] == f"get('data_source.{source.id}.*.id')"
+    assert choice.formula_name["formula"] == (
+        f"get('data_source.{source.id}.*.field_{title.id}')"
+    )
+
+    name_input = Element.objects.get(id=result["inputs"][0]["id"])
+    create_row = BuilderWorkflowAction.objects.get(
+        element_id=result["form_element_id"],
+        content_type__model="localjadawelcreaterowworkflowaction",
+    )
+
+    def submit(name, project):
+        return api_client.post(
+            reverse(
+                "api:builder:workflow_action:dispatch",
+                kwargs={"workflow_action_id": create_row.id},
+            ),
+            {
+                "metadata": json.dumps(
+                    {"form_data": {name_input.id: name, choice.id: project}}
+                )
+            },
+            format="json",
+            HTTP_AUTHORIZATION=f"JWT {ws['token']}",
+        )
+
+    response = submit("Salem", [alpha.id, beta.id])
+    assert response.status_code == HTTP_200_OK, response.json()
+    row = table.get_model().objects.get(**{f"field_{fields['name'].id}": "Salem"})
+    assert {r.id for r in getattr(row, f"field_{link.id}").all()} == {
+        alpha.id,
+        beta.id,
+    }
+
+    # Only the linked table's rows are options.
+    assert submit("Nora", [999999]).status_code != HTTP_200_OK
+    assert (
+        not table.get_model()
+        .objects.filter(**{f"field_{fields['name'].id}": "Nora"})
+        .exists()
+    )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_single_link_dropdown_submits_one_row(api_client, ws, data_fixture):
+    table, fields = ws["table"], ws["fields"]
+    team = data_fixture.create_database_table(database=table.database, name="Team")
+    member = data_fixture.create_text_field(table=team, name="Member", primary=True)
+    [noura] = (
+        RowHandler()
+        .create_rows(ws["user"], team, [{f"field_{member.id}": "Noura"}])
+        .created_rows
+    )
+    assignee = data_fixture.create_link_row_field(
+        table=table,
+        link_row_table=team,
+        name="Assignee",
+        link_row_multiple_relationships=False,
+    )
+    app = run("create_builder_application", ws["endpoint"], name="Portal")
+    page = run(
+        "create_page",
+        ws["endpoint"],
+        application_id=app["application_id"],
+        name="New",
+        path="/",
+    )
+    result = run(
+        "add_form_to_page",
+        ws["endpoint"],
+        page_id=page["page_id"],
+        table_id=table.id,
+        field_ids=[fields["name"].id, assignee.id],
+    )
+    name_input, choice = (item["id"] for item in result["inputs"])
+    assert ChoiceElement.objects.get(id=choice).multiple is False
+    create_row = BuilderWorkflowAction.objects.get(
+        element_id=result["form_element_id"],
+        content_type__model="localjadawelcreaterowworkflowaction",
+    )
+
+    response = api_client.post(
+        reverse(
+            "api:builder:workflow_action:dispatch",
+            kwargs={"workflow_action_id": create_row.id},
+        ),
+        {"metadata": json.dumps({"form_data": {name_input: "Task", choice: noura.id}})},
+        format="json",
+        HTTP_AUTHORIZATION=f"JWT {ws['token']}",
+    )
+
+    assert response.status_code == HTTP_200_OK, response.json()
+    row = table.get_model().objects.get(**{f"field_{fields['name'].id}": "Task"})
+    assert [r.id for r in getattr(row, f"field_{assignee.id}").all()] == [noura.id]
+
+
+@pytest.mark.django_db(transaction=True)
+def test_fields_are_added_to_an_existing_form(api_client, ws, data_fixture):
+    table, fields = ws["table"], ws["fields"]
+    projects = data_fixture.create_database_table(
+        database=table.database, name="Projects"
+    )
+    title = data_fixture.create_text_field(table=projects, name="Title", primary=True)
+    [alpha] = (
+        RowHandler()
+        .create_rows(ws["user"], projects, [{f"field_{title.id}": "Alpha"}])
+        .created_rows
+    )
+    link = data_fixture.create_link_row_field(
+        table=table, link_row_table=projects, name="Project"
+    )
+    app = run("create_builder_application", ws["endpoint"], name="Portal")
+    page = run(
+        "create_page",
+        ws["endpoint"],
+        application_id=app["application_id"],
+        name="New",
+        path="/",
+    )
+    form = run(
+        "add_form_to_page",
+        ws["endpoint"],
+        page_id=page["page_id"],
+        table_id=table.id,
+        field_ids=[fields["name"].id],
+    )
+
+    added = run(
+        "add_fields_to_form",
+        ws["endpoint"],
+        form_element_id=form["form_element_id"],
+        field_ids=[fields["name"].id, link.id],
+    )
+
+    # The name is already asked for; only the project is added.
+    assert [item["field"] for item in added["inputs"]] == ["Project"]
+    children = Element.objects.filter(parent_element_id=form["form_element_id"])
+    assert [child.get_type().type for child in children.order_by("order")] == [
+        "input_text",
+        "choice",
+    ]
+    create_row = BuilderWorkflowAction.objects.get(
+        element_id=form["form_element_id"],
+        content_type__model="localjadawelcreaterowworkflowaction",
+    )
+    response = api_client.post(
+        reverse(
+            "api:builder:workflow_action:dispatch",
+            kwargs={"workflow_action_id": create_row.id},
+        ),
+        {
+            "metadata": json.dumps(
+                {
+                    "form_data": {
+                        form["inputs"][0]["id"]: "Salem",
+                        added["inputs"][0]["id"]: [alpha.id],
+                    }
+                }
+            )
+        },
+        format="json",
+        HTTP_AUTHORIZATION=f"JWT {ws['token']}",
+    )
+    assert response.status_code == HTTP_200_OK, response.json()
+    row = table.get_model().objects.get(**{f"field_{fields['name'].id}": "Salem"})
+    assert [r.id for r in getattr(row, f"field_{link.id}").all()] == [alpha.id]
+
+    with pytest.raises(ValueError):
+        run(
+            "add_fields_to_form",
+            ws["endpoint"],
+            form_element_id=form["form_element_id"],
+            field_ids=[link.id],
+        )
+
+
+@pytest.mark.django_db
+def test_add_fields_to_form_stays_in_the_chat_workspace(ws, data_fixture):
+    other_user = data_fixture.create_user(is_staff=True)
+    other_workspace = data_fixture.create_workspace(user=other_user)
+    other = SanadEndpoint(user=other_user, workspace=other_workspace)
+    database = data_fixture.create_database_application(workspace=other_workspace)
+    table = data_fixture.create_database_table(database=database, name="Theirs")
+    name = data_fixture.create_text_field(table=table, name="Name", primary=True)
+    note = data_fixture.create_text_field(table=table, name="Note")
+    app = run("create_builder_application", other, name="Theirs")
+    page = run(
+        "create_page", other, application_id=app["application_id"], name="P", path="/"
+    )
+    form = run(
+        "add_form_to_page",
+        other,
+        page_id=page["page_id"],
+        table_id=table.id,
+        field_ids=[name.id],
+    )
+    data_fixture.create_user_workspace(workspace=other_workspace, user=ws["user"])
+
+    with pytest.raises(Exception):
+        run(
+            "add_fields_to_form",
+            ws["endpoint"],
+            form_element_id=form["form_element_id"],
+            field_ids=[note.id],
+        )
+    assert (
+        Element.objects.filter(parent_element_id=form["form_element_id"]).count() == 1
+    )

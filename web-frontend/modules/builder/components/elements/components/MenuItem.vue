@@ -131,7 +131,10 @@
 </template>
 
 <script>
-import { resolveApplicationRoute } from '@jadawel/modules/builder/utils/routing'
+import {
+  getRoutePagePath,
+  resolveApplicationRoute,
+} from '@jadawel/modules/builder/utils/routing'
 import element from '@jadawel/modules/builder/mixins/element'
 import resolveElementUrl from '@jadawel/modules/builder/utils/urlResolution'
 import ThemeProvider from '@jadawel/modules/builder/components/theme/ThemeProvider.vue'
@@ -192,7 +195,7 @@ export default {
      */
     const found = resolveApplicationRoute(
       this.pages,
-      this.$route.params.pathMatch
+      getRoutePagePath(this.$route)
     )
 
     if (!found?.length) return

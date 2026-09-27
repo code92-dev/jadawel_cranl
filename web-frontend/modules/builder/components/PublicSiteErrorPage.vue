@@ -25,6 +25,8 @@
 </template>
 
 <script>
+import { getRoutePagePath } from '@jadawel/modules/builder/utils/routing'
+
 export default {
   props: {
     error: {
@@ -63,7 +65,7 @@ export default {
           this.routeName
         )
       ) {
-        if (this.$route.params.pathMatch === '/') {
+        if (getRoutePagePath(this.$route) === '') {
           // Reload the current page
           this.$router.go(0)
         } else {

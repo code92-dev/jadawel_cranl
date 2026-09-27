@@ -14,7 +14,10 @@
 import { computed } from 'vue'
 import { useStore } from 'vuex'
 import { useAsyncData, useNuxtApp, navigateTo, createError } from '#app'
-import { resolveApplicationRoute } from '@jadawel/modules/builder/utils/routing'
+import {
+  getRoutePagePath,
+  resolveApplicationRoute,
+} from '@jadawel/modules/builder/utils/routing'
 
 import { DataProviderType } from '@jadawel/modules/core/dataProviderTypes'
 import _ from 'lodash'
@@ -181,9 +184,7 @@ const {
 
     const found = resolveApplicationRoute(
       store.getters['page/getVisiblePages'](builder),
-      Array.isArray(route.params.pathMatch)
-        ? route.params.pathMatch.join('/')
-        : route.params.pathMatch
+      getRoutePagePath(route)
     )
 
     // Handle 404

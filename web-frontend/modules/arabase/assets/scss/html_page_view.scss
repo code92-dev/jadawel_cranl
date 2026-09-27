@@ -197,6 +197,28 @@
   max-inline-size: 62ch;
 }
 
+.html-page-onboarding__sanad {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-block-end: 12px;
+  padding: 16px 18px;
+  border: 1px solid $palette-neutral-400;
+  border-radius: 8px;
+  background-color: $palette-neutral-50;
+}
+
+.html-page-onboarding__sanad-text {
+  flex: 1 1 auto;
+  min-inline-size: 0;
+}
+
+.html-page-onboarding__sanad-hint {
+  margin: 0;
+  color: $palette-neutral-700;
+  font-size: 13px;
+}
+
 .html-page-onboarding__step {
   display: flex;
   gap: 14px;

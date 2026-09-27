@@ -36,6 +36,8 @@ APPROVAL_TOOLS = frozenset(
         "delete_page",
         "delete_automation_step",
         "publish_workflow",
+        "delete_page_element",
+        "delete_dashboard_widget",
     }
 )
 
@@ -73,6 +75,8 @@ class SanadTool:
     description: str
     input_schema: type[BaseModel]
     run: Callable[[SanadEndpoint, Any], Any]
+    skill: Optional[str] = None
+    """Offered to the model only once this skill is loaded in the chat."""
 
     @property
     def needs_approval(self) -> bool:
@@ -132,7 +136,9 @@ class AddViewFilterInput(BaseModel):
     )
     value: str = Field(
         "",
-        description="The value to compare with, as a string. Empty for empty/not_empty.",
+        description="The value to compare with, as a string. Empty for "
+        "empty/not_empty. Select filters take the option's text (or its ID); "
+        "is_any_of takes several, comma-separated.",
     )
 
 
@@ -216,6 +222,46 @@ def delete_view(endpoint: SanadEndpoint, args: DeleteViewInput) -> dict:
     return {"deleted_view_id": args.view_id}
 
 
+SELECT_FILTER_TYPES = frozenset(
+    {
+        "single_select_equal",
+        "single_select_not_equal",
+        "single_select_is_any_of",
+        "single_select_is_none_of",
+        "multiple_select_has",
+        "multiple_select_has_not",
+    }
+)
+
+
+def _select_filter_value(field, args: "AddViewFilterInput") -> str:
+    """A select filter's value as option IDs, the only form it matches.
+
+    Models naturally write the option's text ("Open"); stored as-is, that
+    filter matches nothing and the view silently shows every row, which once
+    led a model to tell the user that filters are ignored.
+    """
+
+    if args.type not in SELECT_FILTER_TYPES or not args.value.strip():
+        return args.value
+    options = {
+        option.value.strip().casefold(): str(option.id)
+        for option in field.select_options.all()
+    }
+    valid_ids = set(options.values())
+    ids = []
+    for part in args.value.split(","):
+        part = part.strip()
+        if part in valid_ids:
+            ids.append(part)
+        elif part.casefold() in options:
+            ids.append(options[part.casefold()])
+        else:
+            names = ", ".join(option.value for option in field.select_options.all())
+            raise ValueError(f"{part!r} is not an option of this field: {names}.")
+    return ",".join(ids)
+
+
 def add_view_filter(endpoint: SanadEndpoint, args: AddViewFilterInput) -> dict:
     from jadawel.contrib.database.fields.handler import FieldHandler
     from jadawel.contrib.database.views.actions import CreateViewFilterActionType
@@ -225,7 +271,7 @@ def add_view_filter(endpoint: SanadEndpoint, args: AddViewFilterInput) -> dict:
     if field.table_id != view.table_id:
         raise ValueError("That field belongs to a different table.")
     view_filter = CreateViewFilterActionType.do(
-        endpoint.user, view, field, args.type, args.value
+        endpoint.user, view, field, args.type, _select_filter_value(field, args)
     )
     return {"id": view_filter.id, "view_id": view.id, "table_id": view.table_id}
 
@@ -361,9 +407,18 @@ def get_app_tools() -> list[SanadTool]:
         ),
         SanadTool(
             "add_form_to_page",
-            "Add a form to a page; each submission creates a row in a table.",
+            "Add a form to a page; each submission creates a row in a table. "
+            "Link-to-table fields become a dropdown of the linked table's rows.",
             t.AddFormToPageInput,
             t.add_form_to_page,
+        ),
+        SanadTool(
+            "add_fields_to_form",
+            "Ask for more fields in an existing form, and save them with its "
+            "submissions. Link-to-table fields become a dropdown of the linked "
+            "table's rows.",
+            t.AddFieldsToFormInput,
+            t.add_fields_to_form,
         ),
     ]
 
@@ -418,7 +473,61 @@ def get_sanad_tools() -> list[SanadTool]:
             add_view_sort,
         ),
     ]
-    return tools + get_app_tools()
+    return (
+        [
+            SanadTool(
+                "load_skill",
+                "Load a skill: expert instructions for one kind of work. Call it "
+                "before you start that work, once per conversation.",
+                LoadSkillInput,
+                load_skill,
+            )
+        ]
+        + tools
+        + get_app_tools()
+        + get_page_tools()
+        + get_dashboard_tools()
+        + get_page_view_tools()
+    )
+
+
+class LoadSkillInput(BaseModel):
+    name: str = Field(..., description="The skill's name, from the list of skills.")
+
+
+def load_skill(endpoint: SanadEndpoint, args: LoadSkillInput) -> dict:
+    from arabase.sanad.skills import get_skills
+
+    skill = get_skills().get(args.name)
+    if skill is None:
+        raise ValueError(
+            f"There is no skill {args.name!r}. Skills: {', '.join(get_skills())}."
+        )
+    return {
+        "skill": skill.name,
+        "title": skill.title,
+        "instructions": skill.instructions,
+        "note": "Follow these instructions for the rest of this conversation. "
+        "They stay available here; do not load this skill again.",
+    }
+
+
+def get_page_tools() -> list[SanadTool]:
+    from arabase.sanad.page_tools import get_page_tools as page_tools
+
+    return page_tools()
+
+
+def get_dashboard_tools() -> list[SanadTool]:
+    from arabase.sanad.dashboard_tools import get_dashboard_tools as dashboard_tools
+
+    return dashboard_tools()
+
+
+def get_page_view_tools() -> list[SanadTool]:
+    from arabase.sanad.page_view_tools import get_page_view_tools as view_tools
+
+    return view_tools()
 
 
 def safe_tool_error(exc: Exception) -> str:

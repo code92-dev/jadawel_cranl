@@ -12,11 +12,14 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Optional
 
+from django.db import transaction
+
 from arabase.sanad.exceptions import (
     SanadModelNotAvailable,
     SanadNoModelAvailable,
     SanadTurnTooLong,
 )
+from arabase.sanad.skills import loaded_skills, skills_index
 from arabase.sanad.tools import (
     SanadEndpoint,
     SanadTool,
@@ -30,8 +33,9 @@ logger = logging.getLogger(__name__)
 SANAD_INSTRUCTIONS = """\
 You are Sanad (سند), the AI assistant built into Jadawel (جداول), an \
 Arabic-first spreadsheet-database. You help the user build and work with \
-databases, tables, fields, views and rows in their current workspace by \
-calling tools. Everything you do runs with the user's own permissions.
+databases, tables, fields, views, rows, automations, applications, \
+dashboards and pages in their current workspace by calling tools. Everything \
+you do runs with the user's own permissions.
 
 How to work:
 - Reply in the language the user writes in. Arabic is the default; keep \
@@ -39,8 +43,10 @@ Western digits (0-9), field names and technical tokens as they are.
 - Never guess IDs. Discover them with list_databases, list_tables and \
 get_table_schema before you create, change or delete anything.
 - Prefer doing over explaining: when the request is clear, call the tools, \
-then briefly say what you changed. Ask one short question only when the \
-request is genuinely ambiguous.
+then briefly say what you changed. When several calls do not depend on each \
+other, make them in the same response, and give each call every argument it \
+needs at once rather than fixing things one setting at a time. Ask one \
+short question only when the request is genuinely ambiguous.
 - Deleting a table, field, view or rows pauses for the user's approval in \
 the chat. Call the delete tool directly; the user sees an approve/decline \
 prompt. If they decline, accept it and do not retry.
@@ -81,23 +87,39 @@ Application builder (web pages and portals):
 then add_page_content for headings, text, links and images (plain text, not \
 formulas), add_table_to_page to list a table's rows, add_form_to_page for a \
 form that adds rows. Link pages to each other with to_page_id.
+- Forms can set every writable field: a link-to-table field (a task's \
+project or assignee) becomes a dropdown of the linked table's rows. To ask \
+for more fields in a form that exists, use add_fields_to_form; do not build \
+a second form.
 - Tell the user the app is ready to preview in the editor; publishing it to a \
 domain is done by the user in the app's settings.
+
+Pages (صفحة): a Page view is a table view that shows an HTML page written \
+for the table's rows. When the user gives a page number ("page 91", \
+"الصفحة رقم 91") or asks for an HTML page on their data, that number is the \
+Page view's ID: load the html-pages skill. It is not an application page.
 
 - Keep answers short, clear and well structured. Use Markdown lists for steps.
 """
 
-MAX_MODEL_REQUESTS = 25
+MAX_MODEL_REQUESTS = 40
 """Upper bound on model round-trips for one turn, so a confused model that
-keeps calling tools cannot run up an unbounded provider bill."""
+keeps calling tools cannot run up an unbounded provider bill. Building a
+dashboard or a multi-page app well takes 15-25 tool calls on models that make
+one call per request, so the bound leaves room for that and no more."""
 
-TURN_TIME_LIMIT = 300
+TURN_TIME_LIMIT = 540
 """Seconds. A turn runs in a thread (``runner``), which nothing can kill, so it
-checks this itself before each tool call."""
+checks this itself before each tool call. A call arriving later is refused and
+its work lost, so the limit leaves room for the longest single output: writing
+a Page view's document took one model request about four minutes through
+OpenRouter."""
 
 MODEL_REQUEST_TIMEOUT = 120
-"""Seconds one model request may take, so a hung provider cannot hold a turn
-past ``handler.STALE_AFTER``."""
+"""Seconds a model request may stay silent. The HTTP client applies it to each
+read rather than to the whole request, so a provider that streams keep-alive
+bytes (OpenRouter does) can take longer; ``TURN_TIME_LIMIT`` and
+``handler.STALE_AFTER`` bound the turn as a whole."""
 
 
 def get_available_models(workspace: Optional[Workspace] = None) -> list[str]:
@@ -169,6 +191,7 @@ def _result_refs(result: Any) -> dict:
         "workflow_id",
         "application_id",
         "page_id",
+        "dashboard_id",
     ):
         if isinstance(result.get(key), int):
             refs[key] = result[key]
@@ -185,7 +208,11 @@ def _to_pydantic_ai_tool(tool: SanadTool):
             raise ApprovalRequired()
         action = {"tool": tool.name, "arguments": arguments, "ok": True}
         try:
-            result = tool.call(ctx.deps.endpoint, arguments)
+            # One transaction per call, as each editor API request has: tools
+            # that lock rows need one, and a failed call leaves nothing half
+            # done. Turns run on a thread with no request around them.
+            with transaction.atomic():
+                result = tool.call(ctx.deps.endpoint, arguments)
         except Exception as exc:  # noqa: BLE001 - reported back to the model
             logger.info("Sanad tool %s failed: %s", tool.name, exc.__class__.__name__)
             action.update(ok=False, error=safe_tool_error(exc))
@@ -195,7 +222,7 @@ def _to_pydantic_ai_tool(tool: SanadTool):
         ctx.deps.on_action(action)
         return result
 
-    return Tool.from_schema(
+    pydantic_ai_tool = Tool.from_schema(
         run,
         name=tool.name,
         description=tool.description,
@@ -205,6 +232,25 @@ def _to_pydantic_ai_tool(tool: SanadTool):
         # their effects in the order the model asked for.
         sequential=True,
     )
+    if tool.skill:
+        # Hidden until its skill is loaded, so the model builds with the
+        # skill's guidance rather than guessing at a specialist tool.
+        pydantic_ai_tool.prepare = lambda ctx, definition: (
+            definition if tool.skill in loaded_skills(ctx.messages) else None
+        )
+    return pydantic_ai_tool
+
+
+def build_instructions() -> str:
+    return f"""{SANAD_INSTRUCTIONS}
+Skills:
+Each skill is expert guidance for one kind of work. When you are about to do \
+that work — build it, change it, or answer how to — call load_skill with its \
+name first, once per conversation: its instructions then stay in this \
+conversation, so never load the same skill twice. Do not load skills for \
+anything else. Some tools only appear after their skill is loaded.
+{skills_index()}
+"""
 
 
 def build_agent(model):
@@ -212,7 +258,7 @@ def build_agent(model):
 
     return Agent(
         model,
-        instructions=SANAD_INSTRUCTIONS,
+        instructions=build_instructions(),
         deps_type=SanadDeps,
         tools=[_to_pydantic_ai_tool(tool) for tool in get_sanad_tools()],
         output_type=[str, DeferredToolRequests],

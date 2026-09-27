@@ -27,6 +27,7 @@ from rest_framework.status import (
 )
 
 from arabase.sanad import runner
+from arabase.sanad.handler import STALE_AFTER
 from arabase.sanad.models import SanadChat, SanadMessage, SanadMessageStatus
 from arabase.sanad.tools import APPROVAL_TOOLS, get_sanad_tools
 from jadawel.contrib.database.table.models import Table
@@ -579,7 +580,7 @@ def test_a_turn_whose_worker_died_is_released(api_client, sanad):
         chat=chat, role="assistant", status=SanadMessageStatus.PENDING
     )
     SanadMessage.objects.filter(id=stuck.id).update(
-        updated_on=timezone.now() - timedelta(minutes=11)
+        updated_on=timezone.now() - STALE_AFTER - timedelta(minutes=1)
     )
 
     response = api_client.get(
@@ -651,3 +652,34 @@ def test_a_turn_past_its_time_limit_stops(api_client, sanad, monkeypatch):
     assert reply.status == SanadMessageStatus.ERROR
     assert reply.error == "SANAD_ERROR_TIMED_OUT"
     assert reply.actions == []
+
+
+@pytest.mark.django_db(transaction=True)
+def test_every_tool_call_runs_in_a_transaction(api_client, sanad):
+    """Turns run on a thread with no request transaction around them; tools
+    that lock rows (``update_fields`` renaming a field) failed with
+    TransactionManagementError until each call got its own transaction."""
+
+    chat_id = new_chat(api_client, sanad)
+    field = sanad["name_field"]
+    model = scripted_model(
+        [
+            [
+                (
+                    "update_fields",
+                    {
+                        "table_id": sanad["table"].id,
+                        "fields": [{"id": field.id, "name": "Full name"}],
+                    },
+                )
+            ],
+            "Renamed.",
+        ]
+    )
+
+    send(api_client, sanad["token"], chat_id, "rename it", model)
+
+    reply = SanadMessage.objects.get(role="assistant")
+    assert reply.actions[0]["ok"], reply.actions[0]
+    field.refresh_from_db()
+    assert field.name == "Full name"

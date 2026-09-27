@@ -1659,3 +1659,40 @@ of being returned as-is; every caller already treated an empty value as unset
 **Tests:** `backend/tests/arabase/test_generative_ai_settings.py`,
 `web-frontend/test/unit/arabase/sanad.spec.js` (`workspace tools window`,
 `AdminGenerativeAISettings`).
+
+## Builder home page previews and loads again under vue-router 5 (2026-09-27)
+
+**Context:** Both builder routes catch the application page path in
+`:pathMatch(.*)*`. The Nuxt 4 migration moved to vue-router 5, which leaves that
+param out of `route.params` when it matches nothing (vue-router 4 gave `[]`). The
+home page (`/`) therefore arrived with no path, `resolveApplicationRoute` returned
+nothing, and previewing an app (`/builder/<id>/preview/`) or opening a published
+site's root answered 404 "لم يتم العثور على الصفحة"; deeper pages still worked.
+
+| File                                                                       | Change                                                                                                                 | Reason                                                                                      | Merge risk |
+| -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------- |
+| `web-frontend/modules/builder/utils/routing.js`                            | Add `getRoutePagePath(route)`: the page path without its leading slash, `''` when `pathMatch` is absent, arrays joined | One place that reads the catch-all the same way under vue-router 4 and 5                    | low        |
+| `web-frontend/modules/builder/pages/publicPage.vue`                        | Resolve the page with `getRoutePagePath(route)`                                                                        | The home page no longer 404s in preview and on published domains                            | low        |
+| `web-frontend/modules/builder/components/elements/components/MenuItem.vue` | Same                                                                                                                   | Home is highlighted in menus again; nested paths were matched as `'a,b'` from the raw array | low        |
+| `web-frontend/modules/builder/components/PublicSiteErrorPage.vue`          | "Home" compares `getRoutePagePath` with `''` instead of `pathMatch === '/'`                                            | The old comparison never held, so "Home" on the home page pushed instead of reloading       | low        |
+
+**Tests:** `web-frontend/test/unit/builder/utils/routing.spec.js` resolves real URLs
+through vue-router with the builder's own route patterns.
+
+## Counts and percentages from the aggregate-rows service are numbers (2026-09-27)
+
+**Context:** The local aggregate-rows service (behind the dashboard summary and
+progress widgets, builder data sources and the automation "aggregate rows" step)
+rendered every result with the aggregated _field's_ serializer. That is right for
+min, max, sum or average, which are values of the field's own type, and wrong for
+counts and percentages: over a boolean field every `checked_*` result became
+`True`/`False` (a 66.7% win rate showed as `True`), and over a text field a count
+became the string `"2"`. Found while Sanad's dashboards skill was being verified.
+
+| File                                                                      | Change                                                                                                                                                                           | Reason                                                      | Merge risk |
+| ------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------- |
+| `backend/src/jadawel/contrib/integrations/local_jadawel/service_types.py` | `dispatch_data` passes the aggregation type on; `dispatch_transform` uses the field's serializer only for `FIELD_VALUED_AGGREGATIONS` and returns other results as plain numbers | Rates and counts show as numbers whatever the field type is | low        |
+
+**Tests:** `backend/tests/arabase/test_sanad_skills.py`
+(`test_the_dashboard_skills_techniques_work`: a win rate from a boolean formula).
+Core's aggregate-rows, dashboard and builder data source tests pass unchanged.

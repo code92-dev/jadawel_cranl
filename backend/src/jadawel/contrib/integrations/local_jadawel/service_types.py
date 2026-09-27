@@ -1,3 +1,4 @@
+from decimal import Decimal
 from typing import (
     TYPE_CHECKING,
     Any,
@@ -134,6 +135,17 @@ if TYPE_CHECKING:
 
 
 SCHEMA_CACHE_TTL = 60 * 60  # 1 hour
+
+
+FIELD_VALUED_AGGREGATIONS = frozenset(
+    {"min", "max", "min_date", "max_date", "sum", "average", "median"}
+    | {"std_dev", "variance"}
+)
+"""Aggregations whose result is a value of the aggregated field's own type, so
+the field's serializer renders it. Every other aggregation is a count or a
+percentage: a number whatever the field is. Rendering those with the field's
+serializer turned a boolean field's 66.7% into ``True`` and a text field's
+count into ``"2"`` (PATCHES.md)."""
 
 
 class LocalJadawelServiceType(ServiceType):
@@ -1511,6 +1523,7 @@ class LocalJadawelAggregateRowsUserServiceType(
                 "data": {"result": result},
                 "jadawel_table_model": model,
                 "field": field,
+                "aggregation_type": service.aggregation_type,
             }
         except DjangoFieldDoesNotExist as ex:
             raise ServiceImproperlyConfiguredDispatchException(
@@ -1534,16 +1547,20 @@ class LocalJadawelAggregateRowsUserServiceType(
         :return: A dictionary containing the aggregation result.
         """
 
-        # Use the field type's serializer field to ensure the aggregation result
-        # is serialized correctly. Some aggregations can return values which are not
-        # JSON serializable (e.g. Decimal), so we need to use the serializer field
-        # to convert them into a JSON serializable format.
-        result = (
-            data["field"]
-            .get_type()
-            .get_serializer_field(data["field"])
-            .to_representation(data["data"]["result"])
-        )
+        result = data["data"]["result"]
+        if data.get("aggregation_type") in FIELD_VALUED_AGGREGATIONS:
+            # Use the field type's serializer field to ensure the aggregation
+            # result is serialized correctly. Some aggregations can return values
+            # which are not JSON serializable (e.g. Decimal), so we need to use
+            # the serializer field to convert them into a JSON serializable format.
+            result = (
+                data["field"]
+                .get_type()
+                .get_serializer_field(data["field"])
+                .to_representation(result)
+            )
+        elif isinstance(result, Decimal):
+            result = float(result)
 
         return DispatchResult(data={"result": result})
 

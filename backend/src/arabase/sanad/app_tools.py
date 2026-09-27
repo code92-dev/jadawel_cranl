@@ -204,9 +204,14 @@ def _describe_field(field) -> dict:
     elif isinstance(field, serializers.ChoiceField):
         info["type"] = "choice"
         info["choices"] = list(field.choices)
-    elif isinstance(field, serializers.ListSerializer):
+    elif isinstance(field, (serializers.ListSerializer, serializers.ListField)):
         info["type"] = "list"
-        info["item"] = _describe_serializer(field.child)
+        child = field.child
+        info["item"] = (
+            _describe_serializer(child)
+            if isinstance(child, serializers.Serializer)
+            else _describe_field(child)
+        )
     elif isinstance(field, serializers.BooleanField):
         info["type"] = "boolean"
     elif isinstance(field, serializers.IntegerField):
@@ -403,6 +408,8 @@ def _apply_step_settings(
     payload = {}
     if label is not None:
         payload["label"] = label
+    if "edges" in settings:
+        settings = {**settings, "edges": _router_edges(node, settings["edges"])}
     if settings:
         payload["service"] = {
             **settings,
@@ -422,6 +429,28 @@ def _apply_step_settings(
     return UpdateAutomationNodeActionType.do(endpoint.user, node.id, data)
 
 
+def _router_edges(node, edges: list) -> list:
+    """Router branches with their ``uid``, which the editor makes up itself.
+
+    A branch given without one keeps the uid of the existing branch with the
+    same label, so the steps attached to it stay attached; a new one gets a
+    new uid.
+    """
+
+    import uuid
+
+    existing = {}
+    service = node.service.specific
+    if hasattr(service, "edges"):
+        existing = {edge.label: str(edge.uid) for edge in service.edges.all()}
+    return [
+        edge
+        if not isinstance(edge, dict) or edge.get("uid")
+        else {**edge, "uid": existing.get(edge.get("label")) or str(uuid.uuid4())}
+        for edge in edges
+    ]
+
+
 class AddAutomationStepInput(BaseModel):
     workflow_id: int = Field(..., description="The workflow to add the step to.")
     type: str = Field(
@@ -438,6 +467,11 @@ class AddAutomationStepInput(BaseModel):
     branch: Optional[str] = Field(
         None,
         description="After a router: the uid of the router edge this step follows.",
+    )
+    inside_step_id: Optional[int] = Field(
+        None,
+        description="An iterator step: make this the first step run for each "
+        "item. Add the following ones with after_step_id.",
     )
     label: Optional[str] = Field(None, description="A short name for the step.")
     settings: dict = Field(
@@ -460,7 +494,9 @@ def add_automation_step(endpoint: SanadEndpoint, args: AddAutomationStepInput):
     workflow = _get_workflow(endpoint, args.workflow_id)
     node_type = automation_node_type_registry.get(args.type)
     placement = {}
-    if args.after_step_id is not None:
+    if args.inside_step_id is not None:
+        placement = {"reference_node_id": args.inside_step_id, "position": "child"}
+    elif args.after_step_id is not None:
         placement = {"reference_node_id": args.after_step_id, "position": "south"}
         if args.branch:
             placement["output"] = args.branch
@@ -669,8 +705,24 @@ class CreatePageInput(BaseModel):
     application_id: int = Field(..., description="The builder application.")
     name: str = Field(..., description="The page name.")
     path: str = Field(
-        ..., description="The URL path, unique in the app, e.g. / or /customers."
+        ...,
+        description="The URL path, unique in the app, e.g. / or /customers. A "
+        "detail page takes a parameter: /customer/:id.",
     )
+
+
+def _path_params(path: str) -> list[dict]:
+    """The parameters a path declares: ``:id`` and ``:x_id`` are numbers."""
+
+    import re
+
+    return [
+        {
+            "name": name,
+            "type": "numeric" if name == "id" or name.endswith("_id") else "text",
+        }
+        for name in re.findall(r":([A-Za-z0-9_]+)", path)
+    ]
 
 
 def create_page(endpoint: SanadEndpoint, args: CreatePageInput) -> dict:
@@ -678,13 +730,21 @@ def create_page(endpoint: SanadEndpoint, args: CreatePageInput) -> dict:
 
     builder = _get_application(endpoint, args.application_id, "builder")
     path = args.path if args.path.startswith("/") else f"/{args.path}"
-    page = PageService().create_page(endpoint.user, builder, args.name, path)
-    return {
+    params = _path_params(path)
+    page = PageService().create_page(
+        endpoint.user, builder, args.name, path, path_params=params or None
+    )
+    result = {
         "page_id": page.id,
         "application_id": builder.id,
         "name": page.name,
         "path": page.path,
     }
+    if params:
+        result["read_parameters_with"] = [
+            f"get('page_parameter.{param['name']}')" for param in params
+        ]
+    return result
 
 
 class DeletePageInput(BaseModel):
@@ -853,7 +913,7 @@ def add_table_to_page(endpoint: SanadEndpoint, args: AddTableToPageInput) -> dic
             endpoint.user,
             page,
             service_type_registry.get("local_jadawel_list_rows"),
-            name=args.title or table.name,
+            name=_data_source_name(page, args.title or table.name),
             table_id=table.id,
             integration_id=integration.id,
         )
@@ -883,8 +943,59 @@ def add_table_to_page(endpoint: SanadEndpoint, args: AddTableToPageInput) -> dic
     }
 
 
+def _data_source_name(page, proposed: str) -> str:
+    """``proposed``, numbered if the page already has a data source by that name."""
+
+    from jadawel.contrib.builder.data_sources.handler import DataSourceHandler
+
+    return DataSourceHandler().find_unused_data_source_name(page, proposed[:200])
+
+
+def _link_row_input(endpoint: SanadEndpoint, page, integration, field):
+    """A dropdown of the linked table's rows, for a link-to-table field.
+
+    Its options come from a list-rows data source on the linked table, as the
+    editor's "formula" options do: each option's value is the row ID, which the
+    create-row action links, and its label is the row's primary field.
+    """
+
+    from django.conf import settings
+
+    from jadawel.contrib.builder.data_sources.service import DataSourceService
+    from jadawel.contrib.builder.elements.models import ChoiceElement
+    from jadawel.contrib.database.fields.models import Field
+    from jadawel.core.services.registries import service_type_registry
+
+    linked = field.link_row_table
+    primary = Field.objects.filter(table=linked, primary=True).first()
+    data_source = DataSourceService().create_data_source(
+        endpoint.user,
+        page,
+        service_type_registry.get("local_jadawel_list_rows"),
+        name=_data_source_name(page, f"{field.name} ({linked.name})"),
+        table_id=linked.id,
+        integration_id=integration.id,
+        # A dropdown shows every option at once, so ask for the most rows allowed.
+        default_result_count=settings.INTEGRATION_LOCAL_JADAWEL_PAGE_SIZE_LIMIT,
+    )
+    rows = f"data_source.{data_source.id}.*"
+    return "choice", {
+        "label": formula_literal(field.name),
+        "show_as_dropdown": True,
+        "multiple": field.link_row_multiple_relationships,
+        "option_type": ChoiceElement.OPTION_TYPE.FORMULAS,
+        "formula_value": f"get('{rows}.id')",
+        "formula_name": (
+            f"get('{rows}.field_{primary.id}')" if primary else f"get('{rows}.id')"
+        ),
+    }
+
+
 def _form_input(field) -> Optional[tuple[str, dict]]:
-    """The input element for ``field``, or None when forms cannot set it."""
+    """The input element for ``field``, or None when forms cannot set it.
+
+    Link-to-table fields are handled by ``_link_row_input``, which needs a page.
+    """
 
     kind = _field_type(field)
     label = {"label": formula_literal(field.name)}
@@ -917,6 +1028,39 @@ def _form_input(field) -> Optional[tuple[str, dict]]:
         ]
         return "choice", {**label, "options": options, "show_as_dropdown": True}
     return None
+
+
+def _add_form_inputs(endpoint, page, integration, form, fields, required_ids):
+    """Add an input for each field to ``form``: ``([(field, element)], skipped)``.
+
+    :raises ValueError: when none of ``fields`` can be filled in by a form.
+    """
+
+    from jadawel.contrib.builder.elements.registries import element_type_registry
+    from jadawel.contrib.builder.elements.service import ElementService
+
+    mapped, skipped = [], []
+    for field in fields:
+        if _field_type(field) == "link_row":
+            spec = _link_row_input(endpoint, page, integration, field)
+        else:
+            spec = _form_input(field)
+        if spec is None:
+            skipped.append(field.name)
+            continue
+        element_type, values = spec
+        element = ElementService().create_element(
+            endpoint.user,
+            element_type_registry.get(element_type),
+            page,
+            parent_element_id=form.id,
+            required=field.id in required_ids,
+            **values,
+        )
+        mapped.append((field, element))
+    if not mapped:
+        raise ValueError("None of these fields can be filled in by a form.")
+    return mapped, skipped
 
 
 class AddFormToPageInput(BaseModel):
@@ -956,7 +1100,6 @@ def add_form_to_page(endpoint: SanadEndpoint, args: AddFormToPageInput) -> dict:
         if not field_type_registry.get_by_model(field).read_only
     ]
     elements = ElementService()
-    created_inputs, skipped = [], []
     with transaction.atomic():
         integration = _local_integration(endpoint, page.builder)
         if args.title:
@@ -973,25 +1116,12 @@ def add_form_to_page(endpoint: SanadEndpoint, args: AddFormToPageInput) -> dict:
             page,
             submit_button_label=formula_literal(args.submit_label),
         )
-        mapped = []
-        for field in writable:
-            spec = _form_input(field)
-            if spec is None:
-                skipped.append(field.name)
-                continue
-            element_type, values = spec
-            element = elements.create_element(
-                endpoint.user,
-                element_type_registry.get(element_type),
-                page,
-                parent_element_id=form.id,
-                required=field.id in args.required_field_ids,
-                **values,
-            )
-            mapped.append((field, element))
-            created_inputs.append({"id": element.id, "field": field.name})
-        if not mapped:
-            raise ValueError("None of these fields can be filled in by a form.")
+        mapped, skipped = _add_form_inputs(
+            endpoint, page, integration, form, writable, args.required_field_ids
+        )
+        created_inputs = [
+            {"id": element.id, "field": field.name} for field, element in mapped
+        ]
 
         # The row a submission creates, attached to the form's submit event.
         # The service is passed as values, as the editor sends it, so the
@@ -1030,5 +1160,97 @@ def add_form_to_page(endpoint: SanadEndpoint, args: AddFormToPageInput) -> dict:
         "application_id": page.builder_id,
         "form_element_id": form.id,
         "inputs": created_inputs,
+        "skipped_fields": skipped,
+    }
+
+
+class AddFieldsToFormInput(BaseModel):
+    form_element_id: int = Field(
+        ..., description="The form to extend (form_element_id from add_form_to_page)."
+    )
+    field_ids: list[int] = Field(
+        ..., description="Fields of the form's table to ask for, in order."
+    )
+    required_field_ids: list[int] = Field(
+        default_factory=list, description="Fields the visitor must fill in."
+    )
+
+
+def add_fields_to_form(endpoint: SanadEndpoint, args: AddFieldsToFormInput) -> dict:
+    from jadawel.contrib.builder.elements.service import ElementService
+    from jadawel.contrib.builder.workflow_actions.models import (
+        BuilderWorkflowAction,
+    )
+    from jadawel.contrib.builder.workflow_actions.service import (
+        BuilderWorkflowActionService,
+    )
+    from jadawel.contrib.database.fields.registries import field_type_registry
+
+    form = ElementService().get_element(endpoint.user, args.form_element_id).specific
+    page = _get_page(endpoint, form.page_id)
+    if form.get_type().type != "form_container":
+        raise ValueError(f"Element {form.id} is not a form.")
+    create_rows = [
+        action.specific
+        for action in BuilderWorkflowAction.objects.filter(element=form)
+        if action.get_type().type == "create_row"
+    ]
+    if len(create_rows) != 1:
+        raise ValueError(
+            "The form must save its submissions with one create-row action."
+        )
+    action = create_rows[0]
+    service = action.service.specific
+    existing = list(service.field_mappings.all())
+    already = {mapping.field_id for mapping in existing if mapping.enabled}
+    fields = [
+        field
+        for field in _pick_fields(service.table, args.field_ids, limit=50)
+        if field.id not in already
+        and not field_type_registry.get_by_model(field).read_only
+    ]
+    if not fields:
+        raise ValueError("The form already asks for every one of these fields.")
+
+    with transaction.atomic():
+        mapped, skipped = _add_form_inputs(
+            endpoint,
+            page,
+            _local_integration(endpoint, page.builder),
+            form,
+            fields,
+            args.required_field_ids,
+        )
+        new_ids = {field.id for field, _ in mapped}
+        BuilderWorkflowActionService().update_workflow_action(
+            endpoint.user,
+            action,
+            service={
+                "field_mappings": [
+                    {
+                        "field_id": mapping.field_id,
+                        "enabled": mapping.enabled,
+                        "value": mapping.value,
+                    }
+                    for mapping in existing
+                    if mapping.field_id not in new_ids
+                ]
+                + [
+                    {
+                        "field_id": field.id,
+                        "enabled": True,
+                        "value": f"get('form_data.{element.id}')",
+                    }
+                    for field, element in mapped
+                ]
+            },
+        )
+    return {
+        "page_id": page.id,
+        "application_id": page.builder_id,
+        "form_element_id": form.id,
+        "inputs": [
+            {"id": element.id, "field": field.name} for field, element in mapped
+        ],
         "skipped_fields": skipped,
     }

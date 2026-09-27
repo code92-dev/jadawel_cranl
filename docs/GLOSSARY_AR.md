@@ -152,6 +152,8 @@ Terms introduced by the Excel/ODS import and export features. Keep "Excel",
 | Approve (an action) | الموافقة / وافق | Confirming a destructive action Sanad asked to run. |
 | Decline | رفض | |
 | Beta | بيتا | Badge on features still being introduced; matches the existing app-type badge. |
+| Skill (Sanad) | مهارة | pl. مهارات. Expert guidance Sanad loads for one kind of work; "consulted a skill" = الاستعانة بمهارة. |
+| Revision (Page view) | نسخة سابقة | pl. النسخ السابقة. A page's earlier document, kept on every rewrite; restore = استعادة نسخة سابقة. |
 
 ## Common actions (verbs)
 

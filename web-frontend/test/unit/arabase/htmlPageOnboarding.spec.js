@@ -130,6 +130,63 @@ describe('HtmlPageOnboarding', () => {
     expect(wrapper.text()).not.toContain('http://localhost:8000//mcp/')
   })
 
+  test('staff can hand the page to Sanad, with its number typed in', async () => {
+    fetchAll.mockResolvedValue({ data: [] })
+    const $bus = { $emit: vi.fn() }
+    const wrapper = await mountSuspended(HtmlPageOnboarding, {
+      props: { database, view },
+      global: {
+        mocks: {
+          $config: { public: { publicBackendUrl: 'http://localhost:8000' } },
+          $client: {},
+          $t,
+          $bus,
+          $store: { getters: { 'auth/isStaff': true } },
+        },
+        stubs: { SettingsModal: true, Copied: true },
+      },
+    })
+
+    // The intro no longer says a page can only be written from outside.
+    expect(translated.map((t) => t.key)).toContain(
+      'htmlPageOnboarding.leadWithSanad'
+    )
+    await wrapper.get('.html-page-onboarding__sanad button').trigger('click')
+
+    const draft = 'htmlPageOnboarding.sanadDraft::{"viewId":4660}'
+    expect($bus.$emit.mock.calls).toEqual([
+      ['toggle-right-sidebar', true],
+      ['sanad-draft', draft],
+    ])
+    // The panel mounts on opening, after the event: it takes the parked text.
+    const { takeSanadDraft } =
+      await import('@jadawel/modules/arabase/sanad/utils/askSanad')
+    expect(takeSanadDraft()).toBe(draft)
+    expect(takeSanadDraft()).toBeNull()
+  })
+
+  test('the Sanad offer is for staff only, like Sanad itself', async () => {
+    fetchAll.mockResolvedValue({ data: [] })
+    const wrapper = await mountSuspended(HtmlPageOnboarding, {
+      props: { database, view },
+      global: {
+        mocks: {
+          $config: { public: { publicBackendUrl: 'http://localhost:8000' } },
+          $client: {},
+          $t,
+          $store: { getters: { 'auth/isStaff': false } },
+        },
+        stubs: { SettingsModal: true, Copied: true },
+      },
+    })
+
+    expect(wrapper.find('.html-page-onboarding__sanad').exists()).toBe(false)
+    expect(translated.map((t) => t.key)).toContain('htmlPageOnboarding.lead')
+    expect(translated.map((t) => t.key)).not.toContain(
+      'htmlPageOnboarding.leadWithSanad'
+    )
+  })
+
   test('a failed endpoint lookup still leaves a usable panel', async () => {
     fetchAll.mockRejectedValue(new Error('boom'))
 

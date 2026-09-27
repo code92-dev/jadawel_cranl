@@ -28,10 +28,10 @@ logger = logging.getLogger(__name__)
 
 TITLE_LENGTH = 80
 
-STALE_AFTER = timedelta(minutes=10)
+STALE_AFTER = timedelta(minutes=15)
 """A turn still pending after this long lost its process (restart, OOM); it is
 shown as failed so the chat is usable again. Longer than a turn can last
-(``agent.TURN_TIME_LIMIT`` plus one model request)."""
+(``agent.TURN_TIME_LIMIT`` plus one long model request)."""
 
 BUSY_STATUSES = (SanadMessageStatus.PENDING, SanadMessageStatus.AWAITING_APPROVAL)
 

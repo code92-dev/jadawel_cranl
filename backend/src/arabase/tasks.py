@@ -162,4 +162,3 @@ def setup_periodic_mcp_mask_token_purge(sender, **kwargs):
         purge_expired_mcp_mask_tokens.s(),
         name=MCP_MASK_TOKEN_PURGE_TASK_NAME,
     )
-

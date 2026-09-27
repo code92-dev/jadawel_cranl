@@ -13,9 +13,8 @@ entry for it.
 
 ## Authoring a page
 
-There is no "generate with AI" button and no model provider configured inside
-Jadawel. Authoring happens from the user's own AI client through the MCP server
-that already ships with the fork.
+Authoring happens from the user's own AI client through the MCP server that
+ships with the fork, or, for staff, through Sanad inside Jadawel (below).
 
 **A new page explains this itself.** Create one and it opens on a setup panel
 (`HtmlPageOnboarding.vue`) with the three things needed to get it written:
@@ -33,6 +32,12 @@ that already ships with the fork.
 The panel is for whoever owns the view. A visitor on a public link to an empty
 page sees a plain "nothing here yet" instead — the endpoint list behind it needs
 an account, and an MCP address is not a visitor's business.
+
+**Or Sanad writes it.** Staff can hand the page to Sanad (سند), the in-app
+assistant, from the same panel: *Ask Sanad* opens it with the page's number typed
+in. Sanad's `html-pages` skill carries this contract and writes through the view's
+own update route, so revisions and the MCP artifact boundary apply the same way
+(see `docs/SANAD_AI_ASSISTANT.md`).
 
 The assistant then calls, in order:
 
