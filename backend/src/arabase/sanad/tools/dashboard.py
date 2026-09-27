@@ -15,7 +15,7 @@ from django.db import transaction
 
 from pydantic import BaseModel, Field
 
-from arabase.sanad.tools import SanadEndpoint, SanadTool
+from arabase.sanad.tools.base import SanadEndpoint, SanadTool
 
 SKILL = "dashboards"
 
@@ -205,9 +205,9 @@ def _check_complete(widget_type: str, settings: "WidgetSettings") -> None:
 
 
 def _get_dashboard(endpoint: SanadEndpoint, dashboard_id: int):
-    from arabase.sanad.app_tools import _get_application
+    from arabase.sanad.tools.base import get_application
 
-    return _get_application(endpoint, dashboard_id, "dashboard")
+    return get_application(endpoint, dashboard_id, "dashboard")
 
 
 def _get_widget(endpoint: SanadEndpoint, widget_id: int):
@@ -480,7 +480,7 @@ def delete_dashboard_widget(
     return {"deleted_widget_id": widget.id, "dashboard_id": widget.dashboard_id}
 
 
-def get_dashboard_tools() -> list[SanadTool]:
+def get_tools() -> list[SanadTool]:
     return [
         SanadTool(
             "create_dashboard",

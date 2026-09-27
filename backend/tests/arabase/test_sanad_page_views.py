@@ -1,6 +1,6 @@
 """Sanad writing Page views (صفحة) through the ``html-pages`` skill.
 
-Covers the tools in ``arabase/sanad/page_view_tools.py``: the data a model is
+Covers the tools in ``arabase/sanad/tools/page.py``: the data a model is
 shown before it writes (shaped exactly like ``row.values`` in the page), the
 write path (revisions, the REST artifact boundary), the checks that catch a
 page which would render blank, and that the skill's own starter document
@@ -12,9 +12,9 @@ from pathlib import Path
 
 import pytest
 
-from arabase.sanad.page_view_tools import SKILL, check_page_html
 from arabase.sanad.skills import get_skills
 from arabase.sanad.tools import SanadEndpoint, get_sanad_tools
+from arabase.sanad.tools.page import SKILL, check_page_html
 from arabase.views.models import HtmlPageView, HtmlPageViewRevision
 from arabase.views.view_types import HtmlPageViewType
 from jadawel.contrib.database.rows.handler import RowHandler
@@ -249,7 +249,9 @@ def test_a_page_takes_no_filters_or_sorts(team):
             value="Sa",
         )
     with pytest.raises(ValueError, match="no filters or sorts"):
-        run("add_view_sort", team["endpoint"], view_id=page["view_id"], field_id=name.id)
+        run(
+            "add_view_sort", team["endpoint"], view_id=page["view_id"], field_id=name.id
+        )
     assert not HtmlPageView.objects.get(id=page["view_id"]).viewfilter_set.exists()
 
 

@@ -186,9 +186,29 @@ panel ──POST message──▶ API ──on commit──▶ runner thread (we
 ```
 
 - **Backend** — `backend/src/arabase/sanad/`: `models.py` (`SanadChat`,
-  `SanadMessage`), `tools.py`, `agent.py`, `handler.py`, `runner.py`; API in
+  `SanadMessage`), `tools/`, `agent.py`, `handler.py`, `runner.py`; API in
   `backend/src/arabase/api/sanad/` under `/api/arabase/sanad/`; migration
   `arabase/0019_sanad_chat`.
+- **Tools, by domain** — `tools/` is one module per domain behind the
+  `SanadTool` contract in `tools/base.py` (name, description, input schema, run
+  function, optional skill). Each module exposes `get_tools()`, and
+  `tools.get_sanad_tools()` gathers them in the order of `tools.DOMAINS`:
+
+  | Module | Tools |
+  |---|---|
+  | `core` | `load_skill`, `list_applications` |
+  | `database` | reused MCP tools (databases, tables, fields, rows), views, filters, sorts |
+  | `automation` | automations, workflows, steps, runs |
+  | `builder` | builder apps at the level of intent: pages, content, tables, forms |
+  | `builder_elements` | every element, data sources and the theme (`app-builder` skill) |
+  | `dashboard` | dashboards and widgets (`dashboards` skill) |
+  | `page` | Page views (`html-pages` skill) |
+
+  Helpers more than one domain uses (`get_application`, `formula_literal`,
+  `describe_serializer`, `select_option_ids`) live in `base.py`, so domains do not
+  import each other; `builder_elements` extends `builder` and is the exception. A
+  new tool goes into its domain's `get_tools()`; a new domain is a module plus an
+  entry in `DOMAINS`.
 - **Model** — core's `generative_ai_model_type_registry` returns a pydantic-ai model
   for the chosen provider; pydantic-ai runs the tool loop.
 - **Tools** — most are the fork's MCP tools, called with the chat user so their

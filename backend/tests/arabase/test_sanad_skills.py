@@ -14,10 +14,10 @@ from pydantic_ai.messages import ModelResponse, TextPart, ToolCallPart
 from pydantic_ai.models.function import FunctionModel
 
 from arabase.sanad.agent import build_agent, build_instructions
-from arabase.sanad.dashboard_tools import SKILL as DASHBOARD_SKILL
-from arabase.sanad.page_tools import SKILL as PAGE_SKILL
 from arabase.sanad.skills import get_skills, loaded_skills
 from arabase.sanad.tools import APPROVAL_TOOLS, SanadEndpoint, get_sanad_tools
+from arabase.sanad.tools.builder_elements import SKILL as PAGE_SKILL
+from arabase.sanad.tools.dashboard import SKILL as DASHBOARD_SKILL
 from jadawel.contrib.automation.workflows.handler import AutomationWorkflowHandler
 from jadawel.contrib.builder.elements.models import Element
 from jadawel.contrib.database.rows.handler import RowHandler

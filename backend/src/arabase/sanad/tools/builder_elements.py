@@ -1,6 +1,6 @@
 """Sanad's element-level tools for application-builder pages, and the theme.
 
-``app_tools`` builds pages from a few intents (content, a table, a form). These
+``builder`` builds pages from a few intents (content, a table, a form). These
 tools reach every element the editor offers — columns, containers, repeats,
 links drawn as buttons, headers, menus — plus data sources and the app's theme,
 so an app can be designed, not only assembled. They are offered only once the
@@ -16,7 +16,7 @@ from django.db import transaction
 
 from pydantic import BaseModel, Field
 
-from arabase.sanad.tools import SanadEndpoint, SanadTool
+from arabase.sanad.tools.base import SanadEndpoint, SanadTool
 
 SKILL = "app-builder"
 
@@ -64,7 +64,7 @@ STYLE_NOTE = (
 
 
 def _get_page(endpoint: SanadEndpoint, page_id: int):
-    from arabase.sanad.app_tools import _get_page as get_page
+    from arabase.sanad.tools.builder import get_page
 
     return get_page(endpoint, page_id)
 
@@ -110,7 +110,7 @@ def _as_formulas(element_type, settings: dict) -> dict:
     parses (``'Welcome'``, ``get('page_parameter.id')``) is kept as a formula.
     """
 
-    from arabase.sanad.app_tools import formula_literal
+    from arabase.sanad.tools.base import formula_literal
     from jadawel.core.formula.parser.parser import get_parse_tree_for_formula
 
     settings = dict(settings)
@@ -261,7 +261,7 @@ class DescribePageElementInput(BaseModel):
 def describe_page_element(
     endpoint: SanadEndpoint, args: DescribePageElementInput
 ) -> dict:
-    from arabase.sanad.app_tools import _describe_serializer
+    from arabase.sanad.tools.base import describe_serializer
     from jadawel.contrib.builder.elements.registries import element_type_registry
 
     if not args.type:
@@ -278,9 +278,7 @@ def describe_page_element(
     element_type = element_type_registry.get(args.type)
     settings = {
         name: info
-        for name, info in _describe_serializer(
-            _request_serializer(element_type)
-        ).items()
+        for name, info in describe_serializer(_request_serializer(element_type)).items()
         if not name.startswith("style_")
         and name
         not in ("parent_element_id", "place_in_container", "roles", "before_id")
@@ -455,7 +453,7 @@ class AddPageDataSourceInput(BaseModel):
 
 
 def add_page_data_source(endpoint: SanadEndpoint, args: AddPageDataSourceInput):
-    from arabase.sanad.app_tools import _data_source_name, _local_integration
+    from arabase.sanad.tools.builder import data_source_name, local_integration
     from jadawel.contrib.builder.data_sources.service import DataSourceService
     from jadawel.contrib.database.mcp import services
     from jadawel.core.services.registries import service_type_registry
@@ -469,12 +467,12 @@ def add_page_data_source(endpoint: SanadEndpoint, args: AddPageDataSourceInput):
     elif args.rows_per_page:
         values["default_result_count"] = args.rows_per_page
     with transaction.atomic():
-        values["integration_id"] = _local_integration(endpoint, page.builder).id
+        values["integration_id"] = local_integration(endpoint, page.builder).id
         data_source = DataSourceService().create_data_source(
             endpoint.user,
             target,
             service_type_registry.get(f"local_jadawel_{args.kind}"),
-            name=_data_source_name(target, args.name),
+            name=data_source_name(target, args.name),
             **values,
         )
     rows = f"data_source.{data_source.id}"
@@ -502,12 +500,12 @@ class GetAppThemeInput(BaseModel):
 
 
 def get_app_theme(endpoint: SanadEndpoint, args: GetAppThemeInput) -> dict:
-    from arabase.sanad.app_tools import _get_application
+    from arabase.sanad.tools.base import get_application
     from jadawel.contrib.builder.api.theme.serializers import (
         serialize_builder_theme,
     )
 
-    builder = _get_application(endpoint, args.application_id, "builder")
+    builder = get_application(endpoint, args.application_id, "builder")
     return {"application_id": builder.id, "theme": serialize_builder_theme(builder)}
 
 
@@ -521,14 +519,14 @@ class UpdateAppThemeInput(BaseModel):
 
 
 def update_app_theme(endpoint: SanadEndpoint, args: UpdateAppThemeInput) -> dict:
-    from arabase.sanad.app_tools import _get_application
+    from arabase.sanad.tools.base import get_application
     from jadawel.api.utils import validate_data
     from jadawel.contrib.builder.api.theme.serializers import (
         CombinedThemeConfigBlocksRequestSerializer,
     )
     from jadawel.contrib.builder.theme.service import ThemeService
 
-    builder = _get_application(endpoint, args.application_id, "builder")
+    builder = get_application(endpoint, args.application_id, "builder")
     unknown = set(args.settings) - set(
         CombinedThemeConfigBlocksRequestSerializer().fields
     )
@@ -545,7 +543,7 @@ def update_app_theme(endpoint: SanadEndpoint, args: UpdateAppThemeInput) -> dict
     return {"application_id": builder.id, "updated": sorted(data)}
 
 
-def get_page_tools() -> list[SanadTool]:
+def get_tools() -> list[SanadTool]:
     return [
         SanadTool(
             "list_page_elements",

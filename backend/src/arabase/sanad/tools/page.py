@@ -17,7 +17,7 @@ from django.db import transaction
 
 from pydantic import BaseModel, Field
 
-from arabase.sanad.tools import SanadEndpoint, SanadTool
+from arabase.sanad.tools.base import SanadEndpoint, SanadTool
 
 SKILL = "html-pages"
 
@@ -374,7 +374,7 @@ def restore_page_view_revision(
         return _write(endpoint, view, {"html": revision.html})
 
 
-def get_page_view_tools() -> list[SanadTool]:
+def get_tools() -> list[SanadTool]:
     return [
         SanadTool(
             "create_page_view",
