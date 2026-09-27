@@ -40,6 +40,7 @@
 <script>
 import { buildPageDocument } from '@jadawel/modules/arabase/views/utils/pageDocument'
 import HtmlPageOnboarding from '@jadawel/modules/arabase/views/components/HtmlPageOnboarding'
+import { visibleFieldsInOrder } from '@jadawel/modules/arabase/views/utils/fields'
 
 /**
  * Renders a page view's HTML.
@@ -94,16 +95,16 @@ export default {
       // The backend already withholds hidden fields from the feed; mirroring
       // that here keeps the `fields` array the page reads consistent with the
       // keys that actually appear on its rows.
-      const fieldOptions = this.view.field_options || {}
-      return this.fields
-        .filter((field) => !fieldOptions[field.id]?.hidden)
-        .map((field) => ({
-          id: field.id,
-          name: field.name,
-          type: field.type,
-          order: fieldOptions[field.id]?.order ?? 0,
-        }))
-        .sort((a, b) => a.order - b.order || a.id - b.id)
+      const fieldOptions =
+        this.view.field_options ||
+        this.$store.getters[this.storeKey + 'getAllFieldOptions'] ||
+        {}
+      return visibleFieldsInOrder(this.fields, fieldOptions).map((field) => ({
+        id: field.id,
+        name: field.name,
+        type: field.type,
+        order: fieldOptions[field.id]?.order ?? 0,
+      }))
     },
     payload() {
       return {
@@ -137,6 +138,7 @@ export default {
   },
   mounted() {
     window.addEventListener('message', this.onMessage)
+    window.addEventListener('blur', this.onWindowBlur)
     // The public page is server-rendered, so the frame is in the HTML the
     // browser parses: it can finish loading — and post its `ready` — before Vue
     // hydrates and the listener above exists. Waiting for `ready` or for `load`
@@ -147,8 +149,26 @@ export default {
   },
   beforeUnmount() {
     window.removeEventListener('message', this.onMessage)
+    window.removeEventListener('blur', this.onWindowBlur)
   },
   methods: {
+    /**
+     * A click inside the frame stays in the frame's document, so the open
+     * header popups (settings, share, the views list) never hear it and stay
+     * open over the page. The one sign of it the app gets is its window losing
+     * focus to the frame; replay that as a click on the frame element, which
+     * is what the popups' click-outside handler listens for.
+     */
+    onWindowBlur() {
+      const frame = this.$refs.frame
+      // Checked on the next tick: focus has not moved yet when `blur` fires.
+      setTimeout(() => {
+        if (frame && document.activeElement === frame) {
+          frame.dispatchEvent(new MouseEvent('mousedown', { bubbles: true }))
+          frame.dispatchEvent(new MouseEvent('click', { bubbles: true }))
+        }
+      })
+    },
     /**
      * Turn `{ id, order, field_1: … }` into the shape documented in the runtime
      * contract: values keyed by field name, with the raw `field_<id>` keys kept

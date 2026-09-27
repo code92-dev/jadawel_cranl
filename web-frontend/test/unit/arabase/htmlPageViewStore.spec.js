@@ -98,6 +98,48 @@ describe('htmlPageView store', () => {
     expect(Object.keys(config)).toEqual(['params'])
   })
 
+  test('loads the field options with the feed when asked to', async () => {
+    const fieldOptions = { 363: { hidden: false, order: 1 } }
+    client.get.mockImplementation((url) =>
+      Promise.resolve({
+        data: url.endsWith('/field-options/')
+          ? { field_options: fieldOptions }
+          : feed,
+      })
+    )
+
+    await actions.fetch.call(
+      { $client: client },
+      { commit, rootGetters: { 'page/view/public/getIsPublic': false } },
+      { view: { id: 5 }, fieldOptions: true }
+    )
+
+    expect(client.get.mock.calls.map(([url]) => url)).toEqual([
+      '/database/views/html-page/5/',
+      '/database/views/5/field-options/',
+    ])
+    expect(commit).toHaveBeenCalledWith('SET_FIELD_OPTIONS', fieldOptions)
+  })
+
+  test('a public page never asks for field options', async () => {
+    await actions.fetch.call(
+      { $client: client },
+      {
+        commit,
+        rootGetters: {
+          'page/view/public/getIsPublic': true,
+          'page/view/public/getAuthToken': 'tok',
+        },
+      },
+      { view: { id: 'slug' }, fieldOptions: true }
+    )
+
+    expect(client.get).toHaveBeenCalledTimes(1)
+    expect(commit.mock.calls.map(([name]) => name)).not.toContain(
+      'SET_FIELD_OPTIONS'
+    )
+  })
+
   test('propagates a failed fetch and still clears the loading flag', async () => {
     const error = new Error('boom')
     client.get.mockRejectedValue(error)
@@ -130,6 +172,7 @@ describe('htmlPageView store', () => {
       count: 1,
       rowLimit: 200,
       truncated: true,
+      fieldOptions: {},
     })
 
     mutations.RESET(current)
@@ -142,6 +185,7 @@ describe('htmlPageView store', () => {
       count: 0,
       rowLimit: 0,
       truncated: false,
+      fieldOptions: {},
     })
   })
 
@@ -161,6 +205,9 @@ describe('htmlPageView store', () => {
     expect(getters.getCount(current)).toBe(4)
     expect(getters.getRowLimit(current)).toBe(50)
     expect(getters.getTruncated(current)).toBe(true)
+    expect(getters.getAllFieldOptions({ fieldOptions: { 1: {} } })).toEqual({
+      1: {},
+    })
   })
 
   test('reset commits RESET', () => {

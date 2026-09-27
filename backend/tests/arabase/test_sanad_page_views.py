@@ -230,6 +230,30 @@ def test_a_protected_page_is_left_to_its_approval_boundary(team, monkeypatch):
 
 
 @pytest.mark.django_db
+def test_a_page_takes_no_filters_or_sorts(team):
+    """The Page view's header offers no Filter or Sort, so a rule Sanad added
+    would be invisible while still changing the rows the page receives."""
+
+    page = run(
+        "create_page_view", team["endpoint"], table_id=team["table"].id, name="Team"
+    )
+    name = team["table"].field_set.get(name="Name")
+
+    with pytest.raises(ValueError, match="no filters or sorts"):
+        run(
+            "add_view_filter",
+            team["endpoint"],
+            view_id=page["view_id"],
+            field_id=name.id,
+            type="contains",
+            value="Sa",
+        )
+    with pytest.raises(ValueError, match="no filters or sorts"):
+        run("add_view_sort", team["endpoint"], view_id=page["view_id"], field_id=name.id)
+    assert not HtmlPageView.objects.get(id=page["view_id"]).viewfilter_set.exists()
+
+
+@pytest.mark.django_db
 def test_pages_stay_in_the_chat_workspace(team, data_fixture):
     other_user = data_fixture.create_user(is_staff=True)
     other_workspace = data_fixture.create_workspace(user=other_user)

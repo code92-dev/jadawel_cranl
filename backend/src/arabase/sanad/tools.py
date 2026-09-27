@@ -151,6 +151,20 @@ class AddViewSortInput(BaseModel):
 SUPPORTED_VIEW_TYPES = ("grid", "gallery", "form", "kanban")
 
 
+def _check_not_page_view(view) -> None:
+    """A Page view shows no Filter or Sort button, so neither may Sanad add one.
+
+    The backend still applies the ones saved earlier, but a rule nobody can see
+    would silently change what the page receives.
+    """
+
+    if view.get_type().type == "html_page":
+        raise ValueError(
+            "A Page view has no filters or sorts. Filter and order the rows in "
+            "the page's own code (the html-pages skill)."
+        )
+
+
 def _get_view(endpoint: SanadEndpoint, view_id: int):
     """Load a view in the chat's workspace that the user can see."""
 
@@ -267,6 +281,7 @@ def add_view_filter(endpoint: SanadEndpoint, args: AddViewFilterInput) -> dict:
     from jadawel.contrib.database.views.actions import CreateViewFilterActionType
 
     view = _get_view(endpoint, args.view_id)
+    _check_not_page_view(view)
     field = FieldHandler().get_field(args.field_id)
     if field.table_id != view.table_id:
         raise ValueError("That field belongs to a different table.")
@@ -284,6 +299,7 @@ def add_view_sort(endpoint: SanadEndpoint, args: AddViewSortInput) -> dict:
     if order not in ("ASC", "DESC"):
         raise ValueError("order must be ASC or DESC.")
     view = _get_view(endpoint, args.view_id)
+    _check_not_page_view(view)
     field = FieldHandler().get_field(args.field_id)
     if field.table_id != view.table_id:
         raise ValueError("That field belongs to a different table.")

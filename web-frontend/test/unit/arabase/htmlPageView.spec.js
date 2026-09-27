@@ -131,6 +131,42 @@ describe('HtmlPageView', () => {
     expect(wrapper.vm.payload.fields.map((f) => f.name)).toEqual(['Name'])
   })
 
+  test("without options on the view, the store's field options apply", async () => {
+    // In the app the view object carries no `field_options`; the store loads
+    // them next to the feed.
+    const wrapper = await mountView()
+    wrapper.vm.$store.getters['view/html_page/getAllFieldOptions'] = {
+      10: { hidden: false, order: 2 },
+      11: { hidden: false, order: 1 },
+    }
+    await wrapper.setProps({
+      view: { ...wrapper.props('view'), field_options: undefined },
+    })
+
+    expect(wrapper.vm.payload.fields.map((f) => f.name)).toEqual([
+      'Amount',
+      'Name',
+    ])
+  })
+
+  test('a click inside the frame closes the popups the header opened', async () => {
+    // The frame keeps its clicks, so a header popup's click-outside handler
+    // only hears one if the component replays it when focus moves in.
+    const wrapper = await mountView()
+    const frame = wrapper.find('iframe').element
+    const clicks = vi.fn()
+    frame.addEventListener('click', clicks)
+    vi.spyOn(document, 'activeElement', 'get').mockReturnValue(frame)
+    vi.useFakeTimers()
+
+    window.dispatchEvent(new Event('blur'))
+    vi.runAllTimers()
+
+    vi.useRealTimers()
+    vi.restoreAllMocks()
+    expect(clicks).toHaveBeenCalledTimes(1)
+  })
+
   test('the page is told which direction to render in', async () => {
     // Direction comes from `<html dir>`, which the arabase plugin drives from
     // the locale. Reading it off `$i18n.localeProperties` instead looked right

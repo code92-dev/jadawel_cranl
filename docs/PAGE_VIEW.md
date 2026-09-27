@@ -215,6 +215,28 @@ test or logged an error — worth knowing before changing `HtmlPageView.vue` or
   manual refresh; `when_shared_publicly_requires_realtime_events` is `False`.
 - The page is read-only. Writing rows back from an AI-authored document is a much
   larger trust decision and is not part of this.
+- No Filter or Sort in the header. The page's code decides what it shows and in
+  what order, so the table's buttons would only look like they do something
+  (`canFilter`/`canSort` are `false` in `viewTypes.js`, and Sanad refuses to add
+  either). The backend's `can_filter`/`can_sort` stay `True` on purpose: a filter
+  saved before the buttons went away keeps narrowing the feed, because dropping
+  it would widen what an already-public page shows.
+
+## The header
+
+Refresh, Source and Settings are the page's own (`HtmlPageViewHeader.vue`); Share
+is core's `ShareViewLink`. Two things to know before touching them:
+
+- Core's share popup lists share warnings per visible field through
+  `getVisibleFieldsInOrder`, which reads `view/html_page/getAllFieldOptions`. The
+  page store loads the view's field options next to the feed when the page opens,
+  and a field with no options counts as visible, as it does in the feed. Without
+  the getter the popup crashed the page with
+  `Cannot read properties of undefined (reading '<field id>')`.
+- A click inside the page stays in the iframe's document, so a header popup's
+  click-outside handler never hears it. `HtmlPageView` watches the window lose
+  focus to the frame and replays that as a click on the frame element, which
+  closes whatever popup is open.
 
 ## Where things live
 

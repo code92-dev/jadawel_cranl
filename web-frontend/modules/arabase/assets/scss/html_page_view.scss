@@ -155,7 +155,11 @@
 
 .html-page-settings {
   padding: 16px;
-  min-inline-size: 280px;
+
+  // A fixed width, as core's header popups have: sized by its content, the
+  // external-resources warning stretched it across the page and over the
+  // sidebar.
+  inline-size: 320px;
 }
 
 .html-page-settings__section {

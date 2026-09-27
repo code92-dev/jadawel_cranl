@@ -2,6 +2,7 @@ import { ViewType } from '@jadawel/modules/database/viewTypes'
 
 import HtmlPageView from '@jadawel/modules/arabase/views/components/HtmlPageView'
 import HtmlPageViewHeader from '@jadawel/modules/arabase/views/components/HtmlPageViewHeader'
+import { visibleFieldsInOrder } from '@jadawel/modules/arabase/views/utils/fields'
 
 /**
  * A view whose body is an HTML document, authored by an AI over MCP.
@@ -37,12 +38,16 @@ export class HtmlPageViewType extends ViewType {
     return i18n.t('htmlPageViewType.sharingLinkName')
   }
 
+  // The page's own code decides what it shows and in what order, so the
+  // table's Filter and Sort buttons would only look like they do something.
+  // The backend still applies filters and sorts saved before they were hidden:
+  // dropping them would widen what a public page shows.
   canFilter() {
-    return true
+    return false
   }
 
   canSort() {
-    return true
+    return false
   }
 
   canShare() {
@@ -66,7 +71,20 @@ export class HtmlPageViewType extends ViewType {
   }
 
   async fetch({ store }, database, view, fields, storePrefix = '') {
-    await store.dispatch(storePrefix + 'view/html_page/fetch', { view })
+    await store.dispatch(storePrefix + 'view/html_page/fetch', {
+      view,
+      fieldOptions: true,
+    })
+  }
+
+  /**
+   * A field with no options yet counts as visible, as it does in the feed: the
+   * public page's info carries no options, only the fields it may show.
+   */
+  getVisibleFieldsInOrder({ $store: store }, fields, view, storePrefix = '') {
+    const fieldOptions =
+      store.getters[storePrefix + 'view/html_page/getAllFieldOptions'] || {}
+    return visibleFieldsInOrder(fields, fieldOptions)
   }
 
   async refresh(context, database, view, fields, storePrefix = '') {
