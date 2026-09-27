@@ -15,27 +15,27 @@
 
 .sanad {
   --sanad-surface: var(--jadawel-content-background, #fff);
-  --sanad-accent: var(--jadawel-primary-500, #275d9f);
-  --sanad-accent-strong: var(--jadawel-primary-700, #124377);
-  --sanad-accent-bright: var(--jadawel-primary-400, #5190ef);
+  --sanad-accent: var(--jadawel-primary-500, #69717d);
+  --sanad-accent-strong: var(--jadawel-primary-700, #434a53);
+  --sanad-accent-bright: var(--jadawel-primary-400, #c4c8ce);
   --sanad-tint: color-mix(
     in srgb,
-    var(--jadawel-primary-300, #acc8f8) 32%,
+    var(--jadawel-primary-300, #e7e9ec) 32%,
     var(--sanad-surface)
   );
   --sanad-tint-strong: color-mix(
     in srgb,
-    var(--jadawel-primary-300, #acc8f8) 62%,
+    var(--jadawel-primary-300, #e7e9ec) 62%,
     var(--sanad-surface)
   );
   --sanad-line: color-mix(
     in srgb,
-    var(--jadawel-primary-300, #acc8f8) 85%,
-    var(--jadawel-primary-500, #275d9f)
+    var(--jadawel-primary-300, #e7e9ec) 85%,
+    var(--jadawel-primary-500, #69717d)
   );
   --sanad-line-soft: color-mix(
     in srgb,
-    var(--jadawel-primary-300, #acc8f8) 55%,
+    var(--jadawel-primary-300, #e7e9ec) 55%,
     var(--sanad-surface)
   );
   --sanad-ink: #1d2228;
