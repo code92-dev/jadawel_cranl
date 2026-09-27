@@ -183,6 +183,12 @@ def test_get_integrations_serializer(
 
     url = reverse("api:integrations:list", kwargs={"application_id": application.id})
 
+    # Jadawel fork: the workspace payload reads the admin-managed AI provider
+    # settings (arabase.generative_ai), one query that is then cached. Warm the
+    # cache first so both measured requests start equal and the comparison
+    # below still only catches queries that grow with tables and views.
+    api_client.get(url, format="json", HTTP_AUTHORIZATION=f"JWT {token}")
+
     with CaptureQueriesContext(connection) as queries:
         response = api_client.get(
             url,

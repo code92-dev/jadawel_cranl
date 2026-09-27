@@ -1656,6 +1656,16 @@ A workspace value that is empty now falls through to the instance settings inste
 of being returned as-is; every caller already treated an empty value as unset
 (`… or settings.JADAWEL_…`), so behaviour without admin settings is unchanged.
 
+The workspace payload now reads those settings too: one query, cached for five
+minutes and dropped on save. `test_get_integrations_serializer` compares the
+query counts of two requests to catch queries that grow with tables and views,
+and a cold cache made the first request one query longer. The test makes one
+unmeasured request first so both measured requests start warm.
+
+| File | Change | Reason | Merge risk |
+| ---- | ------ | ------ | ---------- |
+| `backend/tests/jadawel/contrib/integrations/local_jadawel/test_integration_types.py` | `test_get_integrations_serializer` warms the cache with one request before measuring | The admin AI settings lookup is a single cached query, not one per table or view | low |
+
 **Tests:** `backend/tests/arabase/test_generative_ai_settings.py`,
 `web-frontend/test/unit/arabase/sanad.spec.js` (`workspace tools window`,
 `AdminGenerativeAISettings`).
