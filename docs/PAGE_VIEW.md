@@ -16,28 +16,24 @@ entry for it.
 Authoring happens from the user's own AI client through the MCP server that
 ships with the fork, or, for staff, through Sanad inside Jadawel (below).
 
-**A new page explains this itself.** Create one and it opens on a setup panel
-(`HtmlPageOnboarding.vue`) with the three things needed to get it written:
+**A new page explains this itself.** An empty page opens on a setup panel
+(`HtmlPageOnboarding.vue`) for whoever can edit it:
 
-1. **The endpoint.** The workspace's MCP address, masked like the settings
-   screen masks it, with the Claude Desktop config snippet ready to copy. If the
-   user has no key for this workspace yet, the panel mints one in place rather
-   than sending them to settings to find out how.
-2. **The page's number.** The view id, shown large and copyable. It is what
-   `get_page_view` and `update_page_view` take, so it is the one thing the
-   assistant cannot work without.
-3. **A prompt.** Pre-filled with that number and the call order, ending in a line
-   for the user to describe what they want.
+1. **Ask Sanad, for administrators.** Staff can hand the page to Sanad (سند),
+   the in-app assistant, with the page's number typed in. Sanad's `html-pages`
+   skill carries this contract and writes through the view's own update route,
+   so revisions and the MCP artifact boundary apply the same way (see
+   `docs/SANAD_AI_ASSISTANT.md`). Other users do not see this box.
+2. **A prompt for your own assistant, for everyone.** Pre-filled with the page's
+   number and the call order, ending in a line for the user to describe what
+   they want.
+3. **MCP setup, only when missing.** If the user has no MCP endpoint for this
+   workspace, the prompt is followed by a button that opens the MCP setup
+   directly, since the prompt cannot work without one.
 
-The panel is for whoever owns the view. A visitor on a public link to an empty
-page sees a plain "nothing here yet" instead — the endpoint list behind it needs
-an account, and an MCP address is not a visitor's business.
-
-**Or Sanad writes it.** Staff can hand the page to Sanad (سند), the in-app
-assistant, from the same panel: *Ask Sanad* opens it with the page's number typed
-in. Sanad's `html-pages` skill carries this contract and writes through the view's
-own update route, so revisions and the MCP artifact boundary apply the same way
-(see `docs/SANAD_AI_ASSISTANT.md`).
+A visitor on a public link to an empty page sees a plain "nothing here yet"
+instead: the endpoint list behind the panel needs an account, and an MCP address
+is not a visitor's business.
 
 The assistant then calls, in order:
 

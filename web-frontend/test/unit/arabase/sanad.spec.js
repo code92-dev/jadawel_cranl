@@ -8,6 +8,9 @@ import AppUtilities from '@jadawel/modules/core/components/AppUtilities'
 import { ArabasePlugin } from '@jadawel/modules/arabase/plugins'
 import { AutomationApplicationType } from '@jadawel/modules/automation/applicationTypes'
 import { BuilderApplicationType } from '@jadawel/modules/builder/applicationTypes'
+import { existsSync, readFileSync } from 'node:fs'
+import { resolve } from 'node:path'
+import { INTERFACE_THEMES } from '@jadawel/modules/core/utils/interfaceThemes'
 import {
   askSanad,
   takeSanadDraft,
@@ -349,6 +352,45 @@ describe('SanadPanel', () => {
     expect(wrapper.find('.sanad__input').element.value).toBe('Design page 92: ')
   })
 
+  test('each message is its own block, and a long list of steps folds once answered', async () => {
+    const steps = (count) =>
+      Array.from({ length: count }, () => ({
+        tool: 'create_fields',
+        ok: true,
+        refs: {},
+      }))
+    localStorage.setItem('jadawel.sanad.chat.7', '3')
+    testApp.mock
+      .onGet('/arabase/sanad/chats/3/')
+      .reply(
+        200,
+        chat([
+          message({ id: 1, role: 'user', content: 'Build it' }),
+          message({ id: 2, actions: steps(3), content: 'Done' }),
+          message({ id: 3, actions: steps(6), content: 'Done' }),
+          message({ id: 4, actions: steps(6), status: 'pending' }),
+        ])
+      )
+
+    const wrapper = await mountPanel()
+
+    expect(wrapper.findAll('.sanad__bubble')).toHaveLength(1)
+    expect(wrapper.findAll('.sanad__card')).toHaveLength(3)
+    // Sanad's portrait heads the panel and every one of its answers.
+    const portraits = wrapper.findAll('.sanad__avatar img, .sanad__logo img')
+    expect(portraits).toHaveLength(4)
+    expect(portraits[0].attributes('src')).toMatch(/sanad-avatar/)
+    const open = wrapper
+      .findAll('.sanad__steps')
+      .map((steps) => steps.element.open)
+    // A short list stays open, a long one folds under the answer, and while
+    // Sanad works the steps are its progress, so they stay open.
+    expect(open).toEqual([true, false, true])
+    expect(wrapper.find('.sanad__card--pending .sanad__typing').exists()).toBe(
+      true
+    )
+  })
+
   test('asks to publish with publish wording, not delete wording', async () => {
     localStorage.setItem('jadawel.sanad.chat.7', '3')
     testApp.mock.onGet('/arabase/sanad/chats/3/').reply(
@@ -377,6 +419,37 @@ describe('SanadPanel', () => {
     expect(wrapper.find('.sanad__approval-text').text()).toBe(
       'sanad.tools.publish_workflow'
     )
+  })
+})
+
+describe('the panel follows the selected interface theme', () => {
+  // Read off disk: the stylesheet is what decides the colours, and the test
+  // environment does not compile it.
+  const stylesheet = () => {
+    const relative = 'modules/arabase/assets/scss/sanad.scss'
+    const path = [relative, `web-frontend/${relative}`]
+      .map((candidate) => resolve(process.cwd(), candidate))
+      .find((candidate) => existsSync(candidate))
+    return readFileSync(path, 'utf8')
+  }
+
+  test('its accent and tints come from the theme palette', () => {
+    const css = stylesheet()
+
+    for (const step of [300, 400, 500, 700]) {
+      expect(css).toContain(`var(--jadawel-primary-${step}`)
+    }
+    expect(css).toContain('var(--jadawel-content-background')
+    // A fixed hue would ignore the user's choice of theme.
+    expect(css).not.toMatch(/\$palette-(cyan|blue|green)-/)
+  })
+
+  test('every theme gives the steps the panel mixes from', () => {
+    for (const theme of INTERFACE_THEMES) {
+      for (const step of [300, 400, 500, 700]) {
+        expect(theme.colors[step]).toMatch(/^#[0-9a-f]{6}$/)
+      }
+    }
   })
 })
 

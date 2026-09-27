@@ -1,5 +1,6 @@
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 import { vi } from 'vitest'
+import { flushPromises } from '@vue/test-utils'
 
 import HtmlPageOnboarding from '@jadawel/modules/arabase/views/components/HtmlPageOnboarding'
 import { existsSync, readFileSync } from 'node:fs'
@@ -71,13 +72,58 @@ describe('HtmlPageOnboarding', () => {
     expect(call.params.viewId).toBe(4660)
   })
 
-  test('offers the protected setup when the workspace has no endpoint', async () => {
+  test('without an endpoint, the MCP setup follows the prompt', async () => {
     const wrapper = await mountPanel([])
 
     expect(wrapper.vm.endpoint).toBeUndefined()
-    expect(translated.map((t) => t.key)).toContain(
-      'htmlPageOnboarding.createKey'
-    )
+    const setup = wrapper.get('.html-page-onboarding__setup')
+    expect(setup.text()).toContain('htmlPageOnboarding.mcpSetup')
+    // Directly under the prompt it enables.
+    expect(
+      setup.element.previousElementSibling.classList.contains(
+        'html-page-onboarding__ask'
+      )
+    ).toBe(true)
+  })
+
+  test('the setup button opens the MCP setup itself', async () => {
+    fetchAll.mockResolvedValue({ data: [] })
+    const show = vi.fn()
+    const wrapper = await mountSuspended(HtmlPageOnboarding, {
+      props: { database, view },
+      global: {
+        mocks: {
+          $config: { public: { publicBackendUrl: 'http://localhost:8000' } },
+          $client: {},
+          $t,
+        },
+        stubs: {
+          SettingsModal: {
+            name: 'SettingsModal',
+            template: '<div />',
+            methods: { show },
+          },
+          Copied: true,
+        },
+      },
+    })
+
+    await wrapper.get('.html-page-onboarding__setup button').trigger('click')
+    await flushPromises()
+
+    expect(show).toHaveBeenCalledWith('mcp-endpoint')
+  })
+
+  test('with an endpoint, only the prompt is shown', async () => {
+    const wrapper = await mountPanel([
+      { id: 2, key: 'supersecretkey', workspace_id: 7 },
+    ])
+
+    expect(wrapper.find('.html-page-onboarding__setup').exists()).toBe(false)
+    expect(wrapper.find('.html-page-onboarding__ask').exists()).toBe(true)
+    // No step shows the endpoint address or its key any more.
+    expect(wrapper.text()).not.toContain('supersecretkey')
+    expect(wrapper.text()).not.toContain('/mcp/')
   })
 
   test('only an endpoint from this workspace counts', async () => {
@@ -88,46 +134,7 @@ describe('HtmlPageOnboarding', () => {
     ])
 
     expect(wrapper.vm.endpoint).toBeUndefined()
-  })
-
-  test('the key is masked until it is asked for', async () => {
-    const wrapper = await mountPanel([
-      { id: 2, key: 'supersecretkey', workspace_id: 7 },
-    ])
-
-    // The panel sits open on a table view, often on a shared screen.
-    expect(wrapper.vm.displayedUrl).not.toContain('supersecretkey')
-    expect(wrapper.vm.displayedUrl).toContain('•••••••')
-    // ...while what the copy button puts on the clipboard is the real thing.
-    expect(wrapper.vm.endpointUrl).toBe(
-      'http://localhost:8000/mcp/supersecretkey/sse'
-    )
-
-    wrapper.vm.reveal = true
-    await wrapper.vm.$nextTick()
-    expect(wrapper.vm.displayedUrl).toContain('supersecretkey')
-  })
-
-  test('the config snippet offered for copying holds the real key', async () => {
-    const wrapper = await mountPanel([
-      { id: 2, key: 'supersecretkey', workspace_id: 7 },
-    ])
-
-    expect(wrapper.vm.clientConfig).not.toContain('supersecretkey')
-    expect(wrapper.vm.realClientConfig).toContain('supersecretkey')
-    expect(() => JSON.parse(wrapper.vm.realClientConfig)).not.toThrow()
-  })
-
-  test('normalizes a trailing slash in the public backend URL', async () => {
-    const wrapper = await mountPanel(
-      [{ id: 2, key: 'supersecretkey', workspace_id: 7 }],
-      'http://localhost:8000/'
-    )
-
-    expect(wrapper.get('.html-page-onboarding__code').text()).toBe(
-      'http://localhost:8000/mcp/•••••••/sse'
-    )
-    expect(wrapper.text()).not.toContain('http://localhost:8000//mcp/')
+    expect(wrapper.find('.html-page-onboarding__setup').exists()).toBe(true)
   })
 
   test('staff can hand the page to Sanad, with its number typed in', async () => {
@@ -165,7 +172,7 @@ describe('HtmlPageOnboarding', () => {
     expect(takeSanadDraft()).toBeNull()
   })
 
-  test('the Sanad offer is for staff only, like Sanad itself', async () => {
+  test('a user who is not staff gets the MCP route, without Sanad', async () => {
     fetchAll.mockResolvedValue({ data: [] })
     const wrapper = await mountSuspended(HtmlPageOnboarding, {
       props: { database, view },
@@ -181,6 +188,9 @@ describe('HtmlPageOnboarding', () => {
     })
 
     expect(wrapper.find('.html-page-onboarding__sanad').exists()).toBe(false)
+    // Everyone else still gets the page written over MCP.
+    expect(wrapper.find('.html-page-onboarding__ask').exists()).toBe(true)
+    expect(wrapper.find('.html-page-onboarding__setup').exists()).toBe(true)
     expect(translated.map((t) => t.key)).toContain('htmlPageOnboarding.lead')
     expect(translated.map((t) => t.key)).not.toContain(
       'htmlPageOnboarding.leadWithSanad'
@@ -202,7 +212,9 @@ describe('HtmlPageOnboarding', () => {
     })
 
     expect(wrapper.vm.loading).toBe(false)
-    expect(wrapper.text()).toContain('4660')
+    // The prompt is still there, and the way to set up MCP follows it.
+    expect(wrapper.find('.html-page-onboarding__ask').exists()).toBe(true)
+    expect(wrapper.find('.html-page-onboarding__setup').exists()).toBe(true)
   })
 })
 

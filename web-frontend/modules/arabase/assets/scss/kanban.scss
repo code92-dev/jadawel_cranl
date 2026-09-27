@@ -114,3 +114,11 @@
     color: $color-primary-600;
   }
 }
+
+// The board icon: two top-aligned columns, the second one shorter, drawn the
+// way iconoir draws its own (1.5 stroke, 24 grid) and applied through the same
+// mask as every `iconoir-*` class, so it takes the size and colour of the
+// surrounding text like the other view icons.
+.iconoir-jadawel-kanban::before {
+  mask-image: url('data:image/svg+xml;charset=utf-8,<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3.75" width="6.5" height="16.5" rx="1.25" stroke="currentColor" stroke-width="1.5"/><rect x="13.5" y="3.75" width="6.5" height="11" rx="1.25" stroke="currentColor" stroke-width="1.5"/></svg>');
+}

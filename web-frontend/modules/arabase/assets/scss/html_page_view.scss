@@ -219,27 +219,42 @@
   font-size: 13px;
 }
 
-.html-page-onboarding__step {
+.html-page-onboarding__ask {
+  margin-block-start: 4px;
+}
+
+// No MCP endpoint yet: the way to make one, right under the prompt it enables.
+.html-page-onboarding__setup {
   display: flex;
+  align-items: center;
   gap: 14px;
-  margin-block-end: 26px;
+  margin-block-start: 20px;
+  padding: 14px 16px;
+  border: 1px dashed $palette-neutral-400;
+  border-radius: 8px;
+
+  > i {
+    flex: 0 0 auto;
+    color: $palette-neutral-700;
+    font-size: 22px;
+  }
 }
 
-.html-page-onboarding__step-number {
-  flex: 0 0 26px;
-  block-size: 26px;
-  border-radius: 50%;
-  background-color: $palette-neutral-200;
-  color: $palette-neutral-900;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 26px;
-  text-align: center;
-}
-
-.html-page-onboarding__step-body {
+.html-page-onboarding__setup-text {
   flex: 1 1 auto;
   min-inline-size: 0;
+}
+
+.html-page-onboarding__setup-hint {
+  margin: 0;
+  color: $palette-neutral-700;
+  font-size: 13px;
+}
+
+.html-page-onboarding__setup-title {
+  margin: 0 0 2px;
+  font-size: 14px;
+  font-weight: 600;
 }
 
 .html-page-onboarding__step-title {
@@ -282,12 +297,6 @@
   overflow-wrap: normal;
 }
 
-.html-page-onboarding__code--id {
-  font-size: 18px;
-  font-weight: 600;
-  letter-spacing: 1px;
-}
-
 .html-page-onboarding__copy {
   position: relative;
   flex: 0 0 auto;
@@ -298,18 +307,6 @@
   &:hover {
     background-color: $palette-neutral-100;
   }
-}
-
-.html-page-onboarding__reveal {
-  display: inline-block;
-  margin-block-end: 8px;
-  font-size: 13px;
-}
-
-.html-page-onboarding__warning {
-  margin-block: 0 12px;
-  color: $palette-neutral-700;
-  font-size: 12px;
 }
 
 .html-page-onboarding__footnote {

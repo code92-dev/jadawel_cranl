@@ -222,6 +222,22 @@ panel ──POST message──▶ API ──on commit──▶ runner thread (we
   `getWorkspaceUtilityComponents` / `getRightSidebarWorkspaceComponents` hooks.
   The tools-window hook is a small core addition, logged in PATCHES.md.
 
+### The panel
+
+`SanadPanel.vue` with `modules/arabase/assets/scss/sanad.scss`: a rounded card in
+core's right sidebar. Each message is its own block: the user's words in a solid
+bubble at the end side, each answer in a tinted card with Sanad's avatar, its
+steps (a foldable list, open while Sanad works and folded once a list of more than
+four sits above the answer), the Markdown answer and any approval.
+
+Every colour follows the interface theme the user picked (white, sage, gray, blue,
+rose, amber). `applyInterfaceTheme` puts the palette on the document as
+`--jadawel-primary-100…900` plus surface colours, and the stylesheet mixes its
+tokens (`--sanad-accent`, `--sanad-tint`, `--sanad-line`…) from those with
+`color-mix()`, so switching the theme recolours the panel at once with no script.
+Tints come from the 300 step, the first genuinely coloured one on every palette.
+`sanad.spec.js` fails if the stylesheet goes back to a fixed hue.
+
 ## Security
 
 - **Staff only**, enforced by the API (`ERROR_SANAD_NOT_ALLOWED`), not only hidden

@@ -5,11 +5,11 @@
     </div>
     <!--
       An empty page means two different things to two different people. To
-      whoever owns the view it is a setup screen: the page is authored from
-      outside Jadawel, so without the endpoint and the page's number there is no
-      way in. To a visitor holding a public link it is just a page that has
-      nothing on it yet, and the MCP setup is none of their business — the
-      endpoint list behind it needs an account anyway.
+      whoever can edit the view it is a setup screen: how to get the page
+      written, over MCP (and, for administrators, by Sanad). To a visitor
+      holding a public link it is just a page that has nothing on it yet, and
+      the MCP setup is none of their business — the endpoint list behind it
+      needs an account anyway.
     -->
     <HtmlPageOnboarding
       v-else-if="!view.html && !readOnly"

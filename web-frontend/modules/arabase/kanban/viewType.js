@@ -39,7 +39,7 @@ export class KanbanViewType extends ViewType {
   }
 
   getIconClass() {
-    return 'iconoir-stack'
+    return 'iconoir-jadawel-kanban'
   }
 
   getColorClass() {

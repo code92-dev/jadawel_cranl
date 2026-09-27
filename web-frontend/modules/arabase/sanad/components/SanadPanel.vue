@@ -1,33 +1,51 @@
 <template>
   <section class="sanad" :aria-label="$t('sanad.name')">
     <header class="sanad__header">
-      <i class="sanad__logo iconoir-sparks" aria-hidden="true"></i>
-      <h2 class="sanad__title">{{ $t('sanad.name') }}</h2>
-      <Badge color="cyan" size="small" rounded>{{ $t('sanad.beta') }}</Badge>
+      <span class="sanad__logo" aria-hidden="true">
+        <img :src="avatar" alt="" draggable="false" />
+      </span>
+      <div class="sanad__heading">
+        <h2 class="sanad__title">
+          {{ $t('sanad.name') }}
+          <span class="sanad__beta">{{ $t('sanad.beta') }}</span>
+        </h2>
+        <p class="sanad__tagline">{{ $t('sanad.tagline') }}</p>
+      </div>
       <div class="sanad__header-actions">
-        <ButtonIcon
-          icon="iconoir-clock-rotate-right"
-          :active="showHistory"
+        <button
+          type="button"
+          class="sanad__icon-button"
+          :class="{ 'sanad__icon-button--active': showHistory }"
           :title="$t('sanad.history')"
           :aria-label="$t('sanad.history')"
+          :aria-pressed="showHistory ? 'true' : 'false'"
           @click="toggleHistory"
-        />
-        <ButtonIcon
-          icon="iconoir-plus"
+        >
+          <i class="iconoir-clock-rotate-right" aria-hidden="true"></i>
+        </button>
+        <button
+          type="button"
+          class="sanad__icon-button"
           :title="$t('sanad.newChat')"
           :aria-label="$t('sanad.newChat')"
           @click="startNewChat"
-        />
-        <ButtonIcon
-          icon="iconoir-cancel"
+        >
+          <i class="iconoir-plus" aria-hidden="true"></i>
+        </button>
+        <button
+          type="button"
+          class="sanad__icon-button"
           :title="$t('action.close')"
           :aria-label="$t('action.close')"
           @click="$bus.$emit('toggle-right-sidebar', false)"
-        />
+        >
+          <i class="iconoir-cancel" aria-hidden="true"></i>
+        </button>
       </div>
     </header>
 
     <div v-if="showHistory" class="sanad__history">
+      <p class="sanad__section-title">{{ $t('sanad.history') }}</p>
       <p v-if="chats.length === 0" class="sanad__muted">
         {{ $t('sanad.noHistory') }}
       </p>
@@ -41,15 +59,18 @@
           }"
         >
           <a class="sanad__history-link" @click.prevent="openChat(item.id)">
-            {{ item.title || $t('sanad.untitled') }}
+            <i class="iconoir-chat-lines" aria-hidden="true"></i>
+            <span>{{ item.title || $t('sanad.untitled') }}</span>
           </a>
-          <ButtonIcon
-            icon="iconoir-trash"
-            size="small"
+          <button
+            type="button"
+            class="sanad__icon-button sanad__icon-button--small"
             :title="$t('action.delete')"
             :aria-label="$t('action.delete')"
             @click="removeChat(item.id)"
-          />
+          >
+            <i class="iconoir-trash" aria-hidden="true"></i>
+          </button>
         </li>
       </ul>
     </div>
@@ -57,9 +78,11 @@
     <template v-else>
       <div ref="scroller" class="sanad__messages" aria-live="polite">
         <div v-if="!hasMessages" class="sanad__welcome">
-          <i class="sanad__welcome-icon iconoir-sparks" aria-hidden="true"></i>
+          <span class="sanad__welcome-orb" aria-hidden="true">
+            <img :src="avatar" alt="" draggable="false" />
+          </span>
           <p class="sanad__welcome-title">{{ $t('sanad.welcomeTitle') }}</p>
-          <p class="sanad__muted">{{ $t('sanad.welcomeText') }}</p>
+          <p class="sanad__welcome-text">{{ $t('sanad.welcomeText') }}</p>
           <p v-if="noModel" class="sanad__notice">
             {{ $t('sanad.noModel') }}
             <nuxt-link
@@ -70,18 +93,23 @@
           </p>
           <div v-else class="sanad__suggestions">
             <button
-              v-for="key in suggestionKeys"
-              :key="key"
+              v-for="suggestion in suggestions"
+              :key="suggestion.key"
               type="button"
               class="sanad__suggestion"
-              @click="send($t(key))"
+              @click="send($t(suggestion.key))"
             >
-              {{ $t(key) }}
+              <span class="sanad__suggestion-icon" aria-hidden="true">
+                <i :class="suggestion.icon"></i>
+              </span>
+              <span class="sanad__suggestion-text">{{
+                $t(suggestion.key)
+              }}</span>
             </button>
           </div>
         </div>
 
-        <div
+        <article
           v-for="message in messages"
           :key="message.id"
           class="sanad__message"
@@ -91,31 +119,68 @@
             {{ message.content }}
           </div>
 
-          <template v-else>
-            <ul v-if="message.actions.length" class="sanad__actions">
-              <li
-                v-for="(action, index) in message.actions"
-                :key="index"
-                class="sanad__action"
-                :class="{ 'sanad__action--failed': !action.ok }"
-                :title="action.error || ''"
-              >
+          <div
+            v-else
+            class="sanad__card"
+            :class="{
+              'sanad__card--pending': message.status === 'pending',
+              'sanad__card--error': message.status === 'error',
+            }"
+          >
+            <div class="sanad__card-head">
+              <span class="sanad__avatar" aria-hidden="true">
+                <img :src="avatar" alt="" draggable="false" />
+              </span>
+              <span class="sanad__card-name">{{ $t('sanad.name') }}</span>
+              <span
+                v-if="message.status === 'pending'"
+                class="sanad__typing"
+                aria-hidden="true"
+                ><span></span><span></span><span></span
+              ></span>
+            </div>
+
+            <details
+              v-if="message.actions.length"
+              class="sanad__steps"
+              :open="stepsOpen(message)"
+            >
+              <summary class="sanad__steps-summary">
+                <i class="iconoir-list" aria-hidden="true"></i>
+                {{ $t('sanad.steps', { count: message.actions.length }) }}
                 <i
-                  :class="
-                    action.ok ? 'iconoir-check' : 'iconoir-warning-circle'
-                  "
+                  class="sanad__steps-chevron iconoir-nav-arrow-down"
                   aria-hidden="true"
                 ></i>
-                <span>{{ toolLabel(action.tool) }}</span>
-                <nuxt-link
-                  v-if="action.ok && actionLink(action)"
-                  class="sanad__action-link"
-                  :to="actionLink(action)"
+              </summary>
+              <ul class="sanad__actions">
+                <li
+                  v-for="(action, index) in message.actions"
+                  :key="index"
+                  class="sanad__action"
+                  :class="{ 'sanad__action--failed': !action.ok }"
+                  :title="action.error || ''"
                 >
-                  {{ $t('sanad.open') }}
-                </nuxt-link>
-              </li>
-            </ul>
+                  <i
+                    class="sanad__action-icon"
+                    :class="
+                      action.ok ? 'iconoir-check' : 'iconoir-warning-circle'
+                    "
+                    aria-hidden="true"
+                  ></i>
+                  <span class="sanad__action-label">{{
+                    toolLabel(action.tool)
+                  }}</span>
+                  <nuxt-link
+                    v-if="action.ok && actionLink(action)"
+                    class="sanad__action-link"
+                    :to="actionLink(action)"
+                  >
+                    {{ $t('sanad.open') }}
+                  </nuxt-link>
+                </li>
+              </ul>
+            </details>
 
             <MarkdownIt
               v-if="message.content"
@@ -167,8 +232,12 @@
             <p
               v-for="call in decidedApprovals(message)"
               :key="call.tool_call_id"
-              class="sanad__muted sanad__decided"
+              class="sanad__decided"
             >
+              <i
+                :class="call.approved ? 'iconoir-check' : 'iconoir-cancel'"
+                aria-hidden="true"
+              ></i>
               {{
                 call.approved
                   ? $t('sanad.approved', { action: toolLabel(call.tool) })
@@ -177,54 +246,67 @@
             </p>
 
             <p v-if="message.status === 'pending'" class="sanad__thinking">
-              <span class="sanad__dots" aria-hidden="true"></span>
-              {{ $t('sanad.working') }}
+              <span class="sanad__shimmer">{{ $t('sanad.working') }}</span>
             </p>
             <p v-if="message.status === 'error'" class="sanad__error">
+              <i class="iconoir-warning-circle" aria-hidden="true"></i>
               {{ errorText(message.error) }}
             </p>
-          </template>
-        </div>
+          </div>
+        </article>
       </div>
 
       <form class="sanad__composer" @submit.prevent="send()">
-        <textarea
-          ref="input"
-          v-model="draft"
-          class="sanad__input"
-          rows="2"
-          dir="auto"
-          :placeholder="$t('sanad.placeholder')"
-          :aria-label="$t('sanad.placeholder')"
-          :disabled="busy || noModel"
-          @keydown.enter.exact.prevent="send()"
-        ></textarea>
-        <div class="sanad__composer-row">
-          <select
-            v-if="models.length > 1"
-            v-model="model"
-            class="sanad__model"
-            dir="ltr"
-            :aria-label="$t('sanad.model')"
-            :title="$t('sanad.model')"
-          >
-            <option v-for="name in models" :key="name" :value="name">
-              {{ name }}
-            </option>
-          </select>
-          <span v-else-if="models.length === 1" class="sanad__model-name">
-            {{ models[0] }}
-          </span>
-          <ButtonIcon
-            class="sanad__send"
-            icon="iconoir-send"
-            tag="button"
-            :disabled="!canSend"
-            :loading="sending"
-            :title="$t('sanad.send')"
-            :aria-label="$t('sanad.send')"
-            @click="send()"
-          />
+        <div
+          class="sanad__composer-box"
+          :class="{ 'sanad__composer-box--disabled': busy || noModel }"
+        >
+          <textarea
+            ref="input"
+            v-model="draft"
+            class="sanad__input"
+            rows="2"
+            dir="auto"
+            :placeholder="$t('sanad.placeholder')"
+            :aria-label="$t('sanad.placeholder')"
+            :disabled="busy || noModel"
+            @keydown.enter.exact.prevent="send()"
+          ></textarea>
+          <div class="sanad__composer-row">
+            <label v-if="models.length > 1" class="sanad__model-chip">
+              <i class="iconoir-cpu" aria-hidden="true"></i>
+              <select
+                v-model="model"
+                class="sanad__model"
+                dir="ltr"
+                :aria-label="$t('sanad.model')"
+                :title="$t('sanad.model')"
+              >
+                <option v-for="name in models" :key="name" :value="name">
+                  {{ name }}
+                </option>
+              </select>
+            </label>
+            <span
+              v-else-if="models.length === 1"
+              class="sanad__model-chip sanad__model-name"
+              dir="ltr"
+              :title="models[0]"
+            >
+              <i class="iconoir-cpu" aria-hidden="true"></i>
+              {{ models[0] }}
+            </span>
+            <button
+              type="submit"
+              class="sanad__send"
+              :class="{ 'sanad__send--loading': sending }"
+              :disabled="!canSend"
+              :title="$t('sanad.send')"
+              :aria-label="$t('sanad.send')"
+            >
+              <i class="iconoir-arrow-up" aria-hidden="true"></i>
+            </button>
+          </div>
         </div>
         <p class="sanad__disclaimer">{{ $t('sanad.disclaimer') }}</p>
       </form>
@@ -237,6 +319,7 @@ import MarkdownIt from '@jadawel/modules/core/components/MarkdownIt'
 import SanadService from '@jadawel/modules/arabase/services/sanad'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
 import { takeSanadDraft } from '@jadawel/modules/arabase/sanad/utils/askSanad'
+import sanadAvatar from '@jadawel/modules/arabase/assets/images/sanad-avatar.webp?url'
 
 const POLL_INTERVAL = 1500
 const MODEL_STORAGE_KEY = 'jadawel.sanad.model'
@@ -325,15 +408,17 @@ export default {
       models: [],
       model: '',
       noModel: false,
+      avatar: sanadAvatar,
       draft: '',
       sending: false,
       deciding: false,
       showHistory: false,
       pollTimer: null,
-      suggestionKeys: [
-        'sanad.suggestions.createTable',
-        'sanad.suggestions.formula',
-        'sanad.suggestions.summarize',
+      suggestions: [
+        { key: 'sanad.suggestions.createTable', icon: 'iconoir-table' },
+        { key: 'sanad.suggestions.formula', icon: 'iconoir-calculator' },
+        { key: 'sanad.suggestions.dashboard', icon: 'iconoir-graph-up' },
+        { key: 'sanad.suggestions.summarize', icon: 'iconoir-reports' },
       ],
     }
   },
@@ -568,6 +653,14 @@ export default {
       return this.$t(
         KNOWN_ERRORS.has(code) ? `sanad.errors.${code}` : 'sanad.errors.generic'
       )
+    },
+    /**
+     * A short list of steps stays open; a long one folds once the answer is
+     * in, so the answer is what the user reads first. While Sanad works the
+     * steps stay open: they are the progress.
+     */
+    stepsOpen(message) {
+      return message.status === 'pending' || message.actions.length <= 4
     },
     /** Where "Open" goes for something an action created or changed. */
     actionLink(action) {
