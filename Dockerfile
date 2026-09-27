@@ -17,7 +17,25 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-26 from commit 35ac4472, tag 2.3.11-mcp-restructure.
+# Published 2026-09-27 from commit 9cc6b376, tag 2.3.12-sanad.
+# Adds Sanad (سند), the in-app AI assistant, for instance administrators only.
+# It builds tables, fields, formulas, views, automations, builder apps,
+# dashboards and Page views, loads expert skills on demand, pauses for approval
+# before deleting or publishing, and follows the user's interface theme. AI
+# provider keys (OpenAI, Claude, Ollama, OpenRouter; Mistral off) are managed
+# in Admin -> Settings; environment keys still work. Sanad's turns run on
+# threads in the web process, not Celery, so they no longer stall automations
+# on the single worker. The builder and automation app types are offered to
+# administrators. Fixes: builder preview 404 on the home page, dashboard
+# counts and percentages returned as True or text, and Sanad-built forms now
+# offer linked-table fields. An empty Page view shows the MCP prompt to every
+# editor, with an MCP setup button when none exists, and Sanad to admins.
+# **Migrations: arabase.0019 (Sanad chats) and arabase.0020 (AI provider
+# settings)**, both additive. No environment changes.
+# Previous deployment pin (2.3.11-mcp-restructure):
+# sha256:eb58ae8d44585de5b4f77743c131e50829a6f04778066d87aa03dbf4703b4b8a.
+#
+# Previously published 2026-09-26 from commit 35ac4472, tag 2.3.11-mcp-restructure.
 # Restructures MCP protection (one vault interface for Redis and PostgreSQL,
 # policy and artifact code split by responsibility; an approved page feed
 # drops from 60 to 35 queries) and fixes what it found. Changing page HTML
@@ -260,7 +278,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:eb58ae8d44585de5b4f77743c131e50829a6f04778066d87aa03dbf4703b4b8a
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:89ffdfe1a8d4b41862e20a10d976a5c8023a6dfb573a85bc9d0eebf431471a12
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
