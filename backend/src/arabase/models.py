@@ -38,10 +38,12 @@ from arabase.mcp.protection.models import (
     MCPProtectionPolicy,
 )
 from arabase.sanad.models import (
+    SanadBudget,
     SanadChat,
     SanadMessage,
     SanadMessageRole,
     SanadMessageStatus,
+    SanadUsage,
 )
 from arabase.table_access.models import (
     PendingTableGrant,
@@ -86,10 +88,12 @@ __all__ = [
     "HtmlPageViewRevision",
     "GenerativeAIProviderSettings",
     "PendingTableGrant",
+    "SanadBudget",
     "SanadChat",
     "SanadMessage",
     "SanadMessageRole",
     "SanadMessageStatus",
+    "SanadUsage",
     "TableAccessLevel",
     "TableGrant",
 ]

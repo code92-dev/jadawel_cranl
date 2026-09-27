@@ -48,6 +48,7 @@ export default defineNuxtPlugin({
       'ERROR_SANAD_MODEL_NOT_AVAILABLE',
       'ERROR_SANAD_CHAT_BUSY',
       'ERROR_SANAD_NOTHING_TO_APPROVE',
+      'ERROR_SANAD_BUDGET_EXCEEDED',
     ]) {
       $clientErrorMap.setError(
         code,

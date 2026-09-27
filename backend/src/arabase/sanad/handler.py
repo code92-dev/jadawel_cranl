@@ -8,7 +8,9 @@ from django.contrib.auth.models import AbstractUser
 from django.db import transaction
 from django.utils import timezone
 
+from arabase.sanad import budget
 from arabase.sanad.exceptions import (
+    SanadBudgetExceeded,
     SanadChatBusy,
     SanadChatDoesNotExist,
     SanadNotAllowed,
@@ -16,6 +18,7 @@ from arabase.sanad.exceptions import (
     SanadTurnTooLong,
 )
 from arabase.sanad.models import (
+    SanadBudget,
     SanadChat,
     SanadMessage,
     SanadMessageRole,
@@ -55,6 +58,41 @@ class SanadHandler:
         workspace = CoreHandler().get_workspace(workspace_id)
         self.check_access(user, workspace)
         return workspace
+
+    def get_budget(
+        self, user: AbstractUser, workspace: Workspace
+    ) -> "budget.BudgetStatus":
+        """This month's limits and usage, for anyone who may use Sanad here."""
+
+        self.check_access(user, workspace)
+        return budget.get_status(workspace)
+
+    def update_budget(
+        self,
+        user: AbstractUser,
+        workspace: Workspace,
+        monthly_turn_limit: Optional[int],
+        monthly_token_limit: Optional[int],
+    ) -> "budget.BudgetStatus":
+        """Set a workspace's own limits; ``None`` uses the instance default.
+
+        Only instance staff may, and that stays so once workspace admins can use
+        Sanad: a budget exists to bound what those admins spend.
+
+        :raises SanadNotAllowed: for anyone who is not instance staff.
+        """
+
+        self.check_access(user, workspace)
+        if not user.is_staff:
+            raise SanadNotAllowed()
+        SanadBudget.objects.update_or_create(
+            workspace=workspace,
+            defaults={
+                "monthly_turn_limit": monthly_turn_limit,
+                "monthly_token_limit": monthly_token_limit,
+            },
+        )
+        return budget.get_status(workspace)
 
     def list_chats(self, user: AbstractUser, workspace: Workspace):
         self.check_access(user, workspace)
@@ -108,6 +146,7 @@ class SanadHandler:
         """Record the user's message and queue the assistant's reply.
 
         :raises SanadChatBusy: while the previous turn has not finished.
+        :raises SanadBudgetExceeded: when the workspace's monthly budget is used.
         :raises SanadNoModelAvailable, SanadModelNotAvailable: see
             ``resolve_model_choice``.
         """
@@ -120,6 +159,7 @@ class SanadHandler:
         with transaction.atomic():
             chat = SanadChat.objects.select_for_update().get(id=chat.id)
             self._check_not_busy(chat)
+            budget.start_turn(chat.workspace)
             SanadMessage.objects.create(
                 chat=chat,
                 role=SanadMessageRole.USER,
@@ -148,9 +188,11 @@ class SanadHandler:
         a half-answered request.
 
         :raises SanadNothingToApprove: when no turn is paused.
+        :raises SanadBudgetExceeded: when the workspace's tokens are used up.
         """
 
         self.check_access(user, chat.workspace)
+        budget.check_can_resume(chat.workspace)
         with transaction.atomic():
             message = (
                 SanadMessage.objects.select_for_update()
@@ -187,6 +229,8 @@ class SanadHandler:
     def run(self, message_id: int, decisions: Optional[dict] = None) -> None:
         """The background side: run the model and store what it did and said."""
 
+        from pydantic_ai.usage import RunUsage
+
         from arabase.sanad.agent import build_ai_model, run_turn
         from arabase.sanad.tools import SanadEndpoint
 
@@ -211,6 +255,8 @@ class SanadHandler:
             ).last()
             user_prompt = build_user_prompt(question.content, question.context)
 
+        usage = RunUsage()
+        token_budget = budget.get_status(chat.workspace).remaining_tokens
         try:
             self.check_access(chat.user, chat.workspace)
             result = run_turn(
@@ -220,13 +266,18 @@ class SanadHandler:
                 on_action=on_action,
                 user_prompt=user_prompt,
                 decisions=decisions,
+                usage=usage,
+                token_budget=token_budget,
             )
         except Exception as exc:  # noqa: BLE001 - surfaced to the chat
             logger.exception("Sanad turn %s failed", message.id)
             message.status = SanadMessageStatus.ERROR
-            message.error = _turn_error(exc)
+            message.error = _turn_error(exc, usage, token_budget)
             message.save(update_fields=["status", "error", "updated_on"])
             return
+        finally:
+            # A failed run is billed too, so it counts either way.
+            budget.record_usage(chat.workspace, usage)
 
         chat.history = result.history
         chat.save(update_fields=["history", "updated_on"])
@@ -245,11 +296,15 @@ def _join(first: str, second: str) -> str:
     return "\n\n".join(part for part in (first, second) if part)
 
 
-def _turn_error(exc: Exception) -> str:
+def _turn_error(exc: Exception, usage=None, token_budget=None) -> str:
     from pydantic_ai.exceptions import UsageLimitExceeded
 
     if isinstance(exc, UsageLimitExceeded):
+        if token_budget is not None and usage.total_tokens > token_budget:
+            return "SANAD_ERROR_BUDGET_EXCEEDED"
         return "SANAD_ERROR_TOO_MANY_STEPS"
+    if isinstance(exc, SanadBudgetExceeded):
+        return "SANAD_ERROR_BUDGET_EXCEEDED"
     if isinstance(exc, SanadNotAllowed):
         return "SANAD_ERROR_NOT_ALLOWED"
     if isinstance(exc, SanadTurnTooLong):

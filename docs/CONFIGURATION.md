@@ -34,6 +34,8 @@ variable and the two should always be set together.
 | `JADAWEL_DASHBOARD_AUTH_RATE` | DRF rate for guessing a public dashboard's share password, keyed per link and caller. | `10/hour` |
 | `JADAWEL_DASHBOARD_SHARE_TOKEN_HOURS` | How long the token issued after entering a share password stays valid. | `168` |
 | `JADAWEL_PAGE_VIEW_EXTERNAL_HOSTS` | Comma-separated CDN origins a Page view may load scripts, styles and fonts from, and only when that view has `allow_external_resources` turned on. Never widens `connect-src`, so a page still cannot send its rows anywhere. See `docs/PAGE_VIEW.md`. | jsDelivr, unpkg, cdnjs, Google Fonts |
+| `JADAWEL_SANAD_MONTHLY_TURN_LIMIT` | Messages Sanad answers per workspace per calendar month (UTC), for workspaces without their own limit. Read at call time; empty, `0` or not a number means no limit. See `docs/SANAD_AI_ASSISTANT.md#budget`. | unlimited |
+| `JADAWEL_SANAD_MONTHLY_TOKEN_LIMIT` | Model tokens (input plus output) Sanad may use per workspace per calendar month, for workspaces without their own limit. Same rules as above. | unlimited |
 
 ### MCP protected fields
 

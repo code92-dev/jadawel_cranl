@@ -168,6 +168,7 @@ Sanad's tool labels and skills repeat them.
 | Beta | بيتا | Badge on features still being introduced; matches the existing app-type badge. |
 | Skill (Sanad) | مهارة | pl. مهارات. Expert guidance Sanad loads for one kind of work; "consulted a skill" = الاستعانة بمهارة. |
 | Revision (Page view) | نسخة سابقة | pl. النسخ السابقة. A page's earlier document, kept on every rewrite; restore = استعادة نسخة سابقة. |
+| Monthly allowance (Sanad) | الحصة الشهرية | The per-workspace budget of Sanad messages and tokens; "used up" = استُنفدت. |
 
 ## Common actions (verbs)
 

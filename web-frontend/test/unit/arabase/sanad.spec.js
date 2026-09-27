@@ -250,6 +250,24 @@ describe('SanadPanel', () => {
     expect(wrapper.find('.sanad__error').text()).toMatch(/^sanad\.errors\./)
   })
 
+  test('a used-up monthly allowance is explained, not shown as a failure', async () => {
+    localStorage.setItem('jadawel.sanad.chat.7', '3')
+    testApp.mock
+      .onGet('/arabase/sanad/chats/3/')
+      .reply(
+        200,
+        chat([
+          message({ status: 'error', error: 'SANAD_ERROR_BUDGET_EXCEEDED' }),
+        ])
+      )
+
+    const wrapper = await mountPanel()
+
+    expect(wrapper.find('.sanad__error').text()).toBe(
+      'sanad.errors.SANAD_ERROR_BUDGET_EXCEEDED'
+    )
+  })
+
   test('links built automations and pages to their editors', async () => {
     localStorage.setItem('jadawel.sanad.chat.7', '3')
     testApp.mock.onGet('/arabase/sanad/chats/3/').reply(

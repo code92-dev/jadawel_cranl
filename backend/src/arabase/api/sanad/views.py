@@ -13,6 +13,7 @@ from rest_framework.status import HTTP_202_ACCEPTED, HTTP_204_NO_CONTENT
 from rest_framework.views import APIView
 
 from arabase.api.sanad.errors import (
+    ERROR_SANAD_BUDGET_EXCEEDED,
     ERROR_SANAD_CHAT_BUSY,
     ERROR_SANAD_CHAT_DOES_NOT_EXIST,
     ERROR_SANAD_MODEL_NOT_AVAILABLE,
@@ -21,13 +22,16 @@ from arabase.api.sanad.errors import (
     ERROR_SANAD_NOTHING_TO_APPROVE,
 )
 from arabase.api.sanad.serializers import (
+    SanadBudgetSerializer,
     SanadChatSerializer,
     SanadChatWithMessagesSerializer,
     SanadDecisionsSerializer,
     SanadMessageSerializer,
     SendSanadMessageSerializer,
+    UpdateSanadBudgetSerializer,
 )
 from arabase.sanad.exceptions import (
+    SanadBudgetExceeded,
     SanadChatBusy,
     SanadChatDoesNotExist,
     SanadModelNotAvailable,
@@ -77,6 +81,47 @@ class SanadModelsView(APIView):
 
         workspace = SanadHandler().get_workspace(request.user, workspace_id)
         return Response({"models": get_available_models(workspace)})
+
+
+class SanadBudgetView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @extend_schema(
+        parameters=[WORKSPACE_ID],
+        tags=TAGS,
+        operation_id="get_sanad_budget",
+        description="This month's Sanad limits and usage in the workspace.",
+        responses={200: SanadBudgetSerializer},
+    )
+    @map_exceptions(COMMON_ERRORS)
+    def get(self, request: Request, workspace_id: int) -> Response:
+        handler = SanadHandler()
+        workspace = handler.get_workspace(request.user, workspace_id)
+        status = handler.get_budget(request.user, workspace)
+        return Response(SanadBudgetSerializer(status).data)
+
+    @extend_schema(
+        parameters=[WORKSPACE_ID],
+        tags=TAGS,
+        operation_id="update_sanad_budget",
+        description=(
+            "Sets the workspace's own monthly Sanad limits. Instance staff only."
+        ),
+        request=UpdateSanadBudgetSerializer,
+        responses={200: SanadBudgetSerializer},
+    )
+    @map_exceptions(COMMON_ERRORS)
+    @validate_body(UpdateSanadBudgetSerializer)
+    def put(self, request: Request, workspace_id: int, data: dict) -> Response:
+        handler = SanadHandler()
+        workspace = handler.get_workspace(request.user, workspace_id)
+        status = handler.update_budget(
+            request.user,
+            workspace,
+            data["monthly_turn_limit"],
+            data["monthly_token_limit"],
+        )
+        return Response(SanadBudgetSerializer(status).data)
 
 
 class SanadChatsView(APIView):
@@ -158,6 +203,7 @@ class SanadMessagesView(APIView):
         {
             **COMMON_ERRORS,
             SanadChatBusy: ERROR_SANAD_CHAT_BUSY,
+            SanadBudgetExceeded: ERROR_SANAD_BUDGET_EXCEEDED,
             SanadNoModelAvailable: ERROR_SANAD_NO_MODEL_AVAILABLE,
             SanadModelNotAvailable: ERROR_SANAD_MODEL_NOT_AVAILABLE,
         }
@@ -188,7 +234,11 @@ class SanadDecisionsView(APIView):
         responses={202: SanadMessageSerializer},
     )
     @map_exceptions(
-        {**COMMON_ERRORS, SanadNothingToApprove: ERROR_SANAD_NOTHING_TO_APPROVE}
+        {
+            **COMMON_ERRORS,
+            SanadNothingToApprove: ERROR_SANAD_NOTHING_TO_APPROVE,
+            SanadBudgetExceeded: ERROR_SANAD_BUDGET_EXCEEDED,
+        }
     )
     @validate_body(SanadDecisionsSerializer)
     def post(self, request: Request, chat_id: int, data: dict) -> Response:

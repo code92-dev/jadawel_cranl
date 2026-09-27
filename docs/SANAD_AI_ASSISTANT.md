@@ -186,9 +186,10 @@ panel ──POST message──▶ API ──on commit──▶ runner thread (we
 ```
 
 - **Backend** — `backend/src/arabase/sanad/`: `models.py` (`SanadChat`,
-  `SanadMessage`), `tools/`, `agent.py`, `handler.py`, `runner.py`; API in
-  `backend/src/arabase/api/sanad/` under `/api/arabase/sanad/`; migration
-  `arabase/0019_sanad_chat`.
+  `SanadMessage`, `SanadBudget`, `SanadUsage`), `tools/`, `agent.py`,
+  `handler.py`, `runner.py`, `budget.py`; API in `backend/src/arabase/api/sanad/`
+  under `/api/arabase/sanad/`; migrations `arabase/0019_sanad_chat` and
+  `arabase/0021_sanad_budget`.
 - **Tools, by domain** — `tools/` is one module per domain behind the
   `SanadTool` contract in `tools/base.py` (name, description, input schema, run
   function, optional skill). Each module exposes `get_tools()`, and
@@ -229,6 +230,7 @@ panel ──POST message──▶ API ──on commit──▶ runner thread (we
   fails after 2 minutes without data, and a turn is capped at 40 model requests.
   A turn still `pending` after 15 minutes (its process restarted) is marked
   failed so the chat is usable again.
+- **A budget per workspace** — see [Budget](#budget).
 - **Each tool call runs in its own database transaction**, as each editor API
   request does: tools that lock rows need one, and a failed call leaves nothing
   half done.
@@ -257,6 +259,37 @@ tokens (`--sanad-accent`, `--sanad-tint`, `--sanad-line`…) from those with
 `color-mix()`, so switching the theme recolours the panel at once with no script.
 Tints come from the 300 step, the first genuinely coloured one on every palette.
 `sanad.spec.js` fails if the stylesheet goes back to a fixed hue.
+
+## Budget
+
+Each workspace has a monthly allowance (calendar month, UTC) in two dimensions,
+kept in `SanadUsage` (one row per workspace and month) and enforced by
+`arabase.sanad.budget`:
+
+- **Turns** — messages sent to Sanad, counted when the message is accepted,
+  under a row lock, so a burst of messages cannot slip past the limit. Resuming
+  after an approval is the same turn and is not counted again.
+- **Tokens** — input plus output, as the provider reports them, added after
+  every model run, failed runs included (they are billed too). A running turn is
+  also capped at what is left of the month through pydantic-ai's
+  `UsageLimits.total_tokens_limit`, so it overshoots by at most one response.
+  Turns running at the same moment in one workspace each see the same remainder,
+  so together they can overshoot by up to one turn's worth each.
+
+A used-up allowance refuses a new message with `ERROR_SANAD_BUDGET_EXCEEDED`
+(HTTP 429) and stops a running turn with `SANAD_ERROR_BUDGET_EXCEEDED`; the
+panel shows both in the user's language.
+
+Limits come from the workspace's `SanadBudget` row; a limit left empty there
+falls back to `JADAWEL_SANAD_MONTHLY_TURN_LIMIT` /
+`JADAWEL_SANAD_MONTHLY_TOKEN_LIMIT` (docs/CONFIGURATION.md), and a dimension with
+neither is unlimited — today's behaviour, fine while only staff use Sanad. **Set
+the defaults before opening Sanad to workspace admins.**
+
+`GET /api/arabase/sanad/workspace/<id>/budget/` returns the limits in force and
+this month's `turns` and `tokens` to anyone who may use Sanad there; `PUT` sets
+the workspace's own limits (`null` falls back to the default) and is limited to
+instance staff, which stays true once admins can chat.
 
 ## Security
 
@@ -289,7 +322,8 @@ Tints come from the 300 step, the first genuinely coloured one on every palette.
   fires on a new row, and the generated form's submit action creates a row.
 - `backend/tests/arabase/test_sanad.py` — access rules, full turns against a
   scripted pydantic-ai `FunctionModel`, view tools, cross-workspace isolation, the
-  approval pause, failure handling.
+  approval pause, failure handling, and the budget: counting, refusing, the token
+  cap stopping a turn, approvals not counted twice, defaults and staff-only edits.
 - `backend/tests/arabase/test_sanad_skills.py` — the skills, their on-demand loading
   and tool gating, the dashboard and page tools, and the patterns the skills teach.
 - `backend/tests/arabase/test_sanad_skill_formulas.py` — every number the formulas

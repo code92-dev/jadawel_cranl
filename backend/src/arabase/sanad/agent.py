@@ -306,11 +306,17 @@ def run_turn(
     on_action: Callable[[dict], None],
     user_prompt: Optional[str] = None,
     decisions: Optional[dict[str, bool]] = None,
+    usage=None,
+    token_budget: Optional[int] = None,
 ) -> TurnResult:
     """Run the model until it answers or pauses for an approval.
 
     Pass ``user_prompt`` for a new message, or ``decisions`` (tool call ID →
     approved) to resume a turn that paused for the user's approval.
+
+    ``usage`` (a pydantic-ai ``RunUsage``) is filled in as the run goes, so the
+    caller can bill what a failed run used too. ``token_budget`` caps the run's
+    tokens at what is left of the workspace's month (``budget``).
     """
 
     from pydantic_ai import (
@@ -325,7 +331,10 @@ def run_turn(
     kwargs = {
         "message_history": load_history(history),
         "deps": deps,
-        "usage_limits": UsageLimits(request_limit=MAX_MODEL_REQUESTS),
+        "usage_limits": UsageLimits(
+            request_limit=MAX_MODEL_REQUESTS, total_tokens_limit=token_budget
+        ),
+        "usage": usage,
     }
     if decisions is not None:
         kwargs["deferred_tool_results"] = DeferredToolResults(

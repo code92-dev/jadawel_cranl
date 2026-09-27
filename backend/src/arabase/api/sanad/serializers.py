@@ -52,3 +52,29 @@ class SanadDecisionSerializer(serializers.Serializer):
 
 class SanadDecisionsSerializer(serializers.Serializer):
     decisions = SanadDecisionSerializer(many=True, allow_empty=False)
+
+
+class SanadBudgetSerializer(serializers.Serializer):
+    """A workspace's Sanad budget for the current calendar month (UTC)."""
+
+    month = serializers.DateField(read_only=True)
+    monthly_turn_limit = serializers.IntegerField(
+        source="turn_limit",
+        allow_null=True,
+        read_only=True,
+        help_text="The limit in force, own or instance default; null is none.",
+    )
+    monthly_token_limit = serializers.IntegerField(
+        source="token_limit", allow_null=True, read_only=True
+    )
+    turns = serializers.IntegerField(read_only=True)
+    tokens = serializers.IntegerField(read_only=True)
+
+
+class UpdateSanadBudgetSerializer(serializers.Serializer):
+    monthly_turn_limit = serializers.IntegerField(
+        min_value=0,
+        allow_null=True,
+        help_text="This workspace's own limit; null falls back to the default.",
+    )
+    monthly_token_limit = serializers.IntegerField(min_value=0, allow_null=True)

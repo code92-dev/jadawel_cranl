@@ -24,3 +24,7 @@ class SanadNothingToApprove(Exception):
 
 class SanadTurnTooLong(Exception):
     """The turn ran past ``agent.TURN_TIME_LIMIT``."""
+
+
+class SanadBudgetExceeded(Exception):
+    """The workspace has used up this month's Sanad turns or tokens."""

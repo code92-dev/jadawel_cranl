@@ -33,6 +33,7 @@ from arabase.api.mcp_protection.views import (
     MCPProtectionReadinessView,
 )
 from arabase.api.sanad.views import (
+    SanadBudgetView,
     SanadChatsView,
     SanadChatView,
     SanadDecisionsView,
@@ -160,6 +161,11 @@ urlpatterns = [
         r"^sanad/workspace/(?P<workspace_id>[0-9]+)/models/$",
         SanadModelsView.as_view(),
         name="sanad_models",
+    ),
+    re_path(
+        r"^sanad/workspace/(?P<workspace_id>[0-9]+)/budget/$",
+        SanadBudgetView.as_view(),
+        name="sanad_budget",
     ),
     re_path(
         r"^sanad/workspace/(?P<workspace_id>[0-9]+)/chats/$",

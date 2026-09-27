@@ -3,6 +3,7 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_409_CONFLICT,
+    HTTP_429_TOO_MANY_REQUESTS,
 )
 
 ERROR_SANAD_NOT_ALLOWED = (
@@ -39,4 +40,10 @@ ERROR_SANAD_NOTHING_TO_APPROVE = (
     "ERROR_SANAD_NOTHING_TO_APPROVE",
     HTTP_400_BAD_REQUEST,
     "Every pending action needs exactly one decision, and none may be extra.",
+)
+
+ERROR_SANAD_BUDGET_EXCEEDED = (
+    "ERROR_SANAD_BUDGET_EXCEEDED",
+    HTTP_429_TOO_MANY_REQUESTS,
+    "This workspace has used this month's Sanad allowance.",
 )

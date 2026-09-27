@@ -24,11 +24,18 @@ from rest_framework.status import (
     HTTP_403_FORBIDDEN,
     HTTP_404_NOT_FOUND,
     HTTP_409_CONFLICT,
+    HTTP_429_TOO_MANY_REQUESTS,
 )
 
 from arabase.sanad import runner
+from arabase.sanad.budget import current_month
 from arabase.sanad.handler import STALE_AFTER
-from arabase.sanad.models import SanadChat, SanadMessage, SanadMessageStatus
+from arabase.sanad.models import (
+    SanadChat,
+    SanadMessage,
+    SanadMessageStatus,
+    SanadUsage,
+)
 from arabase.sanad.tools import APPROVAL_TOOLS, get_sanad_tools
 from jadawel.contrib.database.table.models import Table
 from jadawel.contrib.database.views.models import View, ViewFilter, ViewSort
@@ -683,3 +690,126 @@ def test_every_tool_call_runs_in_a_transaction(api_client, sanad):
     assert reply.actions[0]["ok"], reply.actions[0]
     field.refresh_from_db()
     assert field.name == "Full name"
+
+
+# ---------------------------------------------------------------------------
+# Budget
+# ---------------------------------------------------------------------------
+
+
+def budget_url(workspace):
+    return reverse("api:arabase:sanad_budget", kwargs={"workspace_id": workspace.id})
+
+
+def set_budget(api_client, sanad, turns=None, tokens=None):
+    return api_client.put(
+        budget_url(sanad["workspace"]),
+        {"monthly_turn_limit": turns, "monthly_token_limit": tokens},
+        format="json",
+        **auth(sanad["token"]),
+    )
+
+
+@pytest.mark.django_db(transaction=True)
+def test_usage_is_counted_per_workspace_and_month(api_client, sanad):
+    chat_id = new_chat(api_client, sanad)
+    send(api_client, sanad["token"], chat_id, "hi", scripted_model(["Hello."]))
+
+    usage = SanadUsage.objects.get(workspace=sanad["workspace"])
+    assert usage.month == current_month()
+    assert usage.turns == 1 and usage.requests == 1
+    assert usage.input_tokens > 0 and usage.output_tokens > 0
+
+    response = api_client.get(budget_url(sanad["workspace"]), **auth(sanad["token"]))
+    assert response.status_code == HTTP_200_OK
+    assert response.json() == {
+        "month": current_month().isoformat(),
+        "monthly_turn_limit": None,
+        "monthly_token_limit": None,
+        "turns": 1,
+        "tokens": usage.tokens,
+    }
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_used_up_turn_budget_refuses_new_messages(api_client, sanad):
+    assert set_budget(api_client, sanad, turns=1).status_code == HTTP_200_OK
+    chat_id = new_chat(api_client, sanad)
+    send(api_client, sanad["token"], chat_id, "one", scripted_model(["Done."]))
+
+    response = send(api_client, sanad["token"], chat_id, "two", scripted_model([]))
+
+    assert response.status_code == HTTP_429_TOO_MANY_REQUESTS
+    assert response.json()["error"] == "ERROR_SANAD_BUDGET_EXCEEDED"
+    # Refused before anything was recorded: no second question, no turn.
+    assert SanadMessage.objects.filter(chat_id=chat_id).count() == 2
+    assert SanadUsage.objects.get(workspace=sanad["workspace"]).turns == 1
+
+
+@pytest.mark.django_db(transaction=True)
+def test_a_turn_stops_when_the_token_budget_runs_out(api_client, sanad):
+    set_budget(api_client, sanad, tokens=60)
+    chat_id = new_chat(api_client, sanad)
+    # Every response calls a tool, so only the token cap can end this turn.
+    model = scripted_model([[("list_databases", {})]] * 20)
+
+    send(api_client, sanad["token"], chat_id, "keep going", model)
+
+    reply = SanadMessage.objects.get(role="assistant")
+    assert reply.status == SanadMessageStatus.ERROR
+    assert reply.error == "SANAD_ERROR_BUDGET_EXCEEDED"
+    usage = SanadUsage.objects.get(workspace=sanad["workspace"])
+    # The failed turn is billed, and it stopped long before its 20 requests.
+    assert usage.tokens > 60 and usage.requests < 20
+    response = send(api_client, sanad["token"], chat_id, "more", scripted_model([]))
+    assert response.status_code == HTTP_429_TOO_MANY_REQUESTS
+
+
+@pytest.mark.django_db(transaction=True)
+def test_an_approval_resumes_the_turn_without_counting_a_new_one(api_client, sanad):
+    set_budget(api_client, sanad, turns=1)
+    chat_id = new_chat(api_client, sanad)
+    model = scripted_model(
+        [[("delete_table", {"table_id": sanad["table"].id})], "Deleted."]
+    )
+    send(api_client, sanad["token"], chat_id, "delete the table", model)
+
+    response = decide(
+        api_client, sanad["token"], chat_id, {"call-delete_table-0": True}, model
+    )
+
+    assert response.status_code == HTTP_202_ACCEPTED
+    usage = SanadUsage.objects.get(workspace=sanad["workspace"])
+    assert usage.turns == 1 and usage.requests == 2
+
+
+@pytest.mark.django_db
+def test_the_instance_default_applies_without_a_workspace_budget(
+    api_client, sanad, monkeypatch
+):
+    monkeypatch.setenv("JADAWEL_SANAD_MONTHLY_TURN_LIMIT", "5")
+    monkeypatch.setenv("JADAWEL_SANAD_MONTHLY_TOKEN_LIMIT", "not a number")
+
+    body = api_client.get(budget_url(sanad["workspace"]), **auth(sanad["token"]))
+    assert body.json()["monthly_turn_limit"] == 5
+    assert body.json()["monthly_token_limit"] is None
+
+    # A workspace's own limit wins; clearing it falls back to the default.
+    assert set_budget(api_client, sanad, turns=50).json()["monthly_turn_limit"] == 50
+    assert set_budget(api_client, sanad).json()["monthly_turn_limit"] == 5
+
+
+@pytest.mark.django_db
+def test_only_instance_staff_set_a_budget(api_client, data_fixture, sanad):
+    user, token = data_fixture.create_user_and_token()
+    data_fixture.create_user_workspace(user=user, workspace=sanad["workspace"])
+
+    response = api_client.put(
+        budget_url(sanad["workspace"]),
+        {"monthly_turn_limit": None, "monthly_token_limit": None},
+        format="json",
+        **auth(token),
+    )
+
+    assert response.status_code == HTTP_403_FORBIDDEN
+    assert response.json()["error"] == "ERROR_SANAD_NOT_ALLOWED"

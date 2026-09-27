@@ -482,7 +482,8 @@
       "SANAD_ERROR_MODEL_FAILED": "The AI provider did not respond successfully. Check the provider configuration and try again.",
       "SANAD_ERROR_TOO_MANY_STEPS": "Sanad stopped because the request needed too many steps. Try splitting it into smaller requests.",
       "SANAD_ERROR_TIMED_OUT": "Sanad did not finish in time. Please try again.",
-      "SANAD_ERROR_NOT_ALLOWED": "Sanad is only available to instance administrators."
+      "SANAD_ERROR_NOT_ALLOWED": "Sanad is only available to instance administrators.",
+      "SANAD_ERROR_BUDGET_EXCEEDED": "This workspace has used this month's Sanad allowance. An instance administrator can raise it."
     },
     "apiErrors": {
       "ERROR_SANAD_NOT_ALLOWED": {
@@ -504,6 +505,10 @@
       "ERROR_SANAD_NOTHING_TO_APPROVE": {
         "title": "Nothing to approve",
         "description": "This action was already decided. Refresh the chat."
+      },
+      "ERROR_SANAD_BUDGET_EXCEEDED": {
+        "title": "Sanad's monthly allowance is used up",
+        "description": "This workspace has used this month's Sanad messages or tokens. An instance administrator can raise the allowance."
       }
     },
     "approvePublish": "Publish",

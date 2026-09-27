@@ -94,3 +94,56 @@ class SanadMessage(models.Model):
 
     class Meta:
         ordering = ("id",)
+
+
+class SanadBudget(CreatedAndUpdatedOnMixin, models.Model):
+    """A workspace's monthly allowance for Sanad.
+
+    A limit left empty falls back to the instance default
+    (``JADAWEL_SANAD_MONTHLY_TURN_LIMIT`` / ``_TOKEN_LIMIT``); with neither set,
+    that dimension is unlimited. See ``arabase.sanad.budget``.
+    """
+
+    workspace = models.OneToOneField(
+        Workspace,
+        on_delete=models.CASCADE,
+        related_name="+",
+    )
+    monthly_turn_limit = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+        help_text="Messages Sanad may answer per calendar month (UTC).",
+    )
+    monthly_token_limit = models.PositiveBigIntegerField(
+        null=True,
+        blank=True,
+        help_text="Model tokens, input plus output, per calendar month (UTC).",
+    )
+
+
+class SanadUsage(models.Model):
+    """What Sanad used in one workspace during one calendar month (UTC)."""
+
+    workspace = models.ForeignKey(
+        Workspace,
+        on_delete=models.CASCADE,
+        related_name="+",
+    )
+    month = models.DateField(help_text="The first day of the month.")
+    turns = models.PositiveIntegerField(
+        default=0, help_text="Messages sent to Sanad (an approval is not one)."
+    )
+    requests = models.PositiveIntegerField(default=0)
+    input_tokens = models.PositiveBigIntegerField(default=0)
+    output_tokens = models.PositiveBigIntegerField(default=0)
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=["workspace", "month"], name="arabase_sanad_usage_month"
+            )
+        ]
+
+    @property
+    def tokens(self) -> int:
+        return self.input_tokens + self.output_tokens
