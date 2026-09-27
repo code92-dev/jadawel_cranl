@@ -22,7 +22,14 @@ from jadawel.contrib.automation.workflows.handler import AutomationWorkflowHandl
 from jadawel.contrib.builder.elements.models import Element
 from jadawel.contrib.database.rows.handler import RowHandler
 
-SKILL_NAMES = {"app-builder", "automations", "dashboards", "formulas", "html-pages"}
+SKILL_NAMES = {
+    "app-builder",
+    "automations",
+    "dashboards",
+    "formulas",
+    "forms",
+    "html-pages",
+}
 
 
 def run(tool_name, endpoint, **arguments):

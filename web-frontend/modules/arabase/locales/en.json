@@ -475,7 +475,11 @@
       "write_page_view": "Wrote the page",
       "edit_page_view": "Edited the page",
       "list_page_view_revisions": "Checked the page's earlier versions",
-      "restore_page_view_revision": "Restored an earlier version of the page"
+      "restore_page_view_revision": "Restored an earlier version of the page",
+      "create_form": "Created a form",
+      "get_form": "Read a form",
+      "update_form": "Updated a form",
+      "share_form": "Share the form on a public link"
     },
     "errors": {
       "generic": "Sanad could not finish this answer.",

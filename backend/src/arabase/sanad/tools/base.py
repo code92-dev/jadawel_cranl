@@ -2,7 +2,7 @@
 
 A tool is a ``SanadTool``: a name, a description, a pydantic input schema and a
 function run as the signed-in user in the chat's workspace. The tools live in
-one module per domain next to this one (``database``, ``automation``,
+one module per domain next to this one (``database``, ``form``, ``automation``,
 ``builder``, ``builder_elements``, ``dashboard``, ``page``); the package's
 ``get_sanad_tools`` gathers them. Helpers more than one domain needs live here,
 so domains do not import each other; ``builder_elements`` extends ``builder``
@@ -18,9 +18,9 @@ from pydantic import BaseModel, ValidationError
 
 from jadawel.core.models import Workspace
 
-# Tools that delete something, or put a workflow live so it acts on real data
-# unattended. The model must get the user's explicit approval in the panel
-# before any of them runs.
+# Tools that delete something, put a workflow live so it acts on real data
+# unattended, or open a public link to a table. The model must get the user's
+# explicit approval in the panel before any of them runs.
 APPROVAL_TOOLS = frozenset(
     {
         "delete_table",
@@ -32,6 +32,7 @@ APPROVAL_TOOLS = frozenset(
         "publish_workflow",
         "delete_page_element",
         "delete_dashboard_widget",
+        "share_form",
     }
 )
 

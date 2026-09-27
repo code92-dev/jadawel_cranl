@@ -169,6 +169,7 @@ Sanad's tool labels and skills repeat them.
 | Skill (Sanad) | مهارة | pl. مهارات. Expert guidance Sanad loads for one kind of work; "consulted a skill" = الاستعانة بمهارة. |
 | Revision (Page view) | نسخة سابقة | pl. النسخ السابقة. A page's earlier document, kept on every rewrite; restore = استعادة نسخة سابقة. |
 | Monthly allowance (Sanad) | الحصة الشهرية | The per-workspace budget of Sanad messages and tokens; "used up" = استُنفدت. |
+| Public link | رابط عام | A share link anyone can open; sharing a form on one = مشاركة النموذج عبر رابط عام. Its approval reads نشر / ليس الآن like publishing a workflow. |
 
 ## Common actions (verbs)
 

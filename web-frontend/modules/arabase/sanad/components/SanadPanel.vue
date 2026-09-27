@@ -346,6 +346,10 @@ const KNOWN_TOOLS = new Set([
   'delete_view',
   'add_view_filter',
   'add_view_sort',
+  'create_form',
+  'get_form',
+  'update_form',
+  'share_form',
   'list_applications',
   'create_automation',
   'create_workflow',
@@ -385,6 +389,8 @@ const KNOWN_TOOLS = new Set([
   'list_page_view_revisions',
   'restore_page_view_revision',
 ])
+// Approvals that put something live rather than delete it.
+const PUBLISHING_TOOLS = ['publish_workflow', 'share_form']
 const KNOWN_ERRORS = new Set([
   'SANAD_ERROR_MODEL_FAILED',
   'SANAD_ERROR_TOO_MANY_STEPS',
@@ -701,10 +707,13 @@ export default {
       }
       return { name: 'database-table', params }
     },
-    /** Publishing reads as "Publish / Not now"; everything else deletes. */
+    /**
+     * Publishing a workflow or sharing a form reads as "Publish / Not now";
+     * everything else deletes.
+     */
     approvalLabels(message) {
-      const publishing = this.waitingApprovals(message).some(
-        (call) => call.tool === 'publish_workflow'
+      const publishing = this.waitingApprovals(message).some((call) =>
+        PUBLISHING_TOOLS.includes(call.tool)
       )
       return publishing
         ? {

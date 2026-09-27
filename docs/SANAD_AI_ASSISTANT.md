@@ -18,17 +18,18 @@ permissions. Each capability is a tool the model calls:
 | Build               | `create_database`, `create_table` (with initial fields), `update_table`                                                                                                      |
 | Fields and formulas | `create_fields`, `update_fields` — formula fields are how it writes formulas from a description                                                                              |
 | Rows                | `list_table_rows`, `create_rows`, `update_rows`                                                                                                                              |
-| Views               | `create_view` (grid, gallery, form, kanban), `add_view_filter`, `add_view_sort`                                                                                              |
+| Views               | `create_view` (grid, gallery, kanban), `add_view_filter`, `add_view_sort`                                                                                                    |
+| After `forms`       | `create_form`, `get_form`, `update_form`, `share_form`                                                                                                                       |
 | Automations         | `create_automation`, `create_workflow`, `describe_automation_step`, `get_workflow`, `get_workflow_runs`, `add_automation_step`, `update_automation_step`                     |
 | Application builder | `create_builder_application`, `list_pages`, `create_page`, `add_page_content`, `add_table_to_page`, `add_form_to_page`, `add_fields_to_form`                                 |
 | After `app-builder` | `list_page_elements`, `describe_page_element`, `add_page_element`, `update_page_element`, `add_page_data_source`, `get_app_theme`, `update_app_theme`                        |
 | After `dashboards`  | `create_dashboard`, `get_dashboard`, `add_dashboard_widget`, `update_dashboard_widget`                                                                                       |
 | After `html-pages`  | `create_page_view`, `get_page_view`, `write_page_view`, `edit_page_view`, `list_page_view_revisions`, `restore_page_view_revision`                                           |
-| Needs approval      | `delete_table`, `delete_fields`, `delete_rows`, `delete_view`, `delete_page`, `delete_automation_step`, `publish_workflow`, `delete_page_element`, `delete_dashboard_widget` |
+| Needs approval      | `delete_table`, `delete_fields`, `delete_rows`, `delete_view`, `delete_page`, `delete_automation_step`, `publish_workflow`, `delete_page_element`, `delete_dashboard_widget`, `share_form` |
 
 ### Skills
 
-Five skills turn whichever model Sanad runs on into a specialist for one kind of
+Six skills turn whichever model Sanad runs on into a specialist for one kind of
 work. Each is `backend/src/arabase/sanad/skills/<name>/SKILL.md`: front matter
 (`name`, `title`, `description`) and plain Markdown instructions, with no
 provider-specific feature, so every model reads them the same way.
@@ -39,6 +40,7 @@ provider-specific feature, so every model reads them the same way.
 | `automations` | when to automate, every trigger and action, data paths, bulk changes and loops, limits, routers, testing and debugging              |
 | `dashboards`  | every widget and aggregation, layout, chart choice, and techniques (time buckets, rates, linked-record grouping)                    |
 | `formulas`    | both formula languages, precision and rounding rules, NaN and division, dates, accounting and scientific recipes                    |
+| `forms`       | Form views (نموذج): which fields a form can ask, questions, order, required answers, conditions, after-submit, sharing, prefills     |
 | `html-pages`  | Page views (صفحة): the sandbox and data contract, a starter document, design craft, inline SVG charts, RTL and number formatting    |
 
 **Loaded on demand.** The system prompt lists only each skill's one-line
@@ -92,6 +94,32 @@ setup panel; it opens Sanad with "Design page <number>: " typed in a new chat.
 - The runtime the skill teaches is checked against `pageDocument.js` and
   `HtmlPageView.vue` by `test_sanad_page_views.py`, and the skill's starter
   document must pass `check_page_html`.
+
+### Forms (نموذج)
+
+A Form view made with `create_view` starts with every field disabled, so it asks
+nothing; `create_view` now refuses `form` and points to `create_form`, which
+builds the whole form in one call: settings (title, description, button text,
+the message or redirect after submitting) and its questions — which fields, in
+what order, their labels, help text, required flags, input style (radios for a
+single select, checkboxes for a multiple select) and show-when conditions on
+earlier answers. Without `questions` it asks every field a form can fill and
+reports the rest (formulas, lookups, created on…) in `skipped_fields`.
+
+Settings are validated by the serializer `PATCH /api/database/views/<id>/` uses
+and saved with `UpdateViewActionType`; questions by the view's field-options
+serializer and `UpdateViewFieldOptionsActionType`, so the editor's rules apply
+and every change can be undone. Select conditions take the option's text and are
+stored as its ID, like view filters. `update_form` changes the settings it is
+given and, with `questions`, replaces them all. `share_form` turns the public
+link on and returns it; it waits for approval like publishing a workflow, since
+anyone with the link can then add rows. Survey mode is not offered: it was a
+premium feature and this fork registers only the plain form mode.
+
+Two facts the `forms` skill teaches, both pinned by `test_sanad_forms.py`: a
+required question that has show-when conditions is only required in the browser
+(`FormViewFieldOptions.is_required`), and the description and after-submit
+message are plain text, not Markdown.
 
 ### Automations
 
@@ -199,6 +227,7 @@ panel ──POST message──▶ API ──on commit──▶ runner thread (we
   |---|---|
   | `core` | `load_skill`, `list_applications` |
   | `database` | reused MCP tools (databases, tables, fields, rows), views, filters, sorts |
+  | `form` | Form views (`forms` skill) |
   | `automation` | automations, workflows, steps, runs |
   | `builder` | builder apps at the level of intent: pages, content, tables, forms |
   | `builder_elements` | every element, data sources and the theme (`app-builder` skill) |
@@ -324,6 +353,9 @@ instance staff, which stays true once admins can chat.
   scripted pydantic-ai `FunctionModel`, view tools, cross-workspace isolation, the
   approval pause, failure handling, and the budget: counting, refusing, the token
   cap stopping a turn, approvals not counted twice, defaults and staff-only edits.
+- `backend/tests/arabase/test_sanad_forms.py` — Form view tools: questions,
+  order, labels, conditions stored as the form renders them, refused mistakes,
+  replacing questions, sharing, workspace isolation, and the skill's facts.
 - `backend/tests/arabase/test_sanad_skills.py` — the skills, their on-demand loading
   and tool gating, the dashboard and page tools, and the patterns the skills teach.
 - `backend/tests/arabase/test_sanad_skill_formulas.py` — every number the formulas

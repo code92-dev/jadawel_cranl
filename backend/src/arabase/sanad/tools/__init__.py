@@ -28,6 +28,7 @@ __all__ = [
 DOMAINS = (
     "core",
     "database",
+    "form",
     "automation",
     "builder",
     "builder_elements",

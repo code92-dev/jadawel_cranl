@@ -438,6 +438,36 @@ describe('SanadPanel', () => {
       'sanad.tools.publish_workflow'
     )
   })
+
+  test('sharing a form on a public link also reads as publishing', async () => {
+    localStorage.setItem('jadawel.sanad.chat.7', '3')
+    testApp.mock.onGet('/arabase/sanad/chats/3/').reply(
+      200,
+      chat([
+        message({
+          status: 'awaiting_approval',
+          approvals: [
+            {
+              tool_call_id: 'c-share',
+              tool: 'share_form',
+              arguments: { view_id: 9 },
+            },
+          ],
+        }),
+      ])
+    )
+
+    const wrapper = await mountPanel()
+
+    const buttons = wrapper.findAll('.sanad__approval-buttons button')
+    expect(buttons.map((button) => button.text())).toEqual([
+      'sanad.approvePublish',
+      'sanad.declinePublish',
+    ])
+    expect(wrapper.find('.sanad__approval-text').text()).toBe(
+      'sanad.tools.share_form'
+    )
+  })
 })
 
 describe('the panel follows the selected interface theme', () => {

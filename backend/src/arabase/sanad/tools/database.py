@@ -55,7 +55,7 @@ class CreateViewInput(BaseModel):
     name: str = Field(..., description="The view name.")
     type: str = Field(
         "grid",
-        description="One of: grid, gallery, form, kanban.",
+        description="One of: grid, gallery, kanban. For a form, use create_form.",
     )
     single_select_field_id: Optional[int] = Field(
         None,
@@ -95,7 +95,7 @@ class AddViewSortInput(BaseModel):
     order: str = Field("ASC", description="ASC or DESC.")
 
 
-SUPPORTED_VIEW_TYPES = ("grid", "gallery", "form", "kanban")
+SUPPORTED_VIEW_TYPES = ("grid", "gallery", "kanban")
 
 
 def _check_not_page_view(view) -> None:
@@ -153,6 +153,13 @@ def create_view(endpoint: SanadEndpoint, args: CreateViewInput) -> dict:
     from jadawel.contrib.database.mcp import services
     from jadawel.contrib.database.views.actions import CreateViewActionType
 
+    if args.type == "form":
+        # Every field of a new form view starts disabled, so it would ask
+        # nothing; create_form picks the questions in the same call.
+        raise ValueError(
+            "Build a form with create_form (load the forms skill): a form view "
+            "created here asks no questions."
+        )
     if args.type not in SUPPORTED_VIEW_TYPES:
         raise ValueError(
             f"Unsupported view type {args.type!r}; use one of "
@@ -242,7 +249,7 @@ def get_tools() -> list[SanadTool]:
         SanadTool(
             "create_view",
             "Create a view on a table. Use it to give the user a filtered or "
-            "sorted perspective, a gallery, a form, or a kanban board.",
+            "sorted perspective, a gallery, or a kanban board.",
             CreateViewInput,
             create_view,
         ),

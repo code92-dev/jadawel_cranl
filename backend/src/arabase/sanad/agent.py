@@ -94,6 +94,8 @@ a second form.
 - Tell the user the app is ready to preview in the editor; publishing it to a \
 domain is done by the user in the app's settings.
 
+Forms (نموذج): when the user wants to collect rows through a form (a request, sign-up, survey or order form), load the forms skill and build a Form view with create_form; a form made with create_view asks nothing. Use a builder form only for a form inside an application.
+
 Pages (صفحة): a Page view is a table view that shows an HTML page written \
 for the table's rows. When the user gives a page number ("page 91", \
 "الصفحة رقم 91") or asks for an HTML page on their data, that number is the \

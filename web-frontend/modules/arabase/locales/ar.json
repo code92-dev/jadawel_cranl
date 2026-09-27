@@ -475,7 +475,11 @@
       "write_page_view": "كتابة الصفحة",
       "edit_page_view": "تعديل الصفحة",
       "list_page_view_revisions": "مراجعة النسخ السابقة من الصفحة",
-      "restore_page_view_revision": "استعادة نسخة سابقة من الصفحة"
+      "restore_page_view_revision": "استعادة نسخة سابقة من الصفحة",
+      "create_form": "إنشاء نموذج",
+      "get_form": "قراءة نموذج",
+      "update_form": "تعديل نموذج",
+      "share_form": "مشاركة النموذج عبر رابط عام"
     },
     "errors": {
       "generic": "لم يتمكن سند من إكمال هذه الإجابة.",
