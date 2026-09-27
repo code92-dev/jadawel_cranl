@@ -13,6 +13,7 @@ from arabase.dashboard.widgets.models import (
     RecordsListWidget,
     UpcomingDatesWidget,
 )
+from arabase.generative_ai.models import GenerativeAIProviderSettings
 from arabase.integrations.local_jadawel.models import (
     LocalJadawelGroupedAggregateRows,
     LocalJadawelTableServiceAggregationGroupBy,
@@ -83,6 +84,7 @@ __all__ = [
     "HtmlPageView",
     "HtmlPageViewFieldOptions",
     "HtmlPageViewRevision",
+    "GenerativeAIProviderSettings",
     "PendingTableGrant",
     "SanadChat",
     "SanadMessage",

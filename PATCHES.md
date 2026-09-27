@@ -1634,3 +1634,28 @@ described in `docs/SANAD_AI_ASSISTANT.md`.
 | `web-frontend/modules/automation/applicationTypes.js` | Same                                                                         | Offer "أتمتة" to instance administrators only | low        |
 
 **Tests:** `web-frontend/test/unit/arabase/sanad.spec.js` (`admin-only features`).
+
+## Sanad in the tools window; admin-managed AI provider keys (2026-09-27)
+
+**Context:** Sanad moved from its own left-panel entry into the workspace tools
+window, and AI provider keys moved from environment variables into the admin
+settings page, where administrators manage them. Both need a seam core did not
+have: the tools window (`AppUtilities`) rendered a fixed list, and the provider
+registry could only read a workspace's settings or the environment. Everything
+else — the settings model, sealing, API, settings section, the Mistral switch-off —
+is additive under `arabase/generative_ai`, `arabase/api/generative_ai` and
+`modules/arabase/generativeAI` (docs/SANAD_AI_ASSISTANT.md, "Configuration").
+
+| File                                                    | Change                                                                                                                             | Reason                                                                                      | Merge risk |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ---------- |
+| `backend/src/jadawel/core/generative_ai/registries.py`  | `get_workspace_setting` falls back to `generative_ai_model_type_registry.instance_settings_getter` when the workspace has no value | Let admin-managed keys serve every AI feature, ahead of the `JADAWEL_<PROVIDER>_*` fallback | low        |
+| `web-frontend/modules/core/plugins.js`                  | Add the `getWorkspaceUtilityComponents(workspace)` plugin hook                                                                     | Lets modules add items to the workspace tools window                                        | low        |
+| `web-frontend/modules/core/components/AppUtilities.vue` | Render those components at the end of the tools menu; `close` hides the window                                                     | The other half of the hook; Sanad opens from here                                           | low        |
+
+A workspace value that is empty now falls through to the instance settings instead
+of being returned as-is; every caller already treated an empty value as unset
+(`… or settings.JADAWEL_…`), so behaviour without admin settings is unchanged.
+
+**Tests:** `backend/tests/arabase/test_generative_ai_settings.py`,
+`web-frontend/test/unit/arabase/sanad.spec.js` (`workspace tools window`,
+`AdminGenerativeAISettings`).

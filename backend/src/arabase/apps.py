@@ -29,6 +29,12 @@ class ArabaseConfig(AppConfig):
 
         plugin_registry.register(ArabasePlugin())
 
+        from arabase.generative_ai.handler import apply_provider_policy
+
+        # AI provider keys are managed by administrators in the admin settings
+        # page, and Mistral is switched off for now (arabase.generative_ai).
+        apply_provider_policy()
+
         from arabase.integrations.local_jadawel.service_types import (
             LocalJadawelGroupedAggregateRowsUserServiceType,
         )

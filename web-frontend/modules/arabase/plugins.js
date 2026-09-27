@@ -1,6 +1,7 @@
 import { JadawelPlugin } from '@jadawel/modules/core/plugins'
 import ShareDashboardLink from '@jadawel/modules/arabase/dashboard/components/ShareDashboardLink'
-import SanadSidebarItem from '@jadawel/modules/arabase/sanad/components/SanadSidebarItem'
+import SanadUtilityItem from '@jadawel/modules/arabase/sanad/components/SanadUtilityItem'
+import AdminGenerativeAISettings from '@jadawel/modules/arabase/generativeAI/AdminGenerativeAISettings'
 import SanadPanel from '@jadawel/modules/arabase/sanad/components/SanadPanel'
 
 /**
@@ -30,14 +31,23 @@ export class ArabasePlugin extends JadawelPlugin {
 
   /**
    * Sanad (سند), the AI assistant, is limited to instance staff while it is
-   * introduced; the API enforces the same rule. It lives in core's right
-   * sidebar, the slot upstream reserved for its assistant.
+   * introduced; the API enforces the same rule. It opens from the workspace
+   * tools window and lives in core's right sidebar, the slot upstream reserved
+   * for its assistant.
    */
-  getSidebarWorkspaceComponents(workspace) {
-    return this.app.$store.getters['auth/isStaff'] ? [SanadSidebarItem] : []
+  getWorkspaceUtilityComponents(workspace) {
+    return this.app.$store.getters['auth/isStaff'] ? [SanadUtilityItem] : []
   }
 
   getRightSidebarWorkspaceComponents(workspace) {
     return this.app.$store.getters['auth/isStaff'] ? [SanadPanel] : []
+  }
+
+  /**
+   * AI provider keys, managed by administrators on the admin settings page
+   * (arabase.generative_ai). The page is already staff-only.
+   */
+  getSettingsPageComponents() {
+    return [AdminGenerativeAISettings]
   }
 }

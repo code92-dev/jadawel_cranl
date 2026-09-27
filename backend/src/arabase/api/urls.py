@@ -17,6 +17,10 @@ from arabase.api.dashboard_share.views import (
     DashboardShareRotateSlugView,
     DashboardShareView,
 )
+from arabase.api.generative_ai.views import (
+    AdminGenerativeAIProviderView,
+    AdminGenerativeAIView,
+)
 from arabase.api.mcp_protection.artifacts import (
     ArtifactDraftApprovalView,
     ArtifactDraftView,
@@ -176,5 +180,15 @@ urlpatterns = [
         r"^sanad/chats/(?P<chat_id>[0-9]+)/decisions/$",
         SanadDecisionsView.as_view(),
         name="sanad_decisions",
+    ),
+    re_path(
+        r"^admin/generative-ai/$",
+        AdminGenerativeAIView.as_view(),
+        name="admin_generative_ai",
+    ),
+    re_path(
+        r"^admin/generative-ai/(?P<provider>[a-z_]+)/$",
+        AdminGenerativeAIProviderView.as_view(),
+        name="admin_generative_ai_provider",
     ),
 ]

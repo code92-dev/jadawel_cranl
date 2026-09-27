@@ -170,5 +170,11 @@ export default defineNuxtPlugin({
     // the tab here keeps the core component untouched while removing the entry
     // point; the matching API route is removed in the backend (see PATCHES.md).
     $registry.unregister('workspaceSettings', 'generative-ai')
+
+    // Mistral is switched off for now, matching DISABLED_PROVIDERS in
+    // arabase.generative_ai.store: the backend never enables it, and dropping
+    // the frontend type keeps it out of every provider picker (AI connections,
+    // AI steps). The type's code is untouched; remove this line to restore it.
+    $registry.unregister('generativeAIModel', 'mistral')
   },
 })

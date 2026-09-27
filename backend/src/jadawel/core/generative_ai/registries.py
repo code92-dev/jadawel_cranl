@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import os
 from functools import cached_property
-from typing import TYPE_CHECKING, Any, Optional
+from typing import TYPE_CHECKING, Any, Callable, Optional
 
 from loguru import logger
 from pydantic_ai.messages import UserContent
@@ -341,12 +341,17 @@ class GenerativeAIModelType(Instance):
         if settings_override is not None and key in settings_override:
             return settings_override[key]
 
-        if not isinstance(workspace, Workspace):
-            return None
+        if isinstance(workspace, Workspace):
+            settings = workspace.generative_ai_models_settings or {}
+            value = settings.get(self.type, {}).get(key, None)
+            if value:
+                return value
 
-        settings = workspace.generative_ai_models_settings or {}
-        type_settings = settings.get(self.type, {})
-        return type_settings.get(key, None)
+        # Jadawel fork: instance-wide settings an administrator manages in the
+        # admin settings page (arabase.generative_ai). Unset, callers fall back
+        # to the JADAWEL_<PROVIDER>_* environment variables as before.
+        getter = generative_ai_model_type_registry.instance_settings_getter
+        return getter(self.type, key) if getter else None
 
     def get_api_key(
         self,
@@ -611,6 +616,10 @@ class GenerativeAIModelType(Instance):
 class GenerativeAIModelTypeRegistry(Registry):
     name = "generative_ai_model_type"
     does_not_exist_exception_class = GenerativeAITypeDoesNotExist
+
+    instance_settings_getter: Optional[Callable[[str, str], Any]] = None
+    """Jadawel fork: `(provider type, key) -> value` for instance-wide settings,
+    consulted after the workspace's own settings. Set by `arabase`."""
 
     def get_enabled_models_per_type(
         self, workspace: Optional[Workspace] = None

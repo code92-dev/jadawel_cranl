@@ -54,6 +54,15 @@ export class JadawelPlugin extends Registerable {
   }
 
   /**
+   * Jadawel fork: every registered plugin can add items to the workspace tools
+   * window (AppUtilities). Each component renders a `context__menu-item` and
+   * receives the `workspace`; emitting `close` hides the window.
+   */
+  getWorkspaceUtilityComponents(workspace) {
+    return []
+  }
+
+  /**
    * Every registered plugin can display additional items in the user context menu.
    */
   getUserContextComponents() {

@@ -399,7 +399,7 @@
     "untitled": "Untitled chat",
     "welcomeTitle": "Hi, I'm Sanad",
     "welcomeText": "Ask me to build tables, add fields and formulas, organise views, or work with your rows. I act with your permissions and ask before deleting anything.",
-    "noModel": "No AI provider is configured on this instance. Set JADAWEL_OPENAI_API_KEY, JADAWEL_ANTHROPIC_API_KEY, JADAWEL_OLLAMA_HOST or another provider with its model list, then restart.",
+    "noModel": "No AI provider is set up yet. An administrator can add a key in the admin settings.",
     "suggestions": {
       "createTable": "Create a projects table with a status, an owner and a due date",
       "formula": "Add a formula field that calculates the total from price and quantity",
@@ -483,6 +483,32 @@
       }
     },
     "approvePublish": "Publish",
-    "declinePublish": "Not now"
+    "declinePublish": "Not now",
+    "openAISettings": "Open AI settings"
+  },
+  "adminAI": {
+    "title": "AI providers",
+    "description": "Keys for the AI features: Sanad, AI steps in automations and the builder. Keys are stored encrypted and never shown again after saving. Values set here take priority over the server's environment variables.",
+    "active": "Active",
+    "inactive": "Not configured",
+    "apiKey": "API key",
+    "apiKeyPlaceholder": "Paste the API key",
+    "apiKeySaved": "Saved key ending in {hint}. Paste a new one to replace it.",
+    "removeKey": "Remove key",
+    "host": "Host",
+    "baseUrl": "Base URL (optional)",
+    "organization": "Organization (optional)",
+    "models": "Enabled models",
+    "modelsHint": "Comma-separated model names, as the provider writes them.",
+    "reset": "Clear all",
+    "saved": "Saved",
+    "environmentNote": "The server environment also configures this provider; the values here take priority.",
+    "mistralDisabled": "Mistral is disabled for now.",
+    "providers": {
+      "openai": "GPT models from OpenAI, or any OpenAI-compatible server through the base URL.",
+      "anthropic": "Claude models from Anthropic.",
+      "ollama": "Models you run on your own server, so data never leaves it.",
+      "openrouter": "Many providers' models through one OpenRouter key."
+    }
   }
 }

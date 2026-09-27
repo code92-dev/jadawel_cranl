@@ -66,20 +66,36 @@ Compared with the Baserow AI features this was modelled on:
 
 ## Configuration
 
-Sanad has no credentials of its own. It uses the providers the instance already
-configures for generative AI, and offers every enabled model in the panel:
+Administrators manage the AI provider keys in **Admin → Settings → AI providers**
+(`web-frontend/modules/arabase/generativeAI/`, API
+`/api/arabase/admin/generative-ai/`, staff only). The same keys serve every AI
+feature — Sanad, AI steps in automations and the builder — because core's provider
+registry reads them. Four providers are offered:
 
-| Provider   | Variables                                                                                                            |
-| ---------- | -------------------------------------------------------------------------------------------------------------------- |
-| OpenAI     | `JADAWEL_OPENAI_API_KEY`, `JADAWEL_OPENAI_MODELS`, optional `JADAWEL_OPENAI_BASE_URL`, `JADAWEL_OPENAI_ORGANIZATION` |
-| Anthropic  | `JADAWEL_ANTHROPIC_API_KEY`, `JADAWEL_ANTHROPIC_MODELS`                                                              |
-| Mistral    | `JADAWEL_MISTRAL_API_KEY`, `JADAWEL_MISTRAL_MODELS`                                                                  |
-| OpenRouter | `JADAWEL_OPENROUTER_API_KEY`, `JADAWEL_OPENROUTER_MODELS`                                                            |
-| Ollama     | `JADAWEL_OLLAMA_HOST`, `JADAWEL_OLLAMA_MODELS` — keeps all data on your own servers                                  |
+| Provider           | Admin settings                                | Environment fallback                                              |
+| ------------------ | --------------------------------------------- | ----------------------------------------------------------------- |
+| OpenAI             | API key, models, organization, base URL       | `JADAWEL_OPENAI_API_KEY`, `_MODELS`, `_ORGANIZATION`, `_BASE_URL` |
+| Claude (Anthropic) | API key, models                               | `JADAWEL_ANTHROPIC_API_KEY`, `_MODELS`                            |
+| Ollama             | host, models — keeps all data on your servers | `JADAWEL_OLLAMA_HOST`, `_MODELS`                                  |
+| OpenRouter         | API key, models, organization                 | `JADAWEL_OPENROUTER_API_KEY`, `_MODELS`, `_ORGANIZATION`          |
 
-`*_MODELS` is a comma-separated list. With nothing configured the panel explains
-which variables to set, and the API answers `ERROR_SANAD_NO_MODEL_AVAILABLE`.
-Use a model with reliable tool calling; small local models often call tools badly.
+A provider's settings resolve in this order: an AI connection's own settings, the
+workspace, the admin settings, then the environment variables. Keys are sealed with
+a Fernet key derived from `SECRET_KEY` (`arabase.generative_ai.store`), shown back
+only as their last four characters, and unreadable if `SECRET_KEY` changes — re-enter
+them after rotating it.
+
+**Mistral is disabled for now.** Its provider code is untouched and it stays
+registered under its type, but it is never enabled, even if
+`JADAWEL_MISTRAL_API_KEY` is set, and no picker offers it. Re-enabling it means
+removing `"mistral"` from `DISABLED_PROVIDERS` in `arabase/generative_ai/store.py`
+and the `unregister('generativeAIModel', 'mistral')` line in
+`web-frontend/modules/arabase/registryPlugin.js`, then adding it to
+`MANAGED_PROVIDERS` to manage it in the settings page.
+
+With no provider set up, the panel links administrators to the settings, and the
+API answers `ERROR_SANAD_NO_MODEL_AVAILABLE`. Use a model with reliable tool
+calling; small local models often call tools badly.
 
 Workspace-level AI keys were removed on purpose (PATCHES.md, _Remove workspace AI
 keys_), so there is deliberately no per-workspace setting.
@@ -106,10 +122,11 @@ panel ──POST message──▶ API ──on commit──▶ Celery `arabase.s
 - **Turns run in Celery** (`celery` queue, 5-minute limit, at most 25 model
   requests per turn). A turn stuck `pending` for 10 minutes is marked failed so the
   chat is usable again.
-- **Frontend** — `web-frontend/modules/arabase/sanad/`: a sidebar item and a panel
+- **Frontend** — `web-frontend/modules/arabase/sanad/`: an item in the workspace
+  tools window and a panel
   rendered in core's right sidebar through `ArabasePlugin`'s
-  `getSidebarWorkspaceComponents` / `getRightSidebarWorkspaceComponents` hooks. No
-  core component was edited.
+  `getWorkspaceUtilityComponents` / `getRightSidebarWorkspaceComponents` hooks.
+  The tools-window hook is a small core addition, logged in PATCHES.md.
 
 ## Security
 
@@ -134,6 +151,9 @@ panel ──POST message──▶ API ──on commit──▶ Celery `arabase.s
 
 ## Tests
 
+- `backend/tests/arabase/test_generative_ai_settings.py` — admin-only access, keys
+  sealed and never returned, admin settings ahead of the environment, Mistral
+  disabled even when configured, invalid values rejected.
 - `backend/tests/arabase/test_sanad_apps.py` — automation and builder tools, plus
   two whole turns whose results are then used for real: the published workflow
   fires on a new row, and the generated form's submit action creates a row.

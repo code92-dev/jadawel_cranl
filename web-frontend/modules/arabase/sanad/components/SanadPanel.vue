@@ -62,6 +62,11 @@
           <p class="sanad__muted">{{ $t('sanad.welcomeText') }}</p>
           <p v-if="noModel" class="sanad__notice">
             {{ $t('sanad.noModel') }}
+            <nuxt-link
+              class="sanad__notice-link"
+              :to="{ name: 'admin-settings', hash: '#generative-ai' }"
+              >{{ $t('sanad.openAISettings') }}</nuxt-link
+            >
           </p>
           <div v-else class="sanad__suggestions">
             <button

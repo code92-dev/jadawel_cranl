@@ -121,6 +121,14 @@
             {{ $t('sidebar.trash') }}
           </a>
         </li>
+
+        <component
+          :is="component"
+          v-for="(component, index) in pluginUtilityComponents"
+          :key="`plugin-utility-${index}`"
+          :workspace="workspace"
+          @close="$refs.utilitiesContext.hide()"
+        />
       </ul>
 
       <div class="app-utilities__theme">
@@ -220,6 +228,12 @@ export default {
       const label = this.$t('sidebar.members')
       const count = this.workspace.users?.length
       return count ? `${label} (${count})` : label
+    },
+    /** Tools other modules add through `getWorkspaceUtilityComponents`. */
+    pluginUtilityComponents() {
+      return Object.values(this.$registry.getAll('plugin')).flatMap(
+        (plugin) => plugin.getWorkspaceUtilityComponents(this.workspace) || []
+      )
     },
     ...mapGetters({
       unreadNotificationCount: 'notification/getUnreadCount',

@@ -1,0 +1,66 @@
+// The AI providers section of the admin settings page
+// (modules/arabase/generativeAI). Logical properties only.
+@import '@jadawel/modules/core/assets/scss/colors';
+
+.admin-ai__intro {
+  margin-block: 0 16px;
+  color: $palette-neutral-700;
+  max-inline-size: 70ch;
+}
+
+.admin-ai__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.admin-ai__env {
+  margin-block-start: 6px;
+  color: $palette-yellow-900;
+}
+
+.admin-ai__form {
+  display: grid;
+  gap: 12px;
+  min-inline-size: 320px;
+}
+
+.admin-ai__field {
+  display: grid;
+  gap: 4px;
+}
+
+.admin-ai__field-label {
+  font-size: 12px;
+  font-weight: 600;
+  color: $palette-neutral-800;
+}
+
+.admin-ai__hint {
+  font-size: 11px;
+  color: $palette-neutral-600;
+}
+
+.admin-ai__clear {
+  justify-self: start;
+  font-size: 12px;
+  color: $palette-red-800;
+  cursor: pointer;
+}
+
+.admin-ai__actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.admin-ai__saved {
+  font-size: 12px;
+  color: $palette-green-800;
+}
+
+.admin-ai__disabled {
+  margin-block-start: 12px;
+  font-size: 12px;
+  color: $palette-neutral-600;
+}

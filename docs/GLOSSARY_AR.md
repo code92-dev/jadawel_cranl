@@ -146,6 +146,7 @@ Terms introduced by the Excel/ODS import and export features. Keep "Excel",
 |---------|--------|-------|
 | Sanad | سند | Product name of the in-app AI assistant. Never translated; in English UI it reads "Sanad". |
 | AI assistant | المساعد الذكي | Generic description of Sanad. |
+| AI provider | مزوّد الذكاء الاصطناعي | OpenAI, Claude (Anthropic), Ollama, OpenRouter. Provider and product names stay in Latin script. |
 | Chat | محادثة | pl. محادثات. One conversation with Sanad. |
 | Model (AI) | النموذج | The generative AI model; keep the provider/model token (e.g. `openai/gpt-5`) in Latin script. |
 | Approve (an action) | الموافقة / وافق | Confirming a destructive action Sanad asked to run. |

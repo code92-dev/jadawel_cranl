@@ -2,7 +2,9 @@ import { flushPromises } from '@vue/test-utils'
 import { vi } from 'vitest'
 import { TestApp } from '@jadawel/test/helpers/testApp'
 import SanadPanel from '@jadawel/modules/arabase/sanad/components/SanadPanel'
-import SanadSidebarItem from '@jadawel/modules/arabase/sanad/components/SanadSidebarItem'
+import SanadUtilityItem from '@jadawel/modules/arabase/sanad/components/SanadUtilityItem'
+import AdminGenerativeAISettings from '@jadawel/modules/arabase/generativeAI/AdminGenerativeAISettings'
+import AppUtilities from '@jadawel/modules/core/components/AppUtilities'
 import { ArabasePlugin } from '@jadawel/modules/arabase/plugins'
 import { AutomationApplicationType } from '@jadawel/modules/automation/applicationTypes'
 import { BuilderApplicationType } from '@jadawel/modules/builder/applicationTypes'
@@ -16,14 +18,23 @@ const appFor = (isStaff) => ({
 })
 
 describe('admin-only features', () => {
-  test('Sanad is offered to staff only', () => {
+  test('Sanad opens from the tools window, for staff only', () => {
     const staff = new ArabasePlugin({ app: appFor(true) })
     const member = new ArabasePlugin({ app: appFor(false) })
 
-    expect(staff.getSidebarWorkspaceComponents({})).toEqual([SanadSidebarItem])
+    expect(staff.getWorkspaceUtilityComponents({})).toEqual([SanadUtilityItem])
     expect(staff.getRightSidebarWorkspaceComponents({})).toEqual([SanadPanel])
-    expect(member.getSidebarWorkspaceComponents({})).toEqual([])
+    expect(member.getWorkspaceUtilityComponents({})).toEqual([])
     expect(member.getRightSidebarWorkspaceComponents({})).toEqual([])
+    // No left-panel entry any more, for anyone.
+    expect(staff.getSidebarWorkspaceComponents({})).toBeNull()
+  })
+
+  test('the AI settings join the admin settings page', () => {
+    const plugin = new ArabasePlugin({ app: appFor(true) })
+    expect(plugin.getSettingsPageComponents()).toEqual([
+      AdminGenerativeAISettings,
+    ])
   })
 
   test.each([AutomationApplicationType, BuilderApplicationType])(
@@ -89,7 +100,11 @@ describe('SanadPanel', () => {
   test('explains how to configure a provider when none is enabled', async () => {
     const wrapper = await mountPanel([])
 
-    expect(wrapper.find('.sanad__notice').text()).toBe('sanad.noModel')
+    const notice = wrapper.find('.sanad__notice')
+    expect(notice.text()).toContain('sanad.noModel')
+    expect(notice.find('.sanad__notice-link').attributes('href')).toBe(
+      '/admin/settings#generative-ai'
+    )
     expect(wrapper.find('.sanad__input').attributes('disabled')).toBeDefined()
     expect(wrapper.findAll('.sanad__suggestion')).toHaveLength(0)
   })
@@ -301,5 +316,156 @@ describe('SanadPanel', () => {
     expect(wrapper.find('.sanad__approval-text').text()).toBe(
       'sanad.tools.publish_workflow'
     )
+  })
+})
+
+describe('workspace tools window', () => {
+  let testApp = null
+  const workspace = { id: 7, name: 'Workspace', users: [] }
+
+  beforeEach(() => {
+    testApp = new TestApp()
+  })
+
+  afterEach(async () => {
+    await testApp.afterEach()
+    vi.restoreAllMocks()
+  })
+
+  test('lists the tools other modules add', async () => {
+    testApp.store.state.auth.user = { is_staff: true }
+    const wrapper = await testApp.mount(AppUtilities, { props: { workspace } })
+    await wrapper
+      .find('[data-highlight="workspace-utilities"]')
+      .trigger('click')
+    await flushPromises()
+
+    const items = [
+      ...document.querySelectorAll(
+        '.app-utilities__menu .context__menu-item-link'
+      ),
+    ].map((item) => item.textContent.trim())
+    expect(items).toContain('sanad.name')
+    expect(items.indexOf('sanad.name')).toBe(items.length - 1)
+  })
+
+  test('opening Sanad closes the window and opens the side panel', async () => {
+    const wrapper = await testApp.mount(SanadUtilityItem, {
+      props: { workspace },
+    })
+    const emit = vi.spyOn(testApp._app.$bus, '$emit')
+
+    await wrapper.find('a').trigger('click')
+
+    expect(wrapper.emitted('close')).toHaveLength(1)
+    expect(emit).toHaveBeenCalledWith('toggle-right-sidebar', true)
+  })
+})
+
+describe('AdminGenerativeAISettings', () => {
+  let testApp = null
+
+  beforeEach(() => {
+    testApp = new TestApp()
+  })
+
+  afterEach(async () => {
+    await testApp.afterEach()
+    vi.restoreAllMocks()
+  })
+
+  const provider = (type, fields, overrides = {}) => ({
+    type,
+    fields,
+    api_key_set: false,
+    api_key_hint: '',
+    models: [],
+    host: '',
+    base_url: '',
+    organization: '',
+    configured_by_environment: false,
+    enabled: false,
+    updated_on: null,
+    ...overrides,
+  })
+
+  const PROVIDERS = [
+    provider('openai', ['api_key', 'models', 'organization', 'base_url'], {
+      api_key_set: true,
+      api_key_hint: '1234',
+      models: ['gpt-5'],
+      enabled: true,
+    }),
+    provider('anthropic', ['api_key', 'models']),
+    provider('ollama', ['host', 'models']),
+    provider('openrouter', ['api_key', 'models', 'organization']),
+  ]
+
+  const mountSettings = async () => {
+    testApp.mock
+      .onGet('/arabase/admin/generative-ai/')
+      .reply(200, { providers: PROVIDERS })
+    const wrapper = await testApp.mount(AdminGenerativeAISettings, {})
+    await flushPromises()
+    return wrapper
+  }
+
+  test('offers exactly OpenAI, Claude, Ollama and OpenRouter', async () => {
+    const wrapper = await mountSettings()
+
+    const names = wrapper
+      .findAll('.admin-ai__name')
+      .map((name) => name.text().replace(/\s+/g, ' '))
+    expect(names).toEqual([
+      'OpenAI adminAI.active',
+      'Claude (Anthropic) adminAI.inactive',
+      'Ollama adminAI.inactive',
+      'OpenRouter adminAI.inactive',
+    ])
+    expect(wrapper.text()).not.toMatch(/Mistral/)
+    expect(wrapper.find('.admin-ai__disabled').text()).toBe(
+      'adminAI.mistralDisabled'
+    )
+    // Ollama asks for a host, not a key.
+    const ollama = wrapper.findAll('.admin-ai__provider')[2]
+    expect(ollama.findAll('input[type="password"]')).toHaveLength(0)
+  })
+
+  test('never shows a saved key, and saves only what was typed', async () => {
+    const wrapper = await mountSettings()
+    const openai = wrapper.findAll('.admin-ai__provider')[0]
+    const keyInput = openai.find('input[type="password"]')
+    expect(keyInput.element.value).toBe('')
+
+    testApp.mock
+      .onPatch('/arabase/admin/generative-ai/anthropic/')
+      .reply(200, { providers: PROVIDERS })
+    const anthropic = wrapper.findAll('.admin-ai__provider')[1]
+    const [key, models] = anthropic.findAll('input')
+    await key.setValue('sk-ant-secret')
+    await models.setValue('claude-sonnet-5, , claude-haiku-4-5')
+    await anthropic.find('form').trigger('submit')
+    await flushPromises()
+
+    expect(JSON.parse(testApp.mock.history.patch[0].data)).toEqual({
+      api_key: 'sk-ant-secret',
+      models: ['claude-sonnet-5', 'claude-haiku-4-5'],
+    })
+    // The typed key is not kept in the form after saving.
+    expect(anthropic.findAll('input')[0].element.value).toBe('')
+  })
+
+  test('removing a key sends only that request', async () => {
+    const wrapper = await mountSettings()
+    testApp.mock
+      .onPatch('/arabase/admin/generative-ai/openai/')
+      .reply(200, { providers: PROVIDERS })
+
+    await wrapper.find('.admin-ai__clear').trigger('click')
+    await flushPromises()
+
+    expect(JSON.parse(testApp.mock.history.patch[0].data)).toEqual({
+      clear_api_key: true,
+    })
   })
 })

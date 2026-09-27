@@ -116,6 +116,12 @@
   overflow-wrap: anywhere;
 }
 
+.sanad__notice-link {
+  display: block;
+  margin-block-start: 6px;
+  font-weight: 600;
+}
+
 .sanad__suggestions {
   display: grid;
   gap: 8px;
