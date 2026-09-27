@@ -74,9 +74,8 @@
 }
 
 // Sanad's face: a round portrait on the theme's tint, ringed in its accent.
-// Shared by the header, the welcome screen and every answer.
+// Shared by the header and every answer; the welcome screen shows all of him.
 .sanad__logo,
-.sanad__welcome-orb,
 .sanad__avatar {
   display: inline-flex;
   flex: 0 0 auto;
@@ -279,13 +278,40 @@
   text-align: center;
 }
 
-.sanad__welcome-orb {
-  inline-size: 88px;
-  block-size: 88px;
-  box-shadow:
-    0 0 0 3px var(--sanad-accent-bright),
-    0 0 0 10px var(--sanad-tint),
-    0 18px 36px -16px var(--sanad-accent);
+// The full portrait stands in front of a disc of the theme's tint. The drawing
+// is cut off at the waist, so its lower edge fades out instead of ending on a
+// hard line.
+.sanad__welcome-portrait {
+  position: relative;
+  display: block;
+  inline-size: 168px;
+  block-size: 168px;
+  margin-inline: auto;
+
+  &::before {
+    content: '';
+    position: absolute;
+    inset-block: 6% 10%;
+    inset-inline: 10%;
+    border-radius: 50%;
+    background-image: radial-gradient(
+      circle at 50% 35%,
+      var(--sanad-surface) 0%,
+      var(--sanad-tint-strong) 100%
+    );
+    box-shadow:
+      0 0 0 3px var(--sanad-accent-bright),
+      0 0 0 10px var(--sanad-tint);
+  }
+
+  img {
+    position: relative;
+    inline-size: 100%;
+    block-size: 100%;
+    object-fit: contain;
+    mask-image: linear-gradient(180deg, #000 78%, transparent 100%);
+    user-select: none;
+  }
 }
 
 .sanad__welcome-title {

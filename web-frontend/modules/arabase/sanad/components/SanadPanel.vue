@@ -78,8 +78,12 @@
     <template v-else>
       <div ref="scroller" class="sanad__messages" aria-live="polite">
         <div v-if="!hasMessages" class="sanad__welcome">
-          <span class="sanad__welcome-orb" aria-hidden="true">
-            <img :src="avatar" alt="" draggable="false" />
+          <!--
+            The whole portrait greets the user; once the chat starts, only his
+            face heads the panel and each answer.
+          -->
+          <span class="sanad__welcome-portrait" aria-hidden="true">
+            <img :src="portrait" alt="" draggable="false" />
           </span>
           <p class="sanad__welcome-title">{{ $t('sanad.welcomeTitle') }}</p>
           <p class="sanad__welcome-text">{{ $t('sanad.welcomeText') }}</p>
@@ -320,6 +324,7 @@ import SanadService from '@jadawel/modules/arabase/services/sanad'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
 import { takeSanadDraft } from '@jadawel/modules/arabase/sanad/utils/askSanad'
 import sanadAvatar from '@jadawel/modules/arabase/assets/images/sanad-avatar.webp?url'
+import sanadPortrait from '@jadawel/modules/arabase/assets/images/sanad-portrait.webp?url'
 
 const POLL_INTERVAL = 1500
 const MODEL_STORAGE_KEY = 'jadawel.sanad.model'
@@ -416,6 +421,7 @@ export default {
       model: '',
       noModel: false,
       avatar: sanadAvatar,
+      portrait: sanadPortrait,
       draft: '',
       sending: false,
       deciding: false,

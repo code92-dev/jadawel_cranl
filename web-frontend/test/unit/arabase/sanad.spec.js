@@ -116,6 +116,18 @@ describe('SanadPanel', () => {
     expect(wrapper.findAll('.sanad__suggestion')).toHaveLength(0)
   })
 
+  test('an empty chat is greeted by the whole portrait', async () => {
+    const wrapper = await mountPanel()
+
+    expect(
+      wrapper.find('.sanad__welcome-portrait img').attributes('src')
+    ).toMatch(/sanad-portrait/)
+    // The header keeps the face only.
+    expect(wrapper.find('.sanad__logo img').attributes('src')).toMatch(
+      /sanad-avatar/
+    )
+  })
+
   test('sends a message, then polls until the answer arrives', async () => {
     const wrapper = await mountPanel()
     testApp.mock
@@ -394,10 +406,14 @@ describe('SanadPanel', () => {
 
     expect(wrapper.findAll('.sanad__bubble')).toHaveLength(1)
     expect(wrapper.findAll('.sanad__card')).toHaveLength(3)
-    // Sanad's portrait heads the panel and every one of its answers.
-    const portraits = wrapper.findAll('.sanad__avatar img, .sanad__logo img')
-    expect(portraits).toHaveLength(4)
-    expect(portraits[0].attributes('src')).toMatch(/sanad-avatar/)
+    // Sanad's face heads the panel and every one of its answers; the full
+    // portrait is only for the empty chat's welcome.
+    const faces = wrapper.findAll('.sanad__avatar img, .sanad__logo img')
+    expect(faces).toHaveLength(4)
+    expect(
+      faces.every((face) => /sanad-avatar/.test(face.attributes('src')))
+    ).toBe(true)
+    expect(wrapper.find('.sanad__welcome-portrait').exists()).toBe(false)
     const open = wrapper
       .findAll('.sanad__steps')
       .map((steps) => steps.element.open)
