@@ -1,19 +1,24 @@
 <template>
-  <div
-    :key="elementType.name"
-    v-tooltip="disabled ? isDisallowedReason : elementType.description"
-    class="add-element-card"
-    :class="{ 'add-element-card--disabled': disabled }"
-    @click.stop="onClick"
-  >
-    <div class="add-element-card__element-type">
-      <img
-        class="add-element-card__element-type-icon"
-        :src="elementType.image"
-      />
-    </div>
-    <div v-if="loading" class="loading"></div>
-    <span v-else class="add-element-card__label">{{ elementType.name }}</span>
+  <!-- Jadawel fork: a card of the element gallery, with a preview and when to
+  use the element. -->
+  <div class="element-gallery__item">
+    <button
+      v-tooltip="disabled ? isDisallowedReason : null"
+      type="button"
+      class="element-gallery__card"
+      :class="{ 'element-gallery__card--disabled': disabled }"
+      :aria-disabled="disabled"
+      @click.stop="onClick"
+    >
+      <span class="element-gallery__preview">
+        <img :src="entry.tile" alt="" width="120" height="72" />
+        <span v-if="loading" class="element-gallery__loading">
+          <span class="loading"></span>
+        </span>
+      </span>
+      <span class="element-gallery__name">{{ elementType.name }}</span>
+      <span class="element-gallery__description">{{ description }}</span>
+    </button>
     <component
       :is="disallowedClickModal[0]"
       v-if="disallowedClickModal !== null"
@@ -26,6 +31,11 @@
 </template>
 
 <script>
+import {
+  ELEMENT_GALLERY,
+  galleryEntry,
+} from '@jadawel/modules/arabase/builder/elementGallery'
+
 export default {
   name: 'AddElementCard',
   props: {
@@ -73,6 +83,15 @@ export default {
   },
   emits: ['click'],
   computed: {
+    entry() {
+      return galleryEntry(this.elementType)
+    },
+    description() {
+      const type = this.elementType.getType()
+      return ELEMENT_GALLERY[type]
+        ? this.$t(`elementGallery.elements.${type}`)
+        : this.elementType.description
+    },
     disallowedClickModal() {
       return this.elementType.getDeactivatedClickModal({
         workspace: this.workspace,

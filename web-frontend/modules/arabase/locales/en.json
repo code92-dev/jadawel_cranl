@@ -688,5 +688,100 @@
       "8": "⅔",
       "12": "Full"
     }
+  },
+  "themePresets": {
+    "title": "Start from a ready-made theme",
+    "subtitle": "Sets colours, type, buttons, inputs and tables at once. Fine-tune anything in the tabs below.",
+    "contentLanguage": "Content in",
+    "languages": {
+      "ar": "Arabic",
+      "en": "English"
+    },
+    "applied": "Applied {name}.",
+    "undo": "Undo",
+    "presets": {
+      "jadawel": {
+        "name": "Jadawel",
+        "description": "Sage green on a quiet page, like the dashboards."
+      },
+      "ocean": {
+        "name": "Ocean",
+        "description": "The Jadawel blue: crisp and confident."
+      },
+      "heritage": {
+        "name": "Heritage",
+        "description": "Deep green and gold, for public services."
+      },
+      "sand": {
+        "name": "Sand",
+        "description": "Terracotta and warm paper, for people-facing apps."
+      },
+      "stone": {
+        "name": "Stone",
+        "description": "Steel navy on cool grey, for finance and back-office work."
+      }
+    }
+  },
+  "elementGallery": {
+    "subtitle": "Pick what the page needs; every element takes the app's theme.",
+    "search": "Search elements",
+    "noResults": "No element matches your search.",
+    "category": {
+      "content": "Text and media",
+      "data": "Data",
+      "layout": "Layout",
+      "navigation": "Navigation and actions",
+      "forms": "Forms"
+    },
+    "elements": {
+      "heading": "A page or section title. Use one level 1 per page.",
+      "text": "A paragraph, a list or short formatted text.",
+      "image": "A photo, a logo or an illustration.",
+      "rating": "Shows a score as stars, from data or a fixed value.",
+      "iframe": "Embeds a map, a video or another site.",
+      "table": "Rows from a table, with sorting, search and paging.",
+      "repeat": "Rows as cards: design one, it repeats for each row.",
+      "column": "Places elements side by side; stacks on phones.",
+      "simple_container": "Groups elements in a box you can style as a card.",
+      "header": "A band at the top of every page, for the logo and menu.",
+      "footer": "A band at the bottom of every page.",
+      "menu": "Links to the app's pages, across or down.",
+      "link": "Opens a page or a site; can look like a button.",
+      "button": "Runs actions: save a row, send an email, open a page.",
+      "form_container": "A form that saves a row when it is sent.",
+      "input_text": "A text, number or email field in a form.",
+      "choice": "Pick one or several options from a list.",
+      "checkbox": "A yes or no answer.",
+      "datetime_picker": "A date, with or without a time.",
+      "record_selector": "Pick rows from another table.",
+      "rating_input": "Lets visitors give a score in stars."
+    }
+  },
+  "pageEmpty": {
+    "title": "This page is empty",
+    "text": "Build it from elements: a title, some text, a table of your data, a form. They take the app's theme.",
+    "addElement": "Add an element",
+    "quickStart": "Or start with"
+  },
+  "quickStyles": {
+    "title": "Box style",
+    "styles": {
+      "plain": {
+        "name": "Plain",
+        "description": "No box: the content sits on the page."
+      },
+      "card": {
+        "name": "Card",
+        "description": "A white card with a fine border and rounded corners."
+      },
+      "tinted": {
+        "name": "Tinted",
+        "description": "A soft panel in the theme's primary colour."
+      },
+      "outlined": {
+        "name": "Outlined",
+        "description": "A rounded border, no background."
+      }
+    }
   }
 }

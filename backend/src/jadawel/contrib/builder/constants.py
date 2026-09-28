@@ -30,6 +30,12 @@ class BACKGROUND_IMAGE_MODES(models.TextChoices):
     FIT = "fit"
 
 
+class PAGE_DIRECTIONS(models.TextChoices):
+    AUTO = "auto"
+    RTL = "rtl"
+    LTR = "ltr"
+
+
 class FontWeights(models.TextChoices):
     THIN = "thin"
     EXTRA_LIGHT = "extra-light"

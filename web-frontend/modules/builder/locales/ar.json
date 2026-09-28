@@ -521,7 +521,14 @@
   "pageThemeConfigBlock": {
     "backgroundColor": "لون الخلفية",
     "backgroundImage": "صورة الخلفية",
-    "backgroundMode": "وضع الخلفية"
+    "backgroundMode": "وضع الخلفية",
+    "direction": "الاتجاه",
+    "directionHelp": "اتجاه كتابة محتوى التطبيق. «تلقائي» يتبع لغة كل زائر.",
+    "directions": {
+      "auto": "تلقائي",
+      "rtl": "من اليمين إلى اليسار",
+      "ltr": "من اليسار إلى اليمين"
+    }
   },
   "colorThemeConfigBlockType": {
     "transparent": "شفاف",

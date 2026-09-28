@@ -1,8 +1,9 @@
 <template>
   <div>
     <h2 class="box__title">{{ $t('themeSettings.titleOverview') }}</h2>
+    <ThemePresetGallery :builder="builder" @applied="revision++" />
     <ThemeProvider class="theme-settings">
-      <Tabs>
+      <Tabs :key="revision">
         <Tab
           v-for="themeConfigBlock in themeConfigBlocks"
           :key="themeConfigBlock.getType()"
@@ -25,6 +26,7 @@
 <script>
 import ThemeProvider from '@jadawel/modules/builder/components/theme/ThemeProvider'
 import ThemeConfigBlock from '@jadawel/modules/builder/components/theme/ThemeConfigBlock'
+import ThemePresetGallery from '@jadawel/modules/arabase/builder/components/ThemePresetGallery'
 
 import { mapActions } from 'vuex'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
@@ -32,7 +34,7 @@ import _ from 'lodash'
 
 export default {
   name: 'ThemeSettings',
-  components: { ThemeProvider, ThemeConfigBlock },
+  components: { ThemeProvider, ThemeConfigBlock, ThemePresetGallery },
   provide() {
     return { builder: this.builder, mode: 'edit' }
   },
@@ -41,6 +43,11 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    // Jadawel fork: bumped when a preset is applied, so the forms below, which
+    // copy the theme when they are created, show the new values.
+    return { revision: 0 }
   },
   computed: {
     themeConfigBlocks() {

@@ -8,6 +8,7 @@ import PageThemeConfigBlock from '@jadawel/modules/builder/components/theme/Page
 import InputThemeConfigBlock from '@jadawel/modules/builder/components/theme/InputThemeConfigBlock'
 import TableThemeConfigBlock from '@jadawel/modules/builder/components/theme/TableThemeConfigBlock'
 import { FONT_WEIGHTS } from '@jadawel/modules/builder/fontWeights'
+import { fontFamilyStack } from '@jadawel/modules/builder/fontFamilyTypes'
 import {
   resolveColor,
   colorRecommendation,
@@ -59,8 +60,7 @@ export class ThemeStyle {
 
   addFontFamilyIfExists(theme, propName, styleName) {
     return this.addIfExists(theme, propName, styleName, (v) => {
-      const fontFamilyType = this.$registry.get('fontFamily', v)
-      return `"${fontFamilyType.name}","${fontFamilyType.safeFont}"`
+      return fontFamilyStack(this.$registry.get('fontFamily', v))
     })
   }
 
@@ -438,8 +438,7 @@ export class LinkThemeConfigBlockType extends ThemeConfigBlockType {
         })[v]
     )
     style.addIfExists(theme, `link_font_family`, `--link-font-family`, (v) => {
-      const fontFamilyType = this.app.$registry.get('fontFamily', v)
-      return `"${fontFamilyType.name}","${fontFamilyType.safeFont}"`
+      return fontFamilyStack(this.app.$registry.get('fontFamily', v))
     })
     style.addIfExists(
       theme,
@@ -687,6 +686,12 @@ export class PageThemeConfigBlockType extends ThemeConfigBlockType {
     if (theme.page_background_mode === BACKGROUND_MODES.FIT) {
       style.style['--page-background-size'] = 'contain'
       style.style['--page-background-repeat'] = 'no-repeat'
+    }
+    // Jadawel fork: the direction the content is written in. Read by `.page`
+    // in the fork's builder_elements.scss; "auto" leaves the page to follow
+    // the visitor's language.
+    if (['rtl', 'ltr'].includes(theme.page_direction)) {
+      style.style['--page-direction'] = theme.page_direction
     }
     return style.toObject()
   }

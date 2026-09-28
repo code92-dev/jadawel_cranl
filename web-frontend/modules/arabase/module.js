@@ -42,6 +42,8 @@ export default defineNuxtModule({
     nuxt.options.css.push(resolve('./assets/scss/saudi_riyal.scss'))
     nuxt.options.css.push(resolve('./assets/scss/dashboard_canvas.scss'))
     nuxt.options.css.push(resolve('./assets/scss/dashboard_widgets.scss'))
+    nuxt.options.css.push(resolve('./assets/scss/builder_canvas.scss'))
+    nuxt.options.css.push(resolve('./assets/scss/builder_elements.scss'))
     nuxt.options.css.push(resolve('./assets/scss/admin_backup.scss'))
     nuxt.options.css.push(resolve('./assets/scss/html_page_view.scss'))
     nuxt.options.css.push(resolve('./assets/scss/mcp_protection.scss'))

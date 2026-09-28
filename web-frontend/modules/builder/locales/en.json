@@ -605,7 +605,14 @@
   "pageThemeConfigBlock": {
     "backgroundColor": "Background color",
     "backgroundImage": "Background image",
-    "backgroundMode": "Background mode"
+    "backgroundMode": "Background mode",
+    "direction": "Direction",
+    "directionHelp": "The direction the app's content is written in. Automatic follows each visitor's language.",
+    "directions": {
+      "auto": "Automatic",
+      "rtl": "Right to left",
+      "ltr": "Left to right"
+    }
   },
   "colorThemeConfigBlockType": {
     "transparent": "Transparent",

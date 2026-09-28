@@ -46,10 +46,9 @@
             </div>
           </template>
           <template v-if="elements.length === 0">
-            <AddElementZone
-              class="add-element-zone--full-height"
+            <!-- Jadawel fork: a sketch, the gallery and quick starts. -->
+            <PageEmptyState
               :page="currentPage"
-              :label="$t('pagePreview.emptyMessage')"
               @add-element="$refs.addElementModal.show()"
             />
           </template>
@@ -135,7 +134,7 @@ import { DIRECTIONS, PAGE_PLACES } from '@jadawel/modules/builder/enums'
 import AddElementModal from '@jadawel/modules/builder/components/elements/AddElementModal.vue'
 import ThemeProvider from '@jadawel/modules/builder/components/theme/ThemeProvider.vue'
 import BuilderToasts from '@jadawel/modules/builder/components/BuilderToasts'
-import AddElementZone from '@jadawel/modules/builder/components/elements/AddElementZone'
+import PageEmptyState from '@jadawel/modules/arabase/builder/components/PageEmptyState'
 
 export default {
   name: 'PagePreview',
@@ -145,7 +144,7 @@ export default {
     ElementPreview,
     PreviewNavigationBar,
     BuilderToasts,
-    AddElementZone,
+    PageEmptyState,
   },
   inject: ['builder', 'currentPage', 'workspace'],
   provide() {

@@ -35,6 +35,19 @@
           :options="backgroundModes"
         />
       </FormGroup>
+      <FormGroup
+        horizontal-narrow
+        small-label
+        class="margin-bottom-2"
+        :label="$t('pageThemeConfigBlock.direction')"
+        :helper-text="$t('pageThemeConfigBlock.directionHelp')"
+      >
+        <RadioGroup
+          v-model="v$.values.page_direction.$model"
+          type="button"
+          :options="directions"
+        />
+      </FormGroup>
     </template>
   </ThemeConfigBlockSection>
 </template>
@@ -58,10 +71,17 @@ export default {
         page_background_color: this.theme?.page_background_color,
         page_background_file: this.theme?.page_background_file,
         page_background_mode: this.theme?.page_background_mode,
+        page_direction: this.theme?.page_direction || 'auto',
       },
     }
   },
   computed: {
+    directions() {
+      return ['auto', 'rtl', 'ltr'].map((value) => ({
+        label: this.$t(`pageThemeConfigBlock.directions.${value}`),
+        value,
+      }))
+    },
     backgroundModes() {
       return [
         {
@@ -90,6 +110,7 @@ export default {
         page_background_color: {},
         page_background_file: {},
         page_background_mode: {},
+        page_direction: {},
       },
     }
   },

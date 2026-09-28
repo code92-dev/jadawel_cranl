@@ -1,5 +1,26 @@
 import { Registerable } from '@jadawel/modules/core/registry'
 
+const GENERIC_FAMILIES = ['serif', 'sans-serif', 'monospace', 'cursive']
+
+/**
+ * Jadawel fork: the CSS `font-family` value of a font family type.
+ *
+ * Upstream wrote `"Inter","sans-serif"`: a quoted generic name is a font
+ * family called "sans-serif", which does not exist, and Inter has no Arabic
+ * letters, so Arabic text in an app fell back to whatever the system had. The
+ * app already ships IBM Plex Sans Arabic for its own interface; sans-serif
+ * families now fall back to it, then to the real generic family.
+ */
+export function fontFamilyStack(fontFamilyType) {
+  const generic = fontFamilyType.safeFont
+  const stack = [`"${fontFamilyType.name}"`]
+  if (generic === 'sans-serif') {
+    stack.push('"IBM Plex Sans Arabic"')
+  }
+  stack.push(GENERIC_FAMILIES.includes(generic) ? generic : `"${generic}"`)
+  return stack.join(',')
+}
+
 export class FontFamilyType extends Registerable {
   get name() {
     return ''

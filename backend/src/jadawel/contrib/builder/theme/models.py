@@ -4,6 +4,7 @@ from django.db import models
 from jadawel.contrib.builder.constants import (
     BACKGROUND_IMAGE_MODES,
     COLOR_FIELD_MAX_LENGTH,
+    PAGE_DIRECTIONS,
     WIDTHS,
     FontWeights,
     HorizontalAlignments,
@@ -454,6 +455,17 @@ class PageThemeConfigBlock(ThemeConfigBlock):
         choices=BACKGROUND_IMAGE_MODES.choices,
         max_length=32,
         default=BACKGROUND_IMAGE_MODES.TILE,
+    )
+
+    # Jadawel fork: the direction the app's content is written in. "auto" keeps
+    # upstream's behaviour — the page follows the visitor's interface language —
+    # which lays an English app out right to left for an Arabic visitor.
+    page_direction = models.CharField(
+        help_text="The direction of the page content: auto, rtl or ltr",
+        choices=PAGE_DIRECTIONS.choices,
+        max_length=8,
+        default=PAGE_DIRECTIONS.AUTO,
+        db_default=PAGE_DIRECTIONS.AUTO,
     )
 
 

@@ -1,0 +1,89 @@
+// Application-builder elements, on the published page and in the editor: the
+// finish the theme cannot express — the page's direction, row hover in tables,
+// focus rings, transitions, underline placement, balanced headings. Every rule
+// reads the app's own theme variables, so it works with any theme; the looks
+// themselves come from the theme presets (docs/APPLICATION_REDESIGN.md).
+
+// A standalone stylesheet registered by modules/arabase/module.js after core's
+// default.scss. Logical properties only: this file is a hard-error zone for
+// csstools/use-logical.
+@import '@jadawel/modules/core/assets/scss/colors';
+@import '@jadawel/modules/core/assets/scss/variables';
+
+$accent: var(--main-primary-color, #{$palette-brand-500});
+
+// The direction the app's content is written in (Theme → Page → Direction).
+// Without one set, the page follows the visitor's language, as upstream does.
+.page {
+  direction: var(--page-direction, inherit);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+// --- text -------------------------------------------------------------------
+
+.ab-heading {
+  text-wrap: balance;
+}
+
+.ab-text {
+  text-wrap: pretty;
+}
+
+.ab-link {
+  text-decoration-thickness: from-font;
+  text-underline-offset: 0.2em;
+  transition: color 0.15s ease;
+}
+
+// --- buttons ------------------------------------------------------------------
+
+.ab-button {
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 3px
+      color-mix(
+        in srgb,
+        var(--button-background-color, #{$palette-brand-500}) 32%,
+        transparent
+      );
+  }
+}
+
+// --- inputs -------------------------------------------------------------------
+
+.ab-input {
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:focus {
+    border-color: $accent;
+    box-shadow: 0 0 0 3px color-mix(in srgb, $accent 18%, transparent);
+  }
+}
+
+// --- tables -------------------------------------------------------------------
+
+.ab-table {
+  .ab-table__cell {
+    font-variant-numeric: tabular-nums;
+    transition: background-color 0.12s ease;
+  }
+
+  // The row under the pointer is tinted with the accent, so a wide row can be
+  // followed across. Header rows live in `thead` and are left alone.
+  .jadawel-table--horizontal tbody .jadawel-table__row:hover .ab-table__cell {
+    background-color: color-mix(
+      in srgb,
+      $accent 6%,
+      var(--table-cell-background-color, #{$white})
+    );
+  }
+}

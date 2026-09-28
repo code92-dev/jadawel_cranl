@@ -203,3 +203,9 @@ class ArabaseConfig(AppConfig):
         connect_mcp_protection_lifecycle()
         validate_mcp_tool_protection_contracts(mcp_tool_registry.get_all())
         mcp_tool_registry.register_call_interceptor(intercept_mcp_tool_call)
+
+        # New application-builder apps start from the Jadawel theme preset
+        # (docs/APPLICATION_REDESIGN.md).
+        from arabase.builder.signals import connect_builder_theme_defaults
+
+        connect_builder_theme_defaults()

@@ -1,0 +1,1024 @@
+// The application builder's editor, in the dashboards' design: the canvas the
+// page is edited on (a browser window on a quiet dotted surface, device frames),
+// the chrome around a selected element (outline, name tag, floating toolbar,
+// insert buttons), the element gallery, the empty page and the theme presets.
+// docs/APPLICATION_REDESIGN.md explains the choices.
+
+// A standalone stylesheet registered by modules/arabase/module.js after core's
+// default.scss, so it restyles core's builder classes without editing them.
+// Logical properties only: this file is a hard-error zone for csstools/use-logical.
+@import '@jadawel/modules/core/assets/scss/colors';
+@import '@jadawel/modules/core/assets/scss/variables';
+
+$card-radius: 12px;
+$frame-radius: 12px;
+$device-bezel: 8px;
+$device-radius: 28px;
+$canvas-background: $palette-neutral-100;
+$toolbar-background: $palette-neutral-1200;
+$card-shadow:
+  0 1px 2px rgba(30, 36, 29, 0.05),
+  0 1px 1px rgba(30, 36, 29, 0.03);
+$card-shadow-raised:
+  0 6px 20px rgba(30, 36, 29, 0.08),
+  0 1px 3px rgba(30, 36, 29, 0.06);
+$frame-shadow:
+  0 12px 32px rgba(30, 36, 29, 0.1),
+  0 2px 6px rgba(30, 36, 29, 0.06);
+
+// --- canvas -------------------------------------------------------------------
+
+// The page is edited on a surface of its own, not on the side panel's white:
+// a faint dot grid says "canvas" without competing with the page.
+.page-editor__content > div:first-child {
+  background-color: $canvas-background;
+  background-image: radial-gradient(
+    circle,
+    rgba(126, 138, 124, 0.22) 1px,
+    transparent 1.3px
+  );
+  background-size: 18px 18px;
+}
+
+.page-editor__side-panel {
+  background-color: $white;
+}
+
+.page-preview__wrapper {
+  box-sizing: border-box;
+  padding-block: 20px 24px;
+  padding-inline: 32px;
+}
+
+// The page sits in a browser window: a title bar with the window's three
+// dots, the page's address in a pill, and the "view as" user.
+.preview-navigation-bar {
+  box-sizing: border-box;
+  align-items: center;
+  gap: 12px;
+  min-block-size: 44px;
+  padding-block: 7px;
+  padding-inline: 14px;
+  border: 1px solid $palette-neutral-300;
+  border-block-end-color: $palette-neutral-200;
+  border-start-start-radius: $frame-radius;
+  border-start-end-radius: $frame-radius;
+  background-color: $palette-neutral-25;
+
+  &::before {
+    content: '';
+    flex: none;
+    order: -1;
+    inline-size: 40px;
+    block-size: 10px;
+    background-image:
+      radial-gradient(circle, $palette-neutral-500 4px, transparent 4.5px),
+      radial-gradient(circle, $palette-neutral-500 4px, transparent 4.5px),
+      radial-gradient(circle, $palette-neutral-500 4px, transparent 4.5px);
+    background-position:
+      0 0,
+      15px 0,
+      30px 0;
+    background-repeat: no-repeat;
+    background-size: 10px 10px;
+  }
+}
+
+.preview-navigation-bar__address-bar {
+  min-block-size: 28px;
+  padding-block: 2px;
+  padding-inline: 14px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 999px;
+  background-color: $white;
+  direction: ltr;
+
+  &::before {
+    content: '';
+    inline-size: 12px;
+    block-size: 12px;
+    margin-inline-end: 6px;
+    border-radius: 50%;
+    background-color: $palette-brand-100;
+    box-shadow: inset 0 0 0 3.5px $palette-brand-400;
+  }
+}
+
+.preview-navigation-bar__address-bar-path {
+  color: $palette-neutral-1000;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.page-preview {
+  box-sizing: border-box;
+  border: 1px solid $palette-neutral-300;
+  border-block-start: 0;
+  border-end-start-radius: $frame-radius;
+  border-end-end-radius: $frame-radius;
+  box-shadow: $frame-shadow;
+}
+
+// Tablets and phones get a device frame: a dark bezel and rounded corners.
+.page-preview__wrapper--tablet,
+.page-preview__wrapper--smartphone {
+  .preview-navigation-bar {
+    border: $device-bezel solid $palette-neutral-1200;
+    border-block-end: 1px solid $palette-neutral-200;
+    border-start-start-radius: $device-radius;
+    border-start-end-radius: $device-radius;
+  }
+
+  .page-preview {
+    border: $device-bezel solid $palette-neutral-1200;
+    border-block-start: 0;
+    border-end-start-radius: $device-radius;
+    border-end-end-radius: $device-radius;
+  }
+}
+
+.page-preview__wrapper--smartphone .preview-navigation-bar::before {
+  display: none;
+}
+
+// Header and footer are marked by a dashed rule and a pill, on the page itself.
+.page-preview__separator {
+  border-block-end: 1px dashed $palette-neutral-400;
+}
+
+.page-preview__separator-label {
+  inset-block-start: -10px;
+  padding-block: 3px;
+  padding-inline: 10px;
+  border: 1px solid $palette-neutral-300;
+  background-color: $white;
+  color: $palette-neutral-900;
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 12px;
+  box-shadow: $card-shadow;
+}
+
+// The editor's own UI drawn inside the page — the empty state, name tags,
+// the toolbar, the header and footer labels — reads in the interface's
+// direction, not in the direction of the app's content (Theme → Page).
+$editor-ui-in-page: '.page-empty, .element-preview__tags, .element-preview__menu, .page-preview__separator-label';
+
+[dir='rtl'] .page {
+  #{$editor-ui-in-page} {
+    direction: rtl;
+  }
+}
+
+[dir='ltr'] .page {
+  #{$editor-ui-in-page} {
+    direction: ltr;
+  }
+}
+
+// --- element chrome -----------------------------------------------------------
+
+// Pointing at an element outlines it — only the innermost one, so nested
+// containers do not stack outlines.
+.page-preview .element-preview:not(.element-preview--active):hover:not(
+    :has(.element-preview:hover)
+  ) {
+  outline: 1px dashed $color-primary-400;
+  outline-offset: -1px;
+}
+
+.page-preview .element-preview.element-preview--active::before {
+  inset: 0;
+  border: 2px solid $color-primary-500;
+  border-radius: 4px;
+  box-shadow: 0 0 0 4px rgba(39, 128, 83, 0.12);
+}
+
+// Header and footer elements are shared by several pages: purple, as upstream.
+.page-preview .page__header .element-preview.element-preview--active::before,
+.page-preview .page__footer .element-preview.element-preview--active::before {
+  border-color: $palette-purple-500;
+  box-shadow: 0 0 0 4px rgba(175, 80, 234, 0.12);
+}
+
+.element-preview__tags {
+  inset-block-start: -28px;
+  inset-inline-start: 0;
+}
+
+.element-preview--on-top .element-preview__tags {
+  inset-block-end: -28px;
+}
+
+.element-preview__name-tag,
+.element-preview__error-tag {
+  padding-block: 4px;
+  padding-inline: 10px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+  box-shadow: $card-shadow-raised;
+}
+
+.element-preview--active > .element-preview__tags .element-preview__name-tag {
+  background-color: $color-primary-500;
+}
+
+.page__header .element-preview--active > .element-preview__tags .element-preview__name-tag,
+.page__footer .element-preview--active > .element-preview__tags .element-preview__name-tag {
+  background-color: $palette-purple-500;
+}
+
+// The toolbar floats over the selected element's top corner, dark so it reads
+// as the editor's and not the page's.
+.element-preview__menu {
+  gap: 2px;
+  padding: 3px;
+  border: 0;
+  border-radius: 10px;
+  background-color: $toolbar-background;
+  box-shadow: $card-shadow-raised;
+}
+
+.element-preview__menu-item {
+  block-size: 28px;
+  inline-size: 28px;
+  border-radius: 7px;
+  background-color: transparent;
+  color: $palette-neutral-200;
+  font-size: 15px;
+
+  &:first-child,
+  &:last-child {
+    border-radius: 7px;
+  }
+
+  &:hover {
+    background-color: rgba(255, 255, 255, 0.14);
+    color: $white;
+  }
+
+  &--disabled {
+    color: $palette-neutral-1000;
+
+    &:hover {
+      background-color: transparent;
+    }
+  }
+}
+
+.element-preview__menu-item-description {
+  inset-block-start: -30px;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border-radius: 6px;
+  background-color: $toolbar-background;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.element-preview--on-top .element-preview__menu-item-description {
+  inset-block-start: 36px;
+}
+
+// "Insert above / below" are accent buttons on the outline's edge.
+.element-preview__insert {
+  padding: 6px;
+  border: 2px solid $white;
+  background-color: $color-primary-500;
+  color: $white;
+  box-shadow: $card-shadow-raised;
+  transition: transform 0.12s ease;
+
+  &:hover {
+    background-color: $color-primary-600;
+    color: $white;
+    box-shadow: $card-shadow-raised;
+    transform: scale(1.1);
+  }
+}
+
+.element-preview--drop-before::before,
+.element-preview--drop-after::after {
+  block-size: 3px;
+  border-radius: 3px;
+  box-shadow: 0 0 0 3px rgba(39, 128, 83, 0.15);
+}
+
+// "Add an element here" zones inside containers.
+.add-element-zone {
+  border-radius: 8px;
+}
+
+// --- device selector ----------------------------------------------------------
+
+// Desktop, tablet and phone as one segmented control.
+.header .device-selector {
+  gap: 2px;
+  padding: 3px;
+  border-radius: 10px;
+  background-color: $palette-neutral-100;
+}
+
+.header .device-selector__button {
+  border-radius: 7px;
+  background-color: transparent;
+  color: $palette-neutral-900;
+
+  &.button--active {
+    background-color: $white;
+    color: $palette-neutral-1300;
+    box-shadow: $card-shadow;
+  }
+}
+
+// --- element gallery ----------------------------------------------------------
+
+.add-element-modal div.modal__box {
+  max-inline-size: 880px;
+  padding: 28px;
+}
+
+.element-gallery__header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-end: 8px;
+}
+
+.element-gallery__title {
+  margin: 0;
+  color: $palette-neutral-1300;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.element-gallery__subtitle {
+  margin-block: 4px 0;
+  color: $palette-neutral-900;
+  font-size: 13px;
+}
+
+.element-gallery__search {
+  inline-size: 260px;
+}
+
+.element-gallery__section {
+  margin-block-start: 22px;
+}
+
+.element-gallery__section-title {
+  margin-block: 0 10px;
+  color: $palette-neutral-1000;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.element-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.element-gallery__item {
+  display: flex;
+  min-inline-size: 0;
+}
+
+.element-gallery__card {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  min-inline-size: 0;
+  padding: 8px;
+  padding-block-end: 12px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: $card-radius;
+  background-color: $white;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $color-primary-400;
+    box-shadow: $card-shadow-raised;
+    transform: translateY(-1px);
+  }
+
+  &--disabled {
+    cursor: not-allowed;
+    opacity: 0.45;
+
+    &:hover,
+    &:focus-visible {
+      border-color: $palette-neutral-200;
+      box-shadow: none;
+      transform: none;
+    }
+  }
+}
+
+.element-gallery__preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-block-end: 6px;
+  aspect-ratio: 120 / 72;
+  border-radius: 8px;
+  background-color: $palette-neutral-50;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  // The previews are drawn left to right; an Arabic page reads from the right.
+  [dir='rtl'] & img {
+    transform: scaleX(-1);
+  }
+}
+
+.element-gallery__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.element-gallery__name {
+  padding-inline: 4px;
+  color: $palette-neutral-1300;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.element-gallery__description {
+  display: -webkit-box;
+  overflow: hidden;
+  padding-inline: 4px;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 17px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.element-gallery__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-block: 48px;
+  color: $palette-neutral-900;
+  font-size: 13px;
+
+  i {
+    font-size: 24px;
+  }
+}
+
+// --- empty page ---------------------------------------------------------------
+
+.page-empty {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-block-size: 420px;
+  margin: 24px;
+  padding-block: 48px;
+  padding-inline: 24px;
+  border: 1.5px dashed $palette-neutral-400;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.55);
+  font-family: $text-font-stack;
+  text-align: center;
+  transition:
+    border-color 0.15s ease,
+    background-color 0.15s ease;
+
+  &--drag-active {
+    border-color: $color-primary-400;
+  }
+
+  &--drag-over {
+    border-color: $color-primary-500;
+    background-color: $palette-brand-50;
+  }
+}
+
+// A sketch of a finished page: a header band, a hero, a row of cards.
+.page-empty__sketch {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  inline-size: 240px;
+  margin-block-end: 28px;
+  padding: 10px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 12px;
+  background-color: $white;
+  box-shadow: $card-shadow-raised;
+}
+
+.page-empty__band {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding-block: 6px;
+  padding-inline: 8px;
+  border-radius: 6px;
+  background-color: $palette-neutral-100;
+}
+
+.page-empty__logo {
+  inline-size: 12px;
+  block-size: 12px;
+  margin-inline-end: auto;
+  border-radius: 4px;
+  background-color: $palette-brand-500;
+}
+
+.page-empty__nav {
+  inline-size: 18px;
+  block-size: 4px;
+  border-radius: 2px;
+  background-color: $palette-neutral-500;
+}
+
+.page-empty__hero {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding-block: 10px;
+  padding-inline: 8px;
+}
+
+.page-empty__title {
+  inline-size: 60%;
+  block-size: 9px;
+  border-radius: 3px;
+  background-color: $palette-neutral-1000;
+}
+
+.page-empty__line {
+  inline-size: 85%;
+  block-size: 5px;
+  border-radius: 3px;
+  background-color: $palette-neutral-300;
+}
+
+.page-empty__button {
+  inline-size: 44px;
+  block-size: 12px;
+  margin-block-start: 4px;
+  border-radius: 4px;
+  background-color: $palette-brand-500;
+}
+
+.page-empty__cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.page-empty__card {
+  block-size: 34px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 6px;
+  background-image: linear-gradient($palette-brand-100, $palette-brand-100);
+  background-position: 6px 6px;
+  background-repeat: no-repeat;
+  background-size: calc(100% - 12px) 12px;
+}
+
+.page-empty__heading {
+  margin: 0;
+  color: $palette-neutral-1300;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.page-empty__text {
+  max-inline-size: 46ch;
+  margin-block: 6px 20px;
+  color: $palette-neutral-900;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.page-empty__starts {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-block-start: 20px;
+}
+
+.page-empty__starts-label {
+  color: $palette-neutral-900;
+  font-size: 12px;
+}
+
+.page-empty__start {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  block-size: 30px;
+  padding-inline: 12px;
+  border: 1px solid $palette-neutral-300;
+  border-radius: 999px;
+  background-color: $white;
+  color: $palette-neutral-1100;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease;
+
+  i {
+    font-size: 14px;
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+
+  &:enabled:hover {
+    border-color: $color-primary-500;
+    color: $color-primary-600;
+  }
+}
+
+// --- theme presets ------------------------------------------------------------
+
+.theme-presets {
+  margin-block-end: 28px;
+  padding-block-end: 24px;
+  border-block-end: 1px solid $palette-neutral-200;
+}
+
+.theme-presets__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-end: 14px;
+}
+
+.theme-presets__title {
+  margin: 0;
+  color: $palette-neutral-1300;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.theme-presets__subtitle {
+  max-inline-size: 56ch;
+  margin-block: 2px 0;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.theme-presets__language {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.theme-presets__language-label {
+  color: $palette-neutral-900;
+  font-size: 12px;
+}
+
+.theme-presets__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(124px, 1fr));
+  gap: 12px;
+}
+
+.theme-preset {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 6px;
+  padding-block-end: 10px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: $card-radius;
+  background-color: $white;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:disabled {
+    cursor: progress;
+  }
+
+  &:focus-visible,
+  &:enabled:hover {
+    border-color: $color-primary-400;
+    box-shadow: $card-shadow-raised;
+    transform: translateY(-1px);
+  }
+
+  &--active {
+    border-color: $color-primary-500;
+    box-shadow: 0 0 0 3px rgba(39, 128, 83, 0.14);
+  }
+}
+
+// A page drawn in the preset's own colours: header bar, title, text, a button
+// and a link, and a small table.
+.theme-preset__preview {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  aspect-ratio: 16 / 11;
+  border-radius: 8px;
+  background-color: var(--preset-page);
+  box-shadow: inset 0 0 0 1px rgba(30, 36, 29, 0.06);
+}
+
+.theme-preset__bar {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding-block: 6px;
+  padding-inline: 8px;
+  background-color: var(--preset-surface);
+  box-shadow: 0 1px 0 var(--preset-line);
+}
+
+.theme-preset__logo {
+  inline-size: 9px;
+  block-size: 9px;
+  margin-inline-end: auto;
+  border-radius: 3px;
+  background-color: var(--preset-primary);
+}
+
+.theme-preset__nav {
+  inline-size: 16px;
+  block-size: 3px;
+  border-radius: 2px;
+  background-color: var(--preset-text);
+  opacity: 0.45;
+}
+
+.theme-preset__body {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  padding-block: 8px;
+  padding-inline: 8px;
+}
+
+.theme-preset__heading {
+  inline-size: 58%;
+  block-size: 7px;
+  border-radius: 2px;
+  background-color: var(--preset-ink);
+}
+
+.theme-preset__line {
+  inline-size: 82%;
+  block-size: 3px;
+  border-radius: 2px;
+  background-color: var(--preset-text);
+  opacity: 0.35;
+
+  &--short {
+    inline-size: 60%;
+  }
+}
+
+.theme-preset__actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-block: 3px 2px;
+}
+
+.theme-preset__button {
+  inline-size: 30px;
+  block-size: 10px;
+  border-radius: 3px;
+  background-color: var(--preset-primary);
+  background-image: linear-gradient(
+    var(--preset-on-primary),
+    var(--preset-on-primary)
+  );
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 14px 2px;
+}
+
+.theme-preset__link {
+  inline-size: 18px;
+  block-size: 3px;
+  border-radius: 2px;
+  background-color: var(--preset-secondary);
+}
+
+.theme-preset__table {
+  display: flex;
+  flex-direction: column;
+  align-self: stretch;
+  overflow: hidden;
+  border: 1px solid var(--preset-line);
+  border-radius: 4px;
+  background-color: var(--preset-surface);
+}
+
+.theme-preset__row {
+  block-size: 6px;
+
+  & + & {
+    border-block-start: 1px solid var(--preset-line);
+  }
+
+  &--head {
+    background-color: var(--preset-subtle);
+  }
+}
+
+.theme-preset__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: rgba(255, 255, 255, 0.6);
+}
+
+.theme-preset__caption {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-inline: 4px;
+}
+
+.theme-preset__name {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  color: $palette-neutral-1300;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.theme-preset__check {
+  color: $color-primary-500;
+  font-size: 14px;
+}
+
+.theme-preset__description {
+  color: $palette-neutral-900;
+  font-size: 11px;
+  line-height: 15px;
+}
+
+.theme-presets__applied {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-block: 12px 0;
+  color: $palette-neutral-1000;
+  font-size: 12px;
+}
+
+.theme-presets__undo {
+  font-weight: 600;
+}
+
+// --- quick styles -------------------------------------------------------------
+
+.quick-styles {
+  margin-block-end: 20px;
+  padding-block: 4px 20px;
+  border-block-end: 1px solid $palette-neutral-200;
+}
+
+.quick-styles__label {
+  margin-block-end: 8px;
+  color: $palette-neutral-1300;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.quick-styles__options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.quick-style {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding: 4px;
+  padding-block-end: 6px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 10px;
+  background-color: $white;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  &:enabled:hover {
+    border-color: $color-primary-400;
+  }
+
+  &--active {
+    border-color: $color-primary-500;
+    box-shadow: 0 0 0 3px rgba(39, 128, 83, 0.14);
+  }
+}
+
+// A miniature of the box on the page's own colour: two lines of content in it.
+.quick-style__swatch {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  block-size: 36px;
+  padding-inline: 8px;
+  border-radius: 7px;
+  background-color: $palette-neutral-100;
+
+  i {
+    display: block;
+    inline-size: 70%;
+    block-size: 3px;
+    border-radius: 2px;
+    background-color: $palette-neutral-700;
+
+    & + i {
+      inline-size: 45%;
+      background-color: $palette-neutral-500;
+    }
+  }
+
+  &--card,
+  &--tinted,
+  &--outlined {
+    box-shadow: inset 0 0 0 5px $palette-neutral-100;
+    background-color: var(--swatch-background);
+  }
+
+  &--card,
+  &--outlined {
+    outline: 1px solid $palette-neutral-400;
+    outline-offset: -6px;
+  }
+
+  &--card {
+    background-color: $white;
+  }
+}
+
+.quick-style__name {
+  color: $palette-neutral-1100;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: center;
+}

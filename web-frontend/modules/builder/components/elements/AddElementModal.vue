@@ -1,57 +1,52 @@
 <template>
-  <Modal ref="modal" class="add-element-modal">
-    <h2 class="box__title">{{ $t('addElementModal.title') }}</h2>
-    <div class="add-element-modal__content">
-      <FormInput
-        ref="search"
-        v-model="search"
-        size="large"
-        class="add-element-modal__search"
-        :placeholder="$t('addElementModal.searchPlaceholder')"
-        icon-left="iconoir-search"
-      />
-      <div class="add-element-modal__element-cards">
-        <template v-for="group in elementTypes" :key="group.subject">
-          <div
-            v-if="group.elementTypes.length > 0"
-            class="add-element-modal__category"
-          >
-            <Expandable
-              :default-expanded="!initiallyCollapsedCategories[group.subject]"
-            >
-              <template #header="{ toggle, expanded }">
-                <a class="add-element-modal__category-title" @click="toggle">
-                  {{ group.label }}
-                  <i
-                    class="add-element-modal__category-arrow"
-                    :class="{
-                      'iconoir-nav-arrow-down': expanded,
-                      'iconoir-nav-arrow-right': !expanded,
-                    }"
-                  />
-                </a>
-              </template>
-              <template #default>
-                <div class="add-element-modal__category-content">
-                  <AddElementCard
-                    v-for="elementType in group.elementTypes"
-                    :key="elementType.getType()"
-                    :element-type="elementType"
-                    :loading="addingElementType === elementType.getType()"
-                    :workspace="workspace"
-                    :builder="builder"
-                    :page="page"
-                    :place-in-container="placeInContainer"
-                    :parent-element="parentElement"
-                    :before-element="beforeElement"
-                    :page-place="pagePlace"
-                    @click="addElement(elementType)"
-                  />
-                </div>
-              </template>
-            </Expandable>
-          </div>
-        </template>
+  <!-- Jadawel fork: the element gallery (modules/arabase/builder/elementGallery.js). -->
+  <Modal ref="modal" wide class="add-element-modal">
+    <div class="element-gallery">
+      <div class="element-gallery__header">
+        <div class="element-gallery__heading">
+          <h2 class="element-gallery__title">
+            {{ $t('addElementModal.title') }}
+          </h2>
+          <p class="element-gallery__subtitle">
+            {{ $t('elementGallery.subtitle') }}
+          </p>
+        </div>
+        <FormInput
+          ref="search"
+          v-model="search"
+          class="element-gallery__search"
+          :placeholder="$t('elementGallery.search')"
+          icon-left="iconoir-search"
+        />
+      </div>
+      <section
+        v-for="section in sections"
+        :key="section.category"
+        class="element-gallery__section"
+      >
+        <h3 class="element-gallery__section-title">
+          {{ $t(`elementGallery.category.${section.category}`) }}
+        </h3>
+        <div class="element-gallery__grid">
+          <AddElementCard
+            v-for="elementType in section.elementTypes"
+            :key="elementType.getType()"
+            :element-type="elementType"
+            :loading="addingElementType === elementType.getType()"
+            :workspace="workspace"
+            :builder="builder"
+            :page="page"
+            :place-in-container="placeInContainer"
+            :parent-element="parentElement"
+            :before-element="beforeElement"
+            :page-place="pagePlace"
+            @click="addElement(elementType)"
+          />
+        </div>
+      </section>
+      <div v-if="sections.length === 0" class="element-gallery__empty">
+        <i class="iconoir-search"></i>
+        {{ $t('elementGallery.noResults') }}
       </div>
     </div>
   </Modal>
@@ -60,15 +55,17 @@
 <script>
 import modal from '@jadawel/modules/core/mixins/modal'
 import AddElementCard from '@jadawel/modules/builder/components/elements/AddElementCard'
-import { isSubstringOfStrings } from '@jadawel/modules/core/utils/string'
+import {
+  ELEMENT_GALLERY,
+  gallerySections,
+} from '@jadawel/modules/arabase/builder/elementGallery'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
 import { mapActions } from 'vuex'
 import { PAGE_PLACES } from '@jadawel/modules/builder/enums'
-import Expandable from '@jadawel/modules/core/components/Expandable'
 
 export default {
   name: 'AddElementModal',
-  components: { AddElementCard, Expandable },
+  components: { AddElementCard },
   mixins: [modal],
   inject: ['workspace', 'builder', 'currentPage'],
   props: {
@@ -86,43 +83,17 @@ export default {
       parentElementId: null,
       pagePlace: null,
       addingElementType: null,
-      initiallyCollapsedCategories: {},
     }
   },
   computed: {
-    elementTypes() {
-      const elementTypesAll = Object.values(this.$registry.getAll('element'))
-      const filteredTypes = elementTypesAll.filter((elementType) =>
-        isSubstringOfStrings(
-          [elementType.name, elementType.description],
-          this.search
-        )
-      )
-
-      // Define group categories
-      const groupsList = ['baseElement', 'layoutElement', 'formElement']
-
-      // Create group objects with label and empty elementTypes array
-      const groups = groupsList.map((subject) => ({
-        subject,
-        label: this.$t(`addElementCategory.${subject}`),
-        elementTypes: [],
-      }))
-
-      // Fill other groups with filtered element types
-      filteredTypes.forEach((elementType) => {
-        const category = elementType.category() || 'baseElement'
-
-        // Add element to its standard category, even if it's already in suggested elements
-        if (category !== 'suggestedElement') {
-          const group = groups.find((g) => g.subject === category)
-          if (group) {
-            group.elementTypes.push(elementType)
-          }
-        }
+    sections() {
+      return gallerySections(Object.values(this.$registry.getAll('element')), {
+        search: this.search,
+        describe: (type) =>
+          ELEMENT_GALLERY[type.getType()]
+            ? this.$t(`elementGallery.elements.${type.getType()}`)
+            : '',
       })
-
-      return groups
     },
     sharedPage() {
       return this.$store.getters['page/getSharedPage'](this.builder)
