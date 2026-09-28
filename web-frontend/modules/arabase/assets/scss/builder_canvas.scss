@@ -180,7 +180,8 @@ $editor-ui-in-page: '.page-empty, .element-preview__tags, .element-preview__menu
 
 // Pointing at an element outlines it — only the innermost one, so nested
 // containers do not stack outlines.
-.page-preview .element-preview:not(.element-preview--active):hover:not(
+.page-preview
+  .element-preview:not(.element-preview--active):hover:not(
     :has(.element-preview:hover)
   ) {
   outline: 1px dashed $color-primary-400;
@@ -224,8 +225,14 @@ $editor-ui-in-page: '.page-empty, .element-preview__tags, .element-preview__menu
   background-color: $color-primary-500;
 }
 
-.page__header .element-preview--active > .element-preview__tags .element-preview__name-tag,
-.page__footer .element-preview--active > .element-preview__tags .element-preview__name-tag {
+.page__header
+  .element-preview--active
+  > .element-preview__tags
+  .element-preview__name-tag,
+.page__footer
+  .element-preview--active
+  > .element-preview__tags
+  .element-preview__name-tag {
   background-color: $palette-purple-500;
 }
 
