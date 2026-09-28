@@ -266,7 +266,9 @@ def test_a_dashboard_is_built_widget_by_widget(ws, sales):
         dashboard_id=dashboard["dashboard_id"],
         type="summary",
         title="Pipeline value",
-        width=1,
+        width=3,
+        height=2,
+        appearance={"color": "blue", "icon": "coins", "suffix": "SAR"},
         table_id=table.id,
         field_id=sales["amount"].id,
         aggregation_type="sum",
@@ -291,6 +293,7 @@ def test_a_dashboard_is_built_widget_by_widget(ws, sales):
         dashboard_id=dashboard["dashboard_id"],
         type="chart",
         title="Deals per region",
+        chart_type="horizontal_bar",
         table_id=table.id,
         group_by_field_id=sales["region_label"].id,
         series=[{"field_id": sales["name"].id, "aggregation_type": "count"}],
@@ -332,8 +335,27 @@ def test_a_dashboard_is_built_widget_by_widget(ws, sales):
         include_overdue=True,
         field_ids=[sales["name"].id],
     )
+    section = run(
+        "add_dashboard_widget",
+        endpoint,
+        dashboard_id=dashboard["dashboard_id"],
+        type="text",
+        title="المتابعة",
+        body="ما يُغلق هذا الشهر.",
+        text_style="section",
+        width=12,
+        height=1,
+    )
 
-    assert total["width"] == 1
+    assert (total["width"], total["height"]) == (3, 2)
+    assert total["settings"]["appearance"] == {
+        "color": "blue",
+        "icon": "coins",
+        "suffix": "SAR",
+    }
+    assert by_region["settings"]["chart_type"] == "horizontal_bar"
+    assert section["settings"]["text_style"] == "section"
+    assert section["data"] is None and "shows_now" not in section
     assert Decimal(str(total["shows_now"]["result"])) == Decimal("430.50")
     assert "error" not in by_stage["shows_now"], by_stage["shows_now"]
     assert by_stage["settings"]["chart_type"] == "doughnut"
@@ -352,8 +374,11 @@ def test_a_dashboard_is_built_widget_by_widget(ws, sales):
         widget_id=total["widget_id"],
         title="Won value",
         aggregation_type="max",
+        appearance={"compact": True},
     )
     assert changed["title"] == "Won value"
+    assert changed["settings"]["appearance"]["color"] == "blue"
+    assert changed["settings"]["appearance"]["compact"] is True
     assert Decimal(str(changed["shows_now"]["result"])) == Decimal("250.50")
 
     run("delete_dashboard_widget", endpoint, widget_id=latest["widget_id"])
@@ -364,6 +389,7 @@ def test_a_dashboard_is_built_widget_by_widget(ws, sales):
         "chart",
         "progress",
         "upcoming_dates",
+        "text",
     ]
 
 
@@ -400,6 +426,16 @@ def test_a_widget_is_set_up_in_one_call(ws, sales):
             type="summary",
             title="Pipeline",
             table_id=sales["table"].id,
+        )
+    with pytest.raises(ValueError, match="needs table_id"):
+        run(
+            "add_dashboard_widget",
+            ws["endpoint"],
+            dashboard_id=dashboard["dashboard_id"],
+            type="summary",
+            title="Pipeline",
+            field_id=sales["amount"].id,
+            aggregation_type="sum",
         )
     with pytest.raises(ValueError, match="group_by_field_id, series"):
         run(

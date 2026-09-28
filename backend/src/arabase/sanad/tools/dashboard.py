@@ -15,11 +15,25 @@ from django.db import transaction
 
 from pydantic import BaseModel, Field
 
+from arabase.dashboard.appearance import ACCENT_COLORS, ICONS
 from arabase.sanad.tools.base import SanadEndpoint, SanadTool
 
 SKILL = "dashboards"
 
-WIDGET_TYPES = ("summary", "chart", "progress", "records_list", "upcoming_dates")
+WIDGET_TYPES = (
+    "summary",
+    "chart",
+    "progress",
+    "records_list",
+    "upcoming_dates",
+    "text",
+)
+
+DATA_WIDGET_TYPES = WIDGET_TYPES[:-1]
+"""Every type but `text` reads a table through a data source it owns."""
+
+AccentColor = Literal[ACCENT_COLORS]
+Icon = Literal[ICONS]
 
 PREVIEW_CHARACTERS = 1200
 """Enough of a dispatch result to judge a widget, not enough to flood the chat."""
@@ -41,6 +55,36 @@ class SeriesInput(BaseModel):
     color: Optional[str] = Field(None, description="A #rrggbb colour.")
 
 
+class AppearanceInput(BaseModel):
+    """How a widget looks; each type uses what applies to it."""
+
+    color: Optional[AccentColor] = Field(
+        None,
+        description="Accent: the icon chip, a text callout, a single-series "
+        "chart. 'primary' follows the workspace colour.",
+    )
+    icon: Optional[Icon] = Field(
+        None, description="summary/text: an icon beside the title."
+    )
+    prefix: Optional[str] = Field(
+        None, max_length=12, description="summary/progress: before the number."
+    )
+    suffix: Optional[str] = Field(
+        None,
+        max_length=12,
+        description="summary/progress: after the number, e.g. a currency ﷼ or %.",
+    )
+    decimals: Optional[int] = Field(
+        None, ge=0, le=4, description="summary/progress/chart: fixed decimals."
+    )
+    compact: Optional[bool] = Field(
+        None, description="summary/progress/chart: 1.6M instead of 1,610,000."
+    )
+    stacked: Optional[bool] = Field(
+        None, description="chart: stack several series in one bar or area."
+    )
+
+
 class WidgetSettings(BaseModel):
     """Everything a widget can be set up with; each type reads its own part."""
 
@@ -49,9 +93,22 @@ class WidgetSettings(BaseModel):
         None, description="One line under the title: what it measures, the period."
     )
     width: Optional[int] = Field(
-        None, ge=1, le=3, description="1 = a third of the row, 3 = the full row."
+        None,
+        ge=1,
+        le=12,
+        description="Columns of the 12-column board: 3 a quarter, 4 a third, "
+        "6 half, 12 the full row.",
     )
-    height: Optional[int] = Field(None, ge=1, le=3, description="1 short … 3 tall.")
+    height: Optional[int] = Field(
+        None,
+        ge=1,
+        le=12,
+        description="Rows of about 88 px: 1 a section heading, 2 a number, "
+        "4 a chart, 5-6 a list.",
+    )
+    appearance: Optional[AppearanceInput] = Field(
+        None, description="Accent colour, icon and number format."
+    )
     table_id: Optional[int] = Field(None, description="The table the data comes from.")
     view_id: Optional[int] = Field(
         None, description="A view of that table whose filters (and sorts) apply."
@@ -62,7 +119,13 @@ class WidgetSettings(BaseModel):
     aggregation_type: Optional[str] = Field(
         None, description="summary/progress: how to aggregate field_id."
     )
-    chart_type: Optional[Literal["bar", "line", "pie", "doughnut"]] = None
+    chart_type: Optional[
+        Literal["bar", "horizontal_bar", "line", "area", "pie", "doughnut"]
+    ] = Field(
+        None,
+        description="chart: horizontal_bar for long category names or rankings, "
+        "line/area for time.",
+    )
     group_by_field_id: Optional[int] = Field(
         None, description="chart: the field whose values become the categories."
     )
@@ -76,7 +139,7 @@ class WidgetSettings(BaseModel):
     target_value: Optional[float] = Field(
         None, gt=0, description="progress: the value that counts as 100%."
     )
-    display_style: Optional[Literal["bar", "ring"]] = None
+    display_style: Optional[Literal["bar", "ring", "gauge"]] = None
     warning_threshold: Optional[int] = Field(
         None, ge=0, description="progress: % from which it is no longer at risk."
     )
@@ -98,6 +161,14 @@ class WidgetSettings(BaseModel):
     row_count: Optional[int] = Field(
         None, ge=1, le=100, description="records_list/upcoming_dates: rows shown."
     )
+    body: Optional[str] = Field(
+        None, max_length=2000, description="text: plain text under the title."
+    )
+    text_style: Optional[Literal["section", "note", "callout"]] = Field(
+        None,
+        description="text: a section heading splitting the board, a note card or "
+        "a highlighted callout.",
+    )
 
 
 WIDGET_FIELDS = {
@@ -111,6 +182,7 @@ WIDGET_FIELDS = {
     ),
     "records_list": ("field_ids",),
     "upcoming_dates": ("field_ids",),
+    "text": ("body", "text_style"),
 }
 
 
@@ -121,6 +193,8 @@ def _widget_values(widget_type: str, settings: WidgetSettings) -> dict:
         + WIDGET_FIELDS[widget_type]
         if getattr(settings, name) is not None
     }
+    if settings.appearance is not None:
+        values["appearance"] = settings.appearance.model_dump(exclude_none=True)
     if widget_type == "chart" and settings.series is not None:
         from arabase.integrations.local_jadawel.models import series_key
 
@@ -185,6 +259,7 @@ REQUIRED_SETTINGS = {
     "progress": ("field_id", "aggregation_type", "target_value"),
     "records_list": (),
     "upcoming_dates": ("date_field_id",),
+    "text": (),
 }
 """What each widget type cannot show anything without. Asked for up front, so a
 widget is set up in one call rather than created empty and patched field by
@@ -192,6 +267,8 @@ field."""
 
 
 def _check_complete(widget_type: str, settings: "WidgetSettings") -> None:
+    if widget_type in DATA_WIDGET_TYPES and settings.table_id is None:
+        raise ValueError(f"A {widget_type} widget needs table_id.")
     missing = [
         name
         for name in REQUIRED_SETTINGS[widget_type]
@@ -243,7 +320,7 @@ def _configure_source(endpoint: SanadEndpoint, widget, values: dict) -> None:
     )
     from jadawel.core.services.registries import service_type_registry
 
-    if not values:
+    if not values or not hasattr(widget, "data_source"):
         return
     service = widget.data_source.service.specific
     service_type = service.get_type()
@@ -295,7 +372,8 @@ def _widget_summary(endpoint: SanadEndpoint, widget, preview: bool = True) -> di
     from jadawel.contrib.dashboard.widgets.registries import widget_type_registry
 
     data = dict(widget_type_registry.get_serializer(widget, WidgetSerializer).data)
-    service = widget.data_source.service.specific
+    has_source = hasattr(widget, "data_source")
+    service = widget.data_source.service.specific if has_source else None
     source = {"table_id": getattr(service, "table_id", None)}
     for name in (
         "view_id",
@@ -340,9 +418,9 @@ def _widget_summary(endpoint: SanadEndpoint, widget, preview: bool = True) -> di
                 "data_source_id",
             )
         },
-        "data": source,
+        "data": source if has_source else None,
     }
-    if preview:
+    if preview and has_source:
         summary["shows_now"] = _preview(endpoint, widget)
     return summary
 
@@ -401,9 +479,11 @@ def get_dashboard(endpoint: SanadEndpoint, args: GetDashboardInput) -> dict:
 
 class AddDashboardWidgetInput(WidgetSettings):
     dashboard_id: int = Field(..., description="The dashboard to add it to.")
-    type: Literal["summary", "chart", "progress", "records_list", "upcoming_dates"]
+    type: Literal[WIDGET_TYPES]
     title: str = Field(..., description="The widget title.")
-    table_id: int = Field(..., description="The table the data comes from.")
+    table_id: Optional[int] = Field(
+        None, description="The table the data comes from; not for text."
+    )
 
 
 def add_dashboard_widget(
@@ -450,6 +530,9 @@ def update_dashboard_widget(
     widget = _get_widget(endpoint, args.widget_id)
     widget_type = widget.get_type().type
     values = _widget_values(widget_type, args)
+    if "appearance" in values:
+        # Merged, so changing the suffix does not drop the colour.
+        values["appearance"] = {**(widget.appearance or {}), **values["appearance"]}
     with transaction.atomic():
         if values:
             data = validate_data_custom_fields(
@@ -500,9 +583,9 @@ def get_tools() -> list[SanadTool]:
         SanadTool(
             "add_dashboard_widget",
             "Add a widget (summary, chart, progress, records_list, "
-            "upcoming_dates) fully set up in one call — title, description, "
-            "size, table, view and the type's own settings; the result shows "
-            "what it displays.",
+            "upcoming_dates, text) fully set up in one call — title, "
+            "description, size, appearance, table, view and the type's own "
+            "settings; the result shows what it displays.",
             AddDashboardWidgetInput,
             add_dashboard_widget,
             skill=SKILL,
