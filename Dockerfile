@@ -17,7 +17,24 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-28 from commit c96a4bea, tag 2.3.13-dashboard-redesign.
+# Published 2026-09-28 from commit 80af51ec, tag 2.3.14-app-automation-redesign.
+# Redesigns applications and automations like the dashboards. Applications: the
+# page is edited in a browser window on a canvas with device frames, an element
+# gallery grouped by purpose, an empty-page state with quick starts, one-click
+# box styles; five ready-made themes (new apps start from the Jadawel theme in
+# their creator's language), a page direction setting, Arabic text in Inter
+# falls back to IBM Plex Sans Arabic. Automations: an empty workflow starts
+# from 15 recipes (every event and step, Slack included) or an event; steps
+# are grouped and named in plain words, cards are numbered and coloured with a
+# "Needs setup" pill, a readiness bar leads to the next step to finish. Sanad
+# applies theme presets and box styles. Fixes the unreadable "Last published",
+# an untranslated not-found page and literal Arabic in automations.
+# **Migration: builder.0071 (page_direction on the page theme, default auto;
+# additive).** No environment changes.
+# Previous deployment pin (2.3.13-dashboard-redesign):
+# sha256:b49f3a435a09ca736dfb262b67523babc2dc68ec82040ea39112d5c0ec32f300.
+#
+# Previously published 2026-09-28 from commit c96a4bea, tag 2.3.13-dashboard-redesign.
 # Redesigns dashboards: no box around the board, a 12-column grid (existing
 # widgets are rescaled so they look the same), drag to move and a snapping
 # corner handle to resize in edit mode, a widget gallery grouped by purpose,
@@ -301,7 +318,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:b49f3a435a09ca736dfb262b67523babc2dc68ec82040ea39112d5c0ec32f300
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:c7ddbf74c58556da9873444f925b425d1b509d2500747e6606983c9ac1fa81e2
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
