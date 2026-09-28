@@ -2,34 +2,51 @@ import { defineComponent } from 'vue'
 import { mountSuspended } from '@nuxt/test-utils/runtime'
 
 import ChartWidget from '@jadawel/modules/arabase/dashboard/components/widget/ChartWidget'
+import KpiWidget from '@jadawel/modules/arabase/dashboard/components/widget/KpiWidget'
 import ProgressWidget from '@jadawel/modules/arabase/dashboard/components/widget/ProgressWidget'
 import RecordsListWidget from '@jadawel/modules/arabase/dashboard/components/widget/RecordsListWidget'
 import UpcomingDatesWidget from '@jadawel/modules/arabase/dashboard/components/widget/UpcomingDatesWidget'
 import {
   ChartWidgetType,
+  KpiWidgetType,
   ProgressWidgetType,
   RecordsListWidgetType,
+  TextWidgetType,
   UpcomingDatesWidgetType,
 } from '@jadawel/modules/arabase/dashboard/widgetTypes'
 import { WidgetType } from '@jadawel/modules/dashboard/widgetTypes'
 
 /**
  * The plumbing every arabase widget shares: the props it takes, the store
- * getters it reads through `storePrefix`, the context menu in edit mode, the
- * re-emitted `delete-widget`, the misconfiguration badge and the spinner.
+ * getters it reads through `storePrefix`, the frame's title, the
+ * misconfiguration badge and note, and the skeleton while loading. Moving,
+ * resizing and deleting belong to the board's edit chrome, not the widget.
  */
 const WIDGETS = [
   {
+    component: KpiWidget,
+    name: 'KpiWidget',
+    body: '.widget-kpi',
+    data: { result: '1610000' },
+    widget: {},
+  },
+  {
     component: ChartWidget,
     name: 'ChartWidget',
-    root: '.dashboard-chart-widget',
-    data: { result: { series: [], groups: [], truncated: false } },
+    body: '.widget-chart',
+    data: {
+      result: {
+        series: [{ key: 'k', label: 'Amount', data: [3] }],
+        groups: [{ value: 'A' }],
+        truncated: false,
+      },
+    },
     widget: { chart_type: 'bar', series_config: {}, show_legend: true },
   },
   {
     component: ProgressWidget,
     name: 'ProgressWidget',
-    root: '.dashboard-progress-widget',
+    body: '.widget-progress',
     data: { result: '50' },
     widget: {
       target_value: '100',
@@ -41,29 +58,18 @@ const WIDGETS = [
   {
     component: RecordsListWidget,
     name: 'RecordsListWidget',
-    root: '.dashboard-records-list-widget',
-    data: { results: [], has_next_page: false },
+    body: '.widget-table',
+    data: { results: [{ id: 1, Name: 'A' }], has_next_page: false },
     widget: { field_ids: [] },
   },
   {
     component: UpcomingDatesWidget,
     name: 'UpcomingDatesWidget',
-    root: '.dashboard-upcoming-dates-widget',
-    data: { results: [], has_next_page: false },
+    body: '.widget-agenda',
+    data: { results: [{ id: 1, Name: 'A' }], has_next_page: false },
     widget: { field_ids: [] },
   },
 ]
-
-const WidgetContextMenuStub = defineComponent({
-  name: 'WidgetContextMenu',
-  props: {
-    widget: { type: Object, required: true },
-    dashboard: { type: Object, required: true },
-  },
-  emits: ['delete-widget'],
-  template:
-    '<button class="stub-context-menu" @click="$emit(\'delete-widget\', widget)" />',
-})
 
 const chartStub = defineComponent({
   props: { data: Object, options: Object },
@@ -80,7 +86,7 @@ const mountWidget = async (
   const dataSource = {
     id: 70,
     type: 'local_jadawel_list_rows',
-    schema: { items: { properties: {} } },
+    schema: { items: { properties: { field_1: { title: 'Name' } } } },
   }
   const store = {
     getters: {
@@ -93,6 +99,7 @@ const mountWidget = async (
         return error ? { _error: true } : data
       },
       [`${prefix}dashboardApplication/isEditMode`]: isEditMode,
+      'application/getAll': [],
     },
   }
 
@@ -117,6 +124,7 @@ const mountWidget = async (
       mocks: {
         $store: store,
         $registry: {
+          exists: () => true,
           get: () => ({
             getName: () => 'Sum',
             getResult: (ds, result) => result.result,
@@ -124,7 +132,6 @@ const mountWidget = async (
         },
       },
       stubs: {
-        WidgetContextMenu: WidgetContextMenuStub,
         Badge: { template: '<span class="stub-badge"><slot /></span>' },
         BarChart: chartStub,
         LineChart: chartStub,
@@ -155,23 +162,18 @@ describe.each(WIDGETS)('$name shared widget contract', (definition) => {
     expect(wrapper.vm.dataForDataSource).toEqual(definition.data)
     expect(wrapper.vm.isEditMode).toBe(false)
     expect(wrapper.vm.dataSourceMisconfigured).toBe(false)
-    expect(wrapper.find(definition.root).exists()).toBe(true)
-    expect(wrapper.find('.widget__header-title').text()).toBe('Widget title')
-    expect(wrapper.find('.stub-context-menu').exists()).toBe(false)
+    expect(wrapper.find('.widget-frame').exists()).toBe(true)
+    expect(wrapper.find(definition.body).exists()).toBe(true)
+    expect(wrapper.find('.widget-frame__title').text()).toBe('Widget title')
     expect(wrapper.find('.stub-badge').exists()).toBe(false)
   })
 
-  test('edit mode shows the context menu and re-emits delete-widget', async () => {
+  test('the header is the drag handle the board looks for', async () => {
     const wrapper = await mountWidget(definition, { isEditMode: true })
 
-    expect(wrapper.vm.isEditMode).toBe(true)
-    await wrapper.get('.stub-context-menu').trigger('click')
-
-    expect(wrapper.emitted('delete-widget')).toHaveLength(1)
-    expect(wrapper.emitted('delete-widget')[0][0]).toMatchObject({
-      id: 3,
-      data_source_id: 7,
-    })
+    expect(wrapper.find('.widget-frame__header.widget__header').exists()).toBe(
+      true
+    )
   })
 
   test('an errored data source is flagged as misconfigured', async () => {
@@ -179,13 +181,28 @@ describe.each(WIDGETS)('$name shared widget contract', (definition) => {
 
     expect(wrapper.vm.dataSourceMisconfigured).toBe(true)
     expect(wrapper.find('.stub-badge').text()).toBe('widget.fixConfiguration')
+    expect(wrapper.find('.widget-frame__state').exists()).toBe(true)
+    expect(wrapper.find(definition.body).exists()).toBe(false)
+    // The hint to open the settings is only useful to someone editing.
+    expect(wrapper.find('.widget-frame__state-hint').exists()).toBe(false)
   })
 
-  test('shows only a spinner while loading', async () => {
+  test('a misconfigured widget tells an editor where to fix it', async () => {
+    const wrapper = await mountWidget(definition, {
+      error: true,
+      isEditMode: true,
+    })
+
+    expect(wrapper.find('.widget-frame__state-hint').exists()).toBe(true)
+  })
+
+  test('keeps its title and shows a skeleton while loading', async () => {
     const wrapper = await mountWidget(definition, { loading: true })
 
-    expect(wrapper.find('.loading-spinner').exists()).toBe(true)
-    expect(wrapper.find('.widget__header').exists()).toBe(false)
+    expect(wrapper.find('.widget-frame__title').text()).toBe('Widget title')
+    expect(wrapper.find('.widget-frame__skeleton').exists()).toBe(true)
+    expect(wrapper.find(definition.body).exists()).toBe(false)
+    expect(wrapper.find('.stub-badge').exists()).toBe(false)
   })
 })
 
@@ -195,7 +212,7 @@ describe('arabase widget types', () => {
   test.each([
     [ChartWidgetType, 'chart', 10],
     [RecordsListWidgetType, 'records_list', 20],
-    [ProgressWidgetType, 'progress', 30],
+    [ProgressWidgetType, 'progress', 5],
     [UpcomingDatesWidgetType, 'upcoming_dates', 40],
   ])(
     '%s keeps its type and order and loads until dispatched',
@@ -214,4 +231,55 @@ describe('arabase widget types', () => {
       expect(widgetType.isLoading(widget, { 7: { _error: true } })).toBe(false)
     }
   )
+
+  test('the key number replaces summary under the same type name', () => {
+    const widgetType = new KpiWidgetType({ app })
+
+    expect(KpiWidgetType.getType()).toBe('summary')
+    expect(widgetType.getOrder()).toBe(0)
+    expect(widgetType.name).toBe('kpiWidget.name')
+    expect(widgetType.isLoading({ data_source_id: 7 }, {})).toBe(true)
+    expect(
+      widgetType.isLoading({ data_source_id: 7 }, { 7: { result: 1 } })
+    ).toBe(false)
+  })
+
+  test('a text widget never waits for data and a section has no card', () => {
+    const widgetType = new TextWidgetType({ app })
+
+    expect(TextWidgetType.getType()).toBe('text')
+    expect(widgetType.isLoading({ id: 3 }, {})).toBe(false)
+    expect(widgetType.isBare({ text_style: 'section' })).toBe(true)
+    expect(widgetType.isBare({ text_style: 'note' })).toBe(false)
+  })
+
+  test('every variation says where it is listed and the size it starts at', () => {
+    const types = [
+      KpiWidgetType,
+      ProgressWidgetType,
+      ChartWidgetType,
+      RecordsListWidgetType,
+      UpcomingDatesWidgetType,
+      TextWidgetType,
+    ].map((Type) => new Type({ app }))
+    const variations = types.flatMap((type) => type.variations)
+
+    expect(variations).toHaveLength(14)
+    for (const variation of variations) {
+      expect(['numbers', 'charts', 'lists', 'text']).toContain(
+        variation.category
+      )
+      expect(variation.size.width).toBeGreaterThanOrEqual(
+        variation.type.minSize.width
+      )
+      expect(variation.size.height).toBeGreaterThanOrEqual(
+        variation.type.minSize.height
+      )
+      expect(variation.size.width).toBeLessThanOrEqual(12)
+    }
+    const kpi = variations.find((v) => v.type instanceof KpiWidgetType)
+    expect(kpi.size).toEqual({ width: 3, height: 2 })
+    const section = variations.find((v) => v.params.text_style === 'section')
+    expect(section.size).toEqual({ width: 12, height: 1 })
+  })
 })

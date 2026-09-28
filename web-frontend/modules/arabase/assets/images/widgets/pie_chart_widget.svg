@@ -1,8 +1,10 @@
-<svg width="72" height="40" viewBox="0 0 72 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="1.25" y="1.25" width="69.5" height="37.5" rx="4.75" fill="white"/>
-<rect x="1.25" y="1.25" width="69.5" height="37.5" rx="4.75" stroke="#E6E6E7" stroke-width="1.5"/>
-<rect opacity="0.48" x="12" y="31" width="48" height="1" rx="0.5" fill="#E6E6E7"/>
-<circle cx="36" cy="19" r="11" fill="#E6E6E7"/>
-<path d="M36 19V8C42.0751 8 47 12.9249 47 19H36Z" fill="#198DD6"/>
-<path d="M36 19H47C47 25.0751 42.0751 30 36 30V19Z" fill="#0D9439"/>
+<svg width="120" height="72" viewBox="0 0 120 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="14" y="12" width="36" height="5" rx="2.5" fill="#c7d0c4"/>
+<circle cx="40" cy="45" r="18" fill="#eaefe7"/>
+<path d="M40 45 V27 A18 18 0 0 1 56.6 51.9 Z" fill="#278053" stroke="white" stroke-width="1.5"/>
+<path d="M40 45 L56.6 51.9 A18 18 0 0 1 26.5 56.9 Z" fill="#4783db" stroke="white" stroke-width="1.5"/>
+<path d="M40 45 L26.5 56.9 A18 18 0 0 1 40 27 Z" fill="#e5b33d" stroke="white" stroke-width="1.5"/>
+<circle cx="72" cy="34" r="3" fill="#278053"/><rect x="78" y="32" width="26" height="4" rx="2" fill="#eaefe7"/>
+<circle cx="72" cy="45" r="3" fill="#4783db"/><rect x="78" y="43" width="20" height="4" rx="2" fill="#eaefe7"/>
+<circle cx="72" cy="56" r="3" fill="#e5b33d"/><rect x="78" y="54" width="23" height="4" rx="2" fill="#eaefe7"/>
 </svg>

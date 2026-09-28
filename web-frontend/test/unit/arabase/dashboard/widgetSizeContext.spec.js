@@ -40,14 +40,29 @@ describe('WidgetContext size menu item', () => {
 })
 
 describe('WidgetSizeContext', () => {
-  const mountPicker = async (widget = {}) => {
+  const mountPicker = async (
+    widget = {},
+    minSize = { width: 2, height: 2 }
+  ) => {
     const dispatch = vi.fn().mockResolvedValue()
     const wrapper = await mountSuspended(WidgetSizeContext, {
       props: {
         dashboard,
-        widget: { id: 3, title: 'Sales', width: 3, height: 2, ...widget },
+        widget: {
+          id: 3,
+          type: 'summary',
+          title: 'Sales',
+          width: 3,
+          height: 2,
+          ...widget,
+        },
       },
-      global: { mocks: { $store: { dispatch } } },
+      global: {
+        mocks: {
+          $store: { dispatch },
+          $registry: { get: () => ({ minSize }) },
+        },
+      },
     })
     // Context only renders its slot once it has been opened.
     await wrapper
@@ -56,55 +71,82 @@ describe('WidgetSizeContext', () => {
     return { wrapper, dispatch }
   }
 
-  test('clicking a cell patches width/height through updateWidget', async () => {
+  const widths = (wrapper) => wrapper.findAll('.widget-size-context__option')
+  const heights = (wrapper) => wrapper.findAll('.widget-size-context__height')
+
+  test('offers the common widths and heights, marking the current ones', async () => {
+    const { wrapper } = await mountPicker()
+
+    expect(widths(wrapper).map((w) => w.text())).toEqual([
+      'widgetSize.widths.3',
+      'widgetSize.widths.4',
+      'widgetSize.widths.6',
+      'widgetSize.widths.8',
+      'widgetSize.widths.12',
+    ])
+    expect(heights(wrapper).map((h) => h.text())).toEqual([
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '8',
+    ])
+    expect(wrapper.find('.widget-size-context__option--active').text()).toBe(
+      'widgetSize.widths.3'
+    )
+    expect(wrapper.find('.widget-size-context__height--active').text()).toBe(
+      '2'
+    )
+  })
+
+  test('choosing a width keeps the height and patches through updateWidget', async () => {
     const { wrapper, dispatch } = await mountPicker()
 
-    // Cells run (1,1) (2,1) (3,1) (1,2) (2,2) …: index 1 is 2 wide × 1 tall.
-    await wrapper.findAll('.widget-size-context__cell')[1].trigger('click')
+    await widths(wrapper)[2].trigger('click')
 
     expect(dispatch).toHaveBeenCalledWith('dashboardApplication/updateWidget', {
       widgetId: 3,
-      values: { width: 2, height: 1 },
+      values: { width: 6, height: 2 },
       originalValues: { width: 3, height: 2 },
     })
+    expect(wrapper.emitted('selected')).toHaveLength(1)
   })
 
-  test('a widget without width/height falls back to 3x2', async () => {
-    const { wrapper, dispatch } = await mountPicker({
-      width: undefined,
-      height: undefined,
-    })
+  test('choosing a height keeps the width', async () => {
+    const { wrapper, dispatch } = await mountPicker()
 
-    await wrapper.findAll('.widget-size-context__cell')[0].trigger('click')
+    await heights(wrapper)[3].trigger('click')
 
-    expect(dispatch).toHaveBeenCalledWith('dashboardApplication/updateWidget', {
-      widgetId: 3,
-      values: { width: 1, height: 1 },
-      originalValues: { width: 3, height: 2 },
-    })
+    expect(dispatch.mock.calls[0][1].values).toEqual({ width: 3, height: 4 })
   })
 
-  test('hovering a cell previews that rectangle', async () => {
-    const { wrapper } = await mountPicker()
-    const cells = wrapper.findAll('.widget-size-context__cell')
+  test('choosing the current size sends nothing', async () => {
+    const { wrapper, dispatch } = await mountPicker()
 
-    // Hover (2,2): everything up to 2 wide and 2 tall is highlighted.
-    await cells[4].trigger('mouseenter')
+    await heights(wrapper)[1].trigger('click')
 
-    const previewed = cells.filter((cell) =>
-      cell.classes().includes('widget-size-context__cell--preview')
+    expect(dispatch).not.toHaveBeenCalled()
+  })
+
+  test('sizes below the widget type minimum are disabled', async () => {
+    const { wrapper } = await mountPicker({}, { width: 4, height: 3 })
+
+    expect(widths(wrapper)[0].attributes('disabled')).toBeDefined()
+    expect(widths(wrapper)[1].attributes('disabled')).toBeUndefined()
+    expect(heights(wrapper)[1].attributes('disabled')).toBeDefined()
+    expect(heights(wrapper)[2].attributes('disabled')).toBeUndefined()
+  })
+
+  test('a widget without a size is read as the full-width default', async () => {
+    const { wrapper } = await mountPicker({ width: null, height: null })
+
+    expect(wrapper.find('.widget-size-context__option--active').text()).toBe(
+      'widgetSize.widths.12'
     )
-    expect(previewed).toHaveLength(4)
-    expect(wrapper.find('.widget-size-context__preview').text()).toBe(
-      'widgetContext.sizePreview'
+    expect(wrapper.find('.widget-size-context__height--active').text()).toBe(
+      '4'
     )
-  })
-
-  test('the current size is marked', async () => {
-    const { wrapper } = await mountPicker()
-    const cells = wrapper.findAll('.widget-size-context__cell')
-
-    // (3,2) is index 5.
-    expect(cells[5].classes()).toContain('widget-size-context__cell--current')
   })
 })

@@ -1,0 +1,734 @@
+// The dashboard canvas: the page a dashboard sits on, the 12-column widget
+// board, widget cards, the edit-mode chrome (toolbar, resize handle, column
+// guides), the size menu, the widget gallery and the empty state.
+// docs/DASHBOARD_REDESIGN.md explains the choices.
+
+// A standalone stylesheet registered by modules/arabase/module.js after core's
+// default.scss, so it restyles core's dashboard classes without editing them.
+// Logical properties only: this file is a hard-error zone for csstools/use-logical.
+@import '@jadawel/modules/core/assets/scss/colors';
+@import '@jadawel/modules/core/assets/scss/variables';
+
+// Mirrors `layout.js`.
+$board-columns: 12;
+$board-row: 72px;
+$board-gap: 16px;
+$card-radius: 12px;
+$canvas-background: $palette-neutral-50;
+$card-shadow:
+  0 1px 2px rgba(30, 36, 29, 0.05),
+  0 1px 1px rgba(30, 36, 29, 0.03);
+$card-shadow-raised:
+  0 6px 20px rgba(30, 36, 29, 0.08),
+  0 1px 3px rgba(30, 36, 29, 0.06);
+
+// --- canvas -----------------------------------------------------------------
+
+.dashboard-app__layout-scrollable {
+  background-color: $canvas-background;
+}
+
+// Core frames the whole board in a white box with a border and a shadow, which
+// puts cards inside a card. The canvas is the page itself now; the widgets are
+// the only surfaces.
+.dashboard-app__content.dashboard-canvas {
+  box-sizing: border-box;
+  max-inline-size: 1600px;
+  min-block-size: calc(100vh - 52px);
+
+  // Core's 400px minimum pushed the board off a phone screen.
+  min-inline-size: 0;
+  margin: 0 auto;
+  padding-block: 28px 64px;
+  padding-inline: 40px;
+  border: 0;
+  border-radius: 0;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+// The layout leaves 51px for the app header, which a public dashboard does not
+// have; without this the board sat under an empty band.
+.public-dashboard .layout__col-2-2 {
+  inset-block-start: 0;
+}
+
+.dashboard-app__content--small.dashboard-canvas {
+  min-block-size: calc(100vh - 212px);
+}
+
+.dashboard-canvas__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-block-end: 24px;
+}
+
+.dashboard-canvas .dashboard-app__content-header {
+  flex: 1;
+  min-inline-size: 0;
+  margin-block-end: 0;
+}
+
+.dashboard-canvas .dashboard-app__title {
+  color: $palette-neutral-1300;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 34px;
+}
+
+.dashboard-canvas .dashboard-app__description {
+  max-inline-size: 72ch;
+  margin-block-start: 6px;
+  color: $palette-neutral-900;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 22px;
+}
+
+// --- toolbar ------------------------------------------------------------------
+
+.dashboard-toolbar {
+  display: flex;
+  flex: none;
+  align-items: center;
+  gap: 12px;
+  min-block-size: 34px;
+}
+
+.dashboard-toolbar__hint,
+.dashboard-toolbar__updated {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.dashboard-toolbar__hint i {
+  font-size: 15px;
+}
+
+// --- board --------------------------------------------------------------------
+
+// Widgets are placed in `order` and `dense` flow backfills gaps, so a narrow
+// widget fills the space a wide one left. Grid placement follows `direction`:
+// in Arabic the first widget sits at the right.
+.widget-board {
+  position: relative;
+  display: grid;
+  grid-auto-flow: dense;
+  grid-auto-rows: $board-row;
+  grid-template-columns: repeat($board-columns, minmax(0, 1fr));
+  gap: $board-gap;
+}
+
+// While editing, the twelve columns show faintly behind the widgets so a size
+// can be judged against the grid it snaps to. The pattern is symmetric, so it
+// lines up in both directions.
+.widget-board--editing::before {
+  $column: calc(
+    (100% - #{$board-gap * ($board-columns - 1)}) / #{$board-columns}
+  );
+
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 8px;
+  background-image: repeating-linear-gradient(
+    to right,
+    rgba(39, 128, 83, 0.045) 0,
+    rgba(39, 128, 83, 0.045) $column,
+    transparent $column,
+    transparent calc(#{$column} + #{$board-gap})
+  );
+  content: '';
+  pointer-events: none;
+}
+
+// --- widget cards -------------------------------------------------------------
+
+// Core stacks widgets with a top margin, a dashed border when selectable and an
+// outline 8px away when selected; on a grid each is a card of its own.
+.widget-board .dashboard-widget {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  min-block-size: 0;
+  min-inline-size: 0;
+  margin-block-start: 0;
+  border: 1px solid $palette-neutral-200;
+  border-radius: $card-radius;
+  background-color: $white;
+  box-shadow: $card-shadow;
+  transition:
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+
+  > :first-child:not(.dashboard-widget__name),
+  > .dashboard-widget__name + * {
+    flex: 1;
+    min-block-size: 0;
+  }
+}
+
+.widget-board .dashboard-widget--bare {
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
+}
+
+.widget-board .dashboard-widget--selectable {
+  border-style: solid;
+
+  &:hover {
+    border-color: $palette-neutral-400;
+    box-shadow: $card-shadow-raised;
+  }
+}
+
+.widget-board .dashboard-widget--editing.dashboard-widget--bare {
+  border: 1px dashed $palette-neutral-400;
+}
+
+.widget-board .dashboard-widget--selected {
+  border-color: $color-primary-500;
+  box-shadow:
+    0 0 0 1px $color-primary-500,
+    $card-shadow-raised;
+  outline: none;
+}
+
+.widget-board .dashboard-widget--resizing {
+  z-index: 3;
+  border-color: $color-primary-500;
+  box-shadow:
+    0 0 0 3px $color-primary-200,
+    $card-shadow-raised;
+  transition: none;
+}
+
+.widget-board .dashboard-widget__name {
+  // Core pins it with a physical `left`; setting both inline ends replaces
+  // that in either direction.
+  inset-block: -11px auto;
+  inset-inline: 12px auto;
+  z-index: 3;
+  padding-block: 3px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  background-color: $color-primary-500;
+  box-shadow: none;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 14px;
+}
+
+.widget-board--draggable .dashboard-widget {
+  cursor: grab;
+}
+
+// Drop indicator of the grid sortable directive, sized to the target cell by
+// the directive's inline styles.
+.grid-sortable-position-indicator {
+  position: absolute;
+  z-index: 2;
+  box-sizing: border-box;
+  border: 2px dashed $color-primary-500;
+  border-radius: $card-radius;
+  background-color: rgba(39, 128, 83, 0.06);
+  pointer-events: none;
+}
+
+// The "add widget" tile at the end of the board while editing.
+.widget-board__add {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  grid-column: span 3;
+  grid-row: span 2;
+  border: 1.5px dashed $palette-neutral-500;
+  border-radius: $card-radius;
+  background-color: rgba(255, 255, 255, 0.6);
+  color: $palette-neutral-1000;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    color 0.15s ease,
+    background-color 0.15s ease;
+
+  i {
+    font-size: 20px;
+  }
+
+  &:hover,
+  &:focus-visible {
+    border-color: $color-primary-500;
+    background-color: $color-primary-100;
+    color: $color-primary-600;
+  }
+}
+
+// --- edit chrome ----------------------------------------------------------------
+
+// The chrome's parts position against the widget card, not a box of their own.
+.widget-chrome {
+  display: contents;
+}
+
+.widget-chrome__toolbar {
+  position: absolute;
+  inset-block-start: -15px;
+  inset-inline-end: 12px;
+  z-index: 4;
+  display: flex;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid $palette-neutral-300;
+  border-radius: 9px;
+  background-color: $white;
+  box-shadow: 0 4px 14px rgba(8, 11, 7, 0.1);
+  opacity: 0;
+  cursor: default;
+  transform: translateY(4px);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+
+.widget-chrome__toolbar:focus-within,
+.dashboard-widget--selected .widget-chrome__toolbar,
+.dashboard-widget:hover .widget-chrome__toolbar {
+  opacity: 1;
+  transform: none;
+}
+
+.widget-chrome__button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 26px;
+  block-size: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: none;
+  color: $palette-neutral-1000;
+  font-size: 15px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $palette-neutral-100;
+    color: $palette-neutral-1300;
+  }
+}
+
+.widget-chrome__button--danger:hover,
+.widget-chrome__button--danger:focus-visible {
+  background-color: $palette-red-50;
+  color: $palette-red-800;
+}
+
+.widget-chrome__button--loading {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.widget-chrome__drag {
+  cursor: grab;
+}
+
+// The resize handle: an L in the widget's end corner, following the direction.
+.widget-chrome__resize {
+  position: absolute;
+  inset-block-end: 5px;
+  inset-inline-end: 5px;
+  z-index: 4;
+  box-sizing: border-box;
+  inline-size: 14px;
+  block-size: 14px;
+  border-block-end: 2.5px solid $palette-neutral-600;
+  border-inline-end: 2.5px solid $palette-neutral-600;
+  border-end-end-radius: 5px;
+  cursor: nwse-resize;
+  opacity: 0;
+  touch-action: none;
+  transition: opacity 0.12s ease;
+
+  [dir='rtl'] & {
+    cursor: nesw-resize;
+  }
+
+  &:hover {
+    border-color: $color-primary-500;
+  }
+}
+
+.widget-chrome--resizing .widget-chrome__resize,
+.dashboard-widget--selected .widget-chrome__resize,
+.dashboard-widget:hover .widget-chrome__resize {
+  opacity: 1;
+}
+
+.widget-chrome__size {
+  position: absolute;
+  inset-block-end: 10px;
+  inset-inline-end: 26px;
+  z-index: 4;
+  padding-block: 3px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  background-color: $palette-neutral-1200;
+  color: $white;
+  font-size: 12px;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.widget-board-resizing {
+  cursor: nwse-resize;
+  user-select: none;
+
+  &[dir='rtl'],
+  [dir='rtl'] & {
+    cursor: nesw-resize;
+  }
+}
+
+// --- size menu --------------------------------------------------------------------
+
+.widget-size-context {
+  box-sizing: border-box;
+  inline-size: 280px;
+  padding-block: 12px;
+  padding-inline: 14px;
+}
+
+.widget-size-context__label {
+  margin-block-end: 8px;
+  color: $palette-neutral-900;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.widget-size-context__options {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 6px;
+  margin-block-end: 14px;
+}
+
+.widget-size-context__option {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  padding-block: 8px 6px;
+  padding-inline: 6px;
+}
+
+.widget-size-context__bar {
+  display: block;
+  block-size: 6px;
+  border-radius: 3px;
+  background-color: $palette-neutral-200;
+}
+
+.widget-size-context__bar-fill {
+  display: block;
+  block-size: 100%;
+  border-radius: 3px;
+  background-color: $palette-neutral-700;
+}
+
+.widget-size-context__option-label {
+  font-size: 11px;
+  text-align: center;
+}
+
+.widget-size-context__heights {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-block-end: 12px;
+}
+
+.widget-size-context__height {
+  block-size: 28px;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-size-context__option,
+.widget-size-context__height {
+  border: 1px solid $palette-neutral-200;
+  border-radius: 8px;
+  background-color: $white;
+  color: $palette-neutral-1100;
+  cursor: pointer;
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.4;
+  }
+
+  &:hover:not(:disabled) {
+    border-color: $palette-neutral-500;
+  }
+}
+
+.widget-size-context__option--active,
+.widget-size-context__height--active {
+  border-color: $color-primary-500;
+  background-color: $color-primary-100;
+  color: $color-primary-700;
+
+  .widget-size-context__bar-fill {
+    background-color: $color-primary-500;
+  }
+}
+
+.widget-size-context__hint {
+  margin: 0;
+  color: $palette-neutral-900;
+  font-size: 11px;
+  line-height: 16px;
+}
+
+// --- widget gallery -----------------------------------------------------------------
+
+.widget-gallery__header {
+  margin-block-end: 20px;
+}
+
+.widget-gallery__title {
+  margin: 0;
+  color: $palette-neutral-1300;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 28px;
+}
+
+.widget-gallery__subtitle {
+  margin-block: 4px 0;
+  color: $palette-neutral-900;
+  font-size: 13px;
+}
+
+.widget-gallery__section + .widget-gallery__section {
+  margin-block-start: 22px;
+}
+
+.widget-gallery__section-title {
+  margin-block: 0 10px;
+  color: $palette-neutral-1000;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.widget-gallery__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.widget-gallery__card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 8px;
+  padding-block-end: 12px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: $card-radius;
+  background-color: $white;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    border-color: $color-primary-400;
+    box-shadow: $card-shadow-raised;
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    cursor: progress;
+    opacity: 0.6;
+  }
+}
+
+.widget-gallery__preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-block-end: 6px;
+  aspect-ratio: 120 / 72;
+  border-radius: 8px;
+  background-color: $palette-neutral-50;
+
+  img {
+    inline-size: 100%;
+    block-size: 100%;
+  }
+
+  // The previews are drawn left to right; an Arabic board reads from the right.
+  [dir='rtl'] & img {
+    transform: scaleX(-1);
+  }
+}
+
+.widget-gallery__name {
+  padding-inline: 4px;
+  color: $palette-neutral-1300;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.widget-gallery__description {
+  display: -webkit-box;
+  overflow: hidden;
+  padding-inline: 4px;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 17px;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+// --- empty dashboard -------------------------------------------------------------------
+
+.dashboard-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-block: 56px;
+  padding-inline: 24px;
+  border: 1.5px dashed $palette-neutral-400;
+  border-radius: 16px;
+  background-color: rgba(255, 255, 255, 0.5);
+  text-align: center;
+}
+
+.dashboard-empty__preview {
+  display: grid;
+  grid-template-columns: repeat(3, 72px);
+  grid-template-rows: 36px 72px;
+  gap: 8px;
+  margin-block-end: 28px;
+}
+
+.dashboard-empty__tile {
+  display: block;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 8px;
+  background-color: $white;
+  box-shadow: $card-shadow;
+}
+
+.dashboard-empty__tile--kpi {
+  background-image: linear-gradient($palette-neutral-300, $palette-neutral-300);
+  background-position: 10px 12px;
+  background-repeat: no-repeat;
+  background-size: 34px 10px;
+
+  [dir='rtl'] & {
+    background-position: calc(100% - 10px) 12px;
+  }
+}
+
+.dashboard-empty__tile--chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 6px;
+  grid-column: span 2;
+  padding-block: 12px 10px;
+  padding-inline: 14px;
+
+  i {
+    flex: 1;
+    border-start-start-radius: 3px;
+    border-start-end-radius: 3px;
+    background-color: $color-primary-400;
+  }
+}
+
+.dashboard-empty__tile--ring {
+  // A ring: a conic sweep with its centre and its corners painted back to the
+  // tile's white by a radial layer on top.
+  background-image:
+    radial-gradient(
+      circle closest-side,
+      $white 0 62%,
+      transparent 64% 98%,
+      $white 100%
+    ),
+    conic-gradient($color-primary-400 0 68%, $palette-neutral-200 68% 100%);
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size:
+    48px 48px,
+    48px 48px;
+}
+
+.dashboard-empty__title {
+  margin: 0;
+  color: $palette-neutral-1300;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.dashboard-empty__text {
+  max-inline-size: 44ch;
+  margin-block: 8px 24px;
+  color: $palette-neutral-900;
+  font-size: 13px;
+  line-height: 20px;
+}
+
+// --- narrow screens ---------------------------------------------------------------------
+// One column: every widget takes the full width and keeps its height in rows, so
+// the widgets that size their content to their cell still have one. `!important`
+// beats the inline `grid-column` span DashboardWidget sets.
+@media screen and (max-width: $dashboard-breakpoint) {
+  .dashboard-app__content.dashboard-canvas {
+    padding-block: 20px 40px;
+    padding-inline: 16px;
+  }
+
+  .dashboard-canvas__top {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .widget-board {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .widget-board .dashboard-widget,
+  .widget-board__add {
+    grid-column: 1 / -1 !important;
+  }
+
+  .widget-board--editing::before,
+  .dashboard-toolbar__hint {
+    display: none;
+  }
+}

@@ -7,27 +7,42 @@
           :style="{ width: `calc(100% - ${sidebarWidth}px)` }"
         >
           <div
-            class="dashboard-app__content"
-            :class="{ 'dashboard-app__content--small': isInTemplate }"
+            class="dashboard-app__content dashboard-canvas"
+            :class="{
+              'dashboard-app__content--small': isInTemplate,
+              'dashboard-canvas--editing': isEditMode,
+            }"
           >
-            <DashboardContentHeader
-              :dashboard="dashboard"
-              :store-prefix="storePrefix"
-            />
-            <EmptyDashboard
-              v-if="isEmpty"
-              :dashboard="dashboard"
-              @widget-variation-selected="createWidget($event)"
-            />
-            <template v-else>
-              <WidgetBoard :dashboard="dashboard" :store-prefix="storePrefix" />
-              <CreateWidgetButton
-                v-if="isEditMode && canCreateWidget"
+            <div class="dashboard-canvas__top">
+              <DashboardContentHeader
                 :dashboard="dashboard"
                 :store-prefix="storePrefix"
-                @widget-variation-selected="createWidget($event)"
               />
-            </template>
+              <DashboardCanvasToolbar
+                :dashboard="dashboard"
+                :store-prefix="storePrefix"
+                :can-create-widget="canCreateWidget"
+                @add-widget="openGallery"
+              />
+            </div>
+            <DashboardEmptyState
+              v-if="isEmpty"
+              :can-create-widget="canCreateWidget"
+              @add-widget="openGallery"
+            />
+            <WidgetBoard
+              v-else
+              :dashboard="dashboard"
+              :store-prefix="storePrefix"
+              :can-create-widget="canCreateWidget"
+              @add-widget="openGallery"
+            />
+            <WidgetGalleryModal
+              v-if="canCreateWidget"
+              ref="gallery"
+              :dashboard="dashboard"
+              @select="createWidget($event)"
+            />
           </div>
         </div>
         <DashboardSidebar
@@ -42,21 +57,23 @@
 </template>
 
 <script>
-import EmptyDashboard from '@jadawel/modules/dashboard/components/EmptyDashboard'
-import CreateWidgetButton from '@jadawel/modules/dashboard/components/CreateWidgetButton'
 import DashboardSidebar from '@jadawel/modules/dashboard/components/DashboardSidebar'
 import DashboardContentHeader from '@jadawel/modules/dashboard/components/DashboardContentHeader'
 import WidgetBoard from '@jadawel/modules/dashboard/components/WidgetBoard'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
+import DashboardCanvasToolbar from '@jadawel/modules/arabase/dashboard/components/DashboardCanvasToolbar'
+import DashboardEmptyState from '@jadawel/modules/arabase/dashboard/components/DashboardEmptyState'
+import WidgetGalleryModal from '@jadawel/modules/arabase/dashboard/components/WidgetGalleryModal'
 
 export default {
   name: 'DashboardContent',
   components: {
-    EmptyDashboard,
-    CreateWidgetButton,
     WidgetBoard,
     DashboardContentHeader,
     DashboardSidebar,
+    DashboardCanvasToolbar,
+    DashboardEmptyState,
+    WidgetGalleryModal,
   },
   props: {
     dashboard: {
@@ -99,6 +116,21 @@ export default {
     isInTemplate() {
       return this.storePrefix === 'template/'
     },
+    /**
+     * Jadawel fork: a computed rather than core's method, which the template
+     * tested for truthiness — always true, so read-only members saw the add
+     * button. The public and template dashboards never create widgets.
+     */
+    canCreateWidget() {
+      if (this.storePrefix !== '' || !this.dashboard.workspace?.id) {
+        return false
+      }
+      return this.$hasPermission(
+        'dashboard.create_widget',
+        this.dashboard,
+        this.dashboard.workspace.id
+      )
+    },
   },
   methods: {
     toggleEditMode() {
@@ -111,22 +143,22 @@ export default {
         `${this.storePrefix}dashboardApplication/enterEditMode`
       )
     },
-    canCreateWidget() {
-      return this.$hasPermission(
-        'dashboard.create_widget',
-        this.dashboard,
-        this.dashboard.workspace.id
-      )
+    openGallery() {
+      this.$refs.gallery?.show()
     },
     async createWidget(widgetVariation) {
       const widgetType = widgetVariation.type.getType()
       const typeFromRegistry = this.$registry.get('dashboardWidget', widgetType)
+      // Jadawel fork: created at the variation's size, so a key number lands
+      // as a quarter-width card and a list as a wide one.
+      const size = widgetVariation.size || typeFromRegistry.defaultSize || {}
       try {
         await this.$store.dispatch('dashboardApplication/createWidget', {
           dashboard: this.dashboard,
           widget: {
-            title: typeFromRegistry.name,
+            title: widgetVariation.name || typeFromRegistry.name,
             type: widgetType,
+            ...size,
             ...widgetVariation.params,
           },
         })

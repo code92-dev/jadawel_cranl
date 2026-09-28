@@ -20,18 +20,25 @@
       :store-prefix="storePrefix"
       @values-changed="onDataSourceValuesChanged"
     />
+
+    <WidgetAppearanceForm :widget="widget" :store-prefix="storePrefix" />
   </div>
 </template>
 
 <script>
 import DisplayedFieldsFormGroup from '@jadawel/modules/arabase/dashboard/components/data_source/DisplayedFieldsFormGroup'
 import UpcomingRowsDataSourceForm from '@jadawel/modules/arabase/dashboard/components/data_source/UpcomingRowsDataSourceForm'
+import WidgetAppearanceForm from '@jadawel/modules/arabase/dashboard/components/widget/WidgetAppearanceForm'
 import dashboardWidgetSettings from '@jadawel/modules/arabase/dashboard/mixins/dashboardWidgetSettings'
 import tableFields from '@jadawel/modules/database/mixins/tableFields'
 
 export default {
   name: 'UpcomingDatesWidgetSettings',
-  components: { DisplayedFieldsFormGroup, UpcomingRowsDataSourceForm },
+  components: {
+    DisplayedFieldsFormGroup,
+    UpcomingRowsDataSourceForm,
+    WidgetAppearanceForm,
+  },
   mixins: [dashboardWidgetSettings, tableFields],
   methods: {
     /* Overrides the method in the tableFields mixin */

@@ -20,18 +20,25 @@
       :store-prefix="storePrefix"
       @values-changed="onDataSourceValuesChanged"
     />
+
+    <WidgetAppearanceForm :widget="widget" :store-prefix="storePrefix" />
   </div>
 </template>
 
 <script>
 import DisplayedFieldsFormGroup from '@jadawel/modules/arabase/dashboard/components/data_source/DisplayedFieldsFormGroup'
 import ListRowsDataSourceForm from '@jadawel/modules/arabase/dashboard/components/data_source/ListRowsDataSourceForm'
+import WidgetAppearanceForm from '@jadawel/modules/arabase/dashboard/components/widget/WidgetAppearanceForm'
 import dashboardWidgetSettings from '@jadawel/modules/arabase/dashboard/mixins/dashboardWidgetSettings'
 import tableFields from '@jadawel/modules/database/mixins/tableFields'
 
 export default {
   name: 'RecordsListWidgetSettings',
-  components: { DisplayedFieldsFormGroup, ListRowsDataSourceForm },
+  components: {
+    DisplayedFieldsFormGroup,
+    ListRowsDataSourceForm,
+    WidgetAppearanceForm,
+  },
   mixins: [dashboardWidgetSettings, tableFields],
   methods: {
     /**

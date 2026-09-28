@@ -75,10 +75,12 @@
     "noData": "لا توجد بيانات لعرضها في المخطط بعد",
     "misconfigured": "صحّح إعدادات العنصر لعرض المخطط",
     "emptyGroup": "فارغ",
-    "truncated": "يتم عرض أول {count} تصنيف"
+    "truncated": "يتم عرض أول {count} تصنيف",
+    "horizontalBar": "مخطط أعمدة أفقي",
+    "area": "مخطط مساحي",
+    "total": "الإجمالي"
   },
   "chartWidgetSettings": {
-    "appearance": "المظهر",
     "chartType": "نوع المخطط",
     "showLegend": "إظهار مفتاح المخطط"
   },
@@ -100,7 +102,15 @@
   "recordsListWidget": {
     "name": "قائمة السجلات",
     "noRecords": "لا توجد سجلات لعرضها",
-    "misconfigured": "صحّح إعدادات العنصر لعرض السجلات"
+    "misconfigured": "صحّح إعدادات العنصر لعرض السجلات",
+    "count": {
+      "zero": "لا سجلات",
+      "one": "سجل واحد",
+      "two": "سجلان",
+      "few": "{count} سجلات",
+      "many": "{count} سجلًا",
+      "other": "{count} سجل"
+    }
   },
   "recordsListWidgetSettings": {
     "display": "العرض"
@@ -112,7 +122,15 @@
   "progressWidget": {
     "name": "التقدّم",
     "misconfigured": "صحّح إعدادات العنصر لعرض نسبة التقدّم",
-    "ofTarget": "{value} من {target}"
+    "ofTarget": "{value} من {target}",
+    "gaugeName": "مقياس الهدف",
+    "target": "الهدف {target}",
+    "warningMark": "متعثّر دون {value}%",
+    "status": {
+      "met": "تحقّق الهدف",
+      "onTrack": "على المسار",
+      "atRisk": "متعثّر"
+    }
   },
   "progressWidgetSettings": {
     "target": "الهدف",
@@ -124,13 +142,43 @@
     "warningThreshold": "متعثّر فوق",
     "successThreshold": "مُنجز فوق",
     "thresholdHelp": "النسب التي تحدّد لون العنصر",
-    "thresholdError": "يجب ألّا تقل عن نسبة التعثّر"
+    "thresholdError": "يجب ألّا تقل عن نسبة التعثّر",
+    "gauge": "مقياس"
   },
   "upcomingDatesWidget": {
     "name": "التواريخ القادمة",
     "nothingDue": "لا يوجد شيء مستحق في هذه الفترة",
     "misconfigured": "صحّح إعدادات العنصر لعرض الجدول الزمني",
-    "overdueCount": "{count} متأخّر"
+    "overdue": {
+      "one": "بند متأخر",
+      "two": "بندان متأخران",
+      "few": "{count} بنود متأخرة",
+      "many": "{count} بندًا متأخرًا",
+      "other": "{count} بند متأخر"
+    },
+    "group": {
+      "overdue": "متأخر",
+      "today": "اليوم",
+      "week": "خلال 7 أيام",
+      "later": "لاحقًا"
+    },
+    "today": "اليوم",
+    "tomorrow": "غدًا",
+    "yesterday": "أمس",
+    "inDays": {
+      "one": "بعد يوم",
+      "two": "بعد يومين",
+      "few": "بعد {count} أيام",
+      "many": "بعد {count} يومًا",
+      "other": "بعد {count} يوم"
+    },
+    "daysAgo": {
+      "one": "منذ يوم",
+      "two": "منذ يومين",
+      "few": "منذ {count} أيام",
+      "many": "منذ {count} يومًا",
+      "other": "منذ {count} يوم"
+    }
   },
   "listRowsDataSourceForm": {
     "data": "البيانات",
@@ -542,6 +590,113 @@
       "anthropic": "نماذج Claude من Anthropic.",
       "ollama": "نماذج تشغّلها على خادمك، فلا تغادر البيانات خادمك.",
       "openrouter": "نماذج مزوّدين كثيرين عبر مفتاح OpenRouter واحد."
+    }
+  },
+  "widgetFrame": {
+    "misconfigured": "لم يُضبط هذا العنصر بعد",
+    "openSettings": "حدّده لإكمال إعداداته",
+    "empty": "لا يوجد ما يُعرض بعد",
+    "openTable": "فتح الجدول"
+  },
+  "kpiWidget": {
+    "name": "رقم رئيسي",
+    "misconfigured": "اختر جدولًا وحقلًا وطريقة حساب",
+    "caption": "{aggregation} لـ {field}"
+  },
+  "textWidget": {
+    "name": "نص",
+    "section": "عنوان قسم",
+    "note": "ملاحظة",
+    "callout": "إبراز",
+    "placeholder": "أضف النص من إعدادات العنصر"
+  },
+  "textWidgetSettings": {
+    "content": "المحتوى",
+    "style": "النمط",
+    "body": "النص",
+    "bodyHelp": "نص عادي، وتبقى فواصل الأسطر كما هي."
+  },
+  "widgetAppearance": {
+    "title": "المظهر",
+    "color": "اللون المميّز",
+    "icon": "الأيقونة",
+    "noIcon": "بلا أيقونة",
+    "prefix": "قبل الرقم",
+    "suffix": "بعد الرقم",
+    "prefixPlaceholder": "مثل $",
+    "suffixPlaceholder": "مثل ر.س أو %",
+    "decimals": "المنازل العشرية",
+    "decimalsAuto": "تلقائي",
+    "compact": "أرقام مختصرة (1.6 مليون بدل 1,610,000)",
+    "stacked": "تكديس السلاسل",
+    "colors": {
+      "primary": "لون مساحة العمل",
+      "blue": "أزرق",
+      "cyan": "سماوي",
+      "green": "أخضر",
+      "yellow": "كهرماني",
+      "red": "أحمر",
+      "magenta": "أرجواني",
+      "purple": "بنفسجي",
+      "neutral": "رمادي"
+    }
+  },
+  "widgetGallery": {
+    "title": "إضافة عنصر",
+    "subtitle": "اختر ما تريد عرضه، ويمكنك تغيير بياناته ومظهره لاحقًا.",
+    "category": {
+      "numbers": "الأرقام",
+      "charts": "المخططات",
+      "lists": "القوائم",
+      "text": "النصوص والتنظيم"
+    },
+    "description": {
+      "kpi": "رقم واحد مهم: إجمالي أو عدد أو متوسط.",
+      "progress": "رقم مقيس إلى هدف، في شريط.",
+      "gauge": "التقدّم نحو هدف على نصف قرص.",
+      "bar": "مقارنة التصنيفات جنبًا إلى جنب.",
+      "horizontalBar": "ترتيب التصنيفات، والأنسب للأسماء الطويلة.",
+      "line": "كيف تتغيّر قيمة مع الوقت.",
+      "area": "اتجاه عبر الوقت مع تظليل حجمه.",
+      "doughnut": "أجزاء من كل، والإجمالي في المنتصف.",
+      "pie": "أجزاء من كل، لتصنيفات قليلة.",
+      "recordsList": "أحدث صفوف جدول أو عرض.",
+      "upcomingDates": "جدول بما يستحق قريبًا وما تأخّر.",
+      "section": "عنوان يقسم لوحة البيانات إلى أجزاء.",
+      "note": "اشرح كيف تُقرأ الأرقام.",
+      "callout": "أبرز أمرًا يحتاج إلى انتباه."
+    }
+  },
+  "dashboardToolbar": {
+    "editHint": "اسحب العناصر لنقلها، واسحب الزاوية لتغيير حجمها",
+    "addWidget": "إضافة عنصر",
+    "updated": "حُدّثت {time}",
+    "refresh": "تحديث البيانات"
+  },
+  "dashboardEmpty": {
+    "title": "ابنِ لوحة بياناتك",
+    "text": "أضف أرقامًا رئيسية ومخططات وقوائم وملاحظات، وكل عنصر يقرأ من جداولك مباشرة.",
+    "readOnly": "لا تحتوي لوحة البيانات هذه على عناصر بعد.",
+    "addWidget": "أضف أول عنصر"
+  },
+  "widgetChrome": {
+    "move": "اسحب للنقل",
+    "size": "الحجم",
+    "delete": "حذف العنصر",
+    "resize": "اسحب لتغيير الحجم"
+  },
+  "widgetSize": {
+    "width": "العرض",
+    "height": "الارتفاع بالصفوف",
+    "rows": "ارتفاع {count}",
+    "current": "عرض {width} · ارتفاع {height}",
+    "dragHint": "بالخلايا. اسحب زاوية العنصر لأي حجم.",
+    "widths": {
+      "3": "ربع",
+      "4": "ثلث",
+      "6": "نصف",
+      "8": "ثلثان",
+      "12": "كامل"
     }
   }
 }

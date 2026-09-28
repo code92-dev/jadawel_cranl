@@ -1,7 +1,8 @@
-<svg width="72" height="40" viewBox="0 0 72 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-<rect x="1.25" y="1.25" width="69.5" height="37.5" rx="4.75" fill="white"/>
-<rect x="1.25" y="1.25" width="69.5" height="37.5" rx="4.75" stroke="#E6E6E7" stroke-width="1.5"/>
-<rect x="12" y="12" width="16" height="5" rx="2.5" fill="#0D9439"/>
-<rect x="12" y="23" width="48" height="6" rx="3" fill="#E6E6E7"/>
-<rect x="12" y="23" width="32" height="6" rx="3" fill="#0D9439"/>
+<svg width="120" height="72" viewBox="0 0 120 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect x="14" y="14" width="44" height="5" rx="2.5" fill="#c7d0c4"/>
+<rect x="84" y="13" width="22" height="8" rx="4" fill="#dbeee3"/>
+<rect x="14" y="30" width="30" height="12" rx="3" fill="#4d564b"/>
+<rect x="14" y="49" width="92" height="8" rx="4" fill="#eaefe7"/>
+<rect x="14" y="49" width="62" height="8" rx="4" fill="#278053"/>
+<rect x="50" y="47" width="1.5" height="12" rx="0.75" fill="#c7d0c4"/>
 </svg>

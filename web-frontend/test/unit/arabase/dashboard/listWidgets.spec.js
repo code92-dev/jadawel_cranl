@@ -9,6 +9,16 @@ const SCHEMA = {
       field_1: { title: 'Name' },
       field_2: { title: 'Region' },
       field_3: { title: 'Due' },
+      field_4: {
+        title: 'Stage',
+        original_type: 'single_select',
+        metadata: {},
+      },
+      field_5: {
+        title: 'Amount',
+        original_type: 'number',
+        metadata: { number_decimal_places: 2 },
+      },
     },
   },
 }
@@ -29,6 +39,9 @@ const mountListWidget = async (
       'dashboardApplication/getDataForDataSource': () =>
         error ? { _error: true } : { results, has_next_page: false },
       'dashboardApplication/isEditMode': false,
+      'application/getAll': [
+        { id: 40, type: 'database', tables: [{ id: 12 }] },
+      ],
     },
   }
 
@@ -47,7 +60,11 @@ const mountListWidget = async (
     global: {
       mocks: { $store: store },
       stubs: {
-        WidgetContextMenu: true,
+        NuxtLink: {
+          props: ['to'],
+          template:
+            '<a class="stub-link" :data-to="JSON.stringify(to)"><slot /></a>',
+        },
         Badge: { template: '<span><slot /></span>' },
       },
     },
@@ -79,20 +96,60 @@ describe('RecordsListWidget', () => {
     expect(headers(wrapper)).toEqual(['Name', 'Region', 'Due'])
   })
 
+  test('cells render by field type', async () => {
+    const wrapper = await mountListWidget(RecordsListWidget, {
+      widget: { field_ids: [1, 4, 5] },
+      results: [
+        {
+          id: 1,
+          Name: 'First',
+          Stage: { id: 9, value: 'Won', color: 'light-green' },
+          Amount: '1250000.00',
+        },
+      ],
+    })
+
+    const pill = wrapper.find('.widget-pill')
+    expect(pill.text()).toBe('Won')
+    expect(pill.classes()).toContain('background-color--light-green')
+    expect(wrapper.find('.widget-table__number').text()).toBe('1,250,000.00')
+    expect(wrapper.findAll('th')[2].classes()).toContain(
+      'widget-table__cell--end'
+    )
+  })
+
+  test('the header counts the records and links to the table', async () => {
+    const wrapper = await mountListWidget(RecordsListWidget, {
+      dataSource: { table_id: 12, view_id: 5 },
+      results: [{ id: 1, Name: 'First' }],
+    })
+
+    expect(wrapper.find('.widget-count').text()).toBe(
+      'recordsListWidget.count.one - 1'
+    )
+    expect(
+      JSON.parse(wrapper.find('.stub-link').attributes('data-to'))
+    ).toEqual({
+      name: 'database-table',
+      params: { databaseId: 40, tableId: 12, viewId: 5 },
+    })
+  })
+
   test('an empty result set says so instead of rendering an empty table', async () => {
     const wrapper = await mountListWidget(RecordsListWidget, { results: [] })
 
     expect(wrapper.find('table').exists()).toBe(false)
-    expect(wrapper.find('.dashboard-records-list-widget__empty').exists()).toBe(
-      true
+    expect(wrapper.find('.widget-frame__state').text()).toContain(
+      'recordsListWidget.noRecords'
     )
   })
 
   test('a misconfigured data source says so', async () => {
     const wrapper = await mountListWidget(RecordsListWidget, { error: true })
 
-    expect(wrapper.find('.dashboard-records-list-widget__empty').exists()).toBe(
-      true
+    expect(wrapper.find('table').exists()).toBe(false)
+    expect(wrapper.find('.widget-frame__state').text()).toContain(
+      'recordsListWidget.misconfigured'
     )
   })
 })
@@ -116,17 +173,50 @@ describe('UpcomingDatesWidget', () => {
       error: options.error,
     })
 
-  test('the date column is trailing and not repeated among the fields', async () => {
+  const titles = (wrapper) =>
+    wrapper.findAll('.widget-agenda__title').map((title) => title.text())
+
+  test('each row shows its date as a tile, the first field as its title', async () => {
     const wrapper = await mountAgenda({
-      widget: { field_ids: [1, 3] },
+      widget: { field_ids: [1, 3, 2] },
       results: [
         { id: 1, Name: 'Renewal', Region: 'Riyadh', Due: isoDaysFromNow(3) },
       ],
     })
 
-    // 'Due' appears once, as the trailing column, even though it was also
-    // selected as a displayed field.
-    expect(headers(wrapper)).toEqual(['Name', 'Due'])
+    // 'Due' is the tile, so it is not repeated among the text even though it
+    // was also selected as a displayed field.
+    expect(titles(wrapper)).toEqual(['Renewal'])
+    expect(wrapper.find('.widget-agenda__details').text()).toBe('Riyadh')
+    expect(wrapper.find('.widget-agenda__day').text()).toBe(
+      String(Number(isoDaysFromNow(3).slice(8)))
+    )
+    expect(wrapper.find('.widget-agenda__due').text()).toBe(
+      'upcomingDatesWidget.inDays.other - 3'
+    )
+  })
+
+  test('rows are grouped by how soon they fall due', async () => {
+    const wrapper = await mountAgenda({
+      results: [
+        { id: 1, Name: 'Late', Due: isoDaysFromNow(-2) },
+        { id: 2, Name: 'Now', Due: isoDaysFromNow(0) },
+        { id: 3, Name: 'Soon', Due: isoDaysFromNow(2) },
+        { id: 4, Name: 'Far', Due: isoDaysFromNow(20) },
+      ],
+    })
+
+    expect(
+      wrapper.findAll('.widget-agenda__group-title').map((h) => h.text())
+    ).toEqual([
+      'upcomingDatesWidget.group.overdue',
+      'upcomingDatesWidget.group.today',
+      'upcomingDatesWidget.group.week',
+      'upcomingDatesWidget.group.later',
+    ])
+    expect(
+      wrapper.find('.widget-agenda__item--today .widget-agenda__due').text()
+    ).toBe('upcomingDatesWidget.today')
   })
 
   test('an overdue row is flagged and counted', async () => {
@@ -137,9 +227,12 @@ describe('UpcomingDatesWidget', () => {
       ],
     })
 
-    const rows = wrapper.findAll('tbody tr')
-    expect(rows[0].classes()).toContain('widget-record-rows__row--flagged')
-    expect(rows[1].classes()).not.toContain('widget-record-rows__row--flagged')
+    const items = wrapper.findAll('.widget-agenda__item')
+    expect(items[0].classes()).toContain('widget-agenda__item--overdue')
+    expect(items[1].classes()).not.toContain('widget-agenda__item--overdue')
+    expect(wrapper.find('.widget-status--danger').text()).toContain(
+      'upcomingDatesWidget.overdue.one'
+    )
   })
 
   test('a row due today is not flagged as overdue', async () => {
@@ -151,17 +244,18 @@ describe('UpcomingDatesWidget', () => {
       ],
     })
 
-    expect(wrapper.find('tbody tr').classes()).not.toContain(
-      'widget-record-rows__row--flagged'
+    expect(wrapper.find('.widget-agenda__item').classes()).toContain(
+      'widget-agenda__item--today'
     )
+    expect(wrapper.find('.widget-status--danger').exists()).toBe(false)
   })
 
   test('an empty agenda says nothing is due', async () => {
     const wrapper = await mountAgenda({ results: [] })
 
-    expect(
-      wrapper.find('.dashboard-upcoming-dates-widget__empty').exists()
-    ).toBe(true)
+    expect(wrapper.find('.widget-frame__state').text()).toContain(
+      'upcomingDatesWidget.nothingDue'
+    )
   })
 
   test('rows with no date field configured still render', async () => {
@@ -171,6 +265,7 @@ describe('UpcomingDatesWidget', () => {
       results: [{ id: 1, Name: 'Renewal', Region: 'Riyadh' }],
     })
 
-    expect(headers(wrapper)).toEqual(['Name', 'Region'])
+    expect(titles(wrapper)).toEqual(['Renewal'])
+    expect(wrapper.find('.widget-agenda__day').text()).toBe('—')
   })
 })

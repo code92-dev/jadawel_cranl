@@ -1,7 +1,9 @@
 import {
   ChartWidgetType,
+  KpiWidgetType,
   ProgressWidgetType,
   RecordsListWidgetType,
+  TextWidgetType,
   UpcomingDatesWidgetType,
 } from '@jadawel/modules/arabase/dashboard/widgetTypes'
 import {
@@ -90,10 +92,14 @@ export default defineNuxtPlugin({
       new LocalJadawelUpcomingRowsServiceType(context)
     )
 
+    // Replaces upstream's `summary` registration with the fork's key-number
+    // card: same type, so stored widgets keep working.
+    $registry.register('dashboardWidget', new KpiWidgetType(context))
     $registry.register('dashboardWidget', new ChartWidgetType(context))
     $registry.register('dashboardWidget', new RecordsListWidgetType(context))
     $registry.register('dashboardWidget', new ProgressWidgetType(context))
     $registry.register('dashboardWidget', new UpcomingDatesWidgetType(context))
+    $registry.register('dashboardWidget', new TextWidgetType(context))
 
     $registry.register('plugin', new ArabasePlugin(context))
 

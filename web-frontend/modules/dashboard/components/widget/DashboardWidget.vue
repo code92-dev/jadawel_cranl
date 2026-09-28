@@ -4,6 +4,9 @@
     :class="{
       'dashboard-widget--selected': isSelected,
       'dashboard-widget--selectable': isSelectable,
+      'dashboard-widget--editing': isEditMode,
+      'dashboard-widget--bare': isBare,
+      'dashboard-widget--resizing': previewSize !== null,
     }"
     :style="gridStyle"
     @click="selectWidgetIfAllowed(widget.id)"
@@ -19,12 +22,28 @@
       :loading="isLoading"
       :edit-mode="isEditMode"
     />
+    <WidgetEditChrome
+      v-if="isEditMode && !isTemporary"
+      :dashboard="dashboard"
+      :widget="widget"
+      :store-prefix="storePrefix"
+      :can-drag="canArrange"
+      :can-resize="canArrange"
+      @preview="previewSize = $event"
+    />
   </div>
 </template>
 
 <script>
+import WidgetEditChrome from '@jadawel/modules/arabase/dashboard/components/widget/WidgetEditChrome'
+import {
+  DEFAULT_MIN_SIZE,
+  widgetSize,
+} from '@jadawel/modules/arabase/dashboard/layout'
+
 export default {
   name: 'DashboardWidget',
+  components: { WidgetEditChrome },
   props: {
     dashboard: {
       type: Object,
@@ -39,6 +58,22 @@ export default {
       required: false,
       default: '',
     },
+    /**
+     * Jadawel fork (grid board): false on a narrow, single-column board, where
+     * moving and resizing are off.
+     */
+    canArrange: {
+      type: Boolean,
+      required: false,
+      default: true,
+    },
+  },
+  data() {
+    return {
+      // Jadawel fork (grid board): the size a corner drag has reached, shown
+      // until the drag ends.
+      previewSize: null,
+    }
   },
   computed: {
     isSelected() {
@@ -60,15 +95,23 @@ export default {
         `${this.storePrefix}dashboardApplication/isEditMode`
       ]
     },
+    /** A widget still being created carries a temporary, client-side id. */
+    isTemporary() {
+      return this.widget.dashboard_id === undefined
+    },
+    isBare() {
+      return this.widgetType.isBare
+        ? this.widgetType.isBare(this.widget)
+        : false
+    },
     gridStyle() {
-      // Jadawel fork (grid board): the widget's cell spans on the 3-column
-      // board. Widgets without the fields (created before the grid layout, or
-      // mid-creation) keep the old full-width stacked look: 3 columns × 2 rows.
-      const width = Math.min(3, Math.max(1, parseInt(this.widget.width) || 3))
-      const height = Math.min(3, Math.max(1, parseInt(this.widget.height) || 2))
+      // Jadawel fork (grid board): the widget's spans on the 12-column board.
+      const size =
+        this.previewSize ||
+        widgetSize(this.widget, this.widgetType.minSize || DEFAULT_MIN_SIZE)
       return {
-        gridColumn: `span ${width}`,
-        gridRow: `span ${height}`,
+        gridColumn: `span ${size.width}`,
+        gridRow: `span ${size.height}`,
       }
     },
     isLoading() {

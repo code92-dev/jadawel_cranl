@@ -19,6 +19,11 @@ let parent
 let scrollableParent
 let indicator
 
+const sortableChildren = (container) =>
+  [...container.childNodes].filter(
+    (e) => e !== indicator && e.nodeType === 1 && e.sortableId !== undefined
+  )
+
 const getMousedownElement = (el, binding) => {
   const handle = binding.value.handle
   return handle ? el.querySelector(handle) || el : el
@@ -120,9 +125,8 @@ export default {
 
     // Set pointer events to none because that will prevent hover and click
     // effects.
-    const all = [...parent.childNodes].filter(
-      (e) => e !== indicator && e.nodeType === 1
-    )
+    // Only the sortable items: the board also holds its "add widget" tile.
+    const all = sortableChildren(parent)
 
     // Add the `sortable-sorting-item` which disables the pointer events and user
     // select of all the sortable items. This will give a smoother user experience
@@ -225,9 +229,7 @@ export default {
       window.removeEventListener('click', preventOtherClickEvent, true)
     })
 
-    const oldOrder = [...parent.childNodes]
-      .filter((e) => e.nodeType === 1)
-      .map((e) => e.sortableId)
+    const oldOrder = sortableChildren(parent).map((e) => e.sortableId)
     const newOrder = oldOrder.filter((id) => id !== el.sortableId)
     const targetIndex = el.sortableBeforeElement
       ? newOrder.findIndex((id) => id === el.sortableBeforeElement.sortableId)
@@ -261,8 +263,7 @@ export default {
       indicator.parentNode.removeChild(indicator)
     }
 
-    const all = [...parent.childNodes].filter((e) => e.nodeType === 1)
-    all.forEach((s) => {
+    sortableChildren(parent).forEach((s) => {
       s.classList.remove('sortable-sorting-item')
     })
 

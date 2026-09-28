@@ -1,24 +1,56 @@
 <template>
   <Context ref="context">
     <div class="widget-size-context">
-      <div class="widget-size-context__grid" @mouseleave="preview = null">
+      <div class="widget-size-context__label">
+        {{ $t('widgetSize.width') }}
+      </div>
+      <div class="widget-size-context__options">
         <button
-          v-for="cell in cells"
-          :key="`${cell.width}x${cell.height}`"
+          v-for="width in widths"
+          :key="`w${width}`"
           type="button"
-          class="widget-size-context__cell"
+          class="widget-size-context__option"
           :class="{
-            'widget-size-context__cell--preview': isPreviewed(cell),
-            'widget-size-context__cell--current': isCurrent(cell),
+            'widget-size-context__option--active': width === current.width,
           }"
-          :aria-label="$t('widgetContext.sizePreview', cell)"
-          @mouseenter="preview = cell"
-          @click="selectSize(cell)"
-        ></button>
+          :disabled="width < minSize.width"
+          :title="widthLabel(width)"
+          @click="select({ width })"
+        >
+          <span class="widget-size-context__bar">
+            <span
+              class="widget-size-context__bar-fill"
+              :style="{ inlineSize: `${(width / columns) * 100}%` }"
+            ></span>
+          </span>
+          <span class="widget-size-context__option-label">{{
+            widthLabel(width)
+          }}</span>
+        </button>
       </div>
-      <div class="widget-size-context__preview">
-        {{ previewLabel }}
+      <div class="widget-size-context__label">
+        {{ $t('widgetSize.height') }}
       </div>
+      <div class="widget-size-context__heights">
+        <button
+          v-for="height in heights"
+          :key="`h${height}`"
+          type="button"
+          class="widget-size-context__height"
+          :class="{
+            'widget-size-context__height--active': height === current.height,
+          }"
+          :disabled="height < minSize.height"
+          :title="$t('widgetSize.rows', { count: height })"
+          @click="select({ height })"
+        >
+          {{ height }}
+        </button>
+      </div>
+      <p class="widget-size-context__hint">
+        {{ $t('widgetSize.current', current) }} ·
+        {{ $t('widgetSize.dragHint') }}
+      </p>
     </div>
   </Context>
 </template>
@@ -26,12 +58,19 @@
 <script>
 import context from '@jadawel/modules/core/mixins/context'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
+import {
+  DEFAULT_MIN_SIZE,
+  GRID_COLUMNS,
+  HEIGHT_PRESETS,
+  WIDTH_PRESETS,
+  widgetSize,
+} from '@jadawel/modules/arabase/dashboard/layout'
 
 /**
- * Jadawel fork (grid board): the "Size" submenu of the widget context menu — a
- * 3×3 mini-grid picker. Rows are widget height, columns are widget width;
- * hovering a cell previews that rectangle and clicking PATCHes `width`/`height`
- * through the existing debounced `updateWidget` action.
+ * The widget's "Size" menu: a width as a share of the row (quarter, third,
+ * half, two thirds, full) and a height in rows. The corner handle on the board
+ * resizes to any cell; this menu is the precise, keyboard-reachable way to the
+ * common sizes. Changes go through the store's debounced `updateWidget`.
  */
 export default {
   name: 'WidgetSizeContext',
@@ -45,66 +84,56 @@ export default {
       type: Object,
       required: true,
     },
+    storePrefix: {
+      type: String,
+      required: false,
+      default: '',
+    },
   },
   emits: ['selected'],
-  data() {
-    return {
-      preview: null,
-    }
-  },
   computed: {
-    cells() {
-      const cells = []
-      for (let height = 1; height <= 3; height++) {
-        for (let width = 1; width <= 3; width++) {
-          cells.push({ width, height })
-        }
-      }
-      return cells
+    columns() {
+      return GRID_COLUMNS
     },
-    currentSize() {
-      return {
-        width: parseInt(this.widget.width) || 3,
-        height: parseInt(this.widget.height) || 2,
-      }
+    widths() {
+      return WIDTH_PRESETS
     },
-    previewLabel() {
-      const size = this.preview || this.currentSize
-      return this.$t('widgetContext.sizePreview', size)
+    heights() {
+      return HEIGHT_PRESETS
+    },
+    minSize() {
+      const type = this.$registry.get('dashboardWidget', this.widget.type)
+      return type?.minSize || DEFAULT_MIN_SIZE
+    },
+    current() {
+      return widgetSize(this.widget, this.minSize)
     },
   },
   methods: {
-    isPreviewed(cell) {
-      return (
-        this.preview !== null &&
-        cell.width <= this.preview.width &&
-        cell.height <= this.preview.height
-      )
+    widthLabel(width) {
+      return this.$t(`widgetSize.widths.${width}`)
     },
-    isCurrent(cell) {
-      return (
-        cell.width === this.currentSize.width &&
-        cell.height === this.currentSize.height
-      )
-    },
-    async selectSize({ width, height }) {
-      // Closed before the request, not after it. The store debounces the PATCH
-      // by a second, so awaiting it first held the picker open for at least
-      // that long on every click. The store already rolls the widget back if
-      // the request fails, so there is nothing for the open picker to do in the
-      // meantime.
+    async select(change) {
+      const size = { ...this.current, ...change }
+      if (
+        size.width === this.current.width &&
+        size.height === this.current.height
+      ) {
+        return
+      }
+      // Closed before the request: the store debounces the PATCH by a second,
+      // and rolls the widget back itself if it fails.
       this.hide()
       this.$emit('selected')
-
       try {
-        await this.$store.dispatch('dashboardApplication/updateWidget', {
-          widgetId: this.widget.id,
-          values: { width, height },
-          originalValues: {
-            width: this.currentSize.width,
-            height: this.currentSize.height,
-          },
-        })
+        await this.$store.dispatch(
+          `${this.storePrefix}dashboardApplication/updateWidget`,
+          {
+            widgetId: this.widget.id,
+            values: size,
+            originalValues: { ...this.current },
+          }
+        )
       } catch (error) {
         notifyIf(error, 'dashboard')
       }

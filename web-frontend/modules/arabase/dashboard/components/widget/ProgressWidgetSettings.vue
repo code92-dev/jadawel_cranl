@@ -24,28 +24,6 @@
         </FormGroup>
 
         <FormGroup
-          :label="$t('progressWidgetSettings.displayStyle')"
-          class="margin-bottom-2"
-          small-label
-          required
-          horizontal
-          horizontal-narrow
-        >
-          <Dropdown v-model="displayStyle">
-            <DropdownItem
-              :name="$t('progressWidgetSettings.bar')"
-              value="bar"
-              icon="iconoir-minus"
-            ></DropdownItem>
-            <DropdownItem
-              :name="$t('progressWidgetSettings.ring')"
-              value="ring"
-              icon="iconoir-circle"
-            ></DropdownItem>
-          </Dropdown>
-        </FormGroup>
-
-        <FormGroup
           :label="$t('progressWidgetSettings.warningThreshold')"
           :helper-text="$t('progressWidgetSettings.thresholdHelp')"
           class="margin-bottom-2"
@@ -96,16 +74,38 @@
       :store-prefix="storePrefix"
       @values-changed="onDataSourceValuesChanged"
     />
+
+    <WidgetAppearanceForm
+      :widget="widget"
+      :store-prefix="storePrefix"
+      :features="['number']"
+    >
+      <FormGroup
+        :label="$t('progressWidgetSettings.displayStyle')"
+        class="margin-bottom-2"
+        small-label
+      >
+        <SegmentControl
+          :segments="styleSegments"
+          :active-index="styleIndex"
+          size="small"
+          @update:active-index="displayStyle = styles[$event]"
+        />
+      </FormGroup>
+    </WidgetAppearanceForm>
   </div>
 </template>
 
 <script>
 import AggregateRowsDataSourceForm from '@jadawel/modules/dashboard/components/data_source/AggregateRowsDataSourceForm'
+import WidgetAppearanceForm from '@jadawel/modules/arabase/dashboard/components/widget/WidgetAppearanceForm'
 import dashboardWidgetSettings from '@jadawel/modules/arabase/dashboard/mixins/dashboardWidgetSettings'
+
+const STYLES = ['bar', 'ring', 'gauge']
 
 export default {
   name: 'ProgressWidgetSettings',
-  components: { AggregateRowsDataSourceForm },
+  components: { AggregateRowsDataSourceForm, WidgetAppearanceForm },
   mixins: [dashboardWidgetSettings],
   data() {
     return {
@@ -118,6 +118,25 @@ export default {
     }
   },
   computed: {
+    styles() {
+      return STYLES
+    },
+    styleSegments() {
+      return [
+        { label: this.$t('progressWidgetSettings.bar'), icon: 'iconoir-minus' },
+        {
+          label: this.$t('progressWidgetSettings.ring'),
+          icon: 'iconoir-circle',
+        },
+        {
+          label: this.$t('progressWidgetSettings.gauge'),
+          icon: 'iconoir-dashboard-speed',
+        },
+      ]
+    },
+    styleIndex() {
+      return Math.max(0, STYLES.indexOf(this.widget.display_style))
+    },
     displayStyle: {
       get() {
         return this.widget.display_style

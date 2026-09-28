@@ -1,34 +1,5 @@
 <template>
   <div>
-    <form class="margin-bottom-2" @submit.prevent>
-      <FormSection :title="$t('chartWidgetSettings.appearance')">
-        <FormGroup
-          :label="$t('chartWidgetSettings.chartType')"
-          class="margin-bottom-2"
-          small-label
-          required
-          horizontal
-          horizontal-narrow
-        >
-          <Dropdown v-model="chartType">
-            <DropdownItem
-              v-for="type in chartTypes"
-              :key="type.value"
-              :name="type.name"
-              :value="type.value"
-              :icon="type.icon"
-            >
-            </DropdownItem>
-          </Dropdown>
-        </FormGroup>
-        <FormGroup small-label horizontal horizontal-narrow>
-          <Checkbox v-model="showLegend">{{
-            $t('chartWidgetSettings.showLegend')
-          }}</Checkbox>
-        </FormGroup>
-      </FormSection>
-    </form>
-
     <GroupedAggregateRowsDataSourceForm
       v-if="dataSource"
       ref="dataSourceForm"
@@ -39,64 +10,73 @@
       :store-prefix="storePrefix"
       @values-changed="onDataSourceValuesChanged"
     />
+
+    <WidgetAppearanceForm
+      :widget="widget"
+      :store-prefix="storePrefix"
+      :features="appearanceFeatures"
+      default-color="blue"
+    >
+      <FormGroup
+        :label="$t('chartWidgetSettings.chartType')"
+        class="margin-bottom-2"
+        small-label
+        required
+      >
+        <div class="widget-chart-types" role="radiogroup">
+          <button
+            v-for="type in chartTypes"
+            :key="type.value"
+            type="button"
+            role="radio"
+            class="widget-chart-types__option"
+            :class="{
+              'widget-chart-types__option--active': type.value === chartType,
+            }"
+            :aria-checked="type.value === chartType ? 'true' : 'false'"
+            :title="type.name"
+            @click="chartType = type.value"
+          >
+            <i :class="type.icon" aria-hidden="true"></i>
+            <span>{{ type.name }}</span>
+          </button>
+        </div>
+      </FormGroup>
+      <FormGroup small-label class="margin-bottom-2">
+        <Checkbox v-model="showLegend">{{
+          $t('chartWidgetSettings.showLegend')
+        }}</Checkbox>
+      </FormGroup>
+    </WidgetAppearanceForm>
   </div>
 </template>
 
 <script>
 import GroupedAggregateRowsDataSourceForm from '@jadawel/modules/arabase/dashboard/components/data_source/GroupedAggregateRowsDataSourceForm'
-import error from '@jadawel/modules/core/mixins/error'
-import { notifyIf } from '@jadawel/modules/core/utils/error'
+import WidgetAppearanceForm from '@jadawel/modules/arabase/dashboard/components/widget/WidgetAppearanceForm'
+import dashboardWidgetSettings from '@jadawel/modules/arabase/dashboard/mixins/dashboardWidgetSettings'
+import { CHART_TYPES } from '@jadawel/modules/arabase/dashboard/widgetTypes'
 
 export default {
   name: 'ChartWidgetSettings',
-  components: { GroupedAggregateRowsDataSourceForm },
-  mixins: [error],
-  props: {
-    dashboard: {
-      type: Object,
-      required: true,
-    },
-    widget: {
-      type: Object,
-      required: true,
-    },
-    storePrefix: {
-      type: String,
-      required: false,
-      default: '',
-    },
-  },
+  components: { GroupedAggregateRowsDataSourceForm, WidgetAppearanceForm },
+  mixins: [dashboardWidgetSettings],
   computed: {
     chartTypes() {
-      return [
-        {
-          value: 'bar',
-          name: this.$t('chartWidget.bar'),
-          icon: 'iconoir-bar-chart',
-        },
-        {
-          value: 'line',
-          name: this.$t('chartWidget.line'),
-          icon: 'iconoir-graph-up',
-        },
-        {
-          value: 'pie',
-          name: this.$t('chartWidget.pie'),
-          icon: 'iconoir-pie-chart',
-        },
-        {
-          value: 'doughnut',
-          name: this.$t('chartWidget.doughnut'),
-          icon: 'iconoir-pie-chart',
-        },
-      ]
+      return CHART_TYPES.map((type) => ({
+        value: type.value,
+        icon: type.icon,
+        name: this.$t(type.nameKey),
+      }))
     },
     chartType: {
       get() {
         return this.widget.chart_type
       },
       set(value) {
-        this.updateWidget({ chart_type: value })
+        if (value !== this.widget.chart_type) {
+          this.updateWidget({ chart_type: value })
+        }
       },
     },
     showLegend: {
@@ -107,46 +87,9 @@ export default {
         this.updateWidget({ show_legend: value })
       },
     },
-    dataSource() {
-      return this.$store.getters[
-        `${this.storePrefix}dashboardApplication/getDataSourceById`
-      ](this.widget.data_source_id)
-    },
-  },
-  methods: {
-    async updateWidget(values) {
-      const originalValues = Object.fromEntries(
-        Object.keys(values).map((key) => [key, this.widget[key]])
-      )
-      try {
-        await this.$store.dispatch(
-          `${this.storePrefix}dashboardApplication/updateWidget`,
-          {
-            widgetId: this.widget.id,
-            values,
-            originalValues,
-          }
-        )
-      } catch (error) {
-        notifyIf(error, 'dashboard')
-      }
-    },
-    async onDataSourceValuesChanged(changedDataSourceValues) {
-      if (this.$refs.dataSourceForm.isFormValid()) {
-        try {
-          await this.$store.dispatch(
-            `${this.storePrefix}dashboardApplication/updateDataSource`,
-            {
-              dataSourceId: this.dataSource.id,
-              values: changedDataSourceValues,
-            }
-          )
-        } catch (error) {
-          this.$refs.dataSourceForm.reset()
-          this.$refs.dataSourceForm.touch()
-          notifyIf(error, 'dashboard')
-        }
-      }
+    appearanceFeatures() {
+      const sliced = ['pie', 'doughnut'].includes(this.widget.chart_type)
+      return sliced ? ['color', 'number'] : ['color', 'number', 'stacked']
     },
   },
 }

@@ -1,18 +1,33 @@
 <template>
-  <div class="widget-board" :class="{ 'widget-board--draggable': dragEnabled }">
+  <div
+    class="widget-board"
+    :class="{
+      'widget-board--draggable': dragEnabled,
+      'widget-board--editing': isEditMode,
+    }"
+  >
     <DashboardWidget
       v-for="widget in widgets"
       :key="widget.id"
       v-grid-sortable="{
         id: widget.id,
         enabled: canDrag(widget),
-        handle: '.widget__header',
         update: onWidgetDrop,
       }"
       :widget="widget"
       :dashboard="dashboard"
       :store-prefix="storePrefix"
+      :can-arrange="!isNarrowScreen"
     />
+    <button
+      v-if="isEditMode && canCreateWidget"
+      type="button"
+      class="widget-board__add"
+      @click="$emit('add-widget')"
+    >
+      <i class="iconoir-plus" aria-hidden="true"></i>
+      <span>{{ $t('dashboardToolbar.addWidget') }}</span>
+    </button>
   </div>
 </template>
 
@@ -21,9 +36,9 @@ import DashboardWidget from '@jadawel/modules/dashboard/components/widget/Dashbo
 import { notifyIf } from '@jadawel/modules/core/utils/error'
 import { computeWidgetOrderUpdate } from '@jadawel/modules/arabase/utils/gridOrder'
 
-// Matches `$dashboard-breakpoint` in the fork's widget_board.scss: below it the
-// grid collapses to one column and drag-reorder is disabled (the size picker
-// still works there).
+// Matches `$dashboard-breakpoint` in the fork's dashboard_canvas.scss: below it
+// the grid collapses to one column and moving and resizing are off (the size
+// menu still works there).
 const GRID_BREAKPOINT = 900
 
 export default {
@@ -39,7 +54,13 @@ export default {
       required: false,
       default: '',
     },
+    canCreateWidget: {
+      type: Boolean,
+      required: false,
+      default: false,
+    },
   },
+  emits: ['add-widget'],
   data() {
     return {
       windowWidth: null,

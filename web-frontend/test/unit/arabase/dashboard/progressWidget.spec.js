@@ -40,7 +40,6 @@ describe('ProgressWidget', () => {
           },
         },
         stubs: {
-          WidgetContextMenu: true,
           Badge: { template: '<span><slot /></span>' },
         },
       },
@@ -48,16 +47,32 @@ describe('ProgressWidget', () => {
   }
 
   const percentage = (wrapper) =>
-    wrapper.find('.dashboard-progress-widget__percentage').text()
+    wrapper
+      .find('.widget-progress__percentage, .widget-progress__dial-label')
+      .text()
 
   const fillWidth = (wrapper) =>
-    wrapper.find('.dashboard-progress-widget__fill').element.style.width
+    wrapper.find('.widget-progress__fill').attributes('style')
+
+  const tone = (wrapper) =>
+    wrapper
+      .find('.widget-progress')
+      .classes()
+      .find((name) => name.startsWith('widget-tone--'))
+
+  const dash = (wrapper) =>
+    Number(
+      wrapper
+        .find('.widget-progress__arc')
+        .attributes('stroke-dasharray')
+        .split(' ')[0]
+    )
 
   test('the percentage is the result over the target', async () => {
     const wrapper = await mountWidget({ result: '25' })
 
     expect(percentage(wrapper)).toBe('25%')
-    expect(fillWidth(wrapper)).toBe('25%')
+    expect(fillWidth(wrapper)).toContain('25%')
   })
 
   test('overshooting shows above 100% but the bar stops at full', async () => {
@@ -66,30 +81,35 @@ describe('ProgressWidget', () => {
     const wrapper = await mountWidget({ result: '250' })
 
     expect(percentage(wrapper)).toBe('250%')
-    expect(fillWidth(wrapper)).toBe('100%')
+    expect(fillWidth(wrapper)).toContain('100%')
   })
 
-  test('the colour follows the thresholds', async () => {
+  test('the tone and status follow the thresholds', async () => {
     const danger = await mountWidget({ result: '10' })
-    expect(danger.find('.dashboard-progress-widget__fill').classes()).toContain(
-      'dashboard-progress-widget--danger'
+    expect(tone(danger)).toBe('widget-tone--danger')
+    expect(danger.find('.widget-status--danger').text()).toContain(
+      'progressWidget.status.atRisk'
     )
 
     const warning = await mountWidget({ result: '60' })
-    expect(
-      warning.find('.dashboard-progress-widget__fill').classes()
-    ).toContain('dashboard-progress-widget--warning')
+    expect(tone(warning)).toBe('widget-tone--warning')
+    expect(warning.find('.widget-status').text()).toContain(
+      'progressWidget.status.onTrack'
+    )
 
     const success = await mountWidget({ result: '100' })
-    expect(
-      success.find('.dashboard-progress-widget__fill').classes()
-    ).toContain('dashboard-progress-widget--success')
+    expect(tone(success)).toBe('widget-tone--success')
+    expect(success.find('.widget-status').text()).toContain(
+      'progressWidget.status.met'
+    )
   })
 
-  test('a non-numeric result shows a dash instead of NaN', async () => {
+  test('a non-numeric result shows a dash and no status', async () => {
     const wrapper = await mountWidget({ result: null })
 
     expect(percentage(wrapper)).toBe('—')
+    expect(tone(wrapper)).toBe('widget-tone--neutral')
+    expect(wrapper.find('.widget-status').exists()).toBe(false)
   })
 
   test('a zero target shows a dash instead of Infinity', async () => {
@@ -99,32 +119,54 @@ describe('ProgressWidget', () => {
     expect(percentage(wrapper)).toBe('—')
   })
 
-  test('the ring style draws an arc instead of a bar', async () => {
+  test('the value and target follow the number format', async () => {
     const wrapper = await mountWidget({
+      result: '1250000',
+      widget: {
+        target_value: '2000000',
+        appearance: { compact: true, suffix: 'SAR' },
+      },
+    })
+
+    expect(percentage(wrapper)).toBe('63%')
+    expect(wrapper.find('.widget-progress__of').text()).toBe(
+      'progressWidget.ofTarget'
+    )
+    expect(wrapper.vm.valueLabel).toBe('1.3M SAR')
+    expect(wrapper.vm.targetLabel).toBe('2M SAR')
+  })
+
+  test('the bar marks where at risk ends', async () => {
+    const wrapper = await mountWidget({ widget: { warning_threshold: 60 } })
+
+    expect(
+      wrapper.find('.widget-progress__mark').attributes('style')
+    ).toContain('60%')
+  })
+
+  test('the ring and the gauge draw an arc instead of a bar', async () => {
+    const ring = await mountWidget({
       widget: { display_style: 'ring' },
       result: '50',
     })
+    expect(ring.find('.widget-progress__fill').exists()).toBe(false)
+    // pathLength is 100, so the dash is the percentage.
+    expect(dash(ring)).toBe(50)
+    expect(percentage(ring)).toBe('50%')
 
-    expect(wrapper.find('.dashboard-progress-widget__fill').exists()).toBe(
-      false
-    )
-    const arc = wrapper.find('.dashboard-progress-widget__ring-value')
-    const [drawn, total] = arc
-      .attributes('stroke-dasharray')
-      .split(' ')
-      .map(Number)
-    // Half the target, so half the circumference is stroked.
-    expect(drawn / total).toBeCloseTo(0.5, 5)
+    const gauge = await mountWidget({
+      widget: { display_style: 'gauge' },
+      result: '130',
+    })
+    expect(gauge.find('path.widget-progress__arc').exists()).toBe(true)
+    expect(dash(gauge)).toBe(100)
+    expect(percentage(gauge)).toBe('130%')
   })
 
   test('nothing is drawn when the data source is misconfigured', async () => {
     const wrapper = await mountWidget({ error: true })
 
-    expect(wrapper.find('.dashboard-progress-widget__empty').exists()).toBe(
-      true
-    )
-    expect(wrapper.find('.dashboard-progress-widget__fill').exists()).toBe(
-      false
-    )
+    expect(wrapper.find('.widget-frame__state').exists()).toBe(true)
+    expect(wrapper.find('.widget-progress').exists()).toBe(false)
   })
 })

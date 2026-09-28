@@ -1,0 +1,1182 @@
+// Dashboard widgets: the shared frame, accent colours, and each widget's body —
+// key number, progress, chart, records table, agenda, text — plus the settings
+// controls that choose how they look. docs/DASHBOARD_REDESIGN.md explains the
+// choices.
+
+// A standalone stylesheet with its own palette import rather than a partial
+// under core/assets/scss/components: core's default.scss aggregates those, and
+// a fork entry there conflicts on every upstream merge.
+// Logical properties only: this file is a hard-error zone for csstools/use-logical.
+@import '@jadawel/modules/core/assets/scss/colors';
+
+$frame-padding: 18px;
+
+// --- accents --------------------------------------------------------------------
+// A widget's `appearance.color` becomes one of these classes; its parts read the
+// three custom properties. `primary` follows the workspace theme.
+
+@mixin accent($name, $solid, $soft, $strong) {
+  .widget-accent--#{$name} {
+    --accent: #{$solid};
+    --accent-soft: #{$soft};
+    --accent-strong: #{$strong};
+  }
+}
+
+@include accent(
+  primary,
+  $color-primary-500,
+  $color-primary-200,
+  $color-primary-700
+);
+@include accent(blue, $palette-blue-600, $palette-blue-100, $palette-blue-1000);
+@include accent(cyan, $palette-cyan-800, $palette-cyan-100, $palette-cyan-1100);
+@include accent(
+  green,
+  $palette-green-900,
+  $palette-green-100,
+  $palette-green-1100
+);
+@include accent(
+  yellow,
+  $palette-yellow-800,
+  $palette-yellow-100,
+  $palette-yellow-1100
+);
+@include accent(red, $palette-red-700, $palette-red-100, $palette-red-1000);
+@include accent(
+  magenta,
+  $palette-magenta-700,
+  $palette-magenta-100,
+  $palette-magenta-1000
+);
+@include accent(
+  purple,
+  $palette-purple-600,
+  $palette-purple-100,
+  $palette-purple-1000
+);
+@include accent(
+  neutral,
+  $palette-neutral-1000,
+  $palette-neutral-200,
+  $palette-neutral-1300
+);
+
+// --- frame -----------------------------------------------------------------------
+
+.widget-frame {
+  display: flex;
+  flex-direction: column;
+  block-size: 100%;
+  min-block-size: 0;
+  min-inline-size: 0;
+  overflow: hidden;
+  border-radius: 11px;
+}
+
+// Core's `.widget__header` pads 20px 24px and draws a rule under it; the frame
+// keeps the class (the drag handle) but not that look.
+.widget-frame__header.widget__header {
+  flex: none;
+  align-items: flex-start;
+  gap: 10px;
+  padding-block: 16px 0;
+  padding-inline: $frame-padding;
+  border-block-end: 0;
+}
+
+.widget-frame__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 9px;
+  background-color: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 17px;
+}
+
+.widget-frame__heading {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.widget-frame__title-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-inline-size: 0;
+  min-block-size: 20px;
+}
+
+.widget-frame__title {
+  min-inline-size: 0;
+  margin: 0;
+  overflow: hidden;
+  color: $palette-neutral-1200;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-frame__description {
+  margin-block: 1px 0;
+  margin-inline: 0;
+  overflow: hidden;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 17px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-frame__actions {
+  display: flex;
+  flex: none;
+  gap: 2px;
+  margin-block-start: -4px;
+}
+
+.widget-frame__action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 7px;
+  color: $palette-neutral-800;
+  font-size: 15px;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $palette-neutral-100;
+    color: $palette-neutral-1200;
+    text-decoration: none;
+  }
+}
+
+// The body is the size container its content scales against: a key number or a
+// dial reads the cell it was given, not the viewport.
+.widget-frame__body {
+  position: relative;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-block-size: 0;
+  padding-block: 12px 16px;
+  padding-inline: $frame-padding;
+  container-name: widget;
+  container-type: size;
+}
+
+.widget-frame__footer {
+  flex: none;
+  padding-block: 0 14px;
+  padding-inline: $frame-padding;
+  color: $palette-neutral-900;
+  font-size: 12px;
+}
+
+@keyframes widget-shimmer {
+  from {
+    background-position: 100% 0;
+  }
+
+  to {
+    background-position: -100% 0;
+  }
+}
+
+.widget-frame__skeleton {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.widget-frame__skeleton-line {
+  display: block;
+  block-size: 12px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    $palette-neutral-100 0%,
+    $palette-neutral-200 50%,
+    $palette-neutral-100 100%
+  );
+  background-size: 200% 100%;
+  animation: widget-shimmer 1.4s ease-in-out infinite;
+
+  &:nth-child(1) {
+    inline-size: 45%;
+    block-size: 22px;
+  }
+
+  &:nth-child(2) {
+    inline-size: 85%;
+  }
+
+  &:nth-child(3) {
+    inline-size: 60%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .widget-frame__skeleton-line {
+    animation: none;
+  }
+}
+
+.widget-frame__state {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  min-block-size: 0;
+  overflow: hidden;
+  color: $palette-neutral-900;
+  text-align: center;
+}
+
+.widget-frame__state-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 36px;
+  block-size: 36px;
+  margin-block-end: 4px;
+  border-radius: 50%;
+  background-color: $palette-neutral-100;
+  color: $palette-neutral-800;
+  font-size: 18px;
+}
+
+.widget-frame__state-text {
+  max-inline-size: 36ch;
+  margin: 0;
+  font-size: 13px;
+  line-height: 18px;
+}
+
+.widget-frame__state-hint {
+  margin: 0;
+  color: $color-primary-600;
+  font-size: 12px;
+}
+
+@container widget (max-height: 90px) {
+  .widget-frame__state-icon,
+  .widget-frame__state-hint {
+    display: none;
+  }
+}
+
+// --- small labels ------------------------------------------------------------------
+
+.widget-status,
+.widget-count {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  white-space: nowrap;
+
+  i {
+    font-size: 13px;
+  }
+}
+
+.widget-count {
+  background-color: $palette-neutral-100;
+  color: $palette-neutral-1000;
+}
+
+.widget-status--success {
+  background-color: $palette-green-50;
+  color: $palette-green-1100;
+}
+
+.widget-status--warning {
+  background-color: $palette-yellow-100;
+  color: $palette-yellow-1100;
+}
+
+.widget-status--danger {
+  background-color: $palette-red-50;
+  color: $palette-red-900;
+}
+
+// --- key number ----------------------------------------------------------------------
+
+.widget-kpi {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: center;
+  min-block-size: 0;
+}
+
+.widget-kpi__value {
+  overflow: hidden;
+  color: $palette-neutral-1300;
+
+  // About 0.6em a character: the width a number of that length can have,
+  // never taller than most of the card, between 20px and 52px.
+  font-size: clamp(
+    20px,
+    min(calc(160cqi / var(--kpi-characters, 6)), 62cqb),
+    52px
+  );
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-kpi__value--empty {
+  color: $palette-neutral-600;
+}
+
+.widget-kpi__caption {
+  margin-block-start: 4px;
+  overflow: hidden;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// --- progress ---------------------------------------------------------------------------
+
+.widget-tone--success {
+  --tone: #{$palette-green-700};
+}
+
+.widget-tone--warning {
+  --tone: #{$palette-yellow-600};
+}
+
+.widget-tone--danger {
+  --tone: #e35d6a;
+}
+
+.widget-tone--neutral {
+  --tone: #{$palette-neutral-500};
+}
+
+.widget-progress {
+  display: flex;
+  flex: 1;
+  min-block-size: 0;
+}
+
+.widget-progress--bar {
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.widget-progress__headline {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+}
+
+.widget-progress__percentage {
+  color: $palette-neutral-1300;
+  font-size: clamp(22px, min(15cqi, 45cqb), 42px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.widget-progress__of,
+.widget-progress__target {
+  color: $palette-neutral-900;
+  font-size: 12px;
+}
+
+.widget-progress__bar {
+  position: relative;
+  flex: none;
+  block-size: 10px;
+  border-radius: 999px;
+  background-color: $palette-neutral-200;
+}
+
+.widget-progress__fill {
+  block-size: 100%;
+  border-radius: 999px;
+  background-color: var(--tone);
+  transition: inline-size 0.5s ease;
+}
+
+.widget-progress__mark {
+  position: absolute;
+  inset-block: -3px;
+  inline-size: 2px;
+  margin-inline-start: -1px;
+  border-radius: 1px;
+  background-color: $palette-neutral-600;
+}
+
+.widget-progress__track,
+.widget-progress__arc {
+  fill: none;
+  stroke-linecap: round;
+  stroke-width: 4.5;
+}
+
+.widget-progress__track {
+  stroke: $palette-neutral-200;
+}
+
+.widget-progress__arc {
+  stroke: var(--tone);
+  transition: stroke-dasharray 0.6s ease;
+}
+
+.widget-progress__dial {
+  position: relative;
+  flex: none;
+}
+
+.widget-progress__svg {
+  display: block;
+  inline-size: 100%;
+  block-size: 100%;
+
+  // Drawn clockwise from the left; in Arabic progress runs from the right.
+  [dir='rtl'] & {
+    transform: scaleX(-1);
+  }
+}
+
+.widget-progress__dial-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: $palette-neutral-1300;
+  font-size: clamp(14px, 16cqb, 28px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.widget-progress__values {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.widget-progress__value {
+  overflow: hidden;
+  color: $palette-neutral-1200;
+  font-size: clamp(15px, 9cqi, 22px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-progress--ring {
+  align-items: center;
+  gap: 16px;
+
+  .widget-progress__dial {
+    block-size: min(100cqb, 48cqi);
+    aspect-ratio: 1;
+  }
+}
+
+.widget-progress--gauge {
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+
+  .widget-progress__track,
+  .widget-progress__arc {
+    stroke-width: 5;
+  }
+
+  .widget-progress__dial {
+    flex: 1;
+    min-block-size: 0;
+    max-inline-size: 100%;
+    aspect-ratio: 48 / 27;
+  }
+
+  .widget-progress__dial-label {
+    align-items: flex-end;
+    padding-block-end: 2%;
+  }
+
+  .widget-progress__values {
+    flex-direction: row;
+    align-items: baseline;
+    gap: 8px;
+  }
+
+  .widget-progress__value {
+    font-size: 14px;
+  }
+}
+
+// --- chart ---------------------------------------------------------------------------------
+
+.widget-chart {
+  position: relative;
+  flex: 1;
+  min-block-size: 0;
+}
+
+.widget-chart--sliced {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+.widget-chart__pie {
+  position: relative;
+  flex: none;
+  block-size: 100%;
+  max-inline-size: 50%;
+  aspect-ratio: 1;
+}
+
+.widget-chart__canvas {
+  position: absolute;
+  inset: 0;
+}
+
+.widget-chart__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.widget-chart__center-value {
+  color: $palette-neutral-1300;
+  font-size: clamp(13px, 9cqb, 24px);
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  line-height: 1.15;
+}
+
+.widget-chart__center-label {
+  color: $palette-neutral-900;
+  font-size: 11px;
+}
+
+.widget-chart__legend {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 7px;
+  min-inline-size: 0;
+  max-block-size: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: auto;
+  list-style: none;
+}
+
+.widget-chart__legend-item {
+  display: grid;
+  grid-template-columns: 10px minmax(0, 1fr) auto auto;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.widget-chart__swatch {
+  inline-size: 10px;
+  block-size: 10px;
+  border-radius: 3px;
+}
+
+.widget-chart__legend-label {
+  display: -webkit-box;
+  overflow: hidden;
+  color: $palette-neutral-1100;
+  overflow-wrap: anywhere;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.widget-chart__legend-value {
+  color: $palette-neutral-1300;
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+}
+
+.widget-chart__legend-share {
+  min-inline-size: 34px;
+  color: $palette-neutral-800;
+  font-variant-numeric: tabular-nums;
+  text-align: end;
+}
+
+@container widget (max-width: 340px) {
+  .widget-chart--sliced {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .widget-chart__pie {
+    flex: 1;
+    block-size: auto;
+    min-block-size: 0;
+    max-inline-size: 100%;
+  }
+
+  .widget-chart__legend {
+    flex: none;
+    inline-size: 100%;
+    max-block-size: 40%;
+  }
+}
+
+// --- records table ----------------------------------------------------------------------------
+
+.widget-table {
+  flex: 1;
+  min-block-size: 0;
+  margin-block-start: -4px;
+  margin-inline: -$frame-padding;
+  overflow: auto;
+}
+
+.widget-table__table {
+  inline-size: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  font-size: 13px;
+  table-layout: fixed;
+}
+
+.widget-table__head,
+.widget-table__cell {
+  overflow: hidden;
+  padding-inline: 10px;
+  text-align: start;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-table__head {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  padding-block: 8px;
+  border-block-end: 1px solid $palette-neutral-200;
+  background-color: $white;
+  color: $palette-neutral-900;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.widget-table__cell {
+  padding-block: 9px;
+  border-block-end: 1px solid $palette-neutral-100;
+  color: $palette-neutral-1100;
+}
+
+.widget-table__head:first-child,
+.widget-table__cell:first-child {
+  padding-inline-start: $frame-padding;
+}
+
+// The first column is usually the row's name; give it room before the rest
+// share what is left.
+.widget-table__head:first-child {
+  inline-size: 34%;
+}
+
+.widget-table__head:last-child,
+.widget-table__cell:last-child {
+  padding-inline-end: $frame-padding;
+}
+
+.widget-table__row:hover .widget-table__cell {
+  background-color: $palette-neutral-50;
+}
+
+.widget-table__row:last-child .widget-table__cell {
+  border-block-end: 0;
+}
+
+.widget-table__cell--first {
+  color: $palette-neutral-1300;
+  font-weight: 500;
+}
+
+.widget-table__cell--end,
+.widget-table__head.widget-table__cell--end {
+  text-align: end;
+}
+
+.widget-table__number {
+  font-variant-numeric: tabular-nums;
+}
+
+.widget-table__pills {
+  display: inline-flex;
+  gap: 4px;
+  max-inline-size: 100%;
+  overflow: hidden;
+  vertical-align: middle;
+}
+
+.widget-pill,
+.widget-chip {
+  display: inline-block;
+  max-inline-size: 100%;
+  overflow: hidden;
+  font-size: 12px;
+  line-height: 18px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-pill {
+  padding-inline: 8px;
+  border-radius: 999px;
+}
+
+.widget-chip {
+  padding-inline: 6px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 6px;
+  background-color: $palette-neutral-100;
+}
+
+.widget-person {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.widget-person__avatar {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 20px;
+  block-size: 20px;
+  border-radius: 50%;
+  background-color: $color-primary-200;
+  color: $color-primary-700;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.widget-table__check {
+  color: $palette-green-800;
+  font-size: 16px;
+  vertical-align: middle;
+}
+
+.widget-table__uncheck,
+.widget-table__empty {
+  color: $palette-neutral-600;
+}
+
+.widget-table__rating {
+  color: $palette-yellow-600;
+  letter-spacing: 1px;
+}
+
+.widget-table__rating-rest {
+  color: $palette-neutral-300;
+}
+
+// --- agenda ------------------------------------------------------------------------------------
+
+.widget-agenda {
+  flex: 1;
+  min-block-size: 0;
+  margin-inline: -$frame-padding;
+  padding-inline: $frame-padding;
+  overflow: auto;
+}
+
+.widget-agenda__group + .widget-agenda__group {
+  margin-block-start: 10px;
+}
+
+.widget-agenda__group-title {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 1;
+  margin: 0;
+  padding-block: 2px 6px;
+  background-color: $white;
+  color: $palette-neutral-900;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.widget-agenda__list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.widget-agenda__item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-inline: -8px;
+  padding-block: 6px;
+  padding-inline: 8px;
+  border-radius: 8px;
+
+  &:hover {
+    background-color: $palette-neutral-50;
+  }
+}
+
+.widget-agenda__date {
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  inline-size: 40px;
+  block-size: 42px;
+  border-radius: 8px;
+  background-color: $palette-neutral-100;
+  color: $palette-neutral-1200;
+  line-height: 1;
+}
+
+.widget-agenda__day {
+  font-size: 16px;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+}
+
+.widget-agenda__month {
+  margin-block-start: 3px;
+  font-size: 10px;
+  opacity: 0.8;
+}
+
+.widget-agenda__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.widget-agenda__title,
+.widget-agenda__details {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.widget-agenda__title {
+  color: $palette-neutral-1300;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.widget-agenda__details {
+  color: $palette-neutral-900;
+  font-size: 12px;
+}
+
+.widget-agenda__due {
+  flex: none;
+  padding-block: 2px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  background-color: $palette-neutral-100;
+  color: $palette-neutral-1000;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.widget-agenda__item--overdue {
+  .widget-agenda__date,
+  .widget-agenda__due {
+    background-color: $palette-red-50;
+    color: $palette-red-900;
+  }
+}
+
+.widget-agenda__item--today {
+  .widget-agenda__date,
+  .widget-agenda__due {
+    background-color: $palette-yellow-100;
+    color: $palette-yellow-1100;
+  }
+}
+
+// --- text ------------------------------------------------------------------------------------
+
+.widget-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  box-sizing: border-box;
+  block-size: 100%;
+  min-block-size: 0;
+  padding-block: 16px;
+  padding-inline: $frame-padding;
+  overflow: hidden;
+  border-radius: 11px;
+}
+
+.widget-text__icon {
+  display: flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 32px;
+  block-size: 32px;
+  border-radius: 9px;
+  background-color: var(--accent-soft);
+  color: var(--accent-strong);
+  font-size: 17px;
+}
+
+.widget-text__content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  min-block-size: 0;
+  max-block-size: 100%;
+  min-inline-size: 0;
+}
+
+.widget-text__title.widget__header {
+  display: block;
+  flex: none;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  color: $palette-neutral-1300;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 22px;
+}
+
+.widget-text__body,
+.widget-text__placeholder {
+  margin-block: 6px 0;
+  margin-inline: 0;
+  font-size: 13px;
+  line-height: 21px;
+}
+
+.widget-text__body {
+  min-block-size: 0;
+  overflow: auto;
+  color: $palette-neutral-1100;
+  white-space: pre-line;
+}
+
+.widget-text__placeholder {
+  color: $palette-neutral-700;
+}
+
+// A section heading sits on the canvas: a strong title behind the accent bar,
+// its body a single quiet line.
+.widget-text--section {
+  align-items: center;
+  padding-block: 4px;
+  padding-inline: 2px;
+
+  .widget-text__content {
+    justify-content: center;
+    padding-inline-start: 12px;
+    border-inline-start: 4px solid var(--accent);
+  }
+
+  .widget-text__title.widget__header {
+    overflow: hidden;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 26px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .widget-text__body,
+  .widget-text__placeholder {
+    margin-block-start: 1px;
+    overflow: hidden;
+    color: $palette-neutral-900;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .widget-text__icon {
+    display: none;
+  }
+}
+
+.widget-text--callout {
+  background-color: var(--accent-soft);
+
+  .widget-text__icon {
+    background-color: var(--accent);
+    color: $white;
+  }
+
+  .widget-text__title.widget__header,
+  .widget-text__body {
+    color: var(--accent-strong);
+  }
+}
+
+// --- settings: appearance ----------------------------------------------------------------
+
+.widget-appearance-form__swatches {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.widget-appearance-form__swatch {
+  inline-size: 24px;
+  block-size: 24px;
+  padding: 0;
+  border: 2px solid $white;
+  border-radius: 50%;
+  background-color: var(--accent);
+  box-shadow: 0 0 0 1px $palette-neutral-300;
+  cursor: pointer;
+
+  &:focus-visible {
+    outline: 2px solid $color-primary-500;
+    outline-offset: 2px;
+  }
+}
+
+.widget-appearance-form__swatch--active {
+  box-shadow: 0 0 0 2px var(--accent);
+}
+
+.widget-appearance-form__icons {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 4px;
+}
+
+.widget-appearance-form__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  padding: 0;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  background: none;
+  color: $palette-neutral-1000;
+  font-size: 16px;
+  cursor: pointer;
+
+  &:hover {
+    background-color: $palette-neutral-100;
+  }
+}
+
+.widget-appearance-form__icon--active {
+  border-color: $color-primary-500;
+  background-color: $color-primary-100;
+  color: $color-primary-700;
+}
+
+.widget-appearance-form__affixes {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.widget-chart-types {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+.widget-chart-types__option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-block: 8px;
+  padding-inline: 4px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 8px;
+  background-color: $white;
+  color: $palette-neutral-1000;
+  font-size: 11px;
+  cursor: pointer;
+
+  i {
+    font-size: 18px;
+  }
+
+  &:hover {
+    border-color: $palette-neutral-500;
+  }
+}
+
+.widget-chart-types__option--active {
+  border-color: $color-primary-500;
+  background-color: $color-primary-100;
+  color: $color-primary-700;
+}
+
+// --- settings: chart data series (GroupedAggregateRowsDataSourceForm) ---------------------
+
+.grouped-aggregate-series {
+  margin-block-end: 12px;
+  padding-block-end: 4px;
+  border-block-end: 1px solid $palette-neutral-200;
+
+  &:last-of-type {
+    border-block-end: none;
+  }
+}
+
+.grouped-aggregate-series__limit {
+  color: $palette-neutral-700;
+  font-size: 12px;
+}

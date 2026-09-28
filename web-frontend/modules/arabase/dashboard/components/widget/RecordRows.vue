@@ -1,11 +1,16 @@
 <template>
-  <div class="widget-record-rows">
-    <table class="widget-record-rows__table">
+  <div class="widget-table">
+    <table class="widget-table__table">
       <thead>
         <tr>
-          <th v-for="field in fields" :key="field.id">{{ field.name }}</th>
-          <th v-if="trailingLabel" class="widget-record-rows__trailing">
-            {{ trailingLabel }}
+          <th
+            v-for="field in fields"
+            :key="field.id"
+            scope="col"
+            class="widget-table__head"
+            :class="{ 'widget-table__cell--end': alignsEnd(field) }"
+          >
+            {{ field.name }}
           </th>
         </tr>
       </thead>
@@ -13,17 +18,19 @@
         <tr
           v-for="(row, index) in rows"
           :key="row.id ?? index"
-          :class="{ 'widget-record-rows__row--flagged': flagged(row) }"
+          class="widget-table__row"
         >
           <td
-            v-for="field in fields"
+            v-for="(field, fieldIndex) in fields"
             :key="field.id"
-            :title="value(row, field)"
+            class="widget-table__cell"
+            :class="{
+              'widget-table__cell--first': fieldIndex === 0,
+              'widget-table__cell--end': alignsEnd(field),
+            }"
+            :title="text(row, field)"
           >
-            {{ value(row, field) }}
-          </td>
-          <td v-if="trailingLabel" class="widget-record-rows__trailing">
-            {{ trailing(row) }}
+            <RecordCell :cell="describe(row, field)" />
           </td>
         </tr>
       </tbody>
@@ -32,10 +39,22 @@
 </template>
 
 <script>
-import { formatRecordValue } from '@jadawel/modules/arabase/dashboard/recordValues'
+import RecordCell from '@jadawel/modules/arabase/dashboard/components/widget/RecordCell'
+import {
+  describeRecordValue,
+  formatRecordValue,
+} from '@jadawel/modules/arabase/dashboard/recordValues'
 
+const END_ALIGNED = ['number', 'count', 'rollup', 'autonumber', 'rating']
+
+/**
+ * The rows of a list widget as a compact read-only table. Cells render by field
+ * type (`describeRecordValue`): select options keep the colours the grid gives
+ * them, numbers line up at the end of the column.
+ */
 export default {
   name: 'RecordRows',
+  components: { RecordCell },
   props: {
     rows: {
       type: Array,
@@ -45,35 +64,16 @@ export default {
       type: Array,
       required: true,
     },
-    /**
-     * An extra right-hand column, used by the agenda widget for its due-date
-     * text. Kept as a callback so this component stays about layout only.
-     */
-    trailingLabel: {
-      type: String,
-      required: false,
-      default: null,
-    },
-    trailingValue: {
-      type: Function,
-      required: false,
-      default: null,
-    },
-    rowIsFlagged: {
-      type: Function,
-      required: false,
-      default: null,
-    },
   },
   methods: {
-    value(row, field) {
+    describe(row, field) {
+      return describeRecordValue(row[field.name], field, this.$i18n.locale)
+    },
+    text(row, field) {
       return formatRecordValue(row[field.name])
     },
-    trailing(row) {
-      return this.trailingValue ? this.trailingValue(row) : ''
-    },
-    flagged(row) {
-      return this.rowIsFlagged ? this.rowIsFlagged(row) : false
+    alignsEnd(field) {
+      return END_ALIGNED.includes(field.type)
     },
   },
 }

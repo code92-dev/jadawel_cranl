@@ -1,3 +1,6 @@
+import moment from '@jadawel/modules/core/moment'
+import { formatNumber } from '@jadawel/modules/arabase/dashboard/format'
+
 /**
  * Turns a dispatched row value into something printable in a widget list.
  *
@@ -53,6 +56,8 @@ export function resolveDisplayedFields(
     .map(([key, property]) => ({
       id: parseInt(key.replace('field_', ''), 10),
       name: property.title,
+      type: property.original_type || null,
+      metadata: property.metadata || {},
     }))
     .filter(({ name }) => !!name)
 
@@ -65,4 +70,97 @@ export function resolveDisplayedFields(
   return fieldIds
     .map((id) => named.find((field) => field.id === id))
     .filter((field) => field !== undefined)
+}
+
+const SELECT_TYPES = ['single_select', 'multiple_select']
+const LINK_TYPES = ['link_row']
+const PEOPLE_TYPES = [
+  'multiple_collaborators',
+  'created_by',
+  'last_modified_by',
+]
+const NUMBER_TYPES = ['number', 'count', 'rollup', 'autonumber']
+const DATE_TYPES = ['date', 'created_on', 'last_modified']
+
+/** A select option colour as a class suffix, or neutral if it is not one. */
+const optionColor = (color) =>
+  typeof color === 'string' && /^[a-z-]+$/.test(color) ? color : 'light-gray'
+
+const asList = (value) => (Array.isArray(value) ? value : [value])
+
+/**
+ * What a list widget cell shows, by field type: select options as coloured
+ * pills (the colours the grid shows), linked records and people as chips,
+ * numbers aligned and grouped, dates in the reader's language, booleans as a
+ * tick. Anything else falls back to `formatRecordValue` text.
+ *
+ * `field` carries the `type` and `metadata` `resolveDisplayedFields` read off
+ * the schema; the public dashboard may not have them, and gets text.
+ */
+export function describeRecordValue(value, field = {}, locale = 'en') {
+  const empty =
+    value === null ||
+    value === undefined ||
+    value === '' ||
+    (Array.isArray(value) && value.length === 0)
+  if (empty) {
+    return { kind: 'empty', text: '' }
+  }
+  const type = field.type
+  const metadata = field.metadata || {}
+
+  if (typeof value === 'boolean' || type === 'boolean') {
+    return { kind: 'boolean', value: value === true || value === 'true' }
+  }
+  if (SELECT_TYPES.includes(type)) {
+    return {
+      kind: 'pills',
+      items: asList(value)
+        .filter(Boolean)
+        .map((option) => ({
+          text: String(option.value ?? option.name ?? option),
+          color: optionColor(option.color),
+        })),
+    }
+  }
+  if (LINK_TYPES.includes(type)) {
+    return {
+      kind: 'chips',
+      items: asList(value).map((item) => ({ text: formatRecordValue(item) })),
+    }
+  }
+  if (PEOPLE_TYPES.includes(type)) {
+    return {
+      kind: 'people',
+      items: asList(value).map((person) => {
+        const text = formatRecordValue(person)
+        return { text, initial: text.trim().charAt(0).toUpperCase() }
+      }),
+    }
+  }
+  if (NUMBER_TYPES.includes(type) || type === 'rating') {
+    const decimals = Number.isInteger(metadata.number_decimal_places)
+      ? metadata.number_decimal_places
+      : null
+    const text = formatNumber(value, { locale, decimals })
+    if (text !== null) {
+      return type === 'rating'
+        ? { kind: 'rating', value: Number(value), max: metadata.max_value || 5 }
+        : { kind: 'number', text }
+    }
+  }
+  if (DATE_TYPES.includes(type)) {
+    const date = moment(value)
+    if (date.isValid()) {
+      const withTime =
+        metadata.date_include_time === true && String(value).includes('T')
+      return {
+        kind: 'date',
+        text: date
+          .locale(locale)
+          .format(withTime ? 'D MMM YYYY, HH:mm' : 'D MMM YYYY'),
+      }
+    }
+  }
+  return { kind: 'text', text: formatRecordValue(value) }
 }

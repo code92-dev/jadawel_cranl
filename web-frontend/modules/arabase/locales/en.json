@@ -75,10 +75,12 @@
     "noData": "There is nothing to chart yet",
     "misconfigured": "Fix the widget configuration to see the chart",
     "emptyGroup": "Empty",
-    "truncated": "Showing the first {count} groups"
+    "truncated": "Showing the first {count} groups",
+    "horizontalBar": "Horizontal bar chart",
+    "area": "Area chart",
+    "total": "Total"
   },
   "chartWidgetSettings": {
-    "appearance": "Appearance",
     "chartType": "Chart type",
     "showLegend": "Show legend"
   },
@@ -100,7 +102,12 @@
   "recordsListWidget": {
     "name": "Records list",
     "noRecords": "There are no records to show",
-    "misconfigured": "Fix the widget configuration to see the records"
+    "misconfigured": "Fix the widget configuration to see the records",
+    "count": {
+      "zero": "No records",
+      "one": "1 record",
+      "other": "{count} records"
+    }
   },
   "recordsListWidgetSettings": {
     "display": "Display"
@@ -112,7 +119,15 @@
   "progressWidget": {
     "name": "Progress",
     "misconfigured": "Fix the widget configuration to see the progress",
-    "ofTarget": "{value} of {target}"
+    "ofTarget": "{value} of {target}",
+    "gaugeName": "Goal gauge",
+    "target": "Target {target}",
+    "warningMark": "At risk below {value}%",
+    "status": {
+      "met": "Target met",
+      "onTrack": "On track",
+      "atRisk": "At risk"
+    }
   },
   "progressWidgetSettings": {
     "target": "Target",
@@ -124,13 +139,34 @@
     "warningThreshold": "At risk above",
     "successThreshold": "Met above",
     "thresholdHelp": "Percentages that decide the colour of the widget",
-    "thresholdError": "Must not be below the at-risk percentage"
+    "thresholdError": "Must not be below the at-risk percentage",
+    "gauge": "Gauge"
   },
   "upcomingDatesWidget": {
     "name": "Upcoming dates",
     "nothingDue": "Nothing is due in this period",
     "misconfigured": "Fix the widget configuration to see the agenda",
-    "overdueCount": "{count} overdue"
+    "overdue": {
+      "one": "1 overdue",
+      "other": "{count} overdue"
+    },
+    "group": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "week": "Next 7 days",
+      "later": "Later"
+    },
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "yesterday": "Yesterday",
+    "inDays": {
+      "one": "in 1 day",
+      "other": "in {count} days"
+    },
+    "daysAgo": {
+      "one": "1 day ago",
+      "other": "{count} days ago"
+    }
   },
   "listRowsDataSourceForm": {
     "data": "Data",
@@ -542,6 +578,113 @@
       "anthropic": "Claude models from Anthropic.",
       "ollama": "Models you run on your own server, so data never leaves it.",
       "openrouter": "Many providers' models through one OpenRouter key."
+    }
+  },
+  "widgetFrame": {
+    "misconfigured": "This widget is not set up yet",
+    "openSettings": "Select it to finish its settings",
+    "empty": "Nothing to show yet",
+    "openTable": "Open the table"
+  },
+  "kpiWidget": {
+    "name": "Key number",
+    "misconfigured": "Choose a table, a field and a calculation",
+    "caption": "{aggregation} of {field}"
+  },
+  "textWidget": {
+    "name": "Text",
+    "section": "Section heading",
+    "note": "Note",
+    "callout": "Callout",
+    "placeholder": "Add text in the widget's settings"
+  },
+  "textWidgetSettings": {
+    "content": "Content",
+    "style": "Style",
+    "body": "Text",
+    "bodyHelp": "Plain text. Line breaks are kept."
+  },
+  "widgetAppearance": {
+    "title": "Appearance",
+    "color": "Accent colour",
+    "icon": "Icon",
+    "noIcon": "No icon",
+    "prefix": "Before the number",
+    "suffix": "After the number",
+    "prefixPlaceholder": "e.g. $",
+    "suffixPlaceholder": "e.g. SAR, %",
+    "decimals": "Decimals",
+    "decimalsAuto": "Automatic",
+    "compact": "Short numbers (1.6M instead of 1,610,000)",
+    "stacked": "Stack the series",
+    "colors": {
+      "primary": "Workspace colour",
+      "blue": "Blue",
+      "cyan": "Cyan",
+      "green": "Green",
+      "yellow": "Amber",
+      "red": "Red",
+      "magenta": "Magenta",
+      "purple": "Purple",
+      "neutral": "Grey"
+    }
+  },
+  "widgetGallery": {
+    "title": "Add a widget",
+    "subtitle": "Pick what you want to show. You can change its data and look afterwards.",
+    "category": {
+      "numbers": "Numbers",
+      "charts": "Charts",
+      "lists": "Lists",
+      "text": "Text and layout"
+    },
+    "description": {
+      "kpi": "One number that matters: a total, a count or an average.",
+      "progress": "A number measured against a target, as a bar.",
+      "gauge": "Progress toward a goal on a half dial.",
+      "bar": "Compare categories side by side.",
+      "horizontalBar": "Rank categories; best for long names.",
+      "line": "How a value changes over time.",
+      "area": "A trend over time with its volume filled in.",
+      "doughnut": "Parts of a whole, with the total in the middle.",
+      "pie": "Parts of a whole, for a few categories.",
+      "recordsList": "The latest rows of a table or view.",
+      "upcomingDates": "An agenda of what is due soon and overdue.",
+      "section": "A heading that splits the dashboard into parts.",
+      "note": "Explain how to read the numbers.",
+      "callout": "Highlight something that needs attention."
+    }
+  },
+  "dashboardToolbar": {
+    "editHint": "Drag widgets to move them, drag a corner to resize",
+    "addWidget": "Add widget",
+    "updated": "Updated {time}",
+    "refresh": "Refresh the data"
+  },
+  "dashboardEmpty": {
+    "title": "Build your dashboard",
+    "text": "Add key numbers, charts, lists and notes. Each widget reads live from your tables.",
+    "readOnly": "This dashboard has no widgets yet.",
+    "addWidget": "Add your first widget"
+  },
+  "widgetChrome": {
+    "move": "Drag to move",
+    "size": "Size",
+    "delete": "Delete widget",
+    "resize": "Drag to resize"
+  },
+  "widgetSize": {
+    "width": "Width",
+    "height": "Height in rows",
+    "rows": "{count} rows high",
+    "current": "{width} × {height}",
+    "dragHint": "columns × rows. Drag the widget's corner for any size.",
+    "widths": {
+      "3": "¼",
+      "4": "⅓",
+      "6": "½",
+      "8": "⅔",
+      "12": "Full"
     }
   }
 }

@@ -1,3 +1,5 @@
+import { pluralKeys } from '@jadawel/modules/core/utils/plural'
+
 /**
  * What every arabase dashboard widget renders from: its data source and that
  * source's dispatched data, read through `storePrefix` so the same component
@@ -46,6 +48,47 @@ export default {
     },
     dataSourceMisconfigured() {
       return !!this.dataForDataSource?._error
+    },
+    /**
+     * Where the rows behind the widget live, for an "open the table" link.
+     * Only a signed-in member has the database in their sidebar; the public
+     * dashboard and templates have no route to offer.
+     */
+    sourceTableRoute() {
+      const tableId = this.dataSource?.table_id
+      if (!tableId || this.storePrefix !== '') {
+        return null
+      }
+      const applications = this.$store.getters['application/getAll'] || []
+      const database = applications.find(
+        (application) =>
+          application.type === 'database' &&
+          (application.tables || []).some((table) => table.id === tableId)
+      )
+      if (!database) {
+        return null
+      }
+      return {
+        name: 'database-table',
+        params: {
+          databaseId: database.id,
+          tableId,
+          viewId: this.dataSource.view_id || undefined,
+        },
+      }
+    },
+  },
+  methods: {
+    /**
+     * A counted message in the reader's plural form ("3 records", "3 سجلات").
+     * vue-i18n applies the English rule to Arabic, so the CLDR category is
+     * resolved first and names a plain key (see core/utils/plural.js).
+     */
+    counted(base, count) {
+      const keys = pluralKeys(base, this.$i18n.locale, count)
+      const key =
+        keys.find((candidate) => this.$te(candidate)) || keys[keys.length - 1]
+      return this.$t(key, { count })
     },
   },
 }
