@@ -316,8 +316,10 @@ panel shows both in the user's language.
 Limits come from the workspace's `SanadBudget` row; a limit left empty there
 falls back to `JADAWEL_SANAD_MONTHLY_TURN_LIMIT` /
 `JADAWEL_SANAD_MONTHLY_TOKEN_LIMIT` (docs/CONFIGURATION.md), and a dimension with
-neither is unlimited — today's behaviour, fine while only staff use Sanad. **Set
-the defaults before opening Sanad to workspace admins.**
+neither is unlimited. **Neither is set on purpose**: no deployment defines the
+variables and no workspace has a `SanadBudget` row, so Sanad is unlimited
+everywhere while usage is still recorded. Setting one later needs no code
+change.
 
 `GET /api/arabase/sanad/workspace/<id>/budget/` returns the limits in force and
 this month's `turns` and `tokens` to anyone who may use Sanad there; `PUT` sets
