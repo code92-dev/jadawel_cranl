@@ -113,10 +113,12 @@ def test_the_theme_properties_the_app_builder_skill_names_exist():
             text,
         )
     )
-    named -= {"page_parameters", "link_name"}
+    named -= {"page_parameters", "link_name", "input_text"}
     assert named, "the skill should name theme properties"
     assert named <= theme, named - theme
-    fonts = set(re.findall(r"`([a-z_]+)`", text.split("**Type:**")[1].split(".")[0]))
+    fonts = set(
+        re.findall(r"`([a-z_]+)`", text.split("**Fonts:**")[1].split("- **")[0])
+    )
     assert fonts == {
         "inter",
         "arial",

@@ -155,6 +155,27 @@ def _ordered_menu_items(items: list) -> list:
     ]
 
 
+BOX_STYLE_DESCRIPTION = (
+    "A box style from the editor's Style panel, in the app's theme colours: "
+    "'card' (the page's white card: 1 px border, 12 px corners, 24 px padding), "
+    "'tinted' (a soft panel in the primary colour, no border), 'outlined' "
+    "(border only) or 'plain' (no box). Box styles in `settings` win over it."
+)
+
+
+def _with_box_style(builder, key, settings: dict) -> dict:
+    """`settings` on top of the box style `key` computed for the app's theme."""
+
+    if not key:
+        return settings
+    from arabase.builder.box_styles import box_style
+    from jadawel.contrib.builder.api.theme.serializers import (
+        serialize_builder_theme,
+    )
+
+    return {**box_style(key, serialize_builder_theme(builder)), **settings}
+
+
 def _prepare(element_type, settings: dict) -> dict:
     settings = _as_formulas(element_type, settings)
     if isinstance(settings.get("menu_items"), list):
@@ -314,6 +335,9 @@ class AddPageElementInput(BaseModel):
     before_element_id: Optional[int] = Field(
         None, description="Insert before this element; omit to add at the end."
     )
+    box_style: Optional[Literal["plain", "card", "tinted", "outlined"]] = Field(
+        None, description=BOX_STYLE_DESCRIPTION
+    )
 
 
 def add_page_element(endpoint: SanadEndpoint, args: AddPageElementInput) -> dict:
@@ -329,7 +353,7 @@ def add_page_element(endpoint: SanadEndpoint, args: AddPageElementInput) -> dict
     if args.type in MULTI_PAGE_TYPES:
         page = page.builder.shared_page
     element_type = element_type_registry.get(args.type)
-    settings = dict(args.settings)
+    settings = _with_box_style(page.builder, args.box_style, dict(args.settings))
     # A menu is created empty and then given its items, as the editor does:
     # the menu type only accepts items on update.
     menu_items = settings.pop("menu_items", None) if args.type == "menu" else None
@@ -372,7 +396,12 @@ def add_page_element(endpoint: SanadEndpoint, args: AddPageElementInput) -> dict
 
 class UpdatePageElementInput(BaseModel):
     element_id: int = Field(..., description="The element to change.")
-    settings: dict = Field(..., description="Only the settings to change.")
+    settings: dict = Field(
+        default_factory=dict, description="Only the settings to change."
+    )
+    box_style: Optional[Literal["plain", "card", "tinted", "outlined"]] = Field(
+        None, description=BOX_STYLE_DESCRIPTION
+    )
 
 
 def update_page_element(endpoint: SanadEndpoint, args: UpdatePageElementInput):
@@ -387,10 +416,13 @@ def update_page_element(endpoint: SanadEndpoint, args: UpdatePageElementInput):
 
     element = _get_element(endpoint, args.element_id)
     element_type = element.get_type()
+    settings = _with_box_style(element.page.builder, args.box_style, args.settings)
+    if not settings:
+        raise ValueError("Give the settings to change or a box_style.")
     data = validate_data_custom_fields(
         element_type.type,
         element_type_registry,
-        _prepare(element_type, args.settings),
+        _prepare(element_type, settings),
         base_serializer_class=UpdateElementSerializer,
         serializer_class_context={"application_type": BuilderApplicationType},
         partial=True,
@@ -511,14 +543,28 @@ def get_app_theme(endpoint: SanadEndpoint, args: GetAppThemeInput) -> dict:
 
 class UpdateAppThemeInput(BaseModel):
     application_id: int = Field(..., description="The builder application.")
+    preset: Optional[Literal["jadawel", "ocean", "heritage", "sand", "stone"]] = Field(
+        None,
+        description="Apply a complete theme preset first: 'jadawel' (sage, the "
+        "product's own look, as on dashboards), 'ocean' (Jadawel blue), "
+        "'heritage' (deep green and gold, formal), 'sand' (terracotta, warm), "
+        "'stone' (steel navy, sober). `settings` are applied on top.",
+    )
+    content_language: Optional[Literal["ar", "en"]] = Field(
+        None,
+        description="The language the app's content is written in: 'ar' aligns "
+        "everything to the right and lays pages out right to left, 'en' to the "
+        "left. Defaults to 'ar' when a preset is given.",
+    )
     settings: dict = Field(
-        ...,
+        default_factory=dict,
         description="Theme properties to change, named as get_app_theme returns "
         "them, e.g. primary_color, body_font_family, heading_1_font_size.",
     )
 
 
 def update_app_theme(endpoint: SanadEndpoint, args: UpdateAppThemeInput) -> dict:
+    from arabase.builder.theme_presets import language_values, preset_theme
     from arabase.sanad.tools.base import get_application
     from jadawel.api.utils import validate_data
     from jadawel.contrib.builder.api.theme.serializers import (
@@ -532,15 +578,26 @@ def update_app_theme(endpoint: SanadEndpoint, args: UpdateAppThemeInput) -> dict
     )
     if unknown:
         raise ValueError(f"Unknown theme properties: {sorted(unknown)}.")
+    values = {}
+    if args.preset:
+        values.update(preset_theme(args.preset, args.content_language or "ar"))
+    elif args.content_language:
+        values.update(language_values(args.content_language))
+    values.update(args.settings)
+    if not values:
+        raise ValueError("Give a preset, a content_language or settings.")
     data = validate_data(
         CombinedThemeConfigBlocksRequestSerializer,
-        args.settings,
+        values,
         partial=True,
         return_validated=True,
     )
     with transaction.atomic():
         ThemeService().update_theme(endpoint.user, builder, **data)
-    return {"application_id": builder.id, "updated": sorted(data)}
+    result = {"application_id": builder.id, "updated": sorted(data)}
+    if args.preset:
+        result["preset"] = args.preset
+    return result
 
 
 def get_tools() -> list[SanadTool]:
@@ -599,7 +656,7 @@ def get_tools() -> list[SanadTool]:
         ),
         SanadTool(
             "update_app_theme",
-            "Change an app's theme properties.",
+            "Apply a theme preset or change an app's theme properties.",
             UpdateAppThemeInput,
             update_app_theme,
             skill=SKILL,

@@ -24,7 +24,8 @@ Always available:
 Available once this skill is loaded:
 - `list_page_elements` — what a page holds, its header/footer and data sources
 - `describe_page_element` — every element type, or one type's settings
-- `add_page_element`, `update_page_element`, `delete_page_element` (approval)
+- `add_page_element`, `update_page_element`, `delete_page_element` (approval);
+  both take `box_style` — the editor's Card, Tinted, Outlined or Plain box
 - `add_page_data_source` — many rows (`list_rows`) or one row (`get_row`)
 - `get_app_theme`, `update_app_theme` — colours, fonts, buttons, links, inputs,
   tables
@@ -55,7 +56,8 @@ with `:id` declares a page parameter; `create_page` tells you how to read it:
 
 ## 3. Build order
 
-1. `create_builder_application`, then `update_app_theme` (section 5).
+1. `create_builder_application`, then `update_app_theme` with a preset and the
+   content language (section 5).
 2. `create_page` for every page first, so links can point to them.
 3. The shell shared by all pages: a `header` (with a `menu`) and a `footer`.
 4. For each page: data sources, then content top to bottom.
@@ -68,7 +70,7 @@ with `:id` declares a page parameter; `create_page` tells you how to read it:
 
 `add_page_element` takes `type`, `settings`, and optionally
 `parent_element_id` (a container), `place_in_container` (a column index as
-text: '0', '1'…) and `before_element_id`.
+text: '0', '1'…), `before_element_id` and `box_style`.
 
 **Formula settings.** Texts, labels, URLs and values are formulas. At the top
 level of `settings`, plain text is taken literally, so `"value": "Our
@@ -77,77 +79,121 @@ projects"` works. Inside lists and objects, the formula ones are table column
 `'Open'`, read data with `get('…')`, combine with `concat()`. A menu item's
 `name` is plain text — write `"name": "الرئيسية"`, never `"'الرئيسية'"`.
 
-| Type | Key settings |
-|---|---|
-| `heading` | `value`, `level` 1–6 (one level 1 per page) |
-| `text` | `value`, `format` 'plain' or 'markdown' (lists, bold, links) |
-| `link` | `value` (label), `variant` 'link' or 'button', `navigation_type` 'page' + `navigate_to_page_id` + `page_parameters` [{`name`, `value`}], or 'custom' + `navigate_to_url`; `target` 'self'/'blank' |
-| `image` | `image_source_type` 'url', `image_url`, `alt_text` (always) |
-| `column` | `column_amount` 1–6, `layout_type` 'auto', '1:2', '2:1', '1:3', '3:1', '1:1:2', '2:1:1', '1:2:1'; `column_gap` (px), `alignment` 'top'/'center'/'bottom' |
-| `simple_container` | a box; style it as a card |
-| `repeat` | `data_source_id`, `items_per_page`; a card grid is `orientation` 'horizontal' with `items_per_row` {"desktop": 3, "tablet": 2, "smartphone": 1}, `horizontal_gap`, `vertical_gap` (px); its children form the card |
-| `table` | `data_source_id`, `items_per_page`, `fields` (columns) — or use `add_table_to_page` |
-| `header` / `footer` | `share_type` 'all', 'only' or 'except' with `pages`; placed on the shared page for you |
-| `menu` | `orientation`, `alignment`, `menu_items` [{`type` 'link', `name`, `variant`, `navigation_type`, `navigate_to_page_id` or `navigate_to_url`, `target`}] |
-| `iframe` | `source_type` 'url' + `url`, or 'embed' + `embed`; `height` |
-| `rating` | `value`, `max_value`, `rating_style` 'star'/'heart'/… |
-| `button` | runs actions the user adds in the editor; for navigation use a `link` with `variant: 'button'` |
+The elements, grouped as the editor's "Add element" gallery groups them:
 
-**Box styles** apply to every element: `style_padding_top/bottom/left/right`,
+| Group | Type | Key settings |
+|---|---|---|
+| Text and media | `heading` | `value`, `level` 1–6 (one level 1 per page) |
+| | `text` | `value`, `format` 'plain' or 'markdown' (lists, bold, links) |
+| | `image` | `image_source_type` 'url', `image_url`, `alt_text` (always) |
+| | `rating` | `value`, `max_value`, `rating_style` 'star'/'heart'/… |
+| | `iframe` | `source_type` 'url' + `url`, or 'embed' + `embed`; `height` |
+| Data | `table` | `data_source_id`, `items_per_page`, `fields` (columns) — or use `add_table_to_page` |
+| | `repeat` | `data_source_id`, `items_per_page`; a card grid is `orientation` 'horizontal' with `items_per_row` {"desktop": 3, "tablet": 2, "smartphone": 1}, `horizontal_gap`, `vertical_gap` (px); its children form each item |
+| Layout | `column` | `column_amount` 1–6, `layout_type` 'auto', '1:2', '2:1', '1:3', '3:1', '1:1:2', '2:1:1', '1:2:1'; `column_gap` (px), `alignment` 'top'/'center'/'bottom' |
+| | `simple_container` | a box that groups elements; give it a `box_style` |
+| | `header` / `footer` | `share_type` 'all', 'only' or 'except' with `pages`; placed on the shared page for you |
+| Navigation and actions | `menu` | `orientation`, `alignment`, `menu_items` [{`type` 'link', `name`, `variant`, `navigation_type`, `navigate_to_page_id` or `navigate_to_url`, `target`}] |
+| | `link` | `value` (label), `variant` 'link' or 'button', `navigation_type` 'page' + `navigate_to_page_id` + `page_parameters` [{`name`, `value`}], or 'custom' + `navigate_to_url`; `target` 'self'/'blank' |
+| | `button` | runs actions the user adds in the editor; for navigation use a `link` with `variant: 'button'` |
+| Forms | `form_container`, `input_text`, `choice`, `checkbox`, `datetime_picker`, `record_selector`, `rating_input` | build forms with `add_form_to_page` (section 7) rather than input by input |
+
+### Boxes
+
+Give boxes a **`box_style`**, the same four the editor's Style panel offers
+(and marks as chosen), computed from the app's theme:
+
+| `box_style` | Draws | Use for |
+|---|---|---|
+| `card` | the theme's white surface, a 1 px border, 12 px corners, 24 px padding | cards in a grid, a detail page's panels, a form's frame |
+| `tinted` | a soft panel of the primary colour (8 %), no border, 24 px padding | a hero, a callout ("what happens next"), a highlighted section |
+| `outlined` | a 1 px border, 12 px corners, no fill | quiet groupings, side notes |
+| `plain` | no box (the element's default) | undoing a box |
+
+`box_style` works on any element — a `text` with `tinted` is a callout — and
+anything in `settings` wins over it, so `"box_style": "card", "settings":
+{"style_padding_top": 32, …}` is a card with more room. Only reach for the raw
+box settings to adjust one: `style_padding_top/bottom/left/right`,
 `style_margin_top/bottom/left/right` (px), `style_border_<side>_size`,
 `style_border_<side>_color`, `style_border_radius`, `style_background`
 'none'/'color' with `style_background_color`, `style_background_radius`,
 `style_width` 'full', 'full-width', 'normal', 'medium', 'small'. Colours are
-`#rrggbbaa` or a theme name: 'primary', 'secondary', 'border', 'success',
-'warning', 'error', 'transparent'.
+the theme's names — 'primary', 'secondary', 'border', 'success', 'warning',
+'error', 'transparent' — or `#rrggbbaa`; prefer the names, which follow the
+theme when it changes.
 
-**Layout rules.**
+### Layout, as on Jadawel's dashboards
+
 - Use an 8-px spacing scale: 8, 16, 24, 32, 48, 64. Sections are separated by
   32–64 px; items inside a section by 8–16 px. Be consistent.
-- One idea per section: heading, one or two sentences, the content.
+- **Sections:** a level-2 heading, one sentence under it, then the content —
+  one idea per section. The preset's scale (32 / 24 / 19 / 16) keeps the steps
+  clear; don't enlarge body text to make a point.
+- **Cards in a row:** a `column` ('auto', 2–4 columns, `column_gap` 16–24)
+  with a `simple_container` `box_style: 'card'` in each column, or a `repeat`
+  whose child is a `simple_container` `box_style: 'card'` (the repeat itself
+  stays plain). Inside a card: a level-3 heading, one or two lines of text, a
+  link with `variant: 'button'` or `'link'`.
+- **A hero:** a `simple_container` `box_style: 'tinted'`, `style_width`
+  'full-width', padding 48–64: a level-1 heading, one sentence, one or two links
+  with `variant: 'button'`. Headings keep the theme's ink colour, so never put
+  them on a solid `primary` background.
+- **Key facts on a detail page:** a `column` of 3–4 `card` containers, each a
+  small `text` label ("Budget") above a level-3 `heading` reading the value.
+- **A callout:** a `text` (markdown) with `box_style: 'tinted'` — for "how to
+  use this page" or "what happens after you send the form".
 - Put related things side by side with a `column` (e.g. `layout_type` '2:1':
-  content and a side note); stack everything on small screens automatically.
-- Cards: a `simple_container` or a `repeat` item with `style_background`
-  'color', a light background, `style_border_radius` 8–12,
-  `style_padding_*` 16–24.
-- A hero: `style_width` 'full-width' container with the primary colour as
-  background, heading level 1, one line of text, a link with `variant: 'button'`.
+  content and a side note in an `outlined` box); columns stack on phones by
+  themselves.
 - Keep line length readable: text blocks in `style_width` 'medium'.
 
 ## 5. The visual system (theme)
 
 Set the theme once, before content; never style elements one by one when the
-theme can do it. Read it with `get_app_theme`; change it with
-`update_app_theme` using its property names.
+theme can do it. A new app already starts from the **Jadawel** preset, aligned
+for the language of the person who created it — the same look as Jadawel's
+dashboards: white cards and tables on a quiet page, 8 px buttons and inputs,
+12 px tables and images, a clear type scale, the sage accent for actions.
 
-- **Colour:** `primary_color` (brand, buttons, links), `secondary_color`
-  (accents), `border_color`, `main_success_color`, `main_warning_color`,
-  `main_error_color`, `page_background_color`. Colours are `#rrggbbaa`. Text
-  must contrast with its background (at least 4.5:1): dark text on light
-  backgrounds, white text only on dark primaries.
-- **Palettes that work:**
-  - Government / trust: primary `#0f5132ff`, secondary `#c9a227ff`, page `#f7f7f5ff`
-  - Corporate teal: primary `#0f766eff`, secondary `#f59e0bff`, page `#f8fafcff`
-  - Finance navy: primary `#1e3a8aff`, secondary `#0ea5e9ff`, page `#ffffffff`
-  - Health / calm: primary `#0e7490ff`, secondary `#22c55eff`, page `#f0fdfaff`
-- **Type:** fonts are `inter`, `arial`, `verdana`, `tahoma`, `trebuchet_ms`,
+**Start from a preset** with `update_app_theme(preset=…, content_language=…)`;
+it sets colours, fonts, buttons, links, inputs, tables, images, alignment and
+direction in one call. Then change only what the brief needs with `settings`
+(applied on top, in the same call if you like).
+
+| Preset | Look | Use for |
+|---|---|---|
+| `jadawel` | sage green on a quiet page (the default) | internal tools, anything that should feel like Jadawel |
+| `ocean` | the Jadawel logo blue | product and brand-facing apps |
+| `heritage` | deep green and gold on warm paper | government and public services, formal requests |
+| `sand` | terracotta and teal on sand | community, hospitality, people-facing apps |
+| `stone` | steel navy on cool grey | finance, reports, back-office tools |
+
+- **Content language decides alignment and direction.** `content_language:
+  'ar'` aligns headings, text, buttons, images and tables to the right and lays
+  the page out right to left (`page_direction: 'rtl'`), whatever language the
+  visitor's interface is in; `'en'` does the opposite. Write an Arabic app's
+  content in Arabic and pass `'ar'`; never mix alignments by hand.
+- **Fonts:** keep `inter`. It now falls back to IBM Plex Sans Arabic (the
+  font Jadawel's own interface uses) for Arabic letters, so one family serves
+  both scripts. Other fonts: `arial`, `verdana`, `tahoma`, `trebuchet_ms`,
   `times_new_roman`, `georgia`, `garamond`, `courier_new`, `brush_script_mt`.
-  **Inter has no Arabic letters: for Arabic apps use `tahoma` (or `arial`)
-  for `body_font_family`, every `heading_N_font_family`, `button_font_family`,
-  `link_font_family`, `label_font_family`, `input_font_family` and
-  `table_header_font_family`.** A clear scale: `heading_1_font_size` 30,
-  `heading_2_font_size` 22, `heading_3_font_size` 18, `body_font_size` 15.
-- **Arabic alignment:** alignment is physical. For Arabic content set
-  `body_text_alignment`, `heading_N_text_alignment`, `link_text_alignment`,
-  `button_alignment`, `button_text_alignment`, `image_alignment`,
-  `table_header_text_alignment` and `table_cell_alignment` to 'right' (keep
-  'center' where you want it); otherwise buttons and images sit on the left.
-- **Buttons and inputs:** `button_border_radius` 6–8,
-  `button_vertical_padding` 10, `button_horizontal_padding` 20,
-  `input_border_radius` equal to the buttons'. Consistent radii make an app
-  feel designed.
-- **Tables:** `table_header_background_color` a light tint of the primary,
-  `table_cell_alternate_background_color` a very light grey for zebra rows.
+- **Brand colour:** to match an organisation, start from the closest preset
+  and set `primary_color`, `button_background_color`,
+  `button_hover_background_color` (a step darker), `button_border_color` and
+  `link_text_color` to its colour (`#rrggbbaa`). Keep white text only on dark
+  enough colours (4.5:1 contrast); on a light brand colour set
+  `button_text_color` to a dark ink.
+- **All presets are light, keep pages light.** An element keeps the colours
+  it was given one by one: a card's white stays white under any theme, so a
+  dark page would leave white blocks. Change the look through the theme and
+  the box styles, not by colouring elements.
+- **Changing preset later:** `tinted` boxes were mixed from the old primary
+  colour; give them `box_style: 'tinted'` again with `update_page_element` so
+  they take the new one.
+- **Direction on its own:** `settings: {"page_direction": "rtl"}` ('rtl',
+  'ltr' or 'auto', which follows each visitor's language) fixes an app's
+  direction without touching its look.
+- Read the current theme with `get_app_theme` before changing parts of it.
 
 ## 6. Data on pages
 
@@ -204,7 +250,9 @@ reply within two working days"). To ask for more fields later, use
 - The header menu reaches every top-level page; links go where they say.
 - Every data element shows real rows (check with `list_page_elements` and the
   table's rows); nothing reads a field that does not exist.
-- Theme set: Arabic fonts and right alignment for Arabic content, consistent
-  radii and spacing, readable contrast.
+- Theme set: a preset for the content's language (right to left for Arabic),
+  only deliberate changes on top, readable contrast.
+- Boxes are box styles — cards are `card`, heroes and callouts `tinted` — with
+  no one-off colours or radii, and no heading on a solid colour.
 - Forms ask only for needed fields and say what happens after submitting.
 - Tell the user what you built, page by page, and to preview it.
