@@ -106,7 +106,8 @@ const { data: pageData, error } = await useAsyncData(
     } catch (e) {
       throw createError({
         statusCode: 404,
-        message: 'Automation workflow not found.',
+        // Jadawel fork: translated; upstream's message was English only.
+        message: t('automationWorkflow.notFound'),
       })
     }
   }

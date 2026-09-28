@@ -6,8 +6,8 @@
     "errorNodeNotConfigured": "يجب تكوين العقدة قبل أن يتم اختبارها.",
     "errorPreviousNodeNotConfigured": "يجب تكوين العقدة السابقة \"{node}\".",
     "errorPreviousNodesNotTested": "يجب اختبار العقدة السابقة \"{node}\" أولاً.",
-    "buttonLabelTest": "حدث الاختبار",
-    "buttonLabelTestAgain": "حدث الاختبار مرة أخرى",
+    "buttonLabelTest": "اختبار الحدث",
+    "buttonLabelTestAgain": "اختبار الحدث مرة أخرى",
     "testNodeDescription": "اختبر هذا الحدث للتأكد من صحة التكوين. يمكن استخدام البيانات من هذا الاختبار في خطوات لاحقة.",
     "buttonLabelShowPayload": "إظهار الحمولة",
     "buttonLabelShowError": "إظهار الخطأ",
@@ -37,7 +37,7 @@
     "routerWithOutputNodesReplaceError": "لا يمكن استبداله حتى تتم إزالة عقد الإخراج {outputCount} الخاصة به.",
     "iteratorWithChildrenNodesDeleteError": "لا يمكن حذفه حتى تتم إزالة العقد التابعة له.",
     "iteratorWithChildrenNodesReplaceError": "لا يمكن استبداله حتى تتم إزالة العقد الفرعية الخاصة به.",
-    "periodicTriggerLabel": "الزناد الدوري",
+    "periodicTriggerLabel": "جدول زمني",
     "aiAgent": "موجه الذكاء الاصطناعي",
     "slackWriteMessageName": "إرسال رسالة سلاك",
     "slackWriteMessageLabel": "أرسل رسالة إلى #{channel}"
@@ -62,14 +62,14 @@
     "displayTitle": "إنشاء عقدة الأتمتة"
   },
   "workflowNodeContext": {
-    "searchPlaceholderTrigger": "البحث عن محفز...",
+    "searchPlaceholderTrigger": "البحث عن حدث بدء...",
     "searchPlaceholderActions": "البحث عن الإجراءات...",
     "noResults": "لم يتم العثور على نتائج"
   },
   "serviceType": {
-    "periodicTrigger": "الزناد الدوري",
+    "periodicTrigger": "جدول زمني",
     "periodicTriggerDescription": "تشغيل سير العمل على أساس دوري على فترات زمنية محددة",
-    "periodicTriggerTriggeredAt": "أثار في",
+    "periodicTriggerTriggeredAt": "وقت التشغيل",
     "errorIntervalMissing": "مطلوب فاصل زمني.",
     "coreHTTPTrigger": "مشغل HTTP",
     "coreHTTPTriggerDescription": "تلقي طلبات HTTP لبدء سير العمل"
@@ -78,8 +78,8 @@
     "chooseEvent": "اختر حدثًا..."
   },
   "automationHeader": {
-    "startTestRun": "بدء تشغيل الاختبار",
-    "stopTestRun": "إيقاف تشغيل الاختبار",
+    "startTestRun": "بدء تشغيل تجريبي",
+    "stopTestRun": "إيقاف التشغيل التجريبي",
     "publishBtn": "نشر",
     "settingsBtn": "إعدادات",
     "historyBtn": "تاريخ",
@@ -120,7 +120,8 @@
     "showResult": "عرض النتيجة"
   },
   "automationWorkflow": {
-    "title": "سير العمل"
+    "title": "سير العمل",
+    "notFound": "لم يُعثر على سير العمل."
   },
   "automationWelcomeGuidedTourStep": {
     "title": "مرحبًا بك في جداول Automation!",

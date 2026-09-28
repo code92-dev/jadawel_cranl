@@ -5,6 +5,8 @@
       'workflow-node-content--selected': selected,
       'workflow-node-content--dragging': isDragging,
       'workflow-node-content--utility': nodeType.isUtilityNode,
+      'workflow-node-content--setup': isInteractionReady && isInError,
+      [`workflow-node-content--${step.tone}`]: true,
     }"
     :title="!isInError ? displayLabel : ''"
     :data-before-label="getDataBeforeLabel"
@@ -15,30 +17,34 @@
     @click="emit('select-node', node)"
   >
     <div v-if="isDraggable" class="workflow-node-content__drag-handle"></div>
-    <div class="workflow-node-content__icon">
-      <i
-        v-if="nodeType.iconClass"
-        :class="{
-          loading: loading,
-          'iconoir-hammer': !loading && !isInteractionReady,
-          [nodeType.iconClass]: !loading && isInteractionReady,
-        }"
-      ></i>
-      <img v-else :alt="nodeType.name" :src="nodeType.image" />
+    <!-- Jadawel fork: the step's category colour and icon, its number, a
+    plain-language subtitle and a "Needs setup" pill (stepCatalog.js). -->
+    <div
+      class="workflow-node-content__icon step-chip step-chip--large"
+      :class="`step-chip--${step.tone}`"
+    >
+      <i v-if="loading" class="loading"></i>
+      <img v-else-if="step.image" :alt="nodeType.name" :src="step.image" />
+      <i v-else :class="step.icon"></i>
+      <span v-if="stepNumber" class="workflow-node-content__number">{{
+        stepNumber
+      }}</span>
     </div>
 
-    <h1 class="workflow-node-content__title">{{ displayLabel }}</h1>
+    <div class="workflow-node-content__text">
+      <h1 class="workflow-node-content__title">{{ displayLabel }}</h1>
+      <div class="workflow-node-content__subtitle">{{ subtitle }}</div>
+    </div>
 
-    <Badge
+    <span
       v-if="isInteractionReady && isInError"
       :key="errorMessage"
       v-tooltip="errorMessage"
-      rounded
-      color="yellow"
-      size="large"
+      class="workflow-node-content__status"
     >
-      {{ $t('workflowNode.actionConfigure') }}
-    </Badge>
+      <i class="iconoir-warning-circle"></i>
+      {{ $t('stepPanel.needsSetup') }}
+    </span>
 
     <div
       v-if="isInteractionReady"
@@ -120,6 +126,11 @@ import { useVueFlow } from '@vue-flow/core'
 import WorkflowNodeContext from '@jadawel/modules/automation/components/workflow/WorkflowNodeContext'
 import flushPromises from 'flush-promises'
 import NodeGraphHandler from '@jadawel/modules/automation/utils/nodeGraphHandler'
+import {
+  orderedNodes,
+  stepEntry,
+  stepName,
+} from '@jadawel/modules/arabase/automation/stepCatalog'
 
 const { onMove } = useVueFlow()
 const props = defineProps({
@@ -202,6 +213,30 @@ const automation = inject('automation')
 
 const nodeType = computed(() => {
   return app.$registry.get('node', props.node.type)
+})
+
+// Jadawel fork: the step's place in the catalogue, its number in reading
+// order and a subtitle in plain words.
+const step = computed(() => stepEntry(nodeType.value))
+
+const stepNumber = computed(() => {
+  const index = orderedNodes(workflow.value).findIndex(
+    (node) => node.id === props.node.id
+  )
+  return index === -1 ? null : index + 1
+})
+
+const subtitle = computed(() => {
+  const name = stepName(
+    { $t: (...args) => app.$i18n.t(...args) },
+    nodeType.value
+  )
+  const category = app.$i18n.t(
+    `automationSteps.${
+      nodeType.value.isTrigger ? 'triggerCategories' : 'categories'
+    }.${step.value.category}`
+  )
+  return displayLabel.value === name ? category : `${name} · ${category}`
 })
 
 const isDraggable = computed(() => {

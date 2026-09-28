@@ -783,5 +783,255 @@
         "description": "A rounded border, no background."
       }
     }
+  },
+  "automationSteps": {
+    "search": "Search steps",
+    "noResults": "No step matches your search.",
+    "categories": {
+      "records": "Records",
+      "messages": "Messages",
+      "logic": "Logic",
+      "ai": "AI",
+      "web": "Web"
+    },
+    "triggerCategories": {
+      "records": "Table events",
+      "schedule": "Schedule",
+      "web": "Web"
+    },
+    "types": {
+      "local_jadawel_rows_created": {
+        "name": "When a row is added",
+        "description": "Starts each time a row is added to a table, by a person, a form or an import."
+      },
+      "local_jadawel_rows_updated": {
+        "name": "When a row changes",
+        "description": "Starts each time a row in a table is edited; limit it to the fields you care about."
+      },
+      "local_jadawel_rows_deleted": {
+        "name": "When a row is deleted",
+        "description": "Starts each time a row is deleted from a table."
+      },
+      "periodic": {
+        "name": "On a schedule",
+        "description": "Starts every few minutes, hourly, daily, weekly or monthly."
+      },
+      "http_trigger": {
+        "name": "When a web request arrives",
+        "description": "Starts when another system calls this workflow's web address."
+      },
+      "local_jadawel_create_row": {
+        "name": "Add a row",
+        "description": "Adds a row to any table, with values from earlier steps."
+      },
+      "local_jadawel_update_row": {
+        "name": "Update a row",
+        "description": "Changes fields of a row — the one that started the workflow, or another."
+      },
+      "local_jadawel_get_row": {
+        "name": "Find a row",
+        "description": "Looks up one row, by its ID or by a filter, to use its values."
+      },
+      "local_jadawel_list_rows": {
+        "name": "Find rows",
+        "description": "Looks up many rows — a view, a filter — to list or loop over."
+      },
+      "local_jadawel_aggregate_rows": {
+        "name": "Summarise rows",
+        "description": "Counts, sums or averages a field over a table or a view."
+      },
+      "local_jadawel_delete_row": {
+        "name": "Delete a row",
+        "description": "Deletes a row from a table."
+      },
+      "smtp_email": {
+        "name": "Send an email",
+        "description": "Sends an email written with values from earlier steps."
+      },
+      "slack_write_message": {
+        "name": "Post to Slack",
+        "description": "Posts a message to a Slack channel."
+      },
+      "router": {
+        "name": "Split into branches",
+        "description": "Takes a different path depending on a condition."
+      },
+      "iterator": {
+        "name": "Repeat for each item",
+        "description": "Runs the steps inside it once for every row or item in a list."
+      },
+      "ai_agent": {
+        "name": "Ask AI",
+        "description": "Has an AI model write, classify or extract, using earlier steps' values."
+      },
+      "http_request": {
+        "name": "Call a web address",
+        "description": "Sends a request to another system's API and uses its answer."
+      }
+    }
+  },
+  "automationRecipes": {
+    "categories": {
+      "notify": "Tell people",
+      "records": "Keep tables in order",
+      "schedule": "On a schedule",
+      "connect": "Connect and decide"
+    },
+    "recipes": {
+      "email_new_row": {
+        "name": "Email me when a row is added",
+        "description": "Get an email with the details of every new row.",
+        "labels": {
+          "trigger": "New row",
+          "step1": "Email the details"
+        }
+      },
+      "slack_new_row": {
+        "name": "Post new rows to Slack",
+        "description": "Each new row appears in a Slack channel, for the team to see.",
+        "labels": {
+          "trigger": "New row",
+          "step1": "Post to the channel"
+        }
+      },
+      "email_on_change": {
+        "name": "Email when a row changes",
+        "description": "Hear about it when a status, a date or an owner changes.",
+        "labels": {
+          "trigger": "Row changed",
+          "step1": "Email the change"
+        }
+      },
+      "email_related_person": {
+        "name": "Email the person in charge",
+        "description": "Look up the linked person — a manager, a client — and email them.",
+        "labels": {
+          "trigger": "New row",
+          "step1": "Find the person",
+          "step2": "Email them"
+        }
+      },
+      "task_for_new_row": {
+        "name": "Create a follow-up task",
+        "description": "Every new row gets a task in another table, ready to assign.",
+        "labels": {
+          "trigger": "New row",
+          "step1": "Create the follow-up task"
+        }
+      },
+      "archive_finished_rows": {
+        "name": "Archive finished rows",
+        "description": "When a row is marked done, copy it to an archive and remove it.",
+        "labels": {
+          "trigger": "Row marked done",
+          "step1": "Copy to the archive",
+          "step2": "Remove the row"
+        }
+      },
+      "log_deleted_rows": {
+        "name": "Keep a log of deleted rows",
+        "description": "A copy of every deleted row goes to a log table.",
+        "labels": {
+          "trigger": "Row deleted",
+          "step1": "Add it to the log"
+        }
+      },
+      "daily_digest": {
+        "name": "Daily digest",
+        "description": "Every morning at 8:00, the rows that need attention, in one email.",
+        "labels": {
+          "trigger": "Every morning",
+          "step1": "Find the rows",
+          "step2": "Email the digest"
+        }
+      },
+      "overdue_reminders": {
+        "name": "Remind about overdue rows",
+        "description": "Every morning, one reminder email for each overdue row.",
+        "labels": {
+          "trigger": "Every morning",
+          "step1": "Find overdue rows",
+          "step2": "For each row",
+          "step3": "Send the reminder"
+        }
+      },
+      "weekly_totals": {
+        "name": "Weekly totals",
+        "description": "Every Sunday at 8:00, an email with a count or a total from a table.",
+        "labels": {
+          "trigger": "Every week",
+          "step1": "Work out the total",
+          "step2": "Email the total"
+        }
+      },
+      "weekly_slack_summary": {
+        "name": "Weekly summary in Slack",
+        "description": "Every Sunday at 8:00, the week's total posted to a Slack channel.",
+        "labels": {
+          "trigger": "Every week",
+          "step1": "Work out the total",
+          "step2": "Post the summary"
+        }
+      },
+      "web_request_to_row": {
+        "name": "Save web requests as rows",
+        "description": "Another system sends data; each request becomes a row.",
+        "labels": {
+          "trigger": "Web request",
+          "step1": "Save it as a row"
+        }
+      },
+      "send_to_system": {
+        "name": "Send new rows to another system",
+        "description": "Each new row is sent to another system's web address.",
+        "labels": {
+          "trigger": "New row",
+          "step1": "Send it"
+        }
+      },
+      "route_by_value": {
+        "name": "Different steps for each status",
+        "description": "Branch on a field's value and add steps to each branch.",
+        "labels": {
+          "trigger": "Row changed",
+          "step1": "Choose the path"
+        }
+      },
+      "ai_fill_row": {
+        "name": "Let AI fill in new rows",
+        "description": "AI reads each new row and fills a field: a summary, a category, a reply.",
+        "labels": {
+          "trigger": "New row",
+          "step1": "Ask AI",
+          "step2": "Save the answer"
+        }
+      }
+    }
+  },
+  "workflowStart": {
+    "title": "How should this workflow start?",
+    "subtitle": "Pick a recipe for a working flow in one click — you only choose the tables and write the message — or choose the event yourself.",
+    "readOnly": "This workflow has no steps yet.",
+    "recipes": "Start from a recipe",
+    "events": "Or choose what starts it",
+    "steps": {
+      "one": "1 step",
+      "other": "{count} steps"
+    }
+  },
+  "workflowOverview": {
+    "setUpNext": "Set up next",
+    "progress": "{ready} of {total} steps set up",
+    "needsSetup": "{label} — needs setup",
+    "allReady": {
+      "one": "The step is set up",
+      "other": "All {count} steps are set up"
+    }
+  },
+  "stepPanel": {
+    "trigger": "Starts the workflow",
+    "step": "Step {number} of {total}",
+    "needsSetup": "Needs setup",
+    "ready": "Set up"
   }
 }

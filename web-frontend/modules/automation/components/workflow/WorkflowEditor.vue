@@ -31,17 +31,9 @@
         @move-node="emit('move-node', $event)"
         @duplicate-node="emit('duplicate-node', $event)"
       />
-      <template v-else>
-        <div class="workflow-editor__trigger-selector" @scroll.stop>
-          <h2 class="workflow-editor__trigger-selector-title">
-            {{ $t('workflowEditor.chooseEvent') }}
-          </h2>
-          <WorkflowAddNodeMenu
-            :only-trigger="true"
-            @change="emit('add-node', { type: $event })"
-          />
-        </div>
-      </template>
+      <!-- Jadawel fork: an empty workflow shows the start screen (recipes and
+      events) over the canvas, from AutomationWorkflowContent. -->
+      <div v-else class="workflow-editor__empty"></div>
     </template>
   </VueFlow>
 </template>
@@ -54,7 +46,6 @@ import { ref, computed, watch, toRef, inject, onMounted } from 'vue'
 import debounce from 'lodash/debounce'
 
 import WorkflowNode from '@jadawel/modules/automation/components/workflow/WorkflowNode'
-import WorkflowAddNodeMenu from '@jadawel/modules/automation/components/workflow/WorkflowAddNodeMenu'
 import NodeGraphHandler from '@jadawel/modules/automation/utils/nodeGraphHandler'
 
 const props = defineProps({
@@ -90,7 +81,7 @@ const workflow = inject('workflow')
 const workflowDebug = inject('workflowDebug')
 
 // Vue Flow setup
-const { onPaneClick } = useVueFlow()
+const { onPaneClick, fitView } = useVueFlow()
 const vueFlowEdges = []
 
 // Local state
@@ -147,6 +138,19 @@ watch(
     updateKey.value += 1
   },
   { deep: false }
+)
+
+/**
+ * Jadawel fork: the view was fitted to the empty workflow; once it gets its
+ * trigger (by hand or with a whole recipe) it is fitted again to the steps.
+ */
+watch(
+  () => trigger.value?.id,
+  (id, previous) => {
+    if (id && !previous) {
+      setTimeout(() => fitView({ maxZoom: 1, padding: 0.2 }), 700)
+    }
+  }
 )
 
 /**

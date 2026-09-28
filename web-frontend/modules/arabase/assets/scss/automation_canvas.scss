@@ -1,0 +1,755 @@
+// The automation editor, in the dashboards' design: step chips coloured by
+// category, step cards on a quiet canvas, the start screen with recipes, the
+// step gallery, the readiness bar and the step panel's header.
+// docs/AUTOMATION_REDESIGN.md explains the choices.
+
+// A standalone stylesheet registered by modules/arabase/module.js after core's
+// default.scss, so it restyles core's automation classes without editing them.
+// Logical properties only: this file is a hard-error zone for csstools/use-logical.
+@import '@jadawel/modules/core/assets/scss/colors';
+@import '@jadawel/modules/core/assets/scss/variables';
+
+$card-radius: 14px;
+$card-shadow:
+  0 1px 2px rgba(30, 36, 29, 0.05),
+  0 1px 1px rgba(30, 36, 29, 0.03);
+$card-shadow-raised:
+  0 6px 20px rgba(30, 36, 29, 0.08),
+  0 1px 3px rgba(30, 36, 29, 0.06);
+
+// One hue per job (stepCatalog.js `CATEGORY_TONES`): a tint behind the icon,
+// the icon in a deep step of the same hue.
+$tones: (
+  green: (
+    $palette-brand-100,
+    $palette-brand-700,
+  ),
+  amber: (
+    #fdefc8,
+    #8a5a00,
+  ),
+  blue: (
+    #dae4fd,
+    #2a5bd7,
+  ),
+  purple: (
+    #ece0fb,
+    #7a3fc2,
+  ),
+  magenta: (
+    #f9dcef,
+    #b0317f,
+  ),
+  cyan: (
+    #d3f1f4,
+    #11737f,
+  ),
+);
+
+// --- step chip ------------------------------------------------------------------
+
+.step-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 8px;
+  background-color: $palette-neutral-100;
+  color: $palette-neutral-1000;
+  font-size: 15px;
+
+  img {
+    inline-size: 60%;
+    block-size: 60%;
+    object-fit: contain;
+  }
+
+  &--large {
+    inline-size: 40px;
+    block-size: 40px;
+    border-radius: 11px;
+    font-size: 20px;
+  }
+
+  @each $tone, $colors in $tones {
+    &--#{$tone} {
+      background-color: nth($colors, 1);
+      color: nth($colors, 2);
+    }
+  }
+}
+
+// --- canvas -----------------------------------------------------------------------
+
+.automation-workflow__editor {
+  position: relative;
+  background-color: $palette-neutral-50;
+}
+
+// Upstream's "Last published" was near-white on the light header.
+.automation-header__last-published {
+  color: $palette-neutral-900;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+// --- step cards ---------------------------------------------------------------------
+
+.workflow-node-content {
+  gap: 14px;
+  padding-block: 14px;
+  padding-inline: 14px 10px;
+  border: 1px solid $palette-neutral-300;
+  border-radius: $card-radius;
+  box-shadow: $card-shadow;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: $card-shadow-raised;
+  }
+
+  &.workflow-node-content--selected {
+    border: 1px solid $color-primary-500;
+    box-shadow:
+      0 0 0 3px rgba(39, 128, 83, 0.14),
+      $card-shadow-raised;
+  }
+
+  // A step still to be set up carries an amber edge as well as its pill.
+  &.workflow-node-content--setup {
+    border-inline-start: 4px solid #e8a317;
+    padding-inline-start: 11px;
+  }
+
+  // "Starts when" / "Then" above the card.
+  &::before {
+    inset-block-start: -24px;
+    color: $palette-neutral-900;
+    font-size: 12px;
+    font-weight: 600;
+  }
+}
+
+.workflow-node-content__icon.step-chip {
+  position: relative;
+  padding: 0;
+  border: 0;
+  box-shadow: none;
+
+  &:has(img) {
+    padding: 0;
+  }
+}
+
+// The step's number, on the corner of its icon.
+.workflow-node-content__number {
+  position: absolute;
+  inset-block-start: -6px;
+  inset-inline-start: -6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-inline-size: 18px;
+  block-size: 18px;
+  padding-inline: 4px;
+  border: 2px solid $white;
+  border-radius: 999px;
+  background-color: $palette-neutral-1200;
+  color: $white;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.workflow-node-content__text {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.workflow-node-content__text .workflow-node-content__title {
+  margin: 0;
+  color: $palette-neutral-1300;
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.workflow-node-content__subtitle {
+  overflow: hidden;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 16px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.workflow-node-content__status {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 4px;
+  padding-block: 3px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  background-color: #fff4da;
+  color: #8a5a00;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+
+  i {
+    font-size: 13px;
+  }
+}
+
+.workflow-edge__dropzone-wrapper--with-next::after,
+.workflow-edge__label::after {
+  border-color: $palette-neutral-500;
+}
+
+.workflow-edge__label {
+  border-color: $palette-neutral-300;
+  background-color: $white;
+  color: $palette-neutral-1000;
+  font-weight: 600;
+}
+
+// --- start screen -------------------------------------------------------------------
+
+.workflow-editor__empty {
+  inline-size: 1px;
+  block-size: 1px;
+}
+
+.workflow-start {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  overflow-y: auto;
+  background-color: $palette-neutral-50;
+  background-image: radial-gradient(
+    circle,
+    rgba(126, 138, 124, 0.2) 1px,
+    transparent 1.3px
+  );
+  background-size: 18px 18px;
+}
+
+.workflow-start__inner {
+  box-sizing: border-box;
+  max-inline-size: 1080px;
+  margin: 0 auto;
+  padding-block: 40px 64px;
+  padding-inline: 32px;
+}
+
+.workflow-start__intro {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-block-end: 32px;
+  text-align: center;
+}
+
+.workflow-start__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 48px;
+  block-size: 48px;
+  margin-block-end: 14px;
+  border-radius: 14px;
+  background-color: $palette-brand-100;
+  color: $palette-brand-700;
+  font-size: 24px;
+  box-shadow: $card-shadow;
+}
+
+.workflow-start__title {
+  margin: 0;
+  color: $palette-neutral-1300;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 32px;
+}
+
+.workflow-start__subtitle {
+  max-inline-size: 62ch;
+  margin-block: 8px 0;
+  color: $palette-neutral-900;
+  font-size: 14px;
+  line-height: 22px;
+}
+
+.workflow-start__section + .workflow-start__section {
+  margin-block-start: 36px;
+}
+
+.workflow-start__section-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block: 0 14px;
+  color: $palette-neutral-1300;
+  font-size: 15px;
+  font-weight: 600;
+
+  i {
+    color: $palette-brand-500;
+    font-size: 17px;
+  }
+}
+
+.workflow-start__recipes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(236px, 1fr));
+  gap: 14px;
+}
+
+.recipe-card,
+.event-card {
+  border: 1px solid $palette-neutral-200;
+  border-radius: $card-radius;
+  background-color: $white;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+  box-shadow: $card-shadow;
+  transition:
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+.recipe-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+}
+
+// The recipe drawn as its steps: trigger → step → step.
+.recipe-card__flow {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-block-end: 8px;
+  padding: 10px;
+  border-radius: 10px;
+  background-color: $palette-neutral-50;
+}
+
+.recipe-card__arrow {
+  color: $palette-neutral-600;
+  font-size: 14px;
+
+  [dir='rtl'] & {
+    transform: scaleX(-1);
+  }
+}
+
+.recipe-card__loading {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+.recipe-card__name {
+  color: $palette-neutral-1300;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 20px;
+}
+
+.recipe-card__description {
+  flex: 1;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.recipe-card__meta {
+  color: $palette-neutral-800;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.workflow-start__group + .workflow-start__group {
+  margin-block-start: 18px;
+}
+
+.workflow-start__group-title {
+  margin-block: 0 8px;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.workflow-start__events {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+.event-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px;
+}
+
+.event-card__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.event-card__name {
+  color: $palette-neutral-1300;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.event-card__description {
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.recipe-card:disabled,
+.event-card:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.recipe-card:focus-visible,
+.recipe-card:enabled:hover,
+.event-card:focus-visible,
+.event-card:enabled:hover {
+  border-color: $color-primary-400;
+  box-shadow: $card-shadow-raised;
+  transform: translateY(-1px);
+}
+
+// --- step gallery -------------------------------------------------------------------
+
+.workflow-node__context.context {
+  inline-size: 420px;
+  padding: 0;
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.step-gallery__search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 10px;
+  padding-inline: 14px;
+  border-block-end: 1px solid $palette-neutral-200;
+  color: $palette-neutral-800;
+}
+
+.step-gallery__search-input {
+  flex: 1;
+  min-inline-size: 0;
+  border: 0;
+  background: transparent;
+  color: $palette-neutral-1300;
+  font: inherit;
+  font-size: 13px;
+  outline: none;
+}
+
+.step-gallery__sections {
+  // Sections' offsets are measured from the list, for the jump chips.
+  position: relative;
+  max-block-size: min(440px, 50vh);
+  overflow-y: auto;
+  padding-block: 6px 10px;
+}
+
+.step-gallery__section-title {
+  margin-block: 10px 4px;
+  padding-inline: 14px;
+  color: $palette-neutral-800;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.step-gallery__item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  inline-size: 100%;
+  padding-block: 8px;
+  padding-inline: 14px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  text-align: start;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    background-color: $palette-neutral-50;
+  }
+}
+
+.step-gallery__text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-inline-size: 0;
+}
+
+.step-gallery__name {
+  color: $palette-neutral-1300;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.step-gallery__description {
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 17px;
+}
+
+.step-gallery__empty {
+  margin: 0;
+  padding-block: 24px;
+  padding-inline: 14px;
+  color: $palette-neutral-900;
+  font-size: 13px;
+  text-align: center;
+}
+
+// --- readiness bar ------------------------------------------------------------------
+
+.workflow-overview {
+  position: absolute;
+  inset-block-end: 18px;
+  inset-inline-start: 50%;
+  z-index: 4;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  max-inline-size: calc(100% - 180px);
+  padding-block: 7px;
+  padding-inline: 8px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 999px;
+  background-color: $white;
+  box-shadow: $card-shadow-raised;
+  transform: translateX(-50%);
+
+  [dir='rtl'] & {
+    transform: translateX(50%);
+  }
+}
+
+// A ring that fills as steps are set up.
+.workflow-overview__meter {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  inline-size: 30px;
+  block-size: 30px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle closest-side, $white 0 72%, transparent 73%),
+    conic-gradient(
+      #e8a317 0 var(--progress),
+      $palette-neutral-200 var(--progress) 100%
+    );
+  color: #8a5a00;
+  font-size: 14px;
+
+  .workflow-overview--ready & {
+    background:
+      radial-gradient(circle closest-side, $white 0 72%, transparent 73%),
+      conic-gradient($palette-brand-500 0 100%);
+    color: $palette-brand-700;
+  }
+}
+
+.workflow-overview__status {
+  flex: none;
+  color: $palette-neutral-1200;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.workflow-overview__steps {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-inline-size: 0;
+  overflow-x: auto;
+  padding-block: 4px;
+  padding-inline: 4px;
+}
+
+.workflow-overview__arrow {
+  flex: none;
+  color: $palette-neutral-500;
+  font-size: 12px;
+
+  [dir='rtl'] & {
+    transform: scaleX(-1);
+  }
+}
+
+.workflow-overview__step {
+  position: relative;
+  border: 0;
+  cursor: pointer;
+  transition: box-shadow 0.15s ease;
+
+  &:hover {
+    box-shadow: 0 0 0 2px $palette-neutral-300;
+  }
+
+  &--selected,
+  &--selected:hover {
+    box-shadow: 0 0 0 2px $color-primary-500;
+  }
+
+  // A dot for each step still to set up.
+  &--setup::after {
+    content: '';
+    position: absolute;
+    inset-block-start: -3px;
+    inset-inline-end: -3px;
+    inline-size: 9px;
+    block-size: 9px;
+    border: 2px solid $white;
+    border-radius: 50%;
+    background-color: #e8a317;
+  }
+}
+
+.workflow-overview__next {
+  flex: none;
+  border-radius: 999px;
+}
+
+// --- step panel header -----------------------------------------------------------------
+
+.step-panel-header {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  margin-block: -16px 16px;
+  margin-inline: -16px;
+  padding: 16px;
+  border-block-end: 1px solid $palette-neutral-200;
+  background-color: $palette-neutral-25;
+}
+
+.step-panel-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-inline-size: 0;
+}
+
+.step-panel-header__eyebrow {
+  color: $palette-neutral-800;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.step-panel-header__name {
+  color: $palette-neutral-1300;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 22px;
+}
+
+.step-panel-header__description {
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 18px;
+}
+
+.step-panel-header__status {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  gap: 5px;
+  margin-block-start: 6px;
+  padding-block: 3px;
+  padding-inline: 8px;
+  border-radius: 999px;
+  background-color: $palette-brand-50;
+  color: $palette-brand-700;
+  font-size: 11px;
+  font-weight: 600;
+
+  &--setup {
+    background-color: #fff4da;
+    color: #8a5a00;
+  }
+}
+
+.step-gallery__jumps {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-block: 10px;
+  padding-inline: 14px;
+  border-block-end: 1px solid $palette-neutral-200;
+}
+
+.step-gallery__jump {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  block-size: 26px;
+  padding-inline: 10px;
+  border: 1px solid $palette-neutral-300;
+  border-radius: 999px;
+  background-color: $white;
+  color: $palette-neutral-1100;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $color-primary-400;
+  }
+}
+
+.step-gallery__jump-dot {
+  inline-size: 8px;
+  block-size: 8px;
+  border-radius: 50%;
+  background-color: currentcolor;
+}
+
+.recipe-card__loop {
+  display: inline-flex;
+  gap: 4px;
+  padding: 3px;
+  border: 1px dashed $palette-neutral-500;
+  border-radius: 10px;
+}

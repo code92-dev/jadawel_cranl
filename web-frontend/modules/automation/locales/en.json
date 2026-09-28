@@ -1,6 +1,7 @@
 {
   "automationWorkflow": {
-    "title": "Workflow"
+    "title": "Workflow",
+    "notFound": "Automation workflow not found."
   },
   "automationWelcomeGuidedTourStep": {
     "title": "Welcome to Jadawel Automations!",

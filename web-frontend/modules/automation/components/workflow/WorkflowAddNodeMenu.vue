@@ -1,40 +1,20 @@
 <template>
-  <ul class="context__menu">
-    <li
-      v-for="nodeType in nodeTypes"
-      :key="nodeType.getType()"
-      class="context__menu-item"
-    >
-      <a
-        class="context__menu-item-link context__menu-item-link--with-desc"
-        @click="onChange(nodeType.getType())"
-      >
-        <span class="context__menu-item-title" :title="nodeType.name">
-          <i
-            v-if="!nodeType.image"
-            class="context__menu-item-icon"
-            :class="nodeType.iconClass"
-          />
-          <img
-            v-else
-            :alt="nodeType.name"
-            :src="nodeType.image"
-            class="context__menu-item-icon"
-          />
-          {{ nodeType.name }}
-        </span>
-        <div class="context__menu-item-description">
-          {{ nodeType.description }}
-        </div>
-      </a>
-    </li>
-  </ul>
+  <!-- Jadawel fork: steps grouped by purpose, in plain words
+  (modules/arabase/automation/stepCatalog.js). -->
+  <StepGallery
+    :node-types="nodeTypes"
+    :trigger="editingTriggerNode"
+    @select="onChange"
+  />
 </template>
 
 <script>
 import context from '@jadawel/modules/core/mixins/context'
+import StepGallery from '@jadawel/modules/arabase/automation/components/StepGallery'
+
 export default {
   name: 'WorkflowNodeContext',
+  components: { StepGallery },
   mixins: [context],
   props: {
     node: {

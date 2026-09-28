@@ -26,6 +26,22 @@
             @move-node="handleMoveNode"
             @duplicate-node="handleDuplicateNode"
           />
+          <!-- Jadawel fork: recipes and events for an empty workflow, and the
+          readiness bar over a started one (docs/AUTOMATION_REDESIGN.md). -->
+          <WorkflowStart
+            v-if="!hasTrigger"
+            :read-only="isReadOnly"
+            :busy="buildingRecipe"
+            @recipe="handleRecipe"
+            @add-trigger="handleAddNode({ type: $event })"
+          />
+          <WorkflowOverview
+            v-else
+            :workflow="workflow"
+            :automation="automation"
+            :selected-id="selectedNodeId"
+            @select="selectedNodeId = $event"
+          />
         </client-only>
       </div>
       <div v-if="activeSidePanel" class="automation-workflow__side-panel">
@@ -44,6 +60,12 @@ import { ref, computed, provide } from 'vue'
 import AutomationHeader from '@jadawel/modules/automation/components/AutomationHeader'
 import WorkflowEditor from '@jadawel/modules/automation/components/workflow/WorkflowEditor'
 import EditorSidePanels from '@jadawel/modules/automation/components/workflow/EditorSidePanels'
+import WorkflowStart from '@jadawel/modules/arabase/automation/components/WorkflowStart'
+import WorkflowOverview from '@jadawel/modules/arabase/automation/components/WorkflowOverview'
+import {
+  buildRecipe,
+  recipeLabelKeys,
+} from '@jadawel/modules/arabase/automation/recipes'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
 
 const props = defineProps({
@@ -65,10 +87,11 @@ const props = defineProps({
   },
 })
 
-const { $store, $registry, $hasPermission } = useNuxtApp()
+const { $store, $registry, $hasPermission, $client, $i18n } = useNuxtApp()
 
 // Local state
 const isAddingNode = ref(false)
+const buildingRecipe = ref(null)
 const workflowDebug = ref(false)
 
 // Computed properties
@@ -80,6 +103,14 @@ const workflowNodes = computed(() => {
   }
   return $store.getters['automationWorkflowNode/getNodes'](props.workflow)
 })
+
+const hasTrigger = computed(() =>
+  workflowNodes.value.some(
+    (node) =>
+      $registry.exists('node', node.type) &&
+      $registry.get('node', node.type).isTrigger
+  )
+)
 
 const activeSidePanel = computed(() => {
   return $store.getters['automationWorkflow/getActiveSidePanel']
@@ -150,6 +181,25 @@ async function handleAddNode({ type, referenceNode, position, output }) {
   } catch (err) {
     notifyIf(err, 'automation')
   } finally {
+    isAddingNode.value = false
+  }
+}
+
+async function handleRecipe(recipe) {
+  buildingRecipe.value = recipe.key
+  isAddingNode.value = true
+  try {
+    await buildRecipe({
+      store: $store,
+      client: $client,
+      workflow: props.workflow,
+      recipe,
+      labels: recipeLabelKeys(recipe).map((key) => $i18n.t(key)),
+    })
+  } catch (err) {
+    notifyIf(err, 'automation')
+  } finally {
+    buildingRecipe.value = null
     isAddingNode.value = false
   }
 }

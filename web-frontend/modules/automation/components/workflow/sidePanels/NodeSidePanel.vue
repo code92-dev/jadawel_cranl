@@ -3,6 +3,9 @@
     v-if="node"
     :read-only="!$hasPermission('automation.node.update', node, workspace.id)"
   >
+    <!-- Jadawel fork: which step this is, in plain words, and whether it is
+    set up. -->
+    <StepPanelHeader :node="node" :workflow="workflow" />
     <FormGroup
       class="margin-bottom-1"
       :label="$t('nodeSidePanel.labelTitle')"
@@ -43,6 +46,7 @@ import { useStore } from 'vuex'
 import useVuelidate from '@vuelidate/core'
 import { reactive, ref } from 'vue'
 import ReadOnlyForm from '@jadawel/modules/core/components/ReadOnlyForm'
+import StepPanelHeader from '@jadawel/modules/arabase/automation/components/StepPanelHeader'
 import AutomationBuilderFormulaInput from '@jadawel/modules/automation/components/AutomationBuilderFormulaInput'
 import SimulateDispatchNodeForm from '@jadawel/modules/automation/components/form/SimulateDispatchNodeForm'
 import { DATA_PROVIDERS_ALLOWED_NODE_ACTIONS } from '@jadawel/modules/automation/enums'
