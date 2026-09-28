@@ -26,10 +26,13 @@ test.describe("Automation workflow test suite", () => {
       "Ensure the default automation name is displayed in the sidebar."
     ).toBeVisible();
 
-    const chooseTriggerTitle = page.getByText("Choose an event...");
+    // The start screen (recipes and events) of an empty workflow.
+    const chooseTriggerTitle = page.getByText(
+      "How should this workflow start?"
+    );
     await expect(
       chooseTriggerTitle,
-      "Ensure the trigger chooser is visible."
+      "Ensure the start screen is visible."
     ).toBeVisible();
   });
 
@@ -53,10 +56,13 @@ test.describe("Automation workflow test suite", () => {
       "Ensure the duplicated workflow is displayed in the sidebar."
     ).toBeVisible();
 
-    const chooseTriggerTitle = page.getByText("Choose an event...");
+    // The start screen (recipes and events) of an empty workflow.
+    const chooseTriggerTitle = page.getByText(
+      "How should this workflow start?"
+    );
     await expect(
       chooseTriggerTitle,
-      "Ensure the trigger chooser is visible."
+      "Ensure the start screen is visible."
     ).toBeVisible();
   });
 
@@ -89,10 +95,13 @@ test.describe("Automation workflow test suite", () => {
       "Ensure the renamed workflow is displayed in the sidebar."
     ).toBeVisible();
 
-    const chooseTriggerTitle = page.getByText("Choose an event...");
+    // The start screen (recipes and events) of an empty workflow.
+    const chooseTriggerTitle = page.getByText(
+      "How should this workflow start?"
+    );
     await expect(
       chooseTriggerTitle,
-      "Ensure the trigger chooser is visible."
+      "Ensure the start screen is visible."
     ).toBeVisible();
   });
 

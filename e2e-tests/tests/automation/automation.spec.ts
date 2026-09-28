@@ -26,10 +26,13 @@ test.describe("Automation application test suite", () => {
       "Ensure the workflow is visible."
     ).toBeVisible();
 
-    const chooseTriggerTitle = page.getByText("Choose an event...");
+    // The start screen (recipes and events) of an empty workflow.
+    const chooseTriggerTitle = page.getByText(
+      "How should this workflow start?"
+    );
     await expect(
       chooseTriggerTitle,
-      "Ensure the trigger chooser is visible."
+      "Ensure the start screen is visible."
     ).toBeVisible();
   });
 

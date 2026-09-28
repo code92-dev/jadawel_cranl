@@ -17,10 +17,11 @@ test.describe("Automation node test suite", () => {
 
     await automationWorkflowPage.goto();
 
-    // Exact: the configuration panel of the node also contains the sentence
-    // "The node must be configured before it can be tested".
-    const startsWhen = page.getByText("Configure", { exact: true });
-    await expect(startsWhen).toBeVisible();
+    // The unconfigured trigger's card says so.
+    const needsSetup = page
+      .locator(".workflow-node-content__status")
+      .getByText("Needs setup");
+    await expect(needsSetup).toBeVisible();
   });
 
   test("Can create an automation node", async ({ page }) => {
@@ -29,7 +30,11 @@ test.describe("Automation node test suite", () => {
     });
     await createNodeButton.click();
 
-    const rowsCreatedOption = page.getByText("Create a row");
+    // The step gallery names steps in plain words; the card keeps the
+    // service's label.
+    const rowsCreatedOption = page
+      .locator(".step-gallery__item")
+      .getByText("Add a row", { exact: true });
     await expect(rowsCreatedOption).toBeVisible();
     await rowsCreatedOption.click();
 

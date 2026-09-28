@@ -1229,7 +1229,9 @@ def test_import_export_link_row_field(data_fixture):
         imported_workspace, exported_applications, BytesIO(), config, None
     )
     imported_database = imported_applications[0]
-    imported_tables = imported_database.table_set.all()
+    # Jadawel fork: ordered by id, so "Example" comes before "Customers"; the
+    # tables share an `order`, and unordered they came back either way.
+    imported_tables = imported_database.table_set.order_by("id")
     imported_table = imported_tables[0]
     imported_customers_table = imported_tables[1]
     imported_customers_table_views = imported_customers_table.view_set.all()

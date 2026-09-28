@@ -60,8 +60,11 @@ test.describe("Builder page test suite", () => {
   });
 
   test("Can create an element from empty page", async ({ page }) => {
-    await page.getByText("Click to create an element").click();
-    await page.getByText("Heading", { exact: true }).click();
+    await page.locator(".page-empty").getByText("Add an element").click();
+    await page
+      .locator(".modal__box")
+      .getByText("Heading", { exact: true })
+      .click();
 
     await expect(
       page.locator(".modal__box").getByText("Add new element"),
@@ -77,11 +80,24 @@ test.describe("Builder page test suite", () => {
       .locator(".elements-context")
       .getByText("Element", { exact: true })
       .click();
-    await page.getByText("Heading", { exact: true }).click();
+    await page
+      .locator(".modal__box")
+      .getByText("Heading", { exact: true })
+      .click();
 
     await expect(
       page.locator(".modal__box").getByText("Add new element"),
     ).toBeHidden();
+    await expect(
+      page.locator(".element-preview__name-tag").getByText("Heading"),
+    ).toBeVisible();
+  });
+
+  test("Can create an element from the empty page's quick starts", async ({
+    page,
+  }) => {
+    await page.locator(".page-empty__start").getByText("Heading").click();
+
     await expect(
       page.locator(".element-preview__name-tag").getByText("Heading"),
     ).toBeVisible();
