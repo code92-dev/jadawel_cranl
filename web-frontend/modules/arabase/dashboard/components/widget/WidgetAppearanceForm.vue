@@ -92,6 +92,20 @@
             />
           </FormGroup>
         </div>
+        <p class="widget-appearance-form__riyal">
+          <button
+            type="button"
+            class="widget-appearance-form__riyal-button"
+            :class="{
+              'widget-appearance-form__riyal-button--active': riyalChosen,
+            }"
+            :title="$t('widgetAppearance.riyal')"
+            @click="chooseRiyal"
+          >
+            {{ riyalSign }}
+          </button>
+          {{ $t('widgetAppearance.riyalHint') }}
+        </p>
         <FormGroup
           :label="$t('widgetAppearance.decimals')"
           class="margin-bottom-2"
@@ -145,7 +159,11 @@ import {
   appearanceOf,
   iconOf,
 } from '@jadawel/modules/arabase/dashboard/appearance'
-import { formatNumber } from '@jadawel/modules/arabase/dashboard/format'
+import {
+  SAUDI_RIYAL,
+  formatNumber,
+  isRiyal,
+} from '@jadawel/modules/arabase/dashboard/format'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
 
 /**
@@ -202,6 +220,12 @@ export default {
     currentIcon() {
       return iconOf(this.widget)
     },
+    riyalSign() {
+      return SAUDI_RIYAL
+    },
+    riyalChosen() {
+      return isRiyal(this.appearance.suffix) || isRiyal(this.appearance.prefix)
+    },
     currentDecimals() {
       return Number.isInteger(this.appearance.decimals)
         ? this.appearance.decimals
@@ -220,6 +244,12 @@ export default {
         decimals,
         locale: this.$i18n.locale,
       })
+    },
+    /** Amounts in riyals: the unit is stored as ر.س and drawn as the sign. */
+    chooseRiyal() {
+      this.prefix = ''
+      this.suffix = 'ر.س'
+      this.set({ prefix: null, suffix: 'ر.س' })
     },
     commitAffixes() {
       const prefix = this.prefix.trim()

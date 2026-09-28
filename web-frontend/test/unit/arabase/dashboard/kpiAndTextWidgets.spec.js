@@ -63,7 +63,7 @@ describe('KpiWidget', () => {
       widget: { appearance: { compact: true, suffix: 'SAR', decimals: 2 } },
     })
 
-    expect(value(wrapper)).toBe('1.61M SAR')
+    expect(value(wrapper)).toBe('\u20C1\u00A01.61M')
   })
 
   test('a value its field formats itself is kept as it is', async () => {
@@ -92,6 +92,14 @@ describe('KpiWidget', () => {
     )
     expect(wrapper.find('.widget-frame').classes()).toContain(
       'widget-accent--blue'
+    )
+  })
+
+  test('riyal abbreviations in the title become the sign', async () => {
+    const wrapper = await mountKpi({ widget: { title: 'Budget (SAR)' } })
+
+    expect(wrapper.find('.widget-frame__title').text()).toBe(
+      '\u2068Budget (\u20C1)\u2069'
     )
   })
 

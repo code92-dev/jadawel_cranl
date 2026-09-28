@@ -627,7 +627,9 @@
       "magenta": "Magenta",
       "purple": "Purple",
       "neutral": "Grey"
-    }
+    },
+    "riyal": "Saudi riyal",
+    "riyalHint": "Amounts in riyals: ر.س, SAR or ﷼ before or after the number show as the Saudi riyal sign."
   },
   "widgetGallery": {
     "title": "Add a widget",

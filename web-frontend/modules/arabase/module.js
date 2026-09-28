@@ -39,6 +39,7 @@ export default defineNuxtModule({
     // Global RTL / Arabic-first stylesheet. Pushed after core's default.scss
     // (core registers in its own module setup) so it can layer on top. See 1.2.
     nuxt.options.css.push(resolve('./assets/scss/arabase.scss'))
+    nuxt.options.css.push(resolve('./assets/scss/saudi_riyal.scss'))
     nuxt.options.css.push(resolve('./assets/scss/dashboard_canvas.scss'))
     nuxt.options.css.push(resolve('./assets/scss/dashboard_widgets.scss'))
     nuxt.options.css.push(resolve('./assets/scss/admin_backup.scss'))

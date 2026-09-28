@@ -13,8 +13,8 @@
       </span>
       <div class="widget-frame__heading">
         <div class="widget-frame__title-row">
-          <h3 class="widget-frame__title" :title="widget.title">
-            {{ widget.title }}
+          <h3 class="widget-frame__title" :title="title">
+            {{ title }}
           </h3>
           <Badge
             v-if="misconfigured && !loading"
@@ -27,11 +27,11 @@
           <slot v-else-if="!loading" name="badges"></slot>
         </div>
         <p
-          v-if="widget.description"
+          v-if="description"
           class="widget-frame__description"
-          :title="widget.description"
+          :title="description"
         >
-          {{ widget.description }}
+          {{ description }}
         </p>
       </div>
       <div v-if="$slots.actions && !loading" class="widget-frame__actions">
@@ -81,6 +81,7 @@
 
 <script>
 import { accentOf, iconOf } from '@jadawel/modules/arabase/dashboard/appearance'
+import { riyalText } from '@jadawel/modules/arabase/dashboard/format'
 
 /**
  * The card every dashboard widget renders in: an optional icon chip, the title
@@ -148,6 +149,13 @@ export default {
     },
     iconName() {
       return iconOf(this.widget, this.defaultIcon)
+    },
+    /** "Budget (SAR)" reads "Budget (⃁)": the riyal is written as its sign. */
+    title() {
+      return riyalText(this.widget.title)
+    },
+    description() {
+      return riyalText(this.widget.description)
     },
   },
 }

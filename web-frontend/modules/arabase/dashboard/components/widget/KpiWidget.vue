@@ -24,7 +24,10 @@
 import WidgetFrame from '@jadawel/modules/arabase/dashboard/components/widget/WidgetFrame'
 import dashboardWidget from '@jadawel/modules/arabase/dashboard/mixins/dashboardWidget'
 import { numberFormatOf } from '@jadawel/modules/arabase/dashboard/appearance'
-import { formatAggregate } from '@jadawel/modules/arabase/dashboard/format'
+import {
+  formatAggregate,
+  riyalText,
+} from '@jadawel/modules/arabase/dashboard/format'
 
 /**
  * The key-number widget: upstream's `summary` type, drawn by the fork.
@@ -81,7 +84,7 @@ export default {
       return type
         ? this.$t('kpiWidget.caption', {
             aggregation: type.getName(),
-            field: field.name,
+            field: riyalText(field.name),
           })
         : null
     },

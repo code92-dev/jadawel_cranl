@@ -7,13 +7,31 @@
  * so Arabic labels use the same Arabic face as the text around them.
  */
 
-const FALLBACK_FONT = "'Inter', 'IBM Plex Sans Arabic', sans-serif"
+const FALLBACK_FONT =
+  "'Inter', 'IBM Plex Sans Arabic', 'Saudi Riyal Sign', sans-serif"
+
+/**
+ * The dashboard's font stack, which ends in the Saudi riyal sign's own font
+ * (`saudi_riyal.scss`) so tooltips and legends drawn on the canvas show it.
+ */
+function dashboardFont() {
+  if (typeof document === 'undefined') {
+    return FALLBACK_FONT
+  }
+  const root =
+    document.querySelector('.dashboard-app, .public-dashboard') || document.body
+  const family = root ? getComputedStyle(root).fontFamily : ''
+  if (!family) {
+    return FALLBACK_FONT
+  }
+  return family.includes('Saudi Riyal Sign')
+    ? family
+    : family.replace(/,?\s*sans-serif\s*$/, '') +
+        ", 'Saudi Riyal Sign', sans-serif"
+}
 
 export function chartTheme() {
-  let fontFamily = FALLBACK_FONT
-  if (typeof document !== 'undefined' && document.body) {
-    fontFamily = getComputedStyle(document.body).fontFamily || FALLBACK_FONT
-  }
+  const fontFamily = dashboardFont()
   return {
     fontFamily,
     gridColor: '#eaefe7',

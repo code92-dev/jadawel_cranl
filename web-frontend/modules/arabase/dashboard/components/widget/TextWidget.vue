@@ -11,10 +11,10 @@
         :is="textStyle === 'section' ? 'h2' : 'h3'"
         class="widget-text__title widget__header"
       >
-        {{ widget.title }}
+        {{ title }}
       </component>
       <p v-if="widget.body" class="widget-text__body">
-        {{ widget.body }}
+        {{ body }}
       </p>
       <p v-else-if="isEditMode" class="widget-text__placeholder">
         {{ $t('textWidget.placeholder') }}
@@ -25,6 +25,7 @@
 
 <script>
 import { accentOf, iconOf } from '@jadawel/modules/arabase/dashboard/appearance'
+import { riyalText } from '@jadawel/modules/arabase/dashboard/format'
 
 const STYLES = ['section', 'note', 'callout']
 
@@ -77,6 +78,12 @@ export default {
         this.widget,
         this.textStyle === 'callout' ? 'light-bulb' : null
       )
+    },
+    title() {
+      return riyalText(this.widget.title)
+    },
+    body() {
+      return riyalText(this.widget.body)
     },
     isEditMode() {
       return this.$store.getters[

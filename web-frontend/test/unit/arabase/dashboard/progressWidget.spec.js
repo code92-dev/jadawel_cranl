@@ -132,8 +132,8 @@ describe('ProgressWidget', () => {
     expect(wrapper.find('.widget-progress__of').text()).toBe(
       'progressWidget.ofTarget'
     )
-    expect(wrapper.vm.valueLabel).toBe('1.3M SAR')
-    expect(wrapper.vm.targetLabel).toBe('2M SAR')
+    expect(wrapper.vm.valueLabel).toBe('\u20C1\u00A01.3M')
+    expect(wrapper.vm.targetLabel).toBe('\u20C1\u00A02M')
   })
 
   test('the bar marks where at risk ends', async () => {

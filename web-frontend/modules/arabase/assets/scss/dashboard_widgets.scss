@@ -1129,6 +1129,39 @@ $frame-padding: 18px;
   gap: 8px;
 }
 
+.widget-appearance-form__riyal {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-block: -4px 14px;
+  color: $palette-neutral-900;
+  font-size: 12px;
+  line-height: 16px;
+}
+
+.widget-appearance-form__riyal-button {
+  flex: none;
+  inline-size: 30px;
+  block-size: 30px;
+  padding: 0;
+  border: 1px solid $palette-neutral-300;
+  border-radius: 7px;
+  background-color: $white;
+  color: $palette-neutral-1200;
+  font-size: 17px;
+  cursor: pointer;
+
+  &:hover {
+    border-color: $palette-neutral-600;
+  }
+}
+
+.widget-appearance-form__riyal-button--active {
+  border-color: $color-primary-500;
+  background-color: $color-primary-100;
+  color: $color-primary-700;
+}
+
 .widget-chart-types {
   display: grid;
   grid-template-columns: repeat(3, 1fr);

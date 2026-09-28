@@ -51,6 +51,7 @@ term exists).
 | Note (widget) | ملاحظة | A text widget explaining how to read a dashboard. |
 | Callout (widget) | إبراز | A tinted text widget for what needs attention. |
 | Accent colour | اللون المميّز | A widget's colour in its appearance settings. |
+| Saudi riyal sign | رمز الريال السعودي | U+20C1. Dashboards draw it in place of ر.س, to the left of the amount. |
 | Horizontal bar chart | مخطط أعمدة أفقي | |
 | Area chart | مخطط مساحي | |
 | On track / At risk / Target met | على المسار / متعثّر / تحقّق الهدف | Progress status labels. |

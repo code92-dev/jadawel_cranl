@@ -10,7 +10,7 @@
             class="widget-table__head"
             :class="{ 'widget-table__cell--end': alignsEnd(field) }"
           >
-            {{ field.name }}
+            {{ header(field) }}
           </th>
         </tr>
       </thead>
@@ -44,6 +44,7 @@ import {
   describeRecordValue,
   formatRecordValue,
 } from '@jadawel/modules/arabase/dashboard/recordValues'
+import { riyalText } from '@jadawel/modules/arabase/dashboard/format'
 
 const END_ALIGNED = ['number', 'count', 'rollup', 'autonumber', 'rating']
 
@@ -71,6 +72,9 @@ export default {
     },
     text(row, field) {
       return formatRecordValue(row[field.name])
+    },
+    header(field) {
+      return riyalText(field.name)
     },
     alignsEnd(field) {
       return END_ALIGNED.includes(field.type)

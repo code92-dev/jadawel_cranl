@@ -60,7 +60,7 @@ only what changes (it is merged, so a new `suffix` keeps the `color`).
 |---|---|---|
 | `color` | `primary` (the workspace colour), `blue`, `cyan`, `green`, `yellow`, `red`, `magenta`, `purple`, `neutral` | icon chip; chart series; section bar; callout tint |
 | `icon` | `coins`, `cash`, `wallet`, `bank`, `credit-card`, `cart`, `shop`, `box-iso`, `truck`, `graph-up`, `graph-down`, `percentage`, `user`, `group`, `user-crown`, `building`, `calendar`, `clock`, `hourglass`, `check-circle`, `warning-triangle`, `triangle-flag`, `trophy`, `star`, `rocket`, `light-bulb`, `help-circle`, `task-list`, `headset-help`, `mail`, `phone`, `globe` | summary, lists, note, callout |
-| `prefix`, `suffix` | up to 12 characters: `ر.س`, `SAR`, `%`, `يوم`, `$` | summary, progress, chart |
+| `prefix`, `suffix` | up to 12 characters: `ر.س` (Saudi riyal), `%`, `يوم`, `$` | summary, progress, chart |
 | `decimals` | 0–4 (leave out for automatic) | summary, progress, chart |
 | `compact` | `true`: 1.6M / 1.6 مليون instead of 1,610,000 | summary, progress, chart |
 | `stacked` | `true`: several series stacked in one bar or area | chart with 2+ series |
@@ -71,7 +71,12 @@ only what changes (it is merged, so a new `suffix` keeps the `color`).
   done. Lists and notes take one too (`task-list`, `calendar`).
 - **Units.** Put the unit in `suffix` (or `prefix`), not only in the title:
   it is printed beside every value, and axis ticks leave it off so they stay
-  short. Use `compact` for amounts in the hundreds of thousands and above —
+  short.
+- **Saudi riyals.** Give amounts in riyals `suffix: "ر.س"`. The dashboard
+  draws the official Saudi riyal sign (U+20C1) in its place, to the left of the
+  number as the central bank asks — after an Arabic amount, before an English
+  one — and swaps `ر.س`, `SAR` and `﷼` in titles and descriptions for the sign
+  too. Do not type the sign yourself or add "ريال" after the number. Use `compact` for amounts in the hundreds of thousands and above —
   a long number shrinks to fit its card, a compact one stays large.
 - **Colour means something.** One colour per theme — money `blue`, risk
   `red`, done `green`, time `yellow` — not a rainbow; `red` and `yellow` read

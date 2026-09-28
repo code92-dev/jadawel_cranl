@@ -149,4 +149,13 @@ describe('describeRecordValue', () => {
       text: 'Won',
     })
   })
+
+  test("a number field's own riyal unit becomes the sign", () => {
+    expect(
+      describeRecordValue('1500', {
+        type: 'number',
+        metadata: { number_decimal_places: 0, number_suffix: 'SAR' },
+      }).text
+    ).toBe('\u20C1\u00A01,500')
+  })
 })

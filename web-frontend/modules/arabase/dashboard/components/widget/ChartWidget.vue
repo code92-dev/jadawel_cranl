@@ -99,6 +99,7 @@ import {
 } from '@jadawel/modules/arabase/dashboard/appearance'
 import {
   formatNumber,
+  riyalText,
   toNumber,
 } from '@jadawel/modules/arabase/dashboard/format'
 import { chartTheme } from '@jadawel/modules/arabase/dashboard/chartTheme'
@@ -428,11 +429,16 @@ export default {
               : this.isHorizontal
                 ? context.parsed.x
                 : context.parsed.y
-            const label =
-              this.isSliced || this.datasets.length === 1
-                ? context.label
-                : context.dataset.label
-            return ` ${label}: ${this.formatValue(value)}`
+            // The tooltip's title already names the category, so one series
+            // needs only its value. With several, each part is isolated
+            // (U+2068…U+2069) so an English label and an Arabic amount keep
+            // their own order instead of running into each other.
+            const amount = this.formatValue(value)
+            if (!this.isSliced && this.datasets.length === 1) {
+              return ` \u2068${amount}\u2069`
+            }
+            const label = this.isSliced ? context.label : context.dataset.label
+            return ` \u2068${label}\u2069: \u2068${amount}\u2069`
           },
         },
       }
@@ -519,16 +525,16 @@ export default {
     seriesLabel(series) {
       const configured = this.seriesConfig(series).label
       if (configured) {
-        return configured
+        return riyalText(configured)
       }
       if (!this.$registry.exists('viewAggregation', series.aggregation_type)) {
-        return series.label
+        return riyalText(series.label)
       }
       const aggregationType = this.$registry.get(
         'viewAggregation',
         series.aggregation_type
       )
-      return `${series.label} (${aggregationType.getName()})`
+      return `${riyalText(series.label)} (${aggregationType.getName()})`
     },
     seriesColor(series) {
       return resolveColor(this.seriesConfig(series).color)

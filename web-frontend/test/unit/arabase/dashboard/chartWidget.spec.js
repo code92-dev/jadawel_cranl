@@ -266,8 +266,12 @@ describe('ChartWidget', () => {
       },
     })
 
-    expect(wrapper.find('.widget-chart__center-value').text()).toBe('1.6M SAR')
-    expect(wrapper.find('.widget-chart__legend-value').text()).toBe('1.3M SAR')
+    expect(wrapper.find('.widget-chart__center-value').text()).toBe(
+      '\u20C1\u00A01.6M'
+    )
+    expect(wrapper.find('.widget-chart__legend-value').text()).toBe(
+      '\u20C1\u00A01.3M'
+    )
   })
 
   test('no chart is drawn when the data source is misconfigured', async () => {

@@ -1,5 +1,8 @@
 import moment from '@jadawel/modules/core/moment'
-import { formatNumber } from '@jadawel/modules/arabase/dashboard/format'
+import {
+  formatNumber,
+  withAffixes,
+} from '@jadawel/modules/arabase/dashboard/format'
 
 /**
  * Turns a dispatched row value into something printable in a widget list.
@@ -146,7 +149,14 @@ export function describeRecordValue(value, field = {}, locale = 'en') {
     if (text !== null) {
       return type === 'rating'
         ? { kind: 'rating', value: Number(value), max: metadata.max_value || 5 }
-        : { kind: 'number', text }
+        : {
+            kind: 'number',
+            // The field's own unit, with a riyal written as its sign.
+            text: withAffixes(text, {
+              prefix: metadata.number_prefix || '',
+              suffix: metadata.number_suffix || '',
+            }),
+          }
     }
   }
   if (DATE_TYPES.includes(type)) {

@@ -72,7 +72,8 @@ class AppearanceInput(BaseModel):
     suffix: Optional[str] = Field(
         None,
         max_length=12,
-        description="summary/progress: after the number, e.g. a currency ﷼ or %.",
+        description="summary/progress/chart: after the number, e.g. %; ر.س for "
+        "Saudi riyals, drawn as the riyal sign.",
     )
     decimals: Optional[int] = Field(
         None, ge=0, le=4, description="summary/progress/chart: fixed decimals."

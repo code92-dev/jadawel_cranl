@@ -95,6 +95,32 @@ number format, chart type tiles). Sanad chooses from the same lists
 (`backend/src/arabase/dashboard/appearance.py`); `appearance.spec.js` fails if the
 two drift.
 
+## The Saudi riyal sign
+
+Amounts in riyals show the official sign (U+20C1, the Saudi Central Bank's
+2025 symbol) instead of "ر.س":
+
+- **Which units.** A widget `prefix` or `suffix` of `ر.س` (with or without
+  dots and spaces), `ريال`, `ريال سعودي`, `SAR`, `SR` or `﷼`, and a number
+  field's own prefix or suffix in a records list, become the sign. In widget
+  titles, descriptions, text widgets, series labels, captions and table
+  headers the abbreviations `ر.س`, `SAR` and `﷼` are swapped for it ("Budget
+  (SAR)" → "Budget (⃁)"); the word ريال in a sentence is left alone.
+- **Where it goes.** To the left of the amount in both languages, as the
+  central bank's guidance asks: after an Arabic amount (`1.6 مليون ⃁`), before
+  an English one (`⃁ 1.6M`), with a no-break space.
+- **How it is drawn.** No interface font has the glyph yet, so
+  `assets/scss/saudi_riyal.scss` inlines a 480-byte font with only that glyph,
+  built from the bank's public domain artwork
+  (`assets/fonts/saudi-riyal.svg`, `build_saudi_riyal_font.py`). It is a family
+  of its own, "Saudi Riyal Sign", placed after the text fonts in the
+  dashboard's font stacks and the charts' canvas font, so the sign falls
+  through to it and no other character does. (Declaring it as an extra face of
+  Inter does not work: a face whose weight range differs from the family's
+  other faces is matched separately and never picked.)
+- **Settings.** The Appearance section has a riyal button that sets the unit;
+  Sanad's dashboards skill tells it to use `suffix: "ر.س"`.
+
 ## Data and compatibility
 
 - **Migration `dashboard.0005_widget_grid_12_appearance`** multiplies every stored
