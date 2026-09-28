@@ -3,12 +3,16 @@ from django.db import models
 from jadawel.contrib.dashboard.widgets.models import Widget
 
 CHART_TYPE_BAR = "bar"
+CHART_TYPE_HORIZONTAL_BAR = "horizontal_bar"
 CHART_TYPE_LINE = "line"
+CHART_TYPE_AREA = "area"
 CHART_TYPE_PIE = "pie"
 CHART_TYPE_DOUGHNUT = "doughnut"
 CHART_TYPE_CHOICES = [
     (CHART_TYPE_BAR, "Bar"),
+    (CHART_TYPE_HORIZONTAL_BAR, "Horizontal bar"),
     (CHART_TYPE_LINE, "Line"),
+    (CHART_TYPE_AREA, "Area"),
     (CHART_TYPE_PIE, "Pie"),
     (CHART_TYPE_DOUGHNUT, "Doughnut"),
 ]
@@ -52,9 +56,11 @@ class ChartWidget(Widget):
 
 DISPLAY_STYLE_BAR = "bar"
 DISPLAY_STYLE_RING = "ring"
+DISPLAY_STYLE_GAUGE = "gauge"
 DISPLAY_STYLE_CHOICES = [
     (DISPLAY_STYLE_BAR, "Bar"),
     (DISPLAY_STYLE_RING, "Ring"),
+    (DISPLAY_STYLE_GAUGE, "Gauge"),
 ]
 
 
@@ -106,7 +112,7 @@ class ProgressWidget(Widget):
         choices=DISPLAY_STYLE_CHOICES,
         default=DISPLAY_STYLE_BAR,
         db_default=DISPLAY_STYLE_BAR,
-        help_text="Whether progress is drawn as a bar or a ring.",
+        help_text="Whether progress is drawn as a bar, a ring or a gauge.",
     )
     warning_threshold = models.PositiveIntegerField(
         default=50,
@@ -137,4 +143,40 @@ class UpcomingDatesWidget(Widget):
         default=list,
         blank=True,
         help_text="Ids of the fields to show alongside the date, in order.",
+    )
+
+
+TEXT_STYLE_SECTION = "section"
+TEXT_STYLE_NOTE = "note"
+TEXT_STYLE_CALLOUT = "callout"
+TEXT_STYLE_CHOICES = [
+    (TEXT_STYLE_SECTION, "Section heading"),
+    (TEXT_STYLE_NOTE, "Note"),
+    (TEXT_STYLE_CALLOUT, "Callout"),
+]
+
+TEXT_BODY_MAX_LENGTH = 2000
+
+
+class TextWidget(Widget):
+    """
+    Words on the board, with no data behind them: a heading that splits the
+    dashboard into sections, a note explaining how to read it, or a highlighted
+    callout. Numbers only mean something with context, and until now the only
+    place for context was a widget's one-line description.
+    """
+
+    body = models.TextField(
+        blank=True,
+        default="",
+        db_default="",
+        max_length=TEXT_BODY_MAX_LENGTH,
+        help_text="Plain text under the title. Line breaks are kept.",
+    )
+    text_style = models.CharField(
+        max_length=16,
+        choices=TEXT_STYLE_CHOICES,
+        default=TEXT_STYLE_NOTE,
+        db_default=TEXT_STYLE_NOTE,
+        help_text="A section heading, a note card or a highlighted callout.",
     )

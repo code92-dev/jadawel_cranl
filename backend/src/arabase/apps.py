@@ -70,6 +70,7 @@ class ArabaseConfig(AppConfig):
             ChartWidgetType,
             ProgressWidgetType,
             RecordsListWidgetType,
+            TextWidgetType,
             UpcomingDatesWidgetType,
         )
         from jadawel.contrib.dashboard.widgets.registries import widget_type_registry
@@ -78,6 +79,7 @@ class ArabaseConfig(AppConfig):
         widget_type_registry.register(RecordsListWidgetType())
         widget_type_registry.register(ProgressWidgetType())
         widget_type_registry.register(UpcomingDatesWidgetType())
+        widget_type_registry.register(TextWidgetType())
 
         from arabase.kanban.view_types import KanbanViewType
         from arabase.views.view_types import HtmlPageViewType

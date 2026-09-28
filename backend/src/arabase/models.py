@@ -11,6 +11,7 @@ from arabase.dashboard.widgets.models import (
     ChartWidget,
     ProgressWidget,
     RecordsListWidget,
+    TextWidget,
     UpcomingDatesWidget,
 )
 from arabase.generative_ai.models import GenerativeAIProviderSettings
@@ -63,6 +64,7 @@ __all__ = [
     "ChartWidget",
     "ProgressWidget",
     "RecordsListWidget",
+    "TextWidget",
     "UpcomingDatesWidget",
     "LocalJadawelGroupedAggregateRows",
     "LocalJadawelTableServiceAggregationGroupBy",

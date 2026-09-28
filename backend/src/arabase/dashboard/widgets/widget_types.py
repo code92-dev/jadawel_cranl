@@ -10,6 +10,7 @@ from arabase.dashboard.widgets.models import (
     ChartWidget,
     ProgressWidget,
     RecordsListWidget,
+    TextWidget,
     UpcomingDatesWidget,
 )
 from arabase.integrations.local_jadawel.models import remap_series_key
@@ -177,3 +178,17 @@ class UpcomingDatesWidgetType(
 
     class SerializedDict(DataSourceBackedWidgetType.SerializedDict):
         field_ids: list
+
+
+class TextWidgetType(WidgetType):
+    """A heading, note or callout; it owns no data source."""
+
+    type = "text"
+    model_class = TextWidget
+    allowed_fields = WidgetType.allowed_fields + ["body", "text_style"]
+    serializer_field_names = ["body", "text_style"]
+    request_serializer_field_names = ["body", "text_style"]
+
+    class SerializedDict(WidgetType.SerializedDict):
+        body: str
+        text_style: str
