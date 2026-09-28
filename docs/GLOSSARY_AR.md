@@ -45,6 +45,15 @@ term exists).
 | Dashboard | لوحة التحكم | |
 | Widget | عنصر | Dashboard widget. |
 | Size | الحجم | Widget size on the dashboard grid, in columns × rows. |
+| Key number (widget) | رقم رئيسي | The `summary` widget: one headline number. |
+| Goal gauge | مقياس الهدف | The progress widget's half-dial style. |
+| Section heading (widget) | عنوان قسم | A text widget that splits a dashboard into parts. |
+| Note (widget) | ملاحظة | A text widget explaining how to read a dashboard. |
+| Callout (widget) | إبراز | A tinted text widget for what needs attention. |
+| Accent colour | اللون المميّز | A widget's colour in its appearance settings. |
+| Horizontal bar chart | مخطط أعمدة أفقي | |
+| Area chart | مخطط مساحي | |
+| On track / At risk / Target met | على المسار / متعثّر / تحقّق الهدف | Progress status labels. |
 | Trash | سلة المهملات | |
 | Snapshot | لقطة | pl. لقطات |
 | Member | عضو | pl. الأعضاء |

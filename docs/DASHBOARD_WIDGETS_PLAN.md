@@ -10,7 +10,11 @@
 | D1 — records list widget | **Implemented and tested** |
 | D2 — progress widget | **Implemented and tested** |
 | D3 — upcoming dates widget | **Implemented and tested** |
-| Text widget (optional freebie) | Not started |
+| Text widget (optional freebie) | **Implemented** in the dashboard redesign |
+
+The 2026-09-28 redesign (`docs/DASHBOARD_REDESIGN.md`) redrew all of these
+widgets, moved the board to 12 columns, and added the text widget, the
+horizontal bar and area charts, and the progress gauge.
 
 Verified so far:
 
