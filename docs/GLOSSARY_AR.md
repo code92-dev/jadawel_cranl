@@ -160,7 +160,15 @@ Sanad's tool labels and skills repeat them.
 | Element (builder) | عنصر | pl. عناصر. A piece of an application page (heading, table, form…). Same word as a dashboard Widget; the surrounding screen tells them apart. |
 | Theme (application) | سمة | An application's colours, fonts and styles. The user's interface theme is also سمة. |
 | Data source | مصدر البيانات | What feeds a page element or widget with rows. |
+| Ready-made theme | سمة جاهزة | A theme preset of an application: Jadawel (جداول), Ocean (محيط), Heritage (تراث), Sand (رمال), Stone (حجر). |
+| Content language | لغة المحتوى | The language an application's pages are written in; sets alignment and direction. |
+| Direction (page) | الاتجاه | Automatic (تلقائي), Right to left (من اليمين إلى اليسار), Left to right (من اليسار إلى اليمين). |
+| Box style | نمط الصندوق | A container's quick style: Plain (بدون), Card (بطاقة), Tinted (ملوّن), Outlined (بإطار). |
 | Workflow | سير العمل | One automation flow: a trigger followed by its steps. |
+| Step (automation) | خطوة | One action of a workflow: "Step 2 of 4" is الخطوة 2 من 4. |
+| Trigger / starting event | حدث البدء | What starts a workflow. The periodic one is جدول زمني, never الزناد. |
+| Recipe (automation) | وصفة جاهزة | A ready-made workflow built in one click from the start screen. |
+| Needs setup | تحتاج إعدادًا | A step whose settings are still incomplete. |
 
 ## Sanad AI assistant
 

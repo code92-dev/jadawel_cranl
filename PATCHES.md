@@ -1734,3 +1734,55 @@ superseded by the rows below.
 **Tests:** `backend/tests/arabase/test_widget_grid_layout.py` (rescaling,
 appearance validation), `test_dashboard_redesign_widgets.py`, and
 `web-frontend/test/unit/arabase/dashboard/` (18 files).
+
+## Application builder redesign — canvas, gallery, themes, page direction (2026-09-28)
+
+**Context:** `docs/APPLICATION_REDESIGN.md`. The builder's editor and published
+apps take the redesigned dashboards' design: the canvas, element chrome, element
+gallery, empty page, theme presets and box styles. The stylesheets, components,
+gallery previews, presets and the new-app theme hook are fork-owned under
+`web-frontend/modules/arabase/` and `backend/src/arabase/builder/`, and not
+logged here.
+
+| File                                                                                         | Change                                                                                                                                   | Reason                                                                                             | Merge risk |
+| -------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------- | ---------- |
+| `backend/src/jadawel/contrib/builder/constants.py`                                           | `PAGE_DIRECTIONS` choices: `auto`, `rtl`, `ltr`                                                                                          | The new theme property's values                                                                    | low        |
+| `backend/src/jadawel/contrib/builder/theme/models.py`                                        | `PageThemeConfigBlock.page_direction` (default `auto`)                                                                                   | An app states the direction its content is written in instead of following each visitor's language | low        |
+| `backend/src/jadawel/contrib/builder/migrations/0071_pagethemeconfigblock_page_direction.py` | Adds the field with `db_default="auto"`                                                                                                  | Existing apps keep upstream's behaviour                                                            | low        |
+| `web-frontend/modules/builder/fontFamilyTypes.js`                                            | `fontFamilyStack()`: sans-serif families fall back to IBM Plex Sans Arabic, generic families unquoted                                    | `"Inter","sans-serif"` named a non-existent font and left Arabic text to the system                | low        |
+| `web-frontend/modules/builder/themeConfigBlockTypes.js`                                      | Both font-family properties use `fontFamilyStack()`; the page block emits `--page-direction` for `rtl`/`ltr`                             | Arabic in Inter; the page direction                                                                | low        |
+| `web-frontend/modules/builder/components/theme/PageThemeConfigBlock.vue`                     | A Direction radio group (Automatic / Right to left / Left to right)                                                                      | Edits `page_direction`                                                                             | low        |
+| `web-frontend/modules/builder/components/settings/ThemeSettings.vue`                         | The fork's `ThemePresetGallery` above the tabs; the tabs re-created after a preset is applied                                            | One-click presets; the tabs copy the theme when created                                            | low        |
+| `web-frontend/modules/builder/components/elements/AddElementModal.vue`                       | Template replaced by the fork's gallery (sections by purpose, header with search, empty-search message); sections from `gallerySections` | Upstream's grid of unlabelled icons in collapsible "base / layout / form" groups                   | medium     |
+| `web-frontend/modules/builder/components/elements/AddElementCard.vue`                        | A gallery card: preview tile, name, one line on when to use it; the disallowed reason as tooltip                                         | Descriptions were tooltips only, and thin ("A button element")                                     | low        |
+| `web-frontend/modules/builder/components/page/PagePreview.vue`                               | The fork's `PageEmptyState` replaces the full-height `AddElementZone` on an empty page                                                   | A sketch, the gallery and quick starts instead of a bare "+"; it keeps the drop target             | low        |
+| `web-frontend/modules/builder/components/page/sidePanels/StyleSidePanel.vue`                 | The fork's `ElementQuickStyles` above a container's style form; the form re-keyed after a quick style                                    | Card / tinted / outlined boxes in one click                                                        | low        |
+| `web-frontend/modules/builder/locales/{en,ar}.json`                                          | `pageThemeConfigBlock.direction*`                                                                                                        | Labels of the Direction control                                                                    | low        |
+| `backend/tests/arabase/test_sanad_skills.py`                                                 | The skill-fonts assertion reads the skill's new **Fonts:** bullet                                                                        | The app-builder skill's theme section was rewritten around presets                                 | low        |
+
+**Tests:** `backend/tests/arabase/test_builder_theme_presets.py` (presets valid
+and legible, frontend copy in sync, new-app theme by creator language, duplicates
+untouched, `page_direction` validation, Sanad presets) and
+`web-frontend/test/unit/arabase/builder/` (6 files).
+
+## Automation redesign — recipes, step gallery, readiness (2026-09-28)
+
+**Context:** `docs/AUTOMATION_REDESIGN.md`. The automation editor takes the
+redesigned dashboards' and applications' design and gets easier to use: recipes
+that build a whole workflow, a step gallery in plain words, numbered step cards
+coloured by category, a readiness bar and a step panel header. The catalogue,
+recipes, components and styles are fork-owned under
+`web-frontend/modules/arabase/automation/` and `assets/scss/automation_canvas.scss`,
+and not logged here.
+
+| File                                                                                  | Change                                                                                                                   | Reason                                                                                                  | Merge risk |
+| ------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------- | ---------- |
+| `web-frontend/modules/automation/components/workflow/WorkflowAddNodeMenu.vue`         | Template replaced by the fork's `StepGallery` (steps by category, plain names, search)                                  | Upstream's flat list of service names; the menu backs both "add step" and "replace"                    | low        |
+| `web-frontend/modules/automation/components/workflow/WorkflowEditor.vue`              | The "Choose an event…" list inside the canvas is gone (the start screen replaces it); the view is re-fitted once the workflow gets its trigger | The start screen sits over the canvas; the view had been fitted to the empty workflow                  | low        |
+| `web-frontend/modules/automation/components/AutomationWorkflowContent.vue`            | The fork's `WorkflowStart` over an empty workflow, `WorkflowOverview` over a started one; `handleRecipe` builds a recipe | Recipes and events to start from; the readiness bar                                                    | low        |
+| `web-frontend/modules/automation/components/workflow/WorkflowNodeContent.vue`         | Category chip and icon from the catalogue, step number, plain-language subtitle, "Needs setup" pill replacing the yellow "Configure" badge | Steps tell apart at a glance and say what is left to do                                                 | medium     |
+| `web-frontend/modules/automation/components/workflow/sidePanels/NodeSidePanel.vue`    | The fork's `StepPanelHeader` above the label                                                                             | The panel did not say which step it edits                                                               | low        |
+| `web-frontend/modules/automation/pages/automationWorkflow.vue`                        | The not-found message goes through `t('automationWorkflow.notFound')`                                                    | It was English only                                                                                     | low        |
+| `web-frontend/modules/automation/locales/{en,ar}.json`                                | `automationWorkflow.notFound`; Arabic: periodic trigger "جدول زمني" (was "الزناد الدوري"), "اختبار الحدث", "بدء تشغيل تجريبي", "وقت التشغيل", "البحث عن حدث بدء..." | Literal translations that read wrongly                                                                  | low        |
+
+**Tests:** `web-frontend/test/unit/arabase/automation/` (3 files).
