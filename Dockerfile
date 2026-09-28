@@ -17,7 +17,30 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-27 from commit 9cc6b376, tag 2.3.12-sanad.
+# Published 2026-09-28 from commit c96a4bea, tag 2.3.13-dashboard-redesign.
+# Redesigns dashboards: no box around the board, a 12-column grid (existing
+# widgets are rescaled so they look the same), drag to move and a snapping
+# corner handle to resize in edit mode, a widget gallery grouped by purpose,
+# refresh with the time of the last update, and one frame for every widget.
+# Key numbers are formatted and sized to their card; progress says On track /
+# At risk / Target met and gains a gauge; charts add horizontal bar and area
+# and a doughnut total; lists render cells by type; upcoming dates is an
+# agenda. New text widget (section heading, note, callout) and per-widget
+# appearance (colour, icon, number format). Riyal amounts show the official
+# Saudi riyal sign (U+20C1) instead of ر.س. Sanad builds with all of it, and
+# can build Form views with a new forms skill. Also: Page view share no longer
+# crashes and its bar drops Filter and Sort; Sanad's tools are split by domain;
+# token counts are kept for models that report reasoning tokens; Sanad meters
+# usage per workspace against an optional monthly budget.
+# **Migrations: dashboard.0005 (rescales widget sizes ×4/×2, adds
+# `appearance`; reversible), arabase.0021 (Sanad budget and usage tables),
+# arabase.0022 (text widget, new chart and progress styles).** Optional new
+# environment: JADAWEL_SANAD_MONTHLY_TURN_LIMIT / _TOKEN_LIMIT — leave unset,
+# Sanad stays unlimited.
+# Previous deployment pin (2.3.12-sanad):
+# sha256:89ffdfe1a8d4b41862e20a10d976a5c8023a6dfb573a85bc9d0eebf431471a12.
+#
+# Previously published 2026-09-27 from commit 9cc6b376, tag 2.3.12-sanad.
 # Adds Sanad (سند), the in-app AI assistant, for instance administrators only.
 # It builds tables, fields, formulas, views, automations, builder apps,
 # dashboards and Page views, loads expert skills on demand, pauses for approval
@@ -278,7 +301,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:89ffdfe1a8d4b41862e20a10d976a5c8023a6dfb573a85bc9d0eebf431471a12
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:b49f3a435a09ca736dfb262b67523babc2dc68ec82040ea39112d5c0ec32f300
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
