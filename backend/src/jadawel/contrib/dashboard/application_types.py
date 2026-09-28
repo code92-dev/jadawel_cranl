@@ -9,6 +9,11 @@ from jadawel.contrib.dashboard.data_sources.handler import DashboardDataSourceHa
 from jadawel.contrib.dashboard.models import Dashboard
 from jadawel.contrib.dashboard.types import DashboardDict
 from jadawel.contrib.dashboard.widgets.handler import WidgetHandler
+from jadawel.contrib.dashboard.widgets.models import (
+    GRID_COLUMNS,
+    LEGACY_GRID_COLUMNS,
+    rescale_serialized_widgets,
+)
 from jadawel.contrib.integrations.local_jadawel.integration_types import (
     LocalJadawelIntegrationType,
 )
@@ -111,6 +116,7 @@ class DashboardApplicationType(ApplicationType):
 
         return DashboardDict(
             description=dashboard.description,
+            widget_grid_columns=GRID_COLUMNS,
             integrations=serialized_integrations,
             data_sources=serialized_data_sources,
             widgets=serialized_widgets,
@@ -135,7 +141,10 @@ class DashboardApplicationType(ApplicationType):
         self.cache = {}
         serialized_integrations = serialized_values.pop("integrations")
         serialized_data_sources = serialized_values.pop("data_sources")
-        serialized_widgets = serialized_values.pop("widgets")
+        serialized_widgets = rescale_serialized_widgets(
+            serialized_values.pop("widgets"),
+            serialized_values.pop("widget_grid_columns", LEGACY_GRID_COLUMNS),
+        )
 
         progress = ChildProgressBuilder.build(progress_builder, child_total=100)
         application_progress = progress.create_child_builder(represents_progress=20)

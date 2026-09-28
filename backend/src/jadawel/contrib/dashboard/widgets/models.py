@@ -17,6 +17,37 @@ from jadawel.core.mixins import (
 if TYPE_CHECKING:
     from jadawel.contrib.dashboard.models import Dashboard
 
+GRID_COLUMNS = 12
+"""Columns of the widget board. Exports record it, so a dashboard exported from
+the earlier 3-column board is rescaled when it is imported."""
+
+MAX_HEIGHT = 12
+
+LEGACY_GRID_COLUMNS = 3
+"""The board before the 12-column grid: 3 columns of 160 px rows. Exports from
+then carry no `widget_grid_columns`."""
+
+
+def rescale_serialized_widgets(widgets: list[dict], grid_columns: int) -> list[dict]:
+    """
+    Converts exported widget sizes to this board's units. One of the 3 legacy
+    columns is 4 of the 12, and one legacy 160 px row is two 72 px rows plus the
+    gap between them — the same scaling migration 0005 applied to stored widgets.
+    """
+
+    if grid_columns != LEGACY_GRID_COLUMNS:
+        return widgets
+    scale = GRID_COLUMNS // LEGACY_GRID_COLUMNS
+    rescaled = []
+    for widget in widgets:
+        widget = dict(widget)
+        if widget.get("width"):
+            widget["width"] = min(GRID_COLUMNS, widget["width"] * scale)
+        if widget.get("height"):
+            widget["height"] = min(MAX_HEIGHT, widget["height"] * 2)
+        rescaled.append(widget)
+    return rescaled
+
 
 class Widget(
     HierarchicalModelMixin,
@@ -42,13 +73,20 @@ class Widget(
         editable=False,
         default=Decimal("1"),
     )
+    # Jadawel fork (grid board): spans on a 12-column board of 72 px rows.
     width = models.PositiveSmallIntegerField(
-        default=3,
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
+        default=GRID_COLUMNS,
+        validators=[MinValueValidator(1), MaxValueValidator(GRID_COLUMNS)],
     )
     height = models.PositiveSmallIntegerField(
-        default=2,
-        validators=[MinValueValidator(1), MaxValueValidator(3)],
+        default=4,
+        validators=[MinValueValidator(1), MaxValueValidator(MAX_HEIGHT)],
+    )
+    appearance = models.JSONField(
+        default=dict,
+        blank=True,
+        help_text="Presentation options the frontend reads, such as the accent "
+        "colour, icon and number format.",
     )
     content_type = models.ForeignKey(
         ContentType,

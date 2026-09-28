@@ -34,7 +34,14 @@ class WidgetType(
     SerializedDict = WidgetDict
     parent_property_name = "dashboard"
     id_mapping_name = DASHBOARD_WIDGETS
-    allowed_fields = ["title", "description", "order", "width", "height"]
+    allowed_fields = [
+        "title",
+        "description",
+        "order",
+        "width",
+        "height",
+        "appearance",
+    ]
 
     def enhance_queryset(self, queryset: QuerySet[Widget]) -> QuerySet[Widget]:
         """

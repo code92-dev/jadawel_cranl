@@ -11,6 +11,7 @@ class WidgetDict(TypedDict):
     order: str
     width: int
     height: int
+    appearance: dict
     type: str
 
 
@@ -21,5 +22,6 @@ class DashboardDict(TypedDict):
     order: str
     type: str
     widgets: list[WidgetDict]
+    widget_grid_columns: int
     integrations: list[IntegrationDict]
     data_sources: list[DashboardDataSourceDict]
