@@ -17,7 +17,20 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-30 from commit 3ea8df50, tag 2.3.16-my-dashboards.
+# Published 2026-09-30 from commit d096a849, tag 2.3.17-security-audit.
+# Applies the 2026-09-30 security audit (reports in security-reports/): backend
+# dependency bumps — PyJWT 2.15.1 (CVE-2026-102268 CRITICAL + 5 HIGH), anyio
+# 4.15.1 (CVE-2026-63374 CRITICAL), httpx2/httpcore2 2.13.1 — the tarfile
+# "data" filter on backup-restore extraction, the Cross-Origin-Opener-Policy
+# header and /.well-known/security.txt in the bundled Caddy (nginx recipe in
+# parity), and the Secure flag on the i18n-language locale cookie. Backend
+# gates: 868 arabase/fork tests green, locale check 100%. **No migration.**
+# No environment changes; setting JADAWEL_ENABLE_SECURE_PROXY_SSL_HEADER=yes on
+# the host is still recommended (Secure cookies + Django HSTS).
+# Previous deployment pin (2.3.16-my-dashboards):
+# sha256:e2be23e2e30feb04a2cd7daf584e6a637382579422d93fdc886fac931db960b5.
+#
+# Previously published 2026-09-30 from commit 3ea8df50, tag 2.3.16-my-dashboards.
 # Adds "My dashboards" (لوحاتي), a personal page above "My settings" in the user
 # menu: a gallery of dashboards gathered from the user's own workspaces (also
 # from a dashboard's header, "Add to My dashboards") or by public link, on this
@@ -335,7 +348,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:e2be23e2e30feb04a2cd7daf584e6a637382579422d93fdc886fac931db960b5
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:082e15441952b97b8b5b2888ab57c951da79de2eb17374c5301257644b1dabe6
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
