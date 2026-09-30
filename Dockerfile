@@ -17,7 +17,24 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-28 from commit 80af51ec, tag 2.3.14-app-automation-redesign.
+# Published 2026-09-30 from commit 3ea8df50, tag 2.3.16-my-dashboards.
+# Adds "My dashboards" (لوحاتي), a personal page above "My settings" in the user
+# menu: a gallery of dashboards gathered from the user's own workspaces (also
+# from a dashboard's header, "Add to My dashboards") or by public link, on this
+# server or another Jadawel server. A protected link asks for its password
+# before it is added; a link here keeps access until the owner changes the
+# password (only its hash is kept), another server's password is kept sealed
+# with SECRET_KEY to renew that server's token. Every read is checked again, so
+# losing access or a revoked link shows on the card. Other servers are fetched
+# under the webhook outbound rules (JADAWEL_WEBHOOKS_*: no private addresses,
+# https only, 10 s, 5 MB); password guesses share JADAWEL_DASHBOARD_AUTH_RATE.
+# **Migration: arabase.0023 (SavedDashboard table; additive).** No environment
+# changes. (2.3.15-my-dashboards, from 7519cf26, was published but never
+# deployed: it failed the strict Arabic locale and lint checks.)
+# Previous deployment pin (2.3.14-app-automation-redesign):
+# sha256:c7ddbf74c58556da9873444f925b425d1b509d2500747e6606983c9ac1fa81e2.
+#
+# Previously published 2026-09-28 from commit 80af51ec, tag 2.3.14-app-automation-redesign.
 # Redesigns applications and automations like the dashboards. Applications: the
 # page is edited in a browser window on a canvas with device frames, an element
 # gallery grouped by purpose, an empty-page state with quick starts, one-click
@@ -318,7 +335,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:c7ddbf74c58556da9873444f925b425d1b509d2500747e6606983c9ac1fa81e2
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:e2be23e2e30feb04a2cd7daf584e6a637382579422d93fdc886fac931db960b5
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
