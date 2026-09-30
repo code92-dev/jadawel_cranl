@@ -152,7 +152,9 @@ describe('AddSavedDashboardModal', () => {
   })
 
   const mountModal = async (available = []) => {
-    testApp.mock.onGet('/arabase/my-dashboards/available/').reply(200, available)
+    testApp.mock
+      .onGet('/arabase/my-dashboards/available/')
+      .reply(200, available)
     const wrapper = await testApp.mount(AddSavedDashboardModal)
     wrapper.vm.show()
     await flushPromises()
@@ -183,9 +185,10 @@ describe('AddSavedDashboardModal', () => {
 
     expect(wrapper.emitted('added')).toEqual([[card()]])
     expect(
-      wrapper.findAll('.add-saved-dashboard__item')[0].find(
-        '.add-saved-dashboard__added'
-      ).exists()
+      wrapper
+        .findAll('.add-saved-dashboard__item')[0]
+        .find('.add-saved-dashboard__added')
+        .exists()
     ).toBe(true)
   })
 
