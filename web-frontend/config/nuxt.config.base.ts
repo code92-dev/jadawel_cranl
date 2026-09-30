@@ -81,6 +81,11 @@ export default defineNuxtConfig({
       useCookie: true,
       cookieKey: 'i18n-language',
       redirectOn: 'root',
+      // The module defaults this to false, which sends the locale cookie
+      // without the Secure flag on the HTTPS production deployment. The cookie
+      // holds no secret (HttpOnly stays off so client JS can read it), but it
+      // should never ride a plain-HTTP request.
+      cookieSecure: true,
     },
     vueI18n: './i18n.config.ts',
   },

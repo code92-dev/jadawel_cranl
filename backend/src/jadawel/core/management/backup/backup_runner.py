@@ -111,7 +111,10 @@ class JadawelBackupRunner:
 
         with tempfile.TemporaryDirectory() as temporary_directory_name:
             with tarfile.open(backup_file_name, "r:gz") as backup_input_tar:
-                backup_input_tar.extractall(temporary_directory_name)  # noqa: S202
+                # The "data" filter rejects absolute paths, parent traversal
+                # (..), symlinks and device nodes inside the archive, so a
+                # crafted backup cannot write outside the temporary directory.
+                backup_input_tar.extractall(temporary_directory_name, filter="data")
 
             backup_internal_folder_name = Path(backup_file_name).name
             backup_sub_folder = Path(

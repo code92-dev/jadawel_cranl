@@ -1798,3 +1798,15 @@ docs/MY_DASHBOARDS.md. The feature is additive (`arabase/saved_dashboards`,
 | ---- | ------ | ------ | ---- |
 | `web-frontend/modules/core/plugins.js` | New plugin hook `getUserContextComponentsBeforeSettings()`, returning `[]` by default | The entry must sit directly above "My settings" | low; additive, default empty |
 | `web-frontend/modules/core/components/sidebar/SidebarUserContext.vue` | Renders that hook's components just before the "My settings" item (`beforeSettingsComponents`) | Same | low; renders nothing unless a plugin returns components |
+
+## Backup restore extraction hardened with tarfile "data" filter (2026-09-30)
+
+| File | Change | Reason | Risk |
+| ---- | ------ | ------ | ---- |
+| `backend/src/jadawel/core/management/backup/backup_runner.py` | `extractall()` now passes `filter="data"` instead of carrying the `# noqa: S202` suppression | A crafted backup archive could previously write paths outside the temporary extraction directory (absolute paths, `..` traversal, symlinks). The `data` filter rejects those members. Restores are admin-triggered, so exposure was low, but the archive contents are not trustworthy by construction | low; restores of legitimate Jadawel backups only contain regular files inside one folder |
+
+## Locale cookie Secure flag (2026-09-30)
+
+| File | Change | Reason | Risk |
+| ---- | ------ | ------ | ---- |
+| `web-frontend/config/nuxt.config.base.ts` | `detectBrowserLanguage` gains `cookieSecure: true` | `@nuxtjs/i18n` defaults `cookieSecure: false`, so `i18n-language` was sent without the Secure flag on the HTTPS production deployment. The cookie holds no secret (HttpOnly deliberately left off; client JS reads it), but it must not ride plain-HTTP requests. Audit finding SEC-HDR-006. | low; browsers allow Secure cookies on http://localhost, so dev locale detection keeps working — over non-localhost HTTP the cookie is dropped and the locale falls back to detection |

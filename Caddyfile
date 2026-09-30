@@ -53,8 +53,25 @@
         X-Content-Type-Options "nosniff"
         Referrer-Policy "strict-origin-when-cross-origin"
         Permissions-Policy "camera=(), microphone=(), geolocation=(), payment=()"
+        # same-origin-allow-popups rather than same-origin: OAuth/SSO flows open
+        # providers in popups, and plain same-origin would cut their window.opener
+        # relationship. The weaker variant still isolates the app from unrelated
+        # cross-origin tabs (Spectre-class attacks on DOM/API responses).
+        Cross-Origin-Opener-Policy "same-origin-allow-popups"
         # Advertises the framework and its version to anyone fingerprinting.
         -X-Powered-By
+    }
+
+    # RFC 9116 security policy discovery. Static text, so no origin risk; the
+    # Expires field must be refreshed (this one is set to roll over in a year).
+    handle /\.well-known/security.txt {
+        header Content-Type "text/plain; charset=utf-8"
+        respond <<EOF
+Contact: mailto:gotoaziz100@gmail.com
+Expires: 2027-09-30T00:00:00.000Z
+Preferred-Languages: ar, en
+Canonical: {$JADAWEL_PUBLIC_URL:http://localhost}/.well-known/security.txt
+EOF
     }
 
     # Clickjacking protection for the signed-in application only.
