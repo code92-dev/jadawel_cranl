@@ -191,3 +191,6 @@ web-frontend/storybook-static
 # setuptools in-tree build output of the bundled plugins
 plugins/*/backend/build/
 plugins/*/backend/src/*.egg-info/
+
+# Security audit raw scanner output
+security-reports/raw/

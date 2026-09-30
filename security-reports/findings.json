@@ -1,0 +1,323 @@
+{
+  "audit": {
+    "target": "/root/workspace/projects/jadawel_cranl + https://jadawl.site (passive only)",
+    "profile": "standard",
+    "date": "2026-09-30",
+    "commit": "8318a765",
+    "tools": [
+      "gitleaks (docker)",
+      "semgrep (docker, p/default+owasp-top-ten+python+django+typescript+javascript+secrets)",
+      "trivy fs (config,vuln,secret)",
+      "check_headers.py",
+      "manual code review"
+    ]
+  },
+  "findings": [
+    {
+      "id": "SEC-DEP-001",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "category": "dependency",
+      "title": "PyJWT 2.13.0 — 1 CRITICAL + 5 HIGH CVEs (JWT session signing)",
+      "evidence": [
+        "backend/uv.lock: pyjwt 2.13.0; CVE-2026-102268 (CRITICAL), CVE-2026-102266/102267/102271/102272/102273 (HIGH)"
+      ],
+      "status": "fixed-in-code",
+      "fix": "upgraded pyjwt to 2.15.1 in backend/uv.lock; JWT/auth tests pass (tests/jadawel/api/test_jwt_user_cache_perf.py, test_api_authentication.py)",
+      "verify": "uv lock --upgrade-package pyjwt && git diff backend/uv.lock | grep pyjwt; re-run after publish: trivy fs backend/uv.lock"
+    },
+    {
+      "id": "SEC-DEP-002",
+      "severity": "High",
+      "confidence": "Confirmed",
+      "category": "dependency",
+      "title": "anyio 4.12.1 — CVE-2026-63374 (CRITICAL)",
+      "evidence": [
+        "backend/uv.lock: anyio 4.12.1 -> fixed in 4.14.2"
+      ],
+      "status": "fixed-in-code",
+      "fix": "upgraded anyio to 4.15.1 in backend/uv.lock",
+      "verify": "trivy fs backend/uv.lock after image publish"
+    },
+    {
+      "id": "SEC-DEP-003",
+      "severity": "Medium",
+      "confidence": "Confirmed",
+      "category": "dependency",
+      "title": "httpx2 2.3.0 CVE-2026-84382 (HIGH) and httpcore2 2.3.0 CVE-2026-84381 (HIGH)",
+      "evidence": [
+        "backend/uv.lock: httpx2/httpcore2 2.3.0"
+      ],
+      "status": "fixed-in-code",
+      "fix": "upgraded both to 2.13.1; core http request service tests pass (22 passed)",
+      "verify": "trivy fs backend/uv.lock after image publish"
+    },
+    {
+      "id": "SEC-HDR-001",
+      "severity": "Medium",
+      "confidence": "Confirmed",
+      "category": "headers",
+      "title": "HSTS missing on https://jadawl.site (marketing domain) — the app at https://app.jadawl.site already passes (grade A, 90/100)",
+      "evidence": [
+        "security-reports/raw/jadawl-site-headers.json: hsts -> None on jadawl.site (Bunny pull zone 6292730)",
+        "security-reports/raw/jadawl-app-headers.json: app.jadawl.site (pull zone 6480768) sends HSTS + Permissions-Policy correctly — the headers are stripped only on the marketing pull zone"
+      ],
+      "status": "fix-shipped-pending-deploy-verification",
+      "fix": "For the marketing zone: verify origin sends HSTS after redeploy, then check Bunny passes it; if not, add an Edge Rule on zone 6292730 setting Strict-Transport-Security. Also set JADAWEL_ENABLE_SECURE_PROXY_SSL_HEADER=yes in CranL env to enable Secure cookies and Django HSTS (documented in root Dockerfile comments).",
+      "verify": "curl -sI https://jadawl.site | grep -i strict-transport"
+    },
+    {
+      "id": "SEC-HDR-002",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "headers",
+      "title": "Permissions-Policy missing on jadawl.site (marketing domain only — app.jadawl.site passes)",
+      "evidence": [
+        "jadawl-site-headers.json: permissions -> None on jadawl.site; jadawl-app-headers.json: app.jadawl.site sends it correctly"
+      ],
+      "status": "fix-shipped-pending-deploy-verification",
+      "fix": "same path as SEC-HDR-001; if Bunny strips it after redeploy, add an Edge Rule setting Permissions-Policy at the CDN (zone 6292730)",
+      "verify": "curl -sI https://jadawl.site | grep -i permissions-policy"
+    },
+    {
+      "id": "SEC-HDR-006",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "cookies",
+      "title": "i18n-language cookie sent without Secure flag on app.jadawl.site",
+      "evidence": [
+        "jadawl-app-headers.json: cookie_i18n-language warn — Set-Cookie i18n-language=ar; SameSite=Lax but no Secure",
+        "web-frontend/config/nuxt.config.base.ts — @nuxtjs/i18n detectBrowserLanguage defaults cookieSecure to false"
+      ],
+      "status": "fixed-in-code",
+      "fix": "added cookieSecure: true to detectBrowserLanguage (logged in PATCHES.md). Cookie is non-sensitive (locale); HttpOnly stays off so client JS can read it.",
+      "verify": "after deploy: curl -sI https://app.jadawl.site | grep -i set-cookie"
+    },
+    {
+      "id": "SEC-HDR-003",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "headers",
+      "title": "Cross-Origin-Opener-Policy missing (never set anywhere in repo)",
+      "evidence": [
+        "grep over Caddyfile + deploy/ found no COOP; live check: coop -> None"
+      ],
+      "status": "fixed-in-code",
+      "fix": "added Cross-Origin-Opener-Policy \"same-origin-allow-popups\" to Caddyfile baseline header block and deploy/nginx/no-caddy/nginx.conf; caddy validate passes",
+      "verify": "after redeploy: curl -sI https://jadawl.site | grep -i opener-policy"
+    },
+    {
+      "id": "SEC-HDR-004",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "well-known",
+      "title": "No /.well-known/security.txt (RFC 9116)",
+      "evidence": [
+        "live check: /.well-known/security.txt -> 502; no security.txt anywhere in repo"
+      ],
+      "status": "fixed-in-code",
+      "fix": "Caddyfile responds with RFC 9116 policy (Contact: gotoaziz100@gmail.com, Expires 2027-09-30, Preferred-Languages ar/en); nginx parity added",
+      "verify": "after redeploy: curl https://jadawl.site/.well-known/security.txt"
+    },
+    {
+      "id": "SEC-SAST-001",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "sast",
+      "title": "tarfile.extractall without filter in backup restore (path traversal on crafted archive)",
+      "evidence": [
+        "backend/src/jadawel/core/management/backup/backup_runner.py:113 (semgrep trailofbits tarfile-extractall-traversal)"
+      ],
+      "status": "fixed-in-code",
+      "fix": "extractall(temporary_directory_name, filter=\"data\") — rejects absolute paths, traversal, symlinks, device nodes; logged in PATCHES.md; 80 backup tests pass",
+      "verify": "pytest tests/arabase/test_backup.py tests/arabase/test_backup_admin.py"
+    },
+    {
+      "id": "SEC-DEP-004",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "dependency",
+      "title": "Dev-only lockfiles carry vulnerable packages (not shipped in the production image)",
+      "evidence": [
+        "e2e-tests/yarn.lock: axios 1.15.0 (7 HIGH), playwright 1.48.0, nanoid, postcss",
+        "integrations/zapier/yarn.lock: form-data 4.0.0 CVE-2025-7783 (CRITICAL), node-fetch, semver, lodash",
+        "backend/email_compiler/yarn.lock: 24 vulns (minimatch, brace-expansion, lodash, picomatch)"
+      ],
+      "status": "open",
+      "fix": "Run `yarn install && yarn upgrade` refreshes in e2e-tests/, integrations/zapier/, backend/email_compiler/ and commit updated lockfiles. None of these ship in the published image, so practical risk is developer-machine only.",
+      "verify": "trivy fs --scanners vuln <lockfile>"
+    },
+    {
+      "id": "SEC-DEP-005",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "dependency",
+      "title": "web-frontend/yarn.lock: brace-expansion 1.1.18/2.1.4/5.0.9 — CVE-2026-102276/102278 (HIGH, ReDoS in build-time tooling)",
+      "evidence": [
+        "web-frontend/yarn.lock: 6 HIGH entries, all brace-expansion"
+      ],
+      "status": "open",
+      "fix": "Add a resolution pin in web-frontend/package.json (\"brace-expansion\": \"^5.0.10\" respecting existing ranges) or run yarn dedupe; build-time only, low practical risk.",
+      "verify": "trivy fs web-frontend/yarn.lock"
+    },
+    {
+      "id": "SEC-IAC-001",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "container",
+      "title": "Containers/ Dockerfiles run as root; ':latest' base tags; bare 'RUN <pkg> update'",
+      "evidence": [
+        "trivy: DS-0002 in Dockerfile, Caddy.Dockerfile, deploy/all-in-one/Dockerfile, deploy/apache/recommended/Dockerfile, embeddings/Dockerfile; DS-0001 ':latest' in deploy/all-in-one; DS-0017 RUN update alone"
+      ],
+      "status": "open",
+      "fix": "Most are inherited from upstream base images (root Dockerfile is a pull-through pin). For deploy/all-in-one, pin base images by digest (pattern already used by root Dockerfile) and add USER where feasible. Low urgency: the CranL deployment image is pinned by digest.",
+      "verify": "trivy fs --scanners config deploy/"
+    },
+    {
+      "id": "SEC-CI-001",
+      "severity": "Low",
+      "confidence": "Likely",
+      "category": "ci",
+      "title": "GitHub Actions pinned to mutable version tags (@v3/@v4/@v6/@v7) not commit SHAs",
+      "evidence": [
+        ".github/workflows/jadawel-ci.yml:41,88,122,... publish-image.yml:49,59,62 (20 hits, semgrep github-actions-mutable-action-tag)"
+      ],
+      "status": "open",
+      "fix": "Pin third-party actions (astral-sh/setup-uv, extractions/setup-just, docker/*, actions/*) to full commit SHAs with a version comment. Repo is private which lowers supply-chain exposure.",
+      "verify": "grep 'uses:' .github/workflows/*.yml shows @<sha>"
+    },
+    {
+      "id": "SEC-FE-001",
+      "severity": "Low",
+      "confidence": "Confirmed",
+      "category": "frontend",
+      "title": "website/support.js postMessage: wildcard target origin and unvalidated incoming messages",
+      "evidence": [
+        "website/support.js:1391,1862 (wildcard-postmessage-configuration) — outgoing messages carry only __dc_design_mode / __dc_booted state, no secrets",
+        "website/support.js:1411 — listener accepts only __dc_theme and __dc_probe types (CSS theme toggling), limiting impact"
+      ],
+      "status": "open",
+      "fix": "Third-party generated bundle (dc-runtime). If modifiable upstream, restrict the postMessage target origin to the known embed parent; incoming handler impact is bounded to theme toggling. Acceptable residual risk if the bundle is vendor-managed.",
+      "verify": "manual review after change"
+    },
+    {
+      "id": "SEC-FE-003",
+      "severity": "Medium",
+      "confidence": "Confirmed",
+      "category": "frontend",
+      "title": "JWT access token passed in WebSocket URL query string (?jwt_token=...)",
+      "evidence": [
+        "web-frontend/modules/core/plugins/realTimeHandler.js:65-67 — new WebSocket(`${url}?jwt_token=${token}`)"
+      ],
+      "status": "open",
+      "fix": "URL query strings are captured in server access logs, proxy/CDN logs, and can leak via Referer on redirects. Tokens are short-lived access JWTs which bounds the replay window. Inherited from upstream Baserow's Django Channels design; fixing it properly requires a WS auth-ticket or Sec-WebSocket-Protocol mechanism in core (backend ASGI middleware + this plugin), so it is a core-file change to plan deliberately rather than patch. Mitigations to prefer in the meantime: keep access-token lifetime short, and if the edge proxy (Caddy) logs query strings, consider disabling that for /ws/.",
+      "verify": "code review of new WS handshake; grep access logs for jwt_token"
+    },
+    {
+      "id": "SEC-SAST-004",
+      "severity": "Low",
+      "confidence": "Likely",
+      "category": "authz",
+      "title": "Dashboard share password has no minimum length (hashed correctly with Django hashers)",
+      "evidence": [
+        "backend/src/arabase/dashboard/share/models.py:56-62 uses make_password/check_password (good); handler.set_password accepts any non-empty string"
+      ],
+      "status": "open",
+      "fix": "Optionally enforce a minimum length (e.g. 6-8 chars) in handler.set_password and surface it in the share form. Guesses already share JADAWEL_DASHBOARD_AUTH_RATE limiting.",
+      "verify": "pytest tests/arabase -q after adding test"
+    },
+    {
+      "id": "SEC-FE-002",
+      "severity": "Info",
+      "confidence": "Confirmed",
+      "category": "frontend",
+      "title": "Markdown v-html sinks use markdown-it with html:false — safe today, fragile later",
+      "evidence": [
+        "web-frontend/modules/core/components/MarkdownIt.vue:7 v-html with new Markdown() (html disabled by default)",
+        "web-frontend/modules/database/components/view/grid/fields/GridViewFieldRichText.vue:18 (+ Functional/RowCard variants) — parseMarkdown() explicitly sets { html: false }, links get rel=noopener noreferrer nofollow"
+      ],
+      "status": "open",
+      "fix": "Make new Markdown({ html: false }) explicit in MarkdownIt.vue so enabling raw HTML later is a deliberate, reviewed change; consider DOMPurify as defense-in-depth on parseMarkdown output.",
+      "verify": "code review"
+    },
+    {
+      "id": "SEC-DEP-006",
+      "severity": "Info",
+      "confidence": "Confirmed",
+      "category": "deploy",
+      "title": "Apache example configs proxy WS as ws:// to backend containers",
+      "evidence": [
+        "deploy/apache/recommended/sub-domain.conf:12-14, deploy/apache/no-caddy/sub-domain.conf:26-28 — internal Docker bridge network hops, not internet-facing; client TLS terminates at the proxy"
+      ],
+      "status": "open",
+      "fix": "Add a comment to the example configs noting SSL termination must exist at the proxy level (or ship a TLS-enabled example).",
+      "verify": "doc review"
+    },
+    {
+      "id": "SEC-FP-FE-001",
+      "severity": "Info",
+      "confidence": "Confirmed",
+      "category": "false-positive",
+      "title": "Frontend false positives (frontend subagent review)",
+      "evidence": [
+        "web-frontend/modules/database/store/view/bufferedRows.js:583 Object.assign — values is a JSON deep clone (prototype chain broken), overrides from internal store action, neither attacker-controlled",
+        "website/support.js:937 unsafe-formatstring — Python-centric rule; JS console.error does not expand format specifiers and the value is developer-controlled",
+        "web-frontend/env-remap.mjs:56,75 — POSTHOG/SENTRY keys in NUXT_PUBLIC_* are designed to be public; abuse bounded by server-side allowed origins/rate limits"
+      ],
+      "status": "false-positive",
+      "fix": "none"
+    },
+    {
+      "id": "SEC-SECRET-001",
+      "severity": "Info",
+      "confidence": "Confirmed",
+      "category": "secrets",
+      "title": "All 35 gitleaks + 1 trivy secret hits are false positives (test fixtures and placeholders)",
+      "evidence": [
+        "backend/tests/arabase/* dummy keys ('sk-live-abcdefghijklmnop1234', idempotency keys)",
+        "backend/tests/airtable_responses/* — upstream test HTML incl. a public client-side sentry DSN",
+        "backend/src/{jadawel,baserow}/test_utils/constants.py — upstream's committed TEST import/export RSA key",
+        "docs/EMAIL_SETUP.md:202 — redacted 're_…' placeholder",
+        "backend/.venv autobahn cryptosign.py — library's example key"
+      ],
+      "status": "false-positive",
+      "fix": "none needed; consider adding a .gitleaksignore with these fingerprints to cut future noise",
+      "verify": "gitleaks detect"
+    },
+    {
+      "id": "SEC-SAST-002",
+      "severity": "Info",
+      "confidence": "Confirmed",
+      "category": "sast",
+      "title": "84 SQL-construction semgrep hits are upstream parameterized patterns; zero raw-SQL hits in fork code",
+      "evidence": [
+        "55 sqlalchemy-execute-raw-query + 21 formatted-sql-query + 8 custom-expression-as-sql, all in backend/src/jadawel|advocate; grep for execute/RawSQL in backend/src/arabase (non-test): none"
+      ],
+      "status": "false-positive",
+      "fix": "Upstream Baserow's RawSQL helpers bind parameters; spot checks found no string interpolation of user input."
+    },
+    {
+      "id": "SEC-SAST-003",
+      "severity": "Info",
+      "confidence": "Confirmed",
+      "category": "sast",
+      "title": "advocate pickle use is internal wrapper machinery, not attacker-controlled deserialization",
+      "evidence": [
+        "backend/src/advocate/api.py:274 — pickle used to hash/publish its own wrapper classes"
+      ],
+      "status": "false-positive"
+    },
+    {
+      "id": "SEC-HDR-005",
+      "severity": "Info",
+      "confidence": "Confirmed",
+      "category": "headers",
+      "title": "Server: BunnyCDN-* version disclosure",
+      "evidence": [
+        "live response headers"
+      ],
+      "status": "open",
+      "fix": "CDN-level cosmetic; Bunny header settings can override the Server header if desired."
+    }
+  ]
+}
