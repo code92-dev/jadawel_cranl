@@ -2,25 +2,39 @@
 // (modules/arabase/savedDashboards). Logical properties only.
 @import '@jadawel/modules/core/assets/scss/colors';
 
+// The page's own top bar, themed like every header: the workspace tools and
+// notifications pinned to its end corner are drawn for it.
+.my-dashboards__bar {
+  align-items: center;
+  padding-inline-start: 20px;
+}
+
+.my-dashboards__bar-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.my-dashboards__scroll {
+  overflow: auto;
+}
+
 .my-dashboards {
-  // Clear of the app's corner icons, which float over a page with no header.
-  padding: 72px 40px 48px;
+  padding: 32px 40px 48px;
   max-inline-size: 1280px;
   margin-inline: auto;
 }
 
 .my-dashboards__header {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   margin-block-end: 24px;
-}
-
-.my-dashboards__title {
-  margin: 0 0 4px;
-  font-size: 22px;
-  font-weight: 600;
 }
 
 .my-dashboards__description {
@@ -268,26 +282,62 @@
 
 // --------------------------------------------------- one dashboard, opened
 
+// Start padding only: `.layout__col-2-1` keeps the end free for the
+// workspace tools and notifications.
 .saved-dashboard__header {
-  display: flex;
   align-items: center;
   gap: 16px;
-  padding-inline: 16px;
+  padding-inline-start: 20px;
 }
 
+.saved-dashboard__name {
+  overflow: hidden;
+  font-size: 15px;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+// A button on the themed bar: a translucent chip of the bar's own colour, or a
+// white one on the white theme's light bar.
 .saved-dashboard__back {
   display: inline-flex;
+  flex: 0 0 auto;
   align-items: center;
   gap: 6px;
-  color: $palette-neutral-700;
+  margin-inline: auto 12px;
+  padding: 5px 12px;
+  border: 1px solid rgba($white, 0.36);
+  border-radius: 8px;
+  background-color: rgba($white, 0.16);
+  color: $white;
+  font-size: 13px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: background-color 0.15s ease;
+
+  &:hover,
+  &:focus-visible {
+    background-color: rgba($white, 0.28);
+    color: $white;
+    text-decoration: none;
+  }
 
   [dir='rtl'] & i {
     transform: scaleX(-1);
   }
-}
 
-.saved-dashboard__name {
-  font-weight: 600;
+  [data-interface-theme='white'] & {
+    border-color: $palette-neutral-200;
+    background-color: $white;
+    color: $palette-neutral-1000;
+
+    &:hover,
+    &:focus-visible {
+      background-color: $palette-neutral-50;
+      color: $palette-neutral-1200;
+    }
+  }
 }
 
 .saved-dashboard__notice {
@@ -332,5 +382,6 @@
 
   .my-dashboards__header {
     flex-direction: column;
+    align-items: flex-start;
   }
 }

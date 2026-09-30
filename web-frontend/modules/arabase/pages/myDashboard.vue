@@ -1,6 +1,9 @@
 <template>
   <div class="dashboard-app saved-dashboard">
     <header class="layout__col-2-1 header saved-dashboard__header">
+      <span v-if="dashboard" class="saved-dashboard__name">{{
+        dashboard.name
+      }}</span>
       <nuxt-link
         :to="{ name: 'arabase-my-dashboards' }"
         class="saved-dashboard__back"
@@ -8,9 +11,6 @@
         <i class="iconoir-arrow-left"></i>
         {{ $t('myDashboards.title') }}
       </nuxt-link>
-      <span v-if="dashboard" class="saved-dashboard__name">{{
-        dashboard.name
-      }}</span>
     </header>
 
     <div v-if="state === 'loading'" class="loading-absolute-center"></div>

@@ -1,44 +1,51 @@
 <template>
-  <div class="layout__col-2-scroll">
-    <div class="my-dashboards">
-      <header class="my-dashboards__header">
-        <div>
-          <h1 class="my-dashboards__title">{{ $t('myDashboards.title') }}</h1>
+  <div>
+    <!-- The themed bar every other page has, so the workspace tools and
+    notifications pinned to its corner sit on the theme colour. -->
+    <header class="layout__col-2-1 header my-dashboards__bar">
+      <h1 class="my-dashboards__bar-title">
+        <i class="jadawel-icon-dashboard"></i>
+        {{ $t('myDashboards.title') }}
+      </h1>
+    </header>
+    <div class="layout__col-2-2 my-dashboards__scroll">
+      <div class="my-dashboards">
+        <header class="my-dashboards__header">
           <p class="my-dashboards__description">
             {{ $t('myDashboards.description') }}
           </p>
+          <Button icon="iconoir-plus" @click="addModal.show()">
+            {{ $t('myDashboards.addDashboard') }}
+          </Button>
+        </header>
+
+        <div v-if="loading" class="loading-absolute-center"></div>
+
+        <div v-else-if="!cards.length" class="my-dashboards__empty">
+          <i class="my-dashboards__empty-icon jadawel-icon-dashboard"></i>
+          <h2>{{ $t('myDashboards.emptyTitle') }}</h2>
+          <p>{{ $t('myDashboards.emptyText') }}</p>
+          <Button icon="iconoir-plus" @click="addModal.show()">
+            {{ $t('myDashboards.addDashboard') }}
+          </Button>
         </div>
-        <Button icon="iconoir-plus" @click="addModal.show()">
-          {{ $t('myDashboards.addDashboard') }}
-        </Button>
-      </header>
 
-      <div v-if="loading" class="loading-absolute-center"></div>
-
-      <div v-else-if="!cards.length" class="my-dashboards__empty">
-        <i class="my-dashboards__empty-icon jadawel-icon-dashboard"></i>
-        <h2>{{ $t('myDashboards.emptyTitle') }}</h2>
-        <p>{{ $t('myDashboards.emptyText') }}</p>
-        <Button icon="iconoir-plus" @click="addModal.show()">
-          {{ $t('myDashboards.addDashboard') }}
-        </Button>
-      </div>
-
-      <div v-else class="my-dashboards__grid">
-        <SavedDashboardCard
-          v-for="card in cards"
-          :key="card.id"
-          v-grid-sortable="{
-            id: card.id,
-            update: reorder,
-            handle: '.saved-dashboard-card__footer',
-          }"
-          :card="card"
-          @open="open"
-          @open-in-workspace="openInWorkspace"
-          @password="passwordModal.open($event)"
-          @remove="remove"
-        />
+        <div v-else class="my-dashboards__grid">
+          <SavedDashboardCard
+            v-for="card in cards"
+            :key="card.id"
+            v-grid-sortable="{
+              id: card.id,
+              update: reorder,
+              handle: '.saved-dashboard-card__footer',
+            }"
+            :card="card"
+            @open="open"
+            @open-in-workspace="openInWorkspace"
+            @password="passwordModal.open($event)"
+            @remove="remove"
+          />
+        </div>
       </div>
     </div>
 
