@@ -86,6 +86,13 @@
           </a>
         </li>
 
+        <component
+          :is="component"
+          v-for="(component, index) in beforeSettingsComponents"
+          :key="'beforeSettingsComponent' + index"
+          @hide="hide()"
+        ></component>
+
         <li class="context__menu-item">
           <a
             class="context__menu-item-link"
@@ -174,6 +181,12 @@ export default {
       return Object.values(this.adminTypes)
         .slice()
         .sort((a, b) => a.getOrder() - b.getOrder())
+    },
+    /** Jadawel fork: plugin items above "My settings" (My dashboards). */
+    beforeSettingsComponents() {
+      return Object.values(this.$registry.getAll('plugin')).flatMap(
+        (plugin) => plugin.getUserContextComponentsBeforeSettings() || []
+      )
     },
     sidebarUserContextComponents() {
       return Object.values(this.$registry.getAll('plugin'))

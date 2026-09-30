@@ -22,6 +22,7 @@ import { TableAccessWorkspaceSettingsPageType } from '@jadawel/modules/arabase/w
 import { KanbanViewType } from '@jadawel/modules/arabase/kanban/viewType'
 import kanbanStore from '@jadawel/modules/arabase/kanban/store'
 import publicDashboardApplicationStore from '@jadawel/modules/arabase/dashboard/store/publicDashboardApplication'
+import savedDashboardApplicationStore from '@jadawel/modules/arabase/savedDashboards/store/savedDashboardApplication'
 import { HtmlPageViewType } from '@jadawel/modules/arabase/views/viewTypes'
 import htmlPageViewStore from '@jadawel/modules/arabase/views/store/htmlPageView'
 import { McpProtectedEndpointSettingsType } from '@jadawel/modules/arabase/mcp/settingsTypes'
@@ -78,6 +79,13 @@ export default defineNuxtPlugin({
       $store.registerModuleNuxtSafe(
         'public/dashboardApplication',
         publicDashboardApplicationStore
+      )
+    }
+    // The same for a dashboard opened from "My dashboards" (`saved/`).
+    if (!$store.hasModule('saved/dashboardApplication')) {
+      $store.registerModuleNuxtSafe(
+        'saved/dashboardApplication',
+        savedDashboardApplicationStore
       )
     }
 

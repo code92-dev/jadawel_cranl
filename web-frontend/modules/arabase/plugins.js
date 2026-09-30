@@ -3,6 +3,8 @@ import ShareDashboardLink from '@jadawel/modules/arabase/dashboard/components/Sh
 import SanadUtilityItem from '@jadawel/modules/arabase/sanad/components/SanadUtilityItem'
 import AdminGenerativeAISettings from '@jadawel/modules/arabase/generativeAI/AdminGenerativeAISettings'
 import SanadPanel from '@jadawel/modules/arabase/sanad/components/SanadPanel'
+import AddToMyDashboards from '@jadawel/modules/arabase/savedDashboards/components/AddToMyDashboards'
+import MyDashboardsMenuItem from '@jadawel/modules/arabase/savedDashboards/components/MyDashboardsMenuItem'
 
 /**
  * Fork-level UI that core modules render through their plugin hooks. Using the
@@ -15,18 +17,27 @@ export class ArabasePlugin extends JadawelPlugin {
   }
 
   getAdditionalDashboardHeaderComponents(dashboard) {
-    // The endpoints behind it all require `application.update`; rendering the
-    // menu for a viewer would only produce a permission error.
-    if (
-      !this.app.$hasPermission(
-        'application.update',
-        dashboard,
-        dashboard.workspace.id
-      )
-    ) {
-      return []
-    }
-    return [ShareDashboardLink]
+    // Any member who can open the dashboard may pin it to their own page; a
+    // template preview is no workspace of theirs. The sharing endpoints all
+    // require `application.update`; rendering that menu for a viewer would
+    // only produce a permission error.
+    const isMember = Boolean(
+      this.app.$store.getters['workspace/get'](dashboard.workspace.id)
+    )
+    const canShare = this.app.$hasPermission(
+      'application.update',
+      dashboard,
+      dashboard.workspace.id
+    )
+    return [
+      ...(isMember ? [AddToMyDashboards] : []),
+      ...(canShare ? [ShareDashboardLink] : []),
+    ]
+  }
+
+  /** "My dashboards" (لوحاتي), directly above "My settings". */
+  getUserContextComponentsBeforeSettings() {
+    return [MyDashboardsMenuItem]
   }
 
   /**

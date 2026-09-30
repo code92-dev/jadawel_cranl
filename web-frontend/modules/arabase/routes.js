@@ -10,6 +10,18 @@ export const routes = [
     meta: { layout: 'app', middleware: 'staff' },
   },
   {
+    // "My dashboards" (لوحاتي): the user's own collection, and one of its
+    // dashboards opened full size. docs/MY_DASHBOARDS.md.
+    name: 'arabase-my-dashboards',
+    path: '/my-dashboards',
+    file: path.resolve(__dirname, 'pages/myDashboards.vue'),
+  },
+  {
+    name: 'arabase-my-dashboard',
+    path: '/my-dashboards/:savedDashboardId',
+    file: path.resolve(__dirname, 'pages/myDashboard.vue'),
+  },
+  {
     name: 'arabase-public-dashboard',
     path: '/public/dashboard/:slug',
     file: path.resolve(__dirname, 'pages/publicDashboard.vue'),

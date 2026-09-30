@@ -46,6 +46,7 @@ from arabase.sanad.models import (
     SanadMessageStatus,
     SanadUsage,
 )
+from arabase.saved_dashboards.models import SavedDashboard, SavedDashboardSource
 from arabase.table_access.models import (
     PendingTableGrant,
     TableAccessLevel,
@@ -58,6 +59,8 @@ from arabase.views.models import (
 )
 
 __all__ = [
+    "SavedDashboard",
+    "SavedDashboardSource",
     "BackupRun",
     "BackupSchedule",
     "DashboardShare",

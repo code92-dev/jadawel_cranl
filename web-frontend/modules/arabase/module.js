@@ -53,6 +53,7 @@ export default defineNuxtModule({
     nuxt.options.css.push(resolve('./assets/scss/table_access.scss'))
     nuxt.options.css.push(resolve('./assets/scss/sanad.scss'))
     nuxt.options.css.push(resolve('./assets/scss/admin_generative_ai.scss'))
+    nuxt.options.css.push(resolve('./assets/scss/my_dashboards.scss'))
 
     // Public dashboard share pages. Anonymous routes, so they must live
     // outside the authenticated `app` layout.

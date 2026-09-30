@@ -1051,5 +1051,62 @@
     "step": "الخطوة {number} من {total}",
     "needsSetup": "تحتاج إعدادًا",
     "ready": "جاهزة"
+  },
+  "myDashboards": {
+    "title": "لوحاتي",
+    "description": "لوحات التحكم التي جمعتها من مساحات عملك ومن الروابط، معًا في مكان واحد.",
+    "addDashboard": "إضافة لوحة تحكم",
+    "emptyTitle": "لا توجد لوحات تحكم هنا بعد",
+    "emptyText": "أضف لوحة تحكم من إحدى مساحات عملك، أو الصق الرابط العام للوحة تحكم، لتظهر هنا.",
+    "open": "فتح {name}",
+    "menu": "خيارات لوحة التحكم",
+    "openAction": "فتح",
+    "openInWorkspace": "فتح في مساحة العمل",
+    "enterPassword": "إدخال كلمة المرور",
+    "remove": "إزالة من لوحاتي",
+    "untitled": "لوحة تحكم بلا اسم",
+    "sharedLink": "رابط عام",
+    "status": {
+      "password": "تغيّرت كلمة المرور",
+      "unavailable": "لم تعد متاحة",
+      "unreachable": "الخادم لا يستجيب"
+    },
+    "addToMine": "إضافة إلى لوحاتي",
+    "addedTitle": "أُضيفت إلى لوحاتي",
+    "addedMessage": "أصبحت {name} في صفحة لوحاتي.",
+    "addTitle": "إضافة لوحة تحكم",
+    "fromWorkspaces": "من مساحات عملي",
+    "byLink": "عبر رابط",
+    "noWorkspaceDashboards": "لا توجد لوحات تحكم في مساحات عملك بعد.",
+    "added": "مُضافة",
+    "add": "إضافة",
+    "linkDescription": "الصق الرابط العام لأي لوحة تحكم، لك أو لغيرك، على هذا الخادم أو على خادم جداول آخر.",
+    "linkLabel": "رابط لوحة التحكم",
+    "linkPlaceholder": "https://…/public/dashboard/…",
+    "passwordNeeded": "لوحة التحكم هذه محمية بكلمة مرور. أدخل كلمة المرور لإضافتها.",
+    "passwordTitle": "أدخل كلمة المرور",
+    "passwordChanged": "غيّر مالك {name} كلمة المرور. أدخل كلمة المرور الجديدة لعرضها مرة أخرى.",
+    "passwordChangedShort": "غيّر مالك لوحة التحكم هذه كلمة المرور. أدخل كلمة المرور الجديدة لعرضها مرة أخرى.",
+    "passwordLabel": "كلمة المرور",
+    "unlock": "فتح لوحة التحكم",
+    "retry": "إعادة المحاولة",
+    "errors": {
+      "ERROR_SAVED_DASHBOARD_LINK_INVALID": {
+        "title": "هذا ليس رابط لوحة تحكم",
+        "message": "الصق الرابط العام للوحة تحكم، ويكون بالشكل https://…/public/dashboard/…، ويجب أن يبدأ رابط الخادم الآخر بـ https."
+      },
+      "ERROR_SAVED_DASHBOARD_PASSWORD_INCORRECT": {
+        "title": "كلمة المرور غير صحيحة",
+        "message": "كلمة المرور غير صحيحة. تحقّق منها مع مالك لوحة التحكم."
+      },
+      "ERROR_SAVED_DASHBOARD_UNAVAILABLE": {
+        "title": "لوحة التحكم غير متاحة",
+        "message": "لم تعد لوحة التحكم مشاركة، أو تغيّر رابطها، أو لم تعد لديك صلاحية الوصول إليها."
+      },
+      "ERROR_SAVED_DASHBOARD_UNREACHABLE": {
+        "title": "لم يستجب الخادم",
+        "message": "تعذّر الوصول إلى الخادم الذي توجد عليه لوحة التحكم. حاول مرة أخرى لاحقًا."
+      }
+    }
   }
 }

@@ -39,6 +39,7 @@ from arabase.dashboard.share.handler import (
     DashboardShareHandler,
     get_public_authorization_token,
 )
+from arabase.dashboard.share.models import DashboardShare
 from jadawel.api.decorators import map_exceptions, validate_body
 from jadawel.api.schemas import get_error_schema
 from jadawel.contrib.dashboard.api.data_sources.errors import (
@@ -74,6 +75,82 @@ PUBLIC_ERRORS = {
 }
 
 
+def public_dashboard_payload(dashboard) -> dict:
+    """The dashboard, its widgets and its data sources as a link visitor sees
+    them. Also what a link saved to "My dashboards" returns (``saved``)."""
+
+    # Both handlers return lists, so they can be read again below after the
+    # allow-list is built from them.
+    widgets = WidgetHandler().get_widgets(dashboard)
+    data_sources = DashboardDataSourceHandler().get_data_sources(dashboard)
+    allowed_properties = get_public_allowed_properties(
+        dashboard, widgets=widgets, data_sources=data_sources
+    )
+    return {
+        "dashboard": PublicDashboardSerializer(dashboard).data,
+        "widgets": [
+            widget_type_registry.get_serializer(widget, WidgetSerializer).data
+            for widget in widgets
+        ],
+        "data_sources": [
+            PublicDashboardDataSourceSerializer(
+                data_source.service,
+                context={
+                    "data_source": data_source,
+                    # Narrows the schema to the columns this visitor can
+                    # actually dispatch, so the field names of the rest of the
+                    # table are not disclosed either.
+                    "allowed_fields": allowed_properties.get(
+                        data_source.service_id, []
+                    ),
+                },
+            ).data
+            for data_source in data_sources
+        ],
+    }
+
+
+def dispatch_public_data_source(
+    request: Request, share: DashboardShare, data_source_id: int
+) -> dict:
+    """Dispatches one data source of a shared dashboard for a link visitor.
+
+    :raises DashboardDataSourceDoesNotExist: for a data source of another
+        dashboard: the slug is the only authorisation a visitor holds.
+    """
+
+    data_source = DashboardDataSourceHandler().get_data_source(data_source_id)
+    if data_source.dashboard_id != share.dashboard_id:
+        raise DashboardDataSourceDoesNotExist()
+
+    # A visitor is authorised to read the dashboard, which is the fields its
+    # widgets display — not every column of the tables behind them. The private
+    # context places no such limit, so it must not be used here. Only this data
+    # source's entry is read, so only it is built.
+    return DashboardDataSourceHandler().dispatch_data_source(
+        data_source,
+        PublicDashboardDispatchContext(
+            request,
+            allowed_properties=get_public_allowed_properties(
+                share.dashboard, data_sources=[data_source]
+            ),
+        ),
+    )
+
+
+PUBLIC_DISPATCH_ERRORS = {
+    **PUBLIC_ERRORS,
+    DashboardDataSourceDoesNotExist: ERROR_DASHBOARD_DATA_SOURCE_DOES_NOT_EXIST,
+    DashboardDataSourceImproperlyConfigured: (
+        ERROR_DASHBOARD_DATA_SOURCE_IMPROPERLY_CONFIGURED
+    ),
+    ServiceImproperlyConfiguredDispatchException: (
+        ERROR_DASHBOARD_DATA_SOURCE_IMPROPERLY_CONFIGURED
+    ),
+    DoesNotExist: ERROR_DASHBOARD_DATA_DOES_NOT_EXIST,
+}
+
+
 class PublicDashboardInfoView(APIView):
     permission_classes = (AllowAny,)
 
@@ -98,40 +175,7 @@ class PublicDashboardInfoView(APIView):
         share = DashboardShareHandler().get_public_share_by_slug(
             slug, get_public_authorization_token(request)
         )
-        dashboard = share.dashboard
-
-        # Both handlers return lists, so they can be read again below after the
-        # allow-list is built from them.
-        widgets = WidgetHandler().get_widgets(dashboard)
-        data_sources = DashboardDataSourceHandler().get_data_sources(dashboard)
-        allowed_properties = get_public_allowed_properties(
-            dashboard, widgets=widgets, data_sources=data_sources
-        )
-
-        return Response(
-            {
-                "dashboard": PublicDashboardSerializer(dashboard).data,
-                "widgets": [
-                    widget_type_registry.get_serializer(widget, WidgetSerializer).data
-                    for widget in widgets
-                ],
-                "data_sources": [
-                    PublicDashboardDataSourceSerializer(
-                        data_source.service,
-                        context={
-                            "data_source": data_source,
-                            # Narrows the schema to the columns this visitor can
-                            # actually dispatch, so the field names of the rest
-                            # of the table are not disclosed either.
-                            "allowed_fields": allowed_properties.get(
-                                data_source.service_id, []
-                            ),
-                        },
-                    ).data
-                    for data_source in data_sources
-                ],
-            }
-        )
+        return Response(public_dashboard_payload(share.dashboard))
 
 
 class PublicDashboardDispatchView(APIView):
@@ -171,44 +215,13 @@ class PublicDashboardDispatchView(APIView):
         },
     )
     @transaction.atomic
-    @map_exceptions(
-        {
-            **PUBLIC_ERRORS,
-            DashboardDataSourceDoesNotExist: ERROR_DASHBOARD_DATA_SOURCE_DOES_NOT_EXIST,
-            DashboardDataSourceImproperlyConfigured: (
-                ERROR_DASHBOARD_DATA_SOURCE_IMPROPERLY_CONFIGURED
-            ),
-            ServiceImproperlyConfiguredDispatchException: (
-                ERROR_DASHBOARD_DATA_SOURCE_IMPROPERLY_CONFIGURED
-            ),
-            DoesNotExist: ERROR_DASHBOARD_DATA_DOES_NOT_EXIST,
-        }
-    )
+    @map_exceptions(PUBLIC_DISPATCH_ERRORS)
     def post(self, request: Request, slug: str, data_source_id: int) -> Response:
         share = DashboardShareHandler().get_public_share_by_slug(
             slug, get_public_authorization_token(request)
         )
 
-        data_source = DashboardDataSourceHandler().get_data_source(data_source_id)
-        # The slug is the only authorisation a visitor holds, so a data source
-        # that belongs to a different dashboard must look like it doesn't exist.
-        if data_source.dashboard_id != share.dashboard_id:
-            raise DashboardDataSourceDoesNotExist()
-
-        # A visitor is authorised to read the dashboard, which is the fields its
-        # widgets display — not every column of the tables behind them. The
-        # private context places no such limit, so it must not be used here.
-        # Only this data source's entry is read, so only it is built.
-        result = DashboardDataSourceHandler().dispatch_data_source(
-            data_source,
-            PublicDashboardDispatchContext(
-                request,
-                allowed_properties=get_public_allowed_properties(
-                    share.dashboard, data_sources=[data_source]
-                ),
-            ),
-        )
-        return Response(result)
+        return Response(dispatch_public_data_source(request, share, data_source_id))
 
 
 class PublicDashboardAuthThrottle(SimpleRateThrottle):

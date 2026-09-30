@@ -40,6 +40,17 @@ from arabase.api.sanad.views import (
     SanadMessagesView,
     SanadModelsView,
 )
+from arabase.api.saved_dashboards.views import (
+    AddDashboardLinkView,
+    AddWorkspaceDashboardView,
+    AvailableDashboardsView,
+    OrderSavedDashboardsView,
+    SavedDashboardContentView,
+    SavedDashboardDispatchView,
+    SavedDashboardPasswordView,
+    SavedDashboardsView,
+    SavedDashboardView,
+)
 from arabase.api.table_access.views import TableAccessGuestView, TableAccessView
 from arabase.api.views import WorkspaceActivityView, WorkspaceDatabaseStatsView
 
@@ -136,6 +147,48 @@ urlpatterns = [
         r"^public/dashboard/(?P<slug>[-\w]+)/dispatch/(?P<data_source_id>[0-9]+)/$",
         PublicDashboardDispatchView.as_view(),
         name="public_dashboard_dispatch",
+    ),
+    re_path(r"^my-dashboards/$", SavedDashboardsView.as_view(), name="my_dashboards"),
+    re_path(
+        r"^my-dashboards/available/$",
+        AvailableDashboardsView.as_view(),
+        name="my_dashboards_available",
+    ),
+    re_path(
+        r"^my-dashboards/workspace/$",
+        AddWorkspaceDashboardView.as_view(),
+        name="my_dashboards_add_workspace",
+    ),
+    re_path(
+        r"^my-dashboards/link/$",
+        AddDashboardLinkView.as_view(),
+        name="my_dashboards_add_link",
+    ),
+    re_path(
+        r"^my-dashboards/order/$",
+        OrderSavedDashboardsView.as_view(),
+        name="my_dashboards_order",
+    ),
+    re_path(
+        r"^my-dashboards/(?P<saved_dashboard_id>[0-9]+)/$",
+        SavedDashboardView.as_view(),
+        name="my_dashboard",
+    ),
+    re_path(
+        r"^my-dashboards/(?P<saved_dashboard_id>[0-9]+)/password/$",
+        SavedDashboardPasswordView.as_view(),
+        name="my_dashboard_password",
+    ),
+    re_path(
+        r"^my-dashboards/(?P<saved_dashboard_id>[0-9]+)/content/$",
+        SavedDashboardContentView.as_view(),
+        name="my_dashboard_content",
+    ),
+    re_path(
+        r"^my-dashboards/(?P<saved_dashboard_id>[0-9]+)/dispatch/"
+        r"(?P<data_source_id>[0-9]+)/$",
+        SavedDashboardDispatchView.as_view(),
+        name="my_dashboard_dispatch",
     ),
     re_path(
         r"^admin/backup/$",

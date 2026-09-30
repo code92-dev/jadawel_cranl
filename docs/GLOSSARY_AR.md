@@ -43,6 +43,7 @@ term exists).
 | Cell | خلية | |
 | Primary field | الحقل الأساسي | |
 | Dashboard | لوحة التحكم | |
+| My dashboards | لوحاتي | The user's own page collecting dashboards from their workspaces and by link (docs/MY_DASHBOARDS.md). Plural of the term: لوحات التحكم. |
 | Widget | عنصر | Dashboard widget. |
 | Size | الحجم | Widget size on the dashboard grid, in columns × rows. |
 | Key number (widget) | رقم رئيسي | The `summary` widget: one headline number. |

@@ -69,6 +69,14 @@ export class JadawelPlugin extends Registerable {
     return null
   }
 
+  /**
+   * Jadawel fork: items shown in the user context menu directly above "My
+   * settings", rather than after it like `getUserContextComponents`.
+   */
+  getUserContextComponentsBeforeSettings() {
+    return []
+  }
+
   /*
    * Every registered plugin can display a component in the links section of the
    * dashboard sidebar.

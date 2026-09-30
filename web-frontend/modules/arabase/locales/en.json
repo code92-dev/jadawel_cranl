@@ -1033,5 +1033,62 @@
     "step": "Step {number} of {total}",
     "needsSetup": "Needs setup",
     "ready": "Set up"
+  },
+  "myDashboards": {
+    "title": "My dashboards",
+    "description": "Dashboards you collected from your workspaces and from links, together in one place.",
+    "addDashboard": "Add dashboard",
+    "emptyTitle": "No dashboards here yet",
+    "emptyText": "Add a dashboard from one of your workspaces, or paste a dashboard's public link, to see it here.",
+    "open": "Open {name}",
+    "menu": "Dashboard options",
+    "openAction": "Open",
+    "openInWorkspace": "Open in its workspace",
+    "enterPassword": "Enter password",
+    "remove": "Remove from My dashboards",
+    "untitled": "Untitled dashboard",
+    "sharedLink": "Shared link",
+    "status": {
+      "password": "Password changed",
+      "unavailable": "No longer available",
+      "unreachable": "Server not responding"
+    },
+    "addToMine": "Add to My dashboards",
+    "addedTitle": "Added to My dashboards",
+    "addedMessage": "{name} is now on your My dashboards page.",
+    "addTitle": "Add a dashboard",
+    "fromWorkspaces": "From my workspaces",
+    "byLink": "By link",
+    "noWorkspaceDashboards": "Your workspaces have no dashboards yet.",
+    "added": "Added",
+    "add": "Add",
+    "linkDescription": "Paste the public link of any dashboard, yours or someone else's, on this server or another Jadawel server.",
+    "linkLabel": "Dashboard link",
+    "linkPlaceholder": "https://…/public/dashboard/…",
+    "passwordNeeded": "This dashboard is password protected. Enter its password to add it.",
+    "passwordTitle": "Enter the password",
+    "passwordChanged": "The owner of {name} changed its password. Enter the new one to see it again.",
+    "passwordChangedShort": "The owner changed this dashboard's password. Enter the new one to see it again.",
+    "passwordLabel": "Password",
+    "unlock": "Open dashboard",
+    "retry": "Try again",
+    "errors": {
+      "ERROR_SAVED_DASHBOARD_LINK_INVALID": {
+        "title": "That is not a dashboard link",
+        "message": "Paste the public link of a dashboard. It looks like https://…/public/dashboard/…, and a link to another server must start with https."
+      },
+      "ERROR_SAVED_DASHBOARD_PASSWORD_INCORRECT": {
+        "title": "Wrong password",
+        "message": "The password is incorrect. Check it with the dashboard's owner."
+      },
+      "ERROR_SAVED_DASHBOARD_UNAVAILABLE": {
+        "title": "Dashboard not available",
+        "message": "The dashboard is no longer shared, its link changed, or you no longer have access to it."
+      },
+      "ERROR_SAVED_DASHBOARD_UNREACHABLE": {
+        "title": "The server did not respond",
+        "message": "The server this dashboard is on could not be reached. Try again later."
+      }
+    }
   }
 }

@@ -6,13 +6,11 @@ AI call and of every workspace payload, so the rows are cached, still sealed,
 and the cache is dropped whenever an admin saves.
 """
 
-import base64
 from typing import Any, Optional
 
 from django.core.cache import cache
-from django.utils.crypto import salted_hmac
 
-from cryptography.fernet import Fernet, InvalidToken
+from arabase.sealing import Sealer
 
 # The providers administrators can configure, in display order. The labels are
 # the providers' own product names.
@@ -32,30 +30,17 @@ PROVIDER_FIELDS = {
 CACHE_KEY = "arabase:generative_ai:provider_settings"
 CACHE_SECONDS = 300
 
-
-def _fernet() -> Fernet:
-    from django.conf import settings
-
-    key = salted_hmac(
-        "arabase.generative_ai",
-        "provider-api-key",
-        secret=settings.SECRET_KEY,
-        algorithm="sha256",
-    ).digest()
-    return Fernet(base64.urlsafe_b64encode(key))
+_SEALER = Sealer("arabase.generative_ai", "provider-api-key")
 
 
 def seal(value: str) -> str:
-    return _fernet().encrypt(value.encode()).decode()
+    return _SEALER.seal(value)
 
 
 def unseal(value: str) -> Optional[str]:
     """The plain key, or None when it was sealed under another SECRET_KEY."""
 
-    try:
-        return _fernet().decrypt(value.encode()).decode()
-    except InvalidToken:
-        return None
+    return _SEALER.unseal(value)
 
 
 def _load() -> dict[str, dict[str, Any]]:

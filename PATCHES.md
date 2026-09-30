@@ -1787,3 +1787,14 @@ and not logged here.
 | `backend/tests/jadawel/contrib/database/field/test_link_row_field_type.py`            | `test_import_export_link_row_field` orders the imported tables by id                                                    | They share an `order` and came back in either order, failing CI when "Customers" came first            | low        |
 
 **Tests:** `web-frontend/test/unit/arabase/automation/` (3 files).
+
+## My dashboards — user-menu entry above "My settings" (2026-09-29)
+
+docs/MY_DASHBOARDS.md. The feature is additive (`arabase/saved_dashboards`,
+`modules/arabase/savedDashboards`); only its menu entry needs core, since
+`getUserContextComponents` renders after "My settings".
+
+| File | Change | Reason | Risk |
+| ---- | ------ | ------ | ---- |
+| `web-frontend/modules/core/plugins.js` | New plugin hook `getUserContextComponentsBeforeSettings()`, returning `[]` by default | The entry must sit directly above "My settings" | low; additive, default empty |
+| `web-frontend/modules/core/components/sidebar/SidebarUserContext.vue` | Renders that hook's components just before the "My settings" item (`beforeSettingsComponents`) | Same | low; renders nothing unless a plugin returns components |

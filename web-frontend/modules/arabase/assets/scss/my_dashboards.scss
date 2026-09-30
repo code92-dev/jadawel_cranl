@@ -1,0 +1,336 @@
+// "My dashboards" (لوحاتي): the gallery, its cards and the add dialog
+// (modules/arabase/savedDashboards). Logical properties only.
+@import '@jadawel/modules/core/assets/scss/colors';
+
+.my-dashboards {
+  // Clear of the app's corner icons, which float over a page with no header.
+  padding: 72px 40px 48px;
+  max-inline-size: 1280px;
+  margin-inline: auto;
+}
+
+.my-dashboards__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-block-end: 24px;
+}
+
+.my-dashboards__title {
+  margin: 0 0 4px;
+  font-size: 22px;
+  font-weight: 600;
+}
+
+.my-dashboards__description {
+  margin: 0;
+  color: $palette-neutral-700;
+  max-inline-size: 70ch;
+}
+
+.my-dashboards__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 20px;
+}
+
+.my-dashboards__empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-block: 64px;
+  text-align: center;
+  color: $palette-neutral-700;
+
+  h2 {
+    margin: 8px 0 0;
+    font-size: 16px;
+    color: $palette-neutral-900;
+  }
+
+  p {
+    margin: 0 0 12px;
+    max-inline-size: 48ch;
+  }
+}
+
+.my-dashboards__empty-icon {
+  font-size: 40px;
+  color: $palette-neutral-500;
+}
+
+// ------------------------------------------------------------------- card
+
+.saved-dashboard-card {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 12px;
+  background: $white;
+  overflow: hidden;
+  transition:
+    box-shadow 0.15s ease,
+    border-color 0.15s ease;
+
+  &:hover {
+    border-color: $palette-neutral-300;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  }
+}
+
+.saved-dashboard-card__preview {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  block-size: 150px;
+  padding: 14px;
+  border: 0;
+  background: $palette-neutral-25;
+  cursor: pointer;
+
+  .saved-dashboard-card--blocked & {
+    cursor: default;
+  }
+}
+
+// The dashboard's own layout, drawn on its 12-column board without data.
+.saved-dashboard-card__sketch {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-auto-rows: 7px;
+  gap: 3px;
+  inline-size: 100%;
+  max-block-size: 100%;
+  overflow: hidden;
+
+  .saved-dashboard-card--blocked & {
+    opacity: 0.35;
+  }
+}
+
+.saved-dashboard-card__block {
+  border-radius: 3px;
+  background: $palette-neutral-100;
+
+  &--number {
+    background: $palette-blue-100;
+  }
+
+  &--chart {
+    background: $palette-green-100;
+  }
+
+  &--list {
+    background: $palette-purple-100;
+  }
+
+  &--text {
+    background: $palette-neutral-50;
+    border: 1px dashed $palette-neutral-200;
+  }
+}
+
+.saved-dashboard-card__empty {
+  font-size: 32px;
+  color: $palette-neutral-400;
+}
+
+.saved-dashboard-card__status {
+  position: absolute;
+  inset-block-start: 10px;
+  inset-inline-start: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 500;
+
+  &--password {
+    background: $palette-yellow-50;
+    color: $palette-yellow-900;
+  }
+
+  &--unavailable {
+    background: $palette-red-50;
+    color: $palette-red-900;
+  }
+
+  &--unreachable {
+    background: $palette-neutral-100;
+    color: $palette-neutral-800;
+  }
+}
+
+.saved-dashboard-card__footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 14px;
+  border-block-start: 1px solid $palette-neutral-100;
+  cursor: grab;
+}
+
+.saved-dashboard-card__text {
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.saved-dashboard-card__title {
+  overflow: hidden;
+  font-weight: 600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.saved-dashboard-card__source {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-block-start: 2px;
+  overflow: hidden;
+  font-size: 12px;
+  color: $palette-neutral-600;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.saved-dashboard-card__menu {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 6px;
+  color: $palette-neutral-700;
+  cursor: pointer;
+
+  &:hover {
+    background: $palette-neutral-100;
+  }
+}
+
+// ------------------------------------------------------------ add dialog
+
+.add-saved-dashboard__empty {
+  color: $palette-neutral-700;
+}
+
+.add-saved-dashboard__workspace + .add-saved-dashboard__workspace {
+  margin-block-start: 16px;
+}
+
+.add-saved-dashboard__workspace-name {
+  margin-block-end: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $palette-neutral-600;
+}
+
+.add-saved-dashboard__list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.add-saved-dashboard__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-block-size: 40px;
+  padding-inline: 8px;
+  border-radius: 6px;
+
+  &:hover {
+    background: $palette-neutral-50;
+  }
+}
+
+.add-saved-dashboard__item-name {
+  flex: 1;
+  min-inline-size: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.add-saved-dashboard__added {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: $palette-green-800;
+}
+
+// --------------------------------------------------- one dashboard, opened
+
+.saved-dashboard__header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding-inline: 16px;
+}
+
+.saved-dashboard__back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: $palette-neutral-700;
+
+  [dir='rtl'] & i {
+    transform: scaleX(-1);
+  }
+}
+
+.saved-dashboard__name {
+  font-weight: 600;
+}
+
+.saved-dashboard__notice {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  max-inline-size: 420px;
+  margin: 80px auto;
+  text-align: center;
+
+  h2 {
+    margin: 0;
+    font-size: 16px;
+  }
+
+  p {
+    margin: 0 0 8px;
+    color: $palette-neutral-700;
+  }
+}
+
+.saved-dashboard__notice-icon {
+  font-size: 32px;
+  color: $palette-neutral-500;
+}
+
+.saved-dashboard__password {
+  display: flex;
+  gap: 8px;
+  inline-size: 100%;
+
+  > :first-child {
+    flex: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .my-dashboards {
+    padding: 20px 16px 32px;
+  }
+
+  .my-dashboards__header {
+    flex-direction: column;
+  }
+}
