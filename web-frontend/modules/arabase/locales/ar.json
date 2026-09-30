@@ -1082,7 +1082,7 @@
     "add": "إضافة",
     "linkDescription": "الصق الرابط العام لأي لوحة تحكم، لك أو لغيرك، على هذا الخادم أو على خادم جداول آخر.",
     "linkLabel": "رابط لوحة التحكم",
-    "linkPlaceholder": "https://…/public/dashboard/…",
+    "linkPlaceholder": "مثال: https://…/public/dashboard/…",
     "passwordNeeded": "لوحة التحكم هذه محمية بكلمة مرور. أدخل كلمة المرور لإضافتها.",
     "passwordTitle": "أدخل كلمة المرور",
     "passwordChanged": "غيّر مالك {name} كلمة المرور. أدخل كلمة المرور الجديدة لعرضها مرة أخرى.",
