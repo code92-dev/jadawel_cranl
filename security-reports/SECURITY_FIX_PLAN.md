@@ -8,6 +8,28 @@ Tasks are ordered. IDs match `security-reports/findings.json`.
 
 ---
 
+## Follow-up 2026-10-01 (after 2.3.17-security-audit went live)
+
+Verified live on app.jadawl.site: COOP, HSTS, Permissions-Policy, the `Secure`
+locale cookie and security.txt are all served by the new image.
+
+| Item | Status |
+| ---- | ------ |
+| §15 SEC-FE-003 JWT in the WebSocket URL | **Interim fix shipped**: uvicorn logged every socket handshake as `"WebSocket /ws/core/?jwt_token=<live token>" [accepted]` (12 in the local instance's last 3 days; CranL's logs hold the same). `backend/src/arabase/log_redaction.py` filters `uvicorn.error` and `uvicorn.access` and writes `jwt_token=[redacted]`, verified under gunicorn + UvicornWorker. The WS-ticket redesign in core remains open. |
+| security.txt `Canonical` | **Fixed**: printed `https://app.jadawl.site//.well-known/security.txt` (the public URL env var ends in `/`); now built from the request host. |
+| §10 SEC-CI-001 | **Fixed**: every action in both workflows pinned to the commit its current tag points at, with the version as a comment. |
+| §13 SEC-SAST-004 | **No change needed**: `UpdateDashboardSharePasswordSerializer` already enforces `MIN_SHARE_PASSWORD_LENGTH = 8` before the handler is reached. |
+| §14 SEC-FE-002 | **Left as is**: markdown-it already defaults to `html: false`; spelling it out would be a core-file edit with no behaviour change. |
+| §6 SEC-HDR-001/002 (jadawl.site) | **Still open, and the env var cannot fix it**: jadawl.site is the separate `jadawel_website` app (its own nginx), so `JADAWEL_ENABLE_SECURE_PROXY_SSL_HEADER` on the Jadawel app never reaches it. Add the headers to that repo's `jadawel-headers.conf` snippet, or add the two Bunny Edge Rules on pull zone 6292730 listed under §6. |
+| §12 SEC-FE-001 | Open — belongs to the website repo too, not to this image. |
+| §8, §9 | Open — dev/build-time only, nothing ships. |
+
+The same release fixes the page-load regressions measured that day (see
+`docs/PERFORMANCE_2026-10-01.md`); none of the security changes add work to a
+request.
+
+---
+
 ## Done in this session (verify after deploy)
 
 ### 1. SEC-DEP-001/002/003 — Backend runtime dependency bumps (uv.lock)

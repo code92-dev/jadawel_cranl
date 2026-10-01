@@ -41,6 +41,12 @@ class ArabaseConfig(AppConfig):
         # tokens, which Sanad's budget counts (arabase.generative_ai.usage).
         keep_token_counts()
 
+        from arabase.log_redaction import install as redact_logged_tokens
+
+        # uvicorn logs the realtime socket's `?jwt_token=` query string in full
+        # on every connection (arabase.log_redaction).
+        redact_logged_tokens()
+
         from arabase.integrations.local_jadawel.service_types import (
             LocalJadawelGroupedAggregateRowsUserServiceType,
         )
