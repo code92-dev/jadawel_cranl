@@ -113,6 +113,11 @@ upstream error through this route ends up with two conflicting `X-Frame-Options`
 values, because Django sends its own `DENY` — this was observed in testing, not
 theorised.
 
+The replace also drops any policy Django sets, so `/api/webhooks/*` is left out of
+it: a workflow's Response step answers there with content the workflow chose, and
+Django marks it `sandbox`. Those routes get `sandbox; frame-ancestors 'self'`
+instead (added 2026-10-01 with the Baserow 2.4 port).
+
 > **Worth verifying with a real form.** Production returns
 > `X-Frame-Options: DENY` on `/form/<unknown-slug>`. That is Django's header
 > leaking through an error response, but it means embedding may *already* be

@@ -91,7 +91,7 @@ EOF
     # the framing, and the application builder previews pages in a same-origin
     # iframe, which `'none'` would break.
     @app_only {
-        not path /form/* /public/* /media/*
+        not path /form/* /public/* /media/* /api/webhooks/*
     }
     # `>` replaces the field instead of adding to it. Django sends its own
     # `X-Frame-Options: DENY` on API responses, and without this a request that
@@ -99,6 +99,19 @@ EOF
     # values in the same response.
     header @app_only {
         >Content-Security-Policy "frame-ancestors 'self'"
+        >X-Frame-Options "SAMEORIGIN"
+    }
+
+    # A workflow's Response step answers on `/api/webhooks/*` with a body and
+    # content type the workflow chose, which can echo the caller's own input.
+    # Django marks that answer `sandbox` so a browser never runs it as this
+    # origin. The replace above would drop that, so these routes get their own
+    # policy carrying both.
+    @workflow_responses {
+        path /api/webhooks/*
+    }
+    header @workflow_responses {
+        >Content-Security-Policy "sandbox; frame-ancestors 'self'"
         >X-Frame-Options "SAMEORIGIN"
     }
 

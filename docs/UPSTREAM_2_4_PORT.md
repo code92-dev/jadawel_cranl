@@ -109,7 +109,10 @@ text) of a run's answer. An HTTP trigger with "Wait for workflow response" holds
 request until the run reaches a Response step (or ends, answering `204`), up to its
 timeout (bounded by `JADAWEL_AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS`,
 default 20). The answer is sent with `Content-Security-Policy: sandbox` and without
-cookie, HSTS or CSP headers from the workflow.
+cookie, HSTS or CSP headers from the workflow. The `Caddyfile` replaced every app
+route's policy with `frame-ancestors 'self'`, which would have dropped that `sandbox`
+and let a reply's HTML run as the app's origin; `/api/webhooks/*` now gets
+`sandbox; frame-ancestors 'self'` instead.
 
 Not taken: the parts for 2.3's Start-workflow node and Manual trigger, which Jadawel
 does not have. The status code field switches between a code picker and a formula in

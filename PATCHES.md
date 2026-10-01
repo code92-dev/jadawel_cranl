@@ -90,6 +90,7 @@ Baserow 2.4 adds images to rich text, not tables, so tables were not added.
 | `backend/src/jadawel/config/settings/base.py`, `docker-compose*.yml`, `web-frontend/{env-remap.mjs,modules/core/module.js}` | `JADAWEL_AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS` | Bounds the wait |
 | `web-frontend/modules/integrations/core/{serviceTypes.js,components/services/CoreHTTPTriggerServiceForm.vue}`, `integrations/plugin.js`, `automation/{nodeTypes,plugin}.js`, `core/assets/scss/components/services/service_form.scss` | Response service/node types; "Wait for workflow response" on the HTTP trigger | UI |
 | `web-frontend/modules/arabase/automation/stepCatalog.js` | `response` in the Web category ("Reply to the caller") | Fork's step gallery |
+| `Caddyfile` | `/api/webhooks/*` left out of the app-wide `frame-ancestors` replace and given `sandbox; frame-ancestors 'self'` | The replace dropped Django's `sandbox`, so a Response step's HTML would have run as the app's origin |
 
 Not taken: the parts that only serve 2.3 features the fork does not have — the
 Start-workflow node waiting on a child run (`resume_deferred_node_celery_task`,
