@@ -337,6 +337,10 @@ export class CoreResponseServiceType extends WorkflowActionServiceTypeMixin(
 
   getErrorMessage(params) {
     const { service } = params
+    // The node's service is not there yet while a step is being created.
+    if (service === undefined) {
+      return null
+    }
     const isNoContentResponse =
       service.status_code?.mode === 'raw' &&
       service.status_code.formula === '204'

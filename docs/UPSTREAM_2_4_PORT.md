@@ -55,7 +55,7 @@ row per application, and keeps Jadawel's Overview panel underneath.
 
 Backend: `UserLastViewedItem` records what each user opens (views, builder pages,
 dashboards, workflows), batched through a Celery singleton task;
-`/api/last-viewed/` lists them; applications carry `last_viewed`; `UserProfile.preferences`
+`/api/last-viewed/items/` lists them; applications carry `last_viewed`; `UserProfile.preferences`
 stores the sort and view mode; listing all applications filters permissions for all
 workspaces in one pass (`CoreHandler.filter_queryset_for_workspaces`).
 
@@ -149,6 +149,12 @@ sync / views / rows / fields / import-export, core jobs / actions / last viewed 
 users, applications, ws) and `tests/arabase`. Frontend: the core, database,
 automation, integrations, dashboard and arabase unit suites; ESLint, Stylelint,
 Prettier, Ruff and `yarn locale:check --strict`.
+
+End to end, on a local instance running the branch's frontend and backend over the
+production image: the homepage and workspace page in English and Arabic, recently
+viewed, an image in a rich text cell, Group By in Columns layout in Arabic, the
+"Answer a web request" recipe, and a published workflow answering a real request
+with its Response step's status code, header and JSON body through Caddy.
 
 Known pre-existing failures, unrelated to the port: the PostgreSQL data sync tests on
 this host (the test database listens on port 55432, which overflows the `smallint`

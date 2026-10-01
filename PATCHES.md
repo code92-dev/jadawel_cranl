@@ -63,6 +63,7 @@ Baserow 2.4 adds images to rich text, not tables, so tables were not added.
 | ---- | ------ | ------ |
 | `backend/src/jadawel/contrib/database/views/{models,view_types}.py` | `GridView.group_by_layout` (`section` / `column`), exported and importable; not in `copyable_view_attributes`, which belongs to the copy-view-configuration feature the port leaves out | Columns layout |
 | `web-frontend/modules/database/components/view/grid/{GridView,GridViewSection,GridViewGroupByRows,GridViewGroupByBanner,GridViewHead,GridViewRowDragging}.vue`, `view/ViewGroupByContext.vue`, `core/components/HorizontalResize.vue` | Rows drag within and between groups (the row takes the target group's value, then moves, as one undo group); Columns layout with resizable group columns and a layout switch. New inline positions use `insetInlineStart` and `.grid-view__group-columns` uses logical insets, as the fork's grid does for RTL | Group By |
+| `web-frontend/modules/database/components/view/grid/GridViewSection.vue` | The group dividers and group width handles that were already there now also use `insetInlineStart` | They sat on the left in Arabic, which the Columns layout made visible as a stray divider |
 | `web-frontend/modules/database/{store/view/grid.js,utils/gridGroupBy.js,utils/gridGroupByRender.js,services/row.js}` | `moveRow` across groups; `RowService.update/move` take the view and an undo/redo action group | Same |
 | `web-frontend/modules/core/assets/scss/components/{group_bys,views/grid}.scss` | Columns layout styles (new lines in logical properties) | Same |
 
@@ -90,6 +91,7 @@ Baserow 2.4 adds images to rich text, not tables, so tables were not added.
 | `backend/src/jadawel/config/settings/base.py`, `docker-compose*.yml`, `web-frontend/{env-remap.mjs,modules/core/module.js}` | `JADAWEL_AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS` | Bounds the wait |
 | `web-frontend/modules/integrations/core/{serviceTypes.js,components/services/CoreHTTPTriggerServiceForm.vue}`, `integrations/plugin.js`, `automation/{nodeTypes,plugin}.js`, `core/assets/scss/components/services/service_form.scss` | Response service/node types; "Wait for workflow response" on the HTTP trigger | UI |
 | `web-frontend/modules/arabase/automation/stepCatalog.js` | `response` in the Web category ("Reply to the caller") | Fork's step gallery |
+| `web-frontend/modules/integrations/core/serviceTypes.js` | `CoreResponseServiceType.getErrorMessage` returns nothing while the node's service is not loaded yet | Building the "Answer a web request" recipe crashed the editor reading `service.status_code` |
 | `Caddyfile` | `/api/webhooks/*` left out of the app-wide `frame-ancestors` replace and given `sandbox; frame-ancestors 'self'` | The replace dropped Django's `sandbox`, so a Response step's HTML would have run as the app's origin |
 
 Not taken: the parts that only serve 2.3 features the fork does not have — the

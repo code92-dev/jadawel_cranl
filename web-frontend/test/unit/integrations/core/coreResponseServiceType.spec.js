@@ -41,4 +41,8 @@ describe('CoreResponseServiceType', () => {
       expect(serviceType.isInError({ service })).toBe(Boolean(message))
     }
   )
+
+  test('has no error while the step is created and its service not loaded', () => {
+    expect(serviceType.getErrorMessage({ service: undefined })).toBeNull()
+  })
 })

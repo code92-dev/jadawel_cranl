@@ -94,7 +94,7 @@ describe('GridViewSection group column resizing', () => {
       }
       expect(
         wrapper.get('.grid-view__group-by-divider').attributes('style')
-      ).toContain(`left: ${Math.min(finalWidth, 250)}px`)
+      ).toContain(`inset-inline-start: ${Math.min(finalWidth, 250)}px`)
       expect(
         wrapper.find('.grid-view__head-group-width-handle.dragging').exists()
       ).toBe(true)
@@ -115,7 +115,7 @@ describe('GridViewSection group column resizing', () => {
       await nextTick()
       expect(
         wrapper.get('.grid-view__group-by-divider').attributes('style')
-      ).toContain(`left: ${finalWidth}px`)
+      ).toContain(`inset-inline-start: ${finalWidth}px`)
       expect(wrapper.find('.grid-view__head-group-width-handle').exists()).toBe(
         true
       )
@@ -136,7 +136,7 @@ describe('GridViewSection group column resizing', () => {
     expect(testApp.mock.history.patch).toHaveLength(0)
     expect(
       wrapper.get('.grid-view__group-by-divider').attributes('style')
-    ).toContain('left: 200px')
+    ).toContain('inset-inline-start: 200px')
 
     availableWidth.value = 150
     await nextTick()

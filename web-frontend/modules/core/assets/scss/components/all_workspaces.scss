@@ -33,6 +33,12 @@
   align-items: center;
   gap: 2px;
 
+  // A key combination reads left to right in every language. Reversing the
+  // row rather than setting `direction` keeps the chip at the inline end.
+  [dir='rtl'] & {
+    flex-direction: row-reverse;
+  }
+
   kbd {
     min-inline-size: 16px;
     block-size: 16px;

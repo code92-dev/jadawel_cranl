@@ -16,14 +16,14 @@
       v-for="({ left }, index) in groupByDividers"
       :key="'group-by-divider-' + index"
       class="grid-view__group-by-divider"
-      :style="{ left: left + 'px' }"
+      :style="{ insetInlineStart: left + 'px' }"
     ></div>
     <template v-if="!groupByWidthsAreResponsivelyFitted || resizingGroupWidth">
       <HorizontalResize
         v-for="({ groupBy, left }, index) in groupByDividers"
         :key="'group-by-width-' + index"
         class="grid-view__head-group-width-handle"
-        :style="{ left: left + 'px' }"
+        :style="{ insetInlineStart: left + 'px' }"
         :width="renderedGroupByWidths[index]"
         :min="GRID_VIEW_MIN_FIELD_WIDTH"
         @dragging="resizingGroupWidth = $event"
