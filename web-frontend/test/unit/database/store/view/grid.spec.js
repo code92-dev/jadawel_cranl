@@ -1606,6 +1606,31 @@ describe('Grid view store', () => {
       { path: { field_2: 'B' }, depth: 0, row_count: 2 },
     ])
   })
+
+  test('updateRowValue discards a save for a row without an id (row modal closed mid-edit)', async () => {
+    const fields = [{ id: 1, name: 'Name', type: 'text', primary: true }]
+    const view = { id: 1, filters: [], sortings: [], group_bys: [] }
+
+    let patched = false
+    mockServer.mock.onPatch('/database/rows/table/1/batch/').reply(() => {
+      patched = true
+      return [200, { items: [], metadata: {} }]
+    })
+
+    await expect(
+      store.dispatch('grid/updateRowValue', {
+        table: { id: 1 },
+        view,
+        fields,
+        row: {},
+        field: fields[0],
+        value: 'x',
+        oldValue: '',
+      })
+    ).resolves.toBeUndefined()
+
+    expect(patched).toBe(false)
+  })
 })
 
 describe('Grid view store group-by layout mode', () => {

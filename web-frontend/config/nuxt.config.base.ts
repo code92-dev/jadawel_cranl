@@ -95,6 +95,12 @@ export default defineNuxtConfig({
     },
   },
   vite: {
+    resolve: {
+      // Vue keeps render state in module-level variables. Loading more than one
+      // physical runtime makes helpers such as renderSlot observe a different
+      // currentRenderingInstance and can crash during hydration or HMR.
+      dedupe: ['vue'],
+    },
     css: {
       preprocessorOptions: {
         scss: {

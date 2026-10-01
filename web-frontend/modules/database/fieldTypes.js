@@ -15,6 +15,10 @@ import {
   isValidEmail,
   isValidURL,
 } from '@jadawel/modules/core/utils/string'
+import {
+  countImageReferences,
+  stripImageUrls,
+} from '@jadawel/modules/core/editor/richTextImageUtils'
 import { formulaFieldArrayFilterMixin } from '@jadawel/modules/database/arrayFilterMixins'
 import {
   parseNumberValue,
@@ -26,6 +30,10 @@ import moment from '@jadawel/modules/core/moment'
 import guessFormat from 'moment-guess'
 import { Registerable } from '@jadawel/modules/core/registry'
 import { mix } from '@jadawel/modules/core/mixins'
+import {
+  plainTextToMarkdown,
+  richMarkdownToPlainText,
+} from '@jadawel/modules/core/editor/richTextClipboard'
 import FieldNumberSubForm from '@jadawel/modules/database/components/field/FieldNumberSubForm'
 import FieldAutonumberSubForm from '@jadawel/modules/database/components/field/FieldAutonumberSubForm'
 import FieldDurationSubForm from '@jadawel/modules/database/components/field/FieldDurationSubForm'
@@ -1120,6 +1128,20 @@ class SelectOptionBaseFieldType extends FieldType {
   }
 }
 
+// Mirrors `MAX_RICH_TEXT_IMAGES` in `rich_text_utils.py`.
+const MAX_RICH_TEXT_IMAGES = 100
+
+function maxRichTextImagesError(app, value) {
+  const count = countImageReferences(value)
+  if (count > MAX_RICH_TEXT_IMAGES) {
+    return app.$i18n.t('fieldErrors.maxImagesExceeded', {
+      max: MAX_RICH_TEXT_IMAGES,
+      over: count - MAX_RICH_TEXT_IMAGES,
+    })
+  }
+  return null
+}
+
 export class TextFieldType extends FieldType {
   static getType() {
     return 'text'
@@ -1274,6 +1296,17 @@ export class LongTextFieldType extends FieldType {
     }
   }
 
+  getFormViewFieldComponents(field) {
+    const components = super.getFormViewFieldComponents(field)
+    if (field?.long_text_enable_rich_text) {
+      // The upload endpoint needs a signed in user, so an anonymous respondent can't use it.
+      components[DEFAULT_FORM_VIEW_FIELD_COMPONENT_KEY].properties = {
+        allowImageUpload: false,
+      }
+    }
+    return components
+  }
+
   getCardComponent(field) {
     if (field?.long_text_enable_rich_text) {
       return RowCardFieldRichText
@@ -1294,8 +1327,46 @@ export class LongTextFieldType extends FieldType {
     return ''
   }
 
+  prepareRichValueForCopy(field, value) {
+    return {
+      value: this.prepareValueForCopy(field, value),
+      richText: field.long_text_enable_rich_text,
+    }
+  }
+
+  prepareValueForPaste(field, clipboardData, richClipboardData) {
+    if (!field.long_text_enable_rich_text) {
+      // A rich source pasted into a plain field would otherwise carry markdown sentinels.
+      return richClipboardData?.richText
+        ? richMarkdownToPlainText(richClipboardData.value)
+        : clipboardData
+    }
+    if (richClipboardData?.richText) {
+      return richClipboardData.value
+    }
+    // Plain clipboard text isn't from Jadawel, so its image URLs must not reach the preview.
+    return stripImageUrls(plainTextToMarkdown(clipboardData))
+  }
+
+  parseQueryParameter(field, value, options) {
+    // A prefill comes from a link anyone can craft, not from the backend, so
+    // its image URLs must not be trusted.
+    return field.field.long_text_enable_rich_text
+      ? stripImageUrls(value)
+      : value
+  }
+
   canUpsert() {
     return true
+  }
+
+  getValidationError(field, value) {
+    // Jadawel fork: the long text field has no max length check, so only the
+    // image limit applies, measured on the stored form like the backend does.
+    if (field.long_text_enable_rich_text && value) {
+      return maxRichTextImagesError(this.app, stripImageUrls(value))
+    }
+    return null
   }
 
   getSort(name, order) {
@@ -1312,7 +1383,11 @@ export class LongTextFieldType extends FieldType {
   }
 
   getDocsDescription(field) {
-    return this.app.$i18n.t('fieldDocs.longText')
+    return this.app.$i18n.t(
+      field.long_text_enable_rich_text
+        ? 'fieldDocs.longTextRichText'
+        : 'fieldDocs.longText'
+    )
   }
 
   getDocsRequestExample(field) {

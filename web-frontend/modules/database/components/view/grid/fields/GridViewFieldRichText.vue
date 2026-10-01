@@ -6,6 +6,7 @@
     :class="{
       editing: opened && !isModalOpen(),
       'field-rich-text--preview': !opened || isModalOpen(),
+      invalid: editing && !isModalOpen() && !isValid(),
     }"
     @contextmenu="stopContextIfEditing($event)"
   >
@@ -26,20 +27,32 @@
       :class="{ 'grid-field-rich-text__textarea--resizable': editing }"
       :editable="editing && !isModalOpen()"
       :enable-rich-text-formatting="true"
+      :enable-images="true"
       :mentionable-users="workspace ? workspace.users : null"
       :thin-scrollbar="true"
       :menu-container="getMenuContainer"
+      :scrollable-area-element="getScrollableAreaElement"
+      :clipboard-markdown-resolver="resolveClipboardMarkdown"
+      :upload-file="editing ? uploadUserFile : null"
     />
     <i
       v-if="editing && !isModalOpen()"
       class="jadawel-icon-enlarge grid-field-rich-text__textarea-expand-icon"
       @click="($refs.expandedModal.toggle(), resetCellSize())"
     />
+    <div
+      v-show="editing && !isModalOpen() && !isValid()"
+      class="grid-view__cell-error align-right"
+    >
+      {{ getError() }}
+    </div>
     <FieldRichTextModal
       ref="expandedModal"
       v-model="richCopy"
       :field="field"
+      :error="getModalError()"
       :mentionable-users="workspace ? workspace.users : null"
+      :upload-file="uploadUserFile"
       @hidden="onExpandedModalHidden"
     />
   </div>
@@ -47,24 +60,29 @@
 
 <script>
 import RichTextEditor from '@jadawel/modules/core/components/editor/RichTextEditor.vue'
+import UserFileService from '@jadawel/modules/core/services/userFile'
 import gridField from '@jadawel/modules/database/mixins/gridField'
 import gridFieldInput from '@jadawel/modules/database/mixins/gridFieldInput'
 import FieldRichTextModal from '@jadawel/modules/database/components/view/FieldRichTextModal'
 import { parseMarkdown } from '@jadawel/modules/core/editor/markdown'
+import { stripImageUrls } from '@jadawel/modules/core/editor/richTextImageUtils'
+import { getRichTextClipboardContent } from '@jadawel/modules/database/utils/clipboard'
 
 export default {
   components: { RichTextEditor, FieldRichTextModal },
   mixins: [gridField, gridFieldInput],
   data() {
     return {
-      // local copy of the value storing the JSON representation of the rich text editor
       richCopy: '',
+      hasEdits: false,
+      applyingExternalValue: false,
     }
   },
   computed: {
     formattedValue() {
       return parseMarkdown(this.value, {
         openLinkOnClick: true,
+        enableImages: true,
         workspaceUsers: this.workspace ? this.workspace.users : null,
         loggedUserId: this.$store.getters['auth/getUserId'],
       })
@@ -76,19 +94,59 @@ export default {
   watch: {
     value: {
       handler(value) {
+        // A new value from the outside (a realtime update, an undo) is not a
+        // user edit. Without this flag the `richCopy` watcher below would mark
+        // the cell dirty, and `beforeSave` would then serialize the editor
+        // over the value that just arrived.
+        this.applyingExternalValue = true
         this.richCopy = value || ''
+        this.$nextTick(() => {
+          this.applyingExternalValue = false
+        })
       },
       immediate: true,
     },
     editing(editing) {
+      this.hasEdits = false
       if (!editing) {
         this.richCopy = this.value || ''
       }
     },
+    richCopy() {
+      if (this.editing && !this.applyingExternalValue) {
+        this.hasEdits = true
+      }
+    },
+  },
+  mounted() {
+    this.cellDragoverHandler = (e) => {
+      if (!this.editing) {
+        e.preventDefault()
+        e.dataTransfer.dropEffect = 'none'
+      }
+    }
+    this.cellDropHandler = (e) => {
+      if (!this.editing) {
+        e.preventDefault()
+      }
+    }
+    this.$refs.cell.addEventListener('dragover', this.cellDragoverHandler)
+    this.$refs.cell.addEventListener('drop', this.cellDropHandler)
+  },
+  beforeUnmount() {
+    this.$refs.cell?.removeEventListener('dragover', this.cellDragoverHandler)
+    this.$refs.cell?.removeEventListener('drop', this.cellDropHandler)
   },
   methods: {
+    resolveClipboardMarkdown: getRichTextClipboardContent,
+    async uploadUserFile(file) {
+      return await UserFileService(this.$client).uploadFile(file)
+    },
     getMenuContainer() {
       return document.body
+    },
+    getScrollableAreaElement() {
+      return this.$el?.closest('.grid-view__body') ?? null
     },
     isModalOpen() {
       return this.$refs.expandedModal?.isOpen()
@@ -102,9 +160,35 @@ export default {
     cancel() {
       return this.save()
     },
-    beforeSave() {
+    getError() {
+      if (!this.editing) {
+        return this.getValidationError(this.value)
+      }
       const ref = this.isModalOpen() ? 'expandedModal' : 'input'
-      return this.$refs[ref].serializeToMarkdown()
+      // The backend strips resolved image URLs before counting images, so
+      // measure the same string or a valid value is rejected.
+      return this.getValidationError(
+        stripImageUrls(this.$refs[ref]?.serializeToMarkdown())
+      )
+    },
+    getModalError() {
+      return this.isModalOpen() ? this.getError() : null
+    },
+    beforeSave() {
+      if (!this.hasEdits) {
+        return this.value
+      }
+      // Set by onExpandedModalHidden: the modal editor is already torn down by
+      // the time save() runs from there.
+      if (this.$modalMarkdown != null) {
+        return this.$modalMarkdown
+      }
+      // A save reached while the modal is still open (e.g. the cell being
+      // unselected) must read the modal, not the stale inline editor.
+      if (this.isModalOpen()) {
+        return this.$refs.expandedModal?.serializeToMarkdown() ?? this.value
+      }
+      return this.$refs.input?.serializeToMarkdown() ?? this.value
     },
     afterEdit() {
       this.$nextTick(() => {
@@ -113,7 +197,14 @@ export default {
     },
     onExpandedModalHidden() {
       this.preventNextUnselect = true
+      this.$modalMarkdown =
+        this.$refs.expandedModal?.serializeToMarkdown() ?? null
       this.save()
+      this.$modalMarkdown = null
+    },
+    onPaste() {
+      // Prevent the grid paste handler from intercepting TipTap editor pastes.
+      return this.editing
     },
     canSaveByPressingEnter() {
       return false
@@ -137,6 +228,12 @@ export default {
         !this.editing ||
         (!this.$refs.input?.isEventTargetInside(event) && !this.isModalOpen())
       )
+    },
+    canSelectNext(event) {
+      if (this.isModalOpen()) {
+        return false
+      }
+      return !this.editing || event.key === 'Tab'
     },
   },
 }

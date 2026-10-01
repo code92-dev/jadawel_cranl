@@ -31,6 +31,7 @@ from jadawel.contrib.database.api.rows.serializers import (
 from jadawel.contrib.database.fields.handler import FieldHandler
 from jadawel.contrib.database.fields.models import SelectOption
 from jadawel.contrib.database.fields.registries import field_type_registry
+from jadawel.contrib.database.fields.rich_text_utils import MAX_RICH_TEXT_IMAGES
 from jadawel.contrib.database.rows.actions import UpdateRowsActionType
 from jadawel.contrib.database.rows.handler import RowHandler
 from jadawel.contrib.database.search.handler import ALL_SEARCH_MODES
@@ -5308,3 +5309,131 @@ def test_update_row_succeeds_when_legacy_view_index_exceeds_max_size(
 
     grid_view_2.refresh_from_db()
     assert grid_view_2.db_index_name is None
+
+
+@pytest.mark.django_db
+def test_rich_text_image_limit_has_its_own_error_code(api_client, data_fixture):
+    """The frontend shows a string body validation detail as an unknown error."""
+
+    user, token = data_fixture.create_user_and_token()
+    table = data_fixture.create_database_table(user=user)
+    field = data_fixture.create_long_text_field(
+        table=table, long_text_enable_rich_text=True
+    )
+    user_file = data_fixture.create_user_file(original_name="a.png", is_image=True)
+    row = RowHandler().create_row(user=user, table=table)
+
+    def images(count):
+        return {f"field_{field.id}": " ".join([f"![x][{user_file.name}]"] * count)}
+
+    over_limit = images(MAX_RICH_TEXT_IMAGES + 1)
+    list_url = reverse("api:database:rows:list", kwargs={"table_id": table.id})
+    item_url = reverse(
+        "api:database:rows:item", kwargs={"table_id": table.id, "row_id": row.id}
+    )
+    batch_url = reverse("api:database:rows:batch", kwargs={"table_id": table.id})
+    for send, url, body in [
+        (api_client.post, list_url, over_limit),
+        (api_client.patch, item_url, over_limit),
+        (api_client.post, batch_url, {"items": [over_limit]}),
+        (api_client.patch, batch_url, {"items": [{"id": row.id, **over_limit}]}),
+    ]:
+        response = send(url, body, format="json", HTTP_AUTHORIZATION=f"JWT {token}")
+        assert response.status_code == HTTP_400_BAD_REQUEST, url
+        assert response.json() == {
+            "error": "ERROR_RICH_TEXT_IMAGE_LIMIT_EXCEEDED",
+            "detail": (
+                f"A rich text value can reference at most {MAX_RICH_TEXT_IMAGES} "
+                "images."
+            ),
+        }
+
+    response = api_client.patch(
+        item_url,
+        images(MAX_RICH_TEXT_IMAGES),
+        format="json",
+        HTTP_AUTHORIZATION=f"JWT {token}",
+    )
+    assert response.status_code == HTTP_200_OK
+
+
+@pytest.mark.django_db
+def test_rich_text_external_images_are_stored_as_written(api_client, data_fixture):
+    """Whether an external image is shown is the frontend's call, so the API keeps
+    every markdown form of it untouched instead of rejecting or rewriting it."""
+
+    user, token = data_fixture.create_user_and_token()
+    table = data_fixture.create_database_table(user=user)
+    field = data_fixture.create_long_text_field(
+        table=table, long_text_enable_rich_text=True
+    )
+
+    for value in [
+        "![x](https://example.com/p.gif)",
+        "![logo][remote]\n\n[remote]: https://example.com/p.gif",
+    ]:
+        response = api_client.post(
+            reverse("api:database:rows:list", kwargs={"table_id": table.id}),
+            {f"field_{field.id}": value},
+            format="json",
+            HTTP_AUTHORIZATION=f"JWT {token}",
+        )
+        assert response.status_code == HTTP_200_OK
+        assert response.json()[f"field_{field.id}"] == value
+
+
+@pytest.mark.django_db
+@pytest.mark.parametrize("char", ["\x1c", "\u2028", "\ufeff"])
+def test_rich_text_reference_cannot_smuggle_a_foreign_url(
+    api_client, data_fixture, char
+):
+    """The frontend loads the URL of anything it reads as ``![alt][name](url)``, so
+    the backend must read the same text as a reference and strip the URL, even when
+    the name ends in a character only one of Python or JavaScript calls whitespace."""
+
+    user, token = data_fixture.create_user_and_token()
+    table = data_fixture.create_database_table(user=user)
+    field = data_fixture.create_long_text_field(
+        table=table, long_text_enable_rich_text=True
+    )
+    user_file = data_fixture.create_user_file(original_name="a.png", is_image=True)
+
+    response = api_client.post(
+        reverse("api:database:rows:list", kwargs={"table_id": table.id}),
+        {f"field_{field.id}": f"![a][{user_file.name}{char}](https://e.com/p.gif)"},
+        format="json",
+        HTTP_AUTHORIZATION=f"JWT {token}",
+    )
+    assert response.status_code == HTTP_400_BAD_REQUEST
+    assert response.json()["error"] == "ERROR_USER_FILE_DOES_NOT_EXIST"
+
+
+@pytest.mark.django_db
+def test_rich_text_missing_image_has_its_own_error_code(api_client, data_fixture):
+    """The frontend shows a string body validation detail as an unknown error."""
+
+    user, token = data_fixture.create_user_and_token()
+    table = data_fixture.create_database_table(user=user)
+    field = data_fixture.create_long_text_field(
+        table=table, long_text_enable_rich_text=True
+    )
+    row = RowHandler().create_row(user=user, table=table)
+
+    missing = {f"field_{field.id}": "see ![x][zzzzzzzz_yyyyyyyy.png]"}
+    list_url = reverse("api:database:rows:list", kwargs={"table_id": table.id})
+    item_url = reverse(
+        "api:database:rows:item", kwargs={"table_id": table.id, "row_id": row.id}
+    )
+    batch_url = reverse("api:database:rows:batch", kwargs={"table_id": table.id})
+    for send, url, body in [
+        (api_client.post, list_url, missing),
+        (api_client.patch, item_url, missing),
+        (api_client.post, batch_url, {"items": [missing]}),
+        (api_client.patch, batch_url, {"items": [{"id": row.id, **missing}]}),
+    ]:
+        response = send(url, body, format="json", HTTP_AUTHORIZATION=f"JWT {token}")
+        assert response.status_code == HTTP_400_BAD_REQUEST, url
+        assert response.json() == {
+            "error": "ERROR_USER_FILE_DOES_NOT_EXIST",
+            "detail": "The user files ['zzzzzzzz_yyyyyyyy.png'] do not exist.",
+        }, url

@@ -6,6 +6,7 @@ from collections import defaultdict
 from copy import deepcopy
 from datetime import date, datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
+from io import BytesIO
 from itertools import cycle
 from random import randint, randrange, sample
 from typing import (
@@ -67,6 +68,7 @@ from jadawel.contrib.database.api.fields.errors import (
     ERROR_INVALID_ROLLUP_THROUGH_FIELD,
     ERROR_LINK_ROW_TABLE_NOT_IN_SAME_DATABASE,
     ERROR_LINK_ROW_TABLE_NOT_PROVIDED,
+    ERROR_RICH_TEXT_IMAGE_LIMIT_EXCEEDED,
     ERROR_SELF_REFERENCING_LINK_ROW_CANNOT_HAVE_RELATED_FIELD,
     ERROR_TOO_DEEPLY_NESTED_FORMULA,
     ERROR_WITH_FORMULA,
@@ -155,9 +157,14 @@ from jadawel.core.fields import SyncedDateTimeField
 from jadawel.core.formula import JadawelFormulaException
 from jadawel.core.formula.parser.exceptions import FormulaFunctionTypeDoesNotExist
 from jadawel.core.handler import CoreHandler
+from jadawel.core.import_export.utils import file_chunk_generator
 from jadawel.core.models import UserFile, WorkspaceUser
 from jadawel.core.registries import ImportExportConfig
-from jadawel.core.storage import ExportZipFile, get_default_storage
+from jadawel.core.storage import (
+    ExportZipFile,
+    OverwritingStorageHandler,
+    get_default_storage,
+)
 from jadawel.core.user_files.exceptions import UserFileDoesNotExist
 from jadawel.core.user_files.handler import UserFileHandler
 from jadawel.core.utils import grouper, list_to_comma_separated_string
@@ -191,6 +198,8 @@ from .exceptions import (
     InvalidRollupThroughField,
     LinkRowTableNotInSameDatabase,
     LinkRowTableNotProvided,
+    RichTextImageDoesNotExist,
+    RichTextImageLimitExceeded,
     SelfReferencingLinkRowCannotHaveRelatedField,
 )
 from .expressions import extract_jsonb_array_values_to_single_string
@@ -202,7 +211,7 @@ from .field_filters import (
     filename_contains_filter,
     parse_ids_from_csv_string,
 )
-from .field_helpers import prepare_files_for_export
+from .field_helpers import get_exported_zip_names, prepare_files_for_export
 from .field_sortings import OptionallyAnnotatedOrderBy
 from .fields import DurationField as DurationModelField
 from .fields import (
@@ -254,6 +263,20 @@ from .registries import (
     ReadOnlyFieldType,
     StartingRowType,
     field_type_registry,
+)
+from .rich_text_utils import (
+    MARKDOWN_IMAGE_REGEX,
+    MAX_RICH_TEXT_IMAGES,
+    append_user_file_urls,
+    count_image_references,
+    escape_user_file_references,
+    extract_user_file_names,
+    is_renderable_user_file,
+    keep_first_image_references,
+    map_outside_code,
+    replace_user_file_images_with_alt,
+    resolve_user_file_urls,
+    strip_user_file_urls,
 )
 from .utils import DeferredForeignKeyUpdater
 from .utils.duration import (
@@ -482,11 +505,100 @@ class LongTextFieldType(CollationSortMixin, FieldType):
     model_class = LongTextField
     allowed_fields = ["long_text_enable_rich_text"]
     serializer_field_names = ["long_text_enable_rich_text"]
+    api_exceptions_map = {
+        RichTextImageLimitExceeded: ERROR_RICH_TEXT_IMAGE_LIMIT_EXCEEDED,
+    }
     _can_have_db_index = True
     can_upsert = True
 
     def check_can_group_by(self, field: Field, sort_type: str) -> bool:
         return not field.long_text_enable_rich_text
+
+    def after_update(
+        self,
+        from_field,
+        to_field,
+        from_model,
+        to_model,
+        user,
+        connection,
+        altered_column,
+        before,
+        to_field_kwargs,
+    ):
+        """
+        Makes converted values saveable, since ``prepare_value_for_db`` never saw them.
+
+        :raises RichTextImageLimitExceeded: If a value references too many images.
+        """
+
+        was_rich_text = isinstance(from_field, LongTextField) and bool(
+            from_field.long_text_enable_rich_text
+        )
+        if was_rich_text or not to_field.long_text_enable_rich_text:
+            return
+
+        column = to_field.db_column
+        rows = (
+            self._rows_with_image_references(to_model, column)
+            .values_list("id", column)
+            .iterator(chunk_size=100)
+        )
+        user_file_exists: Dict[str, bool] = {}
+        for chunk in grouper(100, rows):
+            values = dict(chunk)
+            escaped = self._escape_missing_user_file_references(
+                values, user_file_exists
+            )
+            values.update(escaped)
+            if any(
+                count_image_references(value) > MAX_RICH_TEXT_IMAGES
+                for value in values.values()
+            ):
+                raise RichTextImageLimitExceeded(MAX_RICH_TEXT_IMAGES)
+            if escaped:
+                to_model.objects_and_trash.bulk_update(
+                    [
+                        to_model(id=row_id, **{column: value})
+                        for row_id, value in escaped.items()
+                    ],
+                    [column],
+                )
+
+    def should_backup_field_data_for_same_type_update(
+        self, old_field: LongTextField, new_field_attrs: Dict[str, Any]
+    ) -> bool:
+        """
+        Backs up the values enabling rich text may escape, so undo restores them.
+
+        :param old_field: The field before the update.
+        :param new_field_attrs: The attributes being updated.
+        :return: Whether the update may escape references in some rows.
+        """
+
+        enables_rich_text = not old_field.long_text_enable_rich_text and bool(
+            new_field_attrs.get("long_text_enable_rich_text")
+        )
+        if not enables_rich_text:
+            return False
+
+        model = old_field.table.get_model(fields=[old_field], field_ids=[])
+        return self._rows_with_image_references(model, old_field.db_column).exists()
+
+    def _rows_with_image_references(
+        self, model: "GeneratedTableModel", column: str
+    ) -> QuerySet:
+        """
+        Returns the rows, trashed included, whose value may contain a reference.
+
+        :param model: The table model.
+        :param column: The long text column.
+        :return: A superset of those rows; the exact match must skip code in Python.
+        """
+
+        return model.objects_and_trash.filter(
+            Q(**{f"{column}__contains": "!["}) & Q(**{f"{column}__contains": "]["})
+        )
 
     def can_be_primary_field(self, field_or_values: Union[Field, dict]) -> bool:
         if isinstance(field_or_values, dict):
@@ -497,16 +609,51 @@ class LongTextFieldType(CollationSortMixin, FieldType):
             )
         return enable_rich_text is False
 
-    def get_serializer_field(self, instance, **kwargs):
+    def _get_serializer_field_base_kwargs(self, **kwargs):
+        """
+        Kwargs shared by the request and response serializer fields, so the two
+        can't drift apart when a new default is added.
+
+        :param kwargs: Overrides passed by the caller; win over the defaults.
+        :return: The kwargs to construct a ``CharField`` with.
+        """
+
         required = kwargs.get("required", False)
-        return serializers.CharField(
-            **{
-                "required": required,
-                "allow_null": not required,
-                "allow_blank": not required,
-                **kwargs,
-            }
-        )
+        return {
+            "required": required,
+            "allow_null": not required,
+            "allow_blank": not required,
+            **kwargs,
+        }
+
+    def get_serializer_field(self, instance, **kwargs):
+        # Input is not normalised here: `prepare_value_for_db` owns the storage
+        # format so every write path (API, import, data sync) stores one shape.
+        base_kwargs = self._get_serializer_field_base_kwargs(**kwargs)
+        if not getattr(instance, "long_text_enable_rich_text", False):
+            return serializers.CharField(**base_kwargs)
+
+        class RichTextRequestField(serializers.CharField):
+            def to_internal_value(self, data):
+                # Resolved image URLs are appended on read and stripped again
+                # on write, so they must not count towards `max_length` or a
+                # value returned by GET could be rejected by an unchanged PATCH.
+                return strip_user_file_urls(super().to_internal_value(data))
+
+        return RichTextRequestField(**base_kwargs)
+
+    def get_response_serializer_field(self, instance, **kwargs):
+        if not instance.long_text_enable_rich_text:
+            return self.get_serializer_field(instance, **kwargs)
+
+        base_kwargs = self._get_serializer_field_base_kwargs(**kwargs)
+
+        class RichTextResponseField(serializers.CharField):
+            def to_representation(self, value):
+                value = super().to_representation(value)
+                return append_user_file_urls(value)
+
+        return RichTextResponseField(**base_kwargs)
 
     def serialize_metadata_for_row_history(
         self,
@@ -545,6 +692,410 @@ class LongTextFieldType(CollationSortMixin, FieldType):
     def get_value_for_filter(self, row: "GeneratedTableModel", field: Field) -> any:
         value = getattr(row, field.db_column)
         return collate_expression(Value(value))
+
+    def _fetch_rich_text_user_files(self, names: set[str]) -> Dict[str, UserFile]:
+        """
+        Fetches the user files referenced by the given names in a single query.
+        Filtering on the indexed ``unique`` part keeps the query cheap regardless
+        of how many names are referenced; the full name is verified in Python.
+        """
+
+        if not names:
+            return {}
+
+        uniques = {name.split("_", 1)[0] for name in names}
+        return {
+            user_file.name: user_file
+            for user_file in UserFile.objects.filter(unique__in=uniques)
+            if user_file.name in names
+        }
+
+    def _get_missing_user_file_names(
+        self, names: Set[str], user_file_exists: Dict[str, bool]
+    ) -> Set[str]:
+        """
+        Returns the names no user file has, querying only the names not seen before.
+
+        :param names: The user file names to check.
+        :param user_file_exists: Whether a name has a user file, filled in as it goes.
+        :return: The names without a user file.
+        """
+
+        unseen = names - user_file_exists.keys()
+        if unseen:
+            existing = self._fetch_rich_text_user_files(unseen)
+            user_file_exists.update((name, name in existing) for name in unseen)
+        return {name for name in names if not user_file_exists[name]}
+
+    def _escape_missing_user_file_references(
+        self, values: Dict[Any, str], user_file_exists: Dict[str, bool]
+    ) -> Dict[Any, str]:
+        """
+        Escapes the references no user file backs, which would fail every later save.
+
+        :param values: The rich text values, keyed by anything.
+        :param user_file_exists: Whether a name has a user file, filled in as it goes.
+        :return: The values that had to be escaped, keyed like ``values``.
+        """
+
+        names_by_key = {
+            key: extract_user_file_names(value) for key, value in values.items()
+        }
+        missing = self._get_missing_user_file_names(
+            set().union(*names_by_key.values()), user_file_exists
+        )
+        return {
+            key: escape_user_file_references(values[key], missing)
+            for key, names in names_by_key.items()
+            if names & missing
+        }
+
+    def _validate_rich_text_references(
+        self,
+        names: set[str],
+        user_files_by_name: Dict[str, UserFile],
+        reference_count: Optional[int] = None,
+    ):
+        """
+        Checks that every user file referenced by a rich text value may be embedded.
+
+        :param names: The user file names extracted from the value.
+        :param user_files_by_name: The matching ``UserFile`` rows, keyed by name.
+        :param reference_count: How many references the value contains, counting
+            repeats. ``names`` is a set, so it cannot bound what a client renders.
+            Defaults to the number of distinct names.
+        :raises ValidationError: If too many files are referenced or one is not
+            an image.
+        :raises RichTextImageDoesNotExist: If a referenced name has no user file.
+        """
+
+        if reference_count is None:
+            reference_count = len(names)
+
+        if reference_count > MAX_RICH_TEXT_IMAGES:
+            raise ValidationError(
+                f"A rich text value can reference at most {MAX_RICH_TEXT_IMAGES} "
+                "images.",
+                code="too_many_images",
+            )
+
+        missing = sorted(name for name in names if name not in user_files_by_name)
+        if missing:
+            raise RichTextImageDoesNotExist(missing)
+
+        not_renderable = sorted(
+            name
+            for name in names
+            if not is_renderable_user_file(user_files_by_name[name])
+        )
+        if not_renderable:
+            raise ValidationError(
+                f"The user files {not_renderable} are not images and cannot be "
+                "embedded.",
+                code="not_an_image",
+            )
+
+    def prepare_value_for_db(self, instance, value):
+        if not instance.long_text_enable_rich_text or not value:
+            return value
+
+        value = strip_user_file_urls(value)
+        names = extract_user_file_names(value)
+        if not names:
+            return value
+
+        self._validate_rich_text_references(
+            names,
+            self._fetch_rich_text_user_files(names),
+            count_image_references(value),
+        )
+        return value
+
+    def prepare_value_for_db_in_bulk(
+        self, instance, values_by_row, continue_on_error=False
+    ):
+        if not instance.long_text_enable_rich_text:
+            return values_by_row
+
+        names_by_row = {}
+        counts_by_row = {}
+        all_names = set()
+        for row_index, value in values_by_row.items():
+            if not value:
+                continue
+            value = strip_user_file_urls(value)
+            values_by_row[row_index] = value
+            names = extract_user_file_names(value)
+            if names:
+                names_by_row[row_index] = names
+                counts_by_row[row_index] = count_image_references(value)
+                all_names |= names
+
+        if not all_names:
+            return values_by_row
+
+        user_files_by_name = self._fetch_rich_text_user_files(all_names)
+        for row_index, names in names_by_row.items():
+            try:
+                self._validate_rich_text_references(
+                    names, user_files_by_name, counts_by_row[row_index]
+                )
+            except Exception as e:
+                if continue_on_error:
+                    values_by_row[row_index] = e
+                else:
+                    raise
+
+        return values_by_row
+
+    def get_export_serialized_value(
+        self,
+        row: "GeneratedTableModel",
+        field_name: str,
+        cache: Dict[str, Any],
+        files_zip=None,
+        storage=None,
+    ):
+        content = self.get_internal_value_from_db(row, field_name)
+        if not content:
+            return content
+
+        field = row._field_objects[int(field_name.removeprefix("field_"))]["field"]
+        if not field.long_text_enable_rich_text:
+            return content
+
+        names = extract_user_file_names(content)
+        if not names or files_zip is None:
+            return content
+
+        user_file_handler = UserFileHandler()
+        existing_names = get_exported_zip_names(cache, files_zip)
+
+        if "_user_file_originals" not in cache:
+            cache["_user_file_originals"] = {}
+        originals_cache = cache["_user_file_originals"]
+
+        uncached = {n for n in names if n not in originals_cache}
+        if uncached:
+            for uf in self._fetch_rich_text_user_files(uncached).values():
+                originals_cache[uf.name] = uf.original_name
+
+        storage = storage or get_default_storage()
+        missing_files = cache.setdefault("_missing_user_files", set())
+
+        image_metadata = []
+        for name in sorted(names):
+            if name not in originals_cache or name in missing_files:
+                continue
+
+            cache_entry = f"user_file_{name}"
+            if cache_entry not in cache:
+                if name not in existing_names:
+                    file_path = user_file_handler.user_file_path(name)
+                    # `files_zip.add` only enqueues a lazy generator; the file is
+                    # read when the zip is streamed, so a missing one would fail the
+                    # export mid-stream. Check once per file and skip instead.
+                    if not storage.exists(file_path):
+                        missing_files.add(name)
+                        continue
+                    chunk_generator = file_chunk_generator(storage, file_path)
+                    files_zip.add(chunk_generator, name)
+                    existing_names.add(name)
+                cache[cache_entry] = True
+
+            image_metadata.append(
+                {"name": name, "original_name": originals_cache[name]}
+            )
+
+        return (
+            {"content": content, "images": image_metadata}
+            if image_metadata
+            else content
+        )
+
+    def set_import_serialized_value(
+        self,
+        row: "GeneratedTableModel",
+        field_name: str,
+        value: Any,
+        id_mapping: Dict[str, Any],
+        cache: Dict[str, Any],
+        files_zip: Optional[ZipFile] = None,
+        storage=None,
+    ):
+        if isinstance(value, dict):
+            content = value.get("content", "")
+            image_metadata = value.get("images", [])
+        else:
+            content = value
+            image_metadata = []
+
+        field = row._field_objects[int(field_name.removeprefix("field_"))]["field"]
+        if content and field.long_text_enable_rich_text:
+            # The archive can carry resolved URLs from the instance that produced
+            # it. Those point at storage this instance does not own, so strip them
+            # to the stored `![alt][name]` form, like `prepare_value_for_db` does.
+            content = strip_user_file_urls(content)
+            # Bound the references before touching the zip, so surplus images are
+            # never uploaded only to end up unreferenced.
+            content = self._sanitize_imported_rich_text(content)
+            if files_zip is not None:
+                originals = {
+                    img["name"]: img["original_name"]
+                    for img in image_metadata
+                    if "original_name" in img
+                }
+                content = self._rewrite_image_names(
+                    content, cache, files_zip, storage, originals
+                )
+
+        setattr(row, field_name, content)
+
+    def _sanitize_imported_rich_text(self, content: str) -> str:
+        """
+        Bounds the number of images an imported value may reference.
+
+        An archive can carry a cell with far more images than the API accepts,
+        which every viewer of the table then has to render. Raising would abort
+        the whole import over one cell, so the surplus is degraded to alt text.
+
+        Only a zip import checks the files exist, in ``_rewrite_image_names``.
+
+        :param content: The imported rich text value.
+        :return: The value with surplus image references replaced by alt text.
+        """
+
+        if count_image_references(content) > MAX_RICH_TEXT_IMAGES:
+            content = keep_first_image_references(content, MAX_RICH_TEXT_IMAGES)
+
+        return content
+
+    def _rewrite_image_names(
+        self,
+        value: str,
+        cache: Dict[str, Any],
+        files_zip: ZipFile,
+        storage: Optional[Storage],
+        originals: Optional[Dict[str, str]] = None,
+    ) -> str:
+        """
+        Re-uploads the referenced zip files and escapes references no user file backs.
+
+        :param value: The imported rich text value.
+        :param cache: The import cache, shared by every imported value.
+        :param files_zip: The zip file of the import.
+        :param storage: The storage to upload the images to.
+        :param originals: The original file names, keyed by the exported names.
+        :return: The value with its references rewritten or escaped.
+        """
+
+        names = extract_user_file_names(value)
+        if not names:
+            return value
+
+        if originals is None:
+            originals = {}
+
+        user_file_handler = UserFileHandler()
+        name_mapping = {}
+        for name in names:
+            cache_entry = f"rich_text_file_{name}"
+            if cache_entry in cache:
+                name_mapping[name] = cache[cache_entry]
+                continue
+            try:
+                stream = files_zip.open(name)
+            except KeyError:
+                continue
+            with stream:
+                original_name = originals.get(name)
+                if not original_name:
+                    deconstructed = UserFile.deconstruct_name(name)
+                    original_name = f"{deconstructed['unique']}.{deconstructed['original_extension']}"
+                # `upload_user_file` consumes and closes the stream, and the zip
+                # stream is not seekable. Buffer so the backfill below still has it.
+                content = stream.read()
+                user_file = user_file_handler.upload_user_file(
+                    None, original_name, BytesIO(content), storage=storage
+                )
+
+            # `upload_user_file` deduplicates on `(original_name, sha256_hash)` and
+            # returns the existing row without writing to `storage`, so the bytes can
+            # be missing when importing into a different backend. Backfill them.
+            file_path = user_file_handler.user_file_path(user_file.name)
+            destination_storage = storage or get_default_storage()
+            if not destination_storage.exists(file_path):
+                OverwritingStorageHandler(destination_storage).save(
+                    file_path, BytesIO(content)
+                )
+
+            name_mapping[name] = user_file.name
+            cache[cache_entry] = user_file.name
+
+        missing = self._get_missing_user_file_names(
+            names - name_mapping.keys(),
+            cache.setdefault("_rich_text_user_file_exists", {}),
+        )
+        if missing:
+            value = escape_user_file_references(value, missing)
+
+        if not name_mapping:
+            return value
+
+        def _replace_import_name(match):
+            old_name = match.group("name")
+            new_name = name_mapping.get(old_name)
+            if new_name:
+                without_ref = match.group(0).removesuffix(f"[{old_name}]")
+                return f"{without_ref}[{new_name}]"
+            return match.group(0)
+
+        return map_outside_code(
+            value,
+            lambda segment: MARKDOWN_IMAGE_REGEX.sub(_replace_import_name, segment),
+        )
+
+    def get_export_value(self, value, field_object, rich_value=False):
+        if not value:
+            return value
+
+        field = field_object["field"]
+        if not field.long_text_enable_rich_text:
+            return value
+
+        # A stored value can already carry a resolved URL -- nothing strips on the
+        # import path -- and appending to that would export `![alt](fresh)(stale)`.
+        # Strip first so this stays idempotent, like `append_user_file_urls`.
+        value = strip_user_file_urls(value)
+
+        names = extract_user_file_names(value)
+        if not names:
+            return value
+
+        url_map = resolve_user_file_urls(names)
+
+        def _replace_for_export(match):
+            name = match.group("name")
+            url = url_map.get(name)
+            if not url:
+                return match.group(0)
+            without_ref = match.group(0).removesuffix(f"[{name}]")
+            return f"{without_ref}({url})"
+
+        return map_outside_code(
+            value,
+            lambda segment: MARKDOWN_IMAGE_REGEX.sub(_replace_for_export, segment),
+        )
+
+    def get_human_readable_value(self, value, field_object):
+        if not value:
+            return value or ""
+
+        field = field_object["field"]
+        if not field.long_text_enable_rich_text:
+            return value
+
+        return replace_user_file_images_with_alt(value)
 
 
 class URLFieldType(CollationSortMixin, TextFieldMatchingRegexFieldType):

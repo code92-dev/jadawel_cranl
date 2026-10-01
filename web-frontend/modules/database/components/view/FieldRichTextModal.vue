@@ -4,34 +4,45 @@
     :full-height="true"
     :content-padding="false"
     :right="true"
+    :can-close="!error"
     @show="show"
     @hidden="$emit('hidden', $event)"
   >
     <template #content>
-      <div class="box__title">
-        <h2 class="row-modal__title">
-          {{ field.name }}
-        </h2>
+      <div class="rich-text-modal">
+        <div class="box__title">
+          <h2 class="row-modal__title">
+            {{ field.name }}
+          </h2>
+        </div>
+        <Alert v-if="error" type="error" class="rich-text-modal__alert">
+          {{ error }}
+        </Alert>
+        <RichTextEditor
+          ref="editor"
+          class="rich-text-modal__editor"
+          :enable-rich-text-formatting="true"
+          :enable-images="true"
+          :mentionable-users="mentionableUsers"
+          :model-value="modelValue"
+          :clipboard-markdown-resolver="resolveClipboardMarkdown"
+          :upload-file="uploadFile"
+          @update:model-value="$emit('update:modelValue', $event)"
+        ></RichTextEditor>
       </div>
-      <RichTextEditor
-        ref="editor"
-        class="rich-text-modal__editor"
-        :enable-rich-text-formatting="true"
-        :mentionable-users="mentionableUsers"
-        :model-value="modelValue"
-        @update:model-value="$emit('update:modelValue', $event)"
-      ></RichTextEditor>
     </template>
   </Modal>
 </template>
 
 <script>
 import RichTextEditor from '@jadawel/modules/core/components/editor/RichTextEditor.vue'
+import Alert from '@jadawel/modules/core/components/Alert'
 import modal from '@jadawel/modules/core/mixins/modal'
+import { getRichTextClipboardContent } from '@jadawel/modules/database/utils/clipboard'
 
 export default {
   name: 'FieldRichTextModal',
-  components: { RichTextEditor },
+  components: { RichTextEditor, Alert },
   mixins: [modal],
   props: {
     field: {
@@ -46,6 +57,14 @@ export default {
       type: [Array],
       default: () => [],
     },
+    error: {
+      type: String,
+      default: null,
+    },
+    uploadFile: {
+      type: Function,
+      default: null,
+    },
   },
   emits: ['hidden', 'input', 'update:modelValue'],
   watch: {
@@ -57,6 +76,7 @@ export default {
     },
   },
   methods: {
+    resolveClipboardMarkdown: getRichTextClipboardContent,
     show() {
       this.$nextTick(() => {
         this.$refs.editor.focus()
@@ -65,9 +85,9 @@ export default {
     isOpen() {
       return this.$refs.modal.isOpen()
     },
-    // Used by the parent to serialize the editor content to markdown.
+    // Editor is only mounted while open; guard for reactive validation during the transition.
     serializeToMarkdown() {
-      return this.$refs.editor.serializeToMarkdown()
+      return this.$refs.editor?.serializeToMarkdown() ?? ''
     },
   },
 }

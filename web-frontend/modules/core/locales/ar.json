@@ -351,6 +351,10 @@
     "showMore": "عرض المزيد من التكرارات",
     "selectNode": "تحديد"
   },
+  "richTextEditor": {
+    "errorUnsupportedImageTitle": "تعذّر إدراج الصورة",
+    "errorUnsupportedImageMessage": "{name} ليست صورة مدعومة، ولم تُضَف."
+  },
   "richTextEditorBubbleMenu": {
     "bold": "عريض",
     "italic": "مائل",

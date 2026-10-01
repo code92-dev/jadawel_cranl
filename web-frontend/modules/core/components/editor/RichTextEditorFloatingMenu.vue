@@ -126,6 +126,7 @@
 import { unref } from 'vue'
 import { posToDOMRect } from '@tiptap/core'
 import { BubbleMenu } from '@tiptap/vue-3/menus'
+import { isRichTextSelectionVisible } from '@jadawel/modules/core/editor/richTextMenuPosition'
 import { isElement } from '@jadawel/modules/core/utils/dom'
 
 export default {
@@ -153,6 +154,10 @@ export default {
       type: Object,
       default: null,
     },
+    visibilityTargets: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -178,6 +183,7 @@ export default {
         offset: { mainAxis: 14, crossAxis: 0 },
         flip: false,
         duration: 0,
+        onUpdate: this.updateScrollVisibility,
       }
       if (this.scrollTarget) {
         opts.scrollTarget = this.scrollTarget
@@ -225,6 +231,16 @@ export default {
     },
   },
   methods: {
+    updateScrollVisibility() {
+      this.$el.style.visibility = isRichTextSelectionVisible(
+        this.editor,
+        this.visibilityTargets.length
+          ? this.visibilityTargets
+          : this.scrollTarget
+      )
+        ? 'visible'
+        : 'hidden'
+    },
     shouldShowMenu({ editor }) {
       if (!this.visible) return false
       const emptySelection = editor.state.selection.empty
@@ -308,6 +324,21 @@ export default {
         // Compute fresh coordinates on each call so floating-ui's autoUpdate
         // always gets the current cursor and editor position.
         getBoundingClientRect: () => {
+          // Floating UI can have a position update queued while the editor is
+          // being unmounted. Avoid accessing TipTap's destroyed editor view.
+          if (editor.isDestroyed) {
+            return {
+              top: 0,
+              bottom: 0,
+              left: 0,
+              right: 0,
+              x: 0,
+              y: 0,
+              width: 0,
+              height: 0,
+            }
+          }
+
           const view = editor.view
           const { from } = view.state.selection
           const cursorRect = posToDOMRect(view, from, from)

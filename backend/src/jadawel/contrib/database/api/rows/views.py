@@ -21,10 +21,7 @@ from jadawel.api.decorators import (
     validate_query_parameters,
 )
 from jadawel.api.errors import ERROR_DATABASE_DEADLOCK, ERROR_USER_NOT_IN_GROUP
-from jadawel.api.exceptions import (
-    QueryParameterValidationException,
-    RequestBodyValidationException,
-)
+from jadawel.api.exceptions import QueryParameterValidationException
 from jadawel.api.pagination import PageNumberPagination
 from jadawel.api.schemas import (
     CLIENT_SESSION_ID_SCHEMA_PARAMETER,
@@ -55,7 +52,10 @@ from jadawel.contrib.database.api.rows.errors import (
     ERROR_ROW_DOES_NOT_EXIST,
     ERROR_ROW_IDS_NOT_UNIQUE,
 )
-from jadawel.contrib.database.api.rows.exceptions import InvalidJoinParameterException
+from jadawel.contrib.database.api.rows.exceptions import (
+    InvalidJoinParameterException,
+    row_values_validation_error,
+)
 from jadawel.contrib.database.api.rows.serializers import (
     GetRowAdjacentSerializer,
     GetRowQueryParamsSerializer,
@@ -555,6 +555,8 @@ class RowsView(APIView):
                     "ERROR_USER_NOT_IN_GROUP",
                     "ERROR_REQUEST_BODY_VALIDATION",
                     "ERROR_REQUEST_BODY_VALIDATION",
+                    "ERROR_RICH_TEXT_IMAGE_LIMIT_EXCEEDED",
+                    "ERROR_USER_FILE_DOES_NOT_EXIST",
                 ]
             ),
             401: get_error_schema(["ERROR_NO_PERMISSION_TO_TABLE"]),
@@ -624,8 +626,8 @@ class RowsView(APIView):
                 user_field_names=False,
                 send_webhook_events=send_webhook_events,
             )
-        except ValidationError as e:
-            raise RequestBodyValidationException(detail=e.message)
+        except ValidationError as exc:
+            raise row_values_validation_error(exc) from exc
 
         hidden_field_ids = (
             get_hidden_field_ids_for_view_user(request.user, view)
@@ -957,7 +959,12 @@ class RowView(APIView):
                 example_type="get", user_field_names=True
             ),
             400: get_error_schema(
-                ["ERROR_USER_NOT_IN_GROUP", "ERROR_REQUEST_BODY_VALIDATION"]
+                [
+                    "ERROR_USER_NOT_IN_GROUP",
+                    "ERROR_REQUEST_BODY_VALIDATION",
+                    "ERROR_RICH_TEXT_IMAGE_LIMIT_EXCEEDED",
+                    "ERROR_USER_FILE_DOES_NOT_EXIST",
+                ]
             ),
             401: get_error_schema(["ERROR_NO_PERMISSION_TO_TABLE"]),
             404: get_error_schema(
@@ -1032,7 +1039,7 @@ class RowView(APIView):
                 .updated_rows[0]
             )
         except ValidationError as exc:
-            raise RequestBodyValidationException(detail=exc.message) from exc
+            raise row_values_validation_error(exc) from exc
 
         hidden_field_ids = (
             get_hidden_field_ids_for_view_user(request.user, view)
@@ -1342,6 +1349,8 @@ class BatchRowsView(APIView):
                     "ERROR_REQUEST_BODY_VALIDATION",
                     "ERROR_ROW_IDS_NOT_UNIQUE",
                     "ERROR_REQUEST_BODY_VALIDATION",
+                    "ERROR_RICH_TEXT_IMAGE_LIMIT_EXCEEDED",
+                    "ERROR_USER_FILE_DOES_NOT_EXIST",
                 ]
             ),
             401: get_error_schema(["ERROR_NO_PERMISSION_TO_TABLE"]),
@@ -1408,7 +1417,7 @@ class BatchRowsView(APIView):
                 send_webhook_events=send_webhook_events,
             )
         except ValidationError as exc:
-            raise RequestBodyValidationException(detail=exc.message)
+            raise row_values_validation_error(exc) from exc
 
         hidden_field_ids = (
             get_hidden_field_ids_for_view_user(request.user, view)
@@ -1508,6 +1517,8 @@ class BatchRowsView(APIView):
                     "ERROR_REQUEST_BODY_VALIDATION",
                     "ERROR_ROW_IDS_NOT_UNIQUE",
                     "ERROR_REQUEST_BODY_VALIDATION",
+                    "ERROR_RICH_TEXT_IMAGE_LIMIT_EXCEEDED",
+                    "ERROR_USER_FILE_DOES_NOT_EXIST",
                 ]
             ),
             401: get_error_schema(["ERROR_NO_PERMISSION_TO_TABLE"]),
@@ -1569,8 +1580,8 @@ class BatchRowsView(APIView):
                 send_webhook_events=send_webhook_events,
             )
             rows = updated_data.updated_rows
-        except ValidationError as e:
-            raise RequestBodyValidationException(detail=e.message)
+        except ValidationError as exc:
+            raise row_values_validation_error(exc) from exc
 
         hidden_field_ids = (
             get_hidden_field_ids_for_view_user(request.user, view)

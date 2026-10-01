@@ -22,6 +22,21 @@ three-way merge (upstream file before the PR → after the PR, renamed `baserow`
 are in `docs/UPSTREAM_2_4_PORT.md`. Files that exist only because of the port (new
 components, migrations, tests) are not listed.
 
+### Images in rich text long text fields (upstream #5775 `5d0bef8f`, with its prerequisite #5721 `3a4a5724`)
+
+Baserow 2.4 adds images to rich text, not tables, so tables were not added.
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/contrib/database/fields/{field_types,field_helpers,exceptions}.py` (+ new `rich_text_utils.py`) | Rich text cells store images as `![alt][user_file_name]`; responses append a signed URL that writes strip again; at most 100 images, each a real uploaded image; exports pack the files. No `max_length`: the fork's long text has none | Image storage format |
+| `backend/src/jadawel/contrib/database/api/{rows/views,rows/exceptions,fields/errors,views/form/views}.py`, `table/receivers.py` | Error for a missing referenced file; public forms refuse image references; usage counting | Same |
+| `backend/src/jadawel/contrib/database/migrations/0216_rich_text_file_uniques.py` | `get_distinct_jadawel_table_file_uniques` also counts rich text image references (fork's renamed functions) | Storage usage and file cleanup see embedded images |
+| `web-frontend/package.json`, `yarn.lock` | TipTap pinned to one release (3.27.4, core 3.30.5) as upstream does; `@tiptap/markdown` + `marked` replace `tiptap-markdown`; prosemirror resolutions | #5721 moved the editor to the official Markdown extension, which the image node builds on |
+| `web-frontend/config/nuxt.config.base.ts` | `vite.resolve.dedupe: ['vue']` | One Vue runtime for the editor |
+| `web-frontend/modules/core/{components/editor/*,editor/*,plugins/clientHandler.js}` | Official Markdown extension, newline fix, image node with upload / drop / paste, trusted URL checks | Editor |
+| `web-frontend/modules/database/{fieldTypes.js,utils/clipboard.js,store/view/grid.js}`, `components/{card,row,view}/*RichText*.vue` | Images in cells, row modal, expanded modal and previews; grid cell shows the image-limit error. `LongTextFieldType.getValidationError` checks only the image limit (no max length in the fork) | Same |
+| `web-frontend/modules/core/assets/scss/components/{rich_text_editor,views/grid/rich_text,views/rich_text_modal}.scss` | Image styles; new rules in logical properties | RTL |
+
 ### Improved Group By views (upstream #5787 `667cfdd8`, #6022 `479e616e`)
 
 | File | Change | Reason |
