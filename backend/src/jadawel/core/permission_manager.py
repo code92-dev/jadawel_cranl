@@ -43,7 +43,11 @@ from .operations import (
     UpdateWorkspaceOperationType,
     UpdateWorkspaceUserOperationType,
 )
-from .registries import PermissionManagerType
+from .registries import (
+    WORKSPACE_FILTER_ALLOW_ALL,
+    WORKSPACE_FILTER_DENY_ALL,
+    PermissionManagerType,
+)
 from .subjects import AnonymousUserSubjectType, UserSubjectType
 
 User = get_user_model()
@@ -152,6 +156,18 @@ class AllowIfTemplatePermissionManagerType(PermissionManagerType):
 
         if operation_name in self.OPERATION_ALLOWED_ON_TEMPLATES and has_template():
             return queryset, True
+
+    def filter_queryset_for_workspaces(
+        self, actor, operation_name, queryset, workspaces
+    ):
+        if operation_name not in self.OPERATION_ALLOWED_ON_TEMPLATES:
+            return None
+
+        return {
+            workspace.id: WORKSPACE_FILTER_ALLOW_ALL
+            for workspace in workspaces
+            if workspace.has_template()
+        }
 
 
 class WorkspaceMemberOnlyPermissionManagerType(PermissionManagerType):
@@ -281,6 +297,15 @@ class WorkspaceMemberOnlyPermissionManagerType(PermissionManagerType):
     ):
         if workspace and not self.is_actor_in_workspace(actor, workspace):
             return queryset.none(), True
+
+    def filter_queryset_for_workspaces(
+        self, actor, operation_name, queryset, workspaces
+    ):
+        return {
+            workspace.id: WORKSPACE_FILTER_DENY_ALL
+            for workspace in workspaces
+            if not self.is_actor_in_workspace(actor, workspace)
+        }
 
 
 class BasicPermissionManagerType(PermissionManagerType):

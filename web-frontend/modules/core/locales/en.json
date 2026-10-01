@@ -3,6 +3,51 @@
     "page": "Page",
     "of": "of {pages}"
   },
+  "allWorkspaces": {
+    "title": "Your workspaces",
+    "searchResults": "Search results",
+    "searchPlaceholder": "Search",
+    "allItems": "All items",
+    "itemsSelected": "{count} item type | {count} item types",
+    "createWorkspace": "Create workspace",
+    "expandedView": "Expanded view",
+    "compactView": "Compact view",
+    "collapseAll": "Collapse all",
+    "expandAll": "Expand all",
+    "workspacesSection": "Workspaces",
+    "itemsSection": "Items",
+    "noResultsTitle": "No results found",
+    "noResultsDescription": "We couldn't find anything for \"{search}\". Check your spelling or use different keywords.",
+    "clearSearch": "Clear search",
+    "membersCount": "0 members | 1 member | {count} members",
+    "itemsCount": "0 items | 1 item | {count} items",
+    "moreElements": "{count} more element | {count} more elements",
+    "noApplications": "No builders yet",
+    "noFilterMatches": "No items match the selected types.",
+    "create": "Create",
+    "members": "Members",
+    "settings": "Settings"
+  },
+  "recentlyViewed": {
+    "title": "Recently viewed",
+    "yourItems": "Your items",
+    "name": "Name",
+    "lastViewed": "Last viewed",
+    "workspace": "Workspace",
+    "allWorkspaces": "All workspaces",
+    "workspacesSelected": "{count} workspace | {count} workspaces",
+    "allItems": "All items",
+    "itemTypesSelected": "{count} item type | {count} item types",
+    "tableView": "Table",
+    "cardsView": "Cards",
+    "loadMore": "Load more",
+    "emptyTitle": "Nothing viewed recently",
+    "emptyDescription": "The views, pages, dashboards and workflows you open show up here.",
+    "noFilterMatchesTitle": "No items match the selected filters",
+    "noFilterMatchesDescription": "Try selecting other workspaces or item types.",
+    "clearFilters": "Clear filters",
+    "goToWorkspaces": "Go to your workspaces"
+  },
   "workspaceSearch": {
     "title": "Search",
     "searchEverything": "Search...",
@@ -53,7 +98,11 @@
     "logoff": "Log out",
     "errorNoWorkspace": "You don’t have any workspaces.",
     "adminTools": "Admin tools",
-    "home": "Home",
+    "recents": "Recents",
+    "allWorkspaces": "All workspaces",
+    "recentlyViewed": "Recently viewed",
+    "backToHome": "Back to home",
+    "templates": "Templates",
     "dashboard": "Dashboard",
     "trash": "Trash",
     "settings": "My settings",
@@ -386,7 +435,8 @@
     "title": "Templates"
   },
   "templateHeader": {
-    "use": "Use this template"
+    "use": "Use this template",
+    "selectWorkspace": "Choose workspace"
   },
   "trashSidebar": {
     "unnamedWorkspace": "Unnamed workspace {id}",
@@ -513,8 +563,8 @@
   },
   "errorLayout": {
     "notFound": "The page you are looking for has not been found. This might be because URL is incorrect or that you don’t have permission to view this page.",
-    "error": "Something went wrong while loading the page. Our developers have been notified of the issue. Please try to refresh or return to the dashboard.",
-    "backDashboard": "Back to dashboard",
+    "error": "Something went wrong while loading the page. Our developers have been notified of the issue. Please try to refresh or return to the homepage.",
+    "backDashboard": "Back to home",
     "backLogin": "Back to login",
     "wrong": "Something went wrong",
     "refresh": "Refresh page"
@@ -522,9 +572,8 @@
   "dashboard": {
     "title": "Dashboard",
     "becomeGithubSponsor": "Become a GitHub sponsor",
-    "suggestedTemplates": "Start from a template",
-    "browseAllTemplates": "Browse all templates",
-    "browseTemplates": "Browse templates",
+    "templates": "Templates",
+    "templatesMessage": "Start with a ready made solution",
     "resources": "Resources",
     "apiDocumentation": "API documentation",
     "apiDocumentationMessage": "Learn more about our code",
@@ -551,37 +600,6 @@
     "untitledDatabase": "Untitled database",
     "otherDatabases": "{count} other databases",
     "activitySummary": "{total} rows added over {days} days"
-  },
-  "dashboardTemplates": {
-    "projectManagement": {
-      "name": "Project management",
-      "description": "Tasks, projects and owners, with status, priority and a due date."
-    },
-    "performanceReview": {
-      "name": "Performance reviews",
-      "description": "Review cycles, goals and feedback for each employee across the year."
-    }
-  },
-  "dashboardApplication": {
-    "createdAt": "created",
-    "tableCount": {
-      "zero": "no tables",
-      "one": "1 table",
-      "other": "{count} tables"
-    },
-    "fieldCount": {
-      "zero": "no columns",
-      "one": "1 column",
-      "other": "{count} columns"
-    },
-    "rowCount": {
-      "zero": "no rows",
-      "one": "1 row",
-      "other": "{count} rows"
-    }
-  },
-  "templateCard": {
-    "viewMore": "View more"
   },
   "login": {
     "title": "Welcome back",

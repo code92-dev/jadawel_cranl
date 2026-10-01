@@ -9,6 +9,7 @@ from pytest_unordered import unordered
 
 from jadawel.core.handler import CoreHandler
 from jadawel.core.jobs.handler import JobHandler
+from jadawel.core.last_viewed.handler import LastViewedHandler
 from jadawel.core.models import (
     WORKSPACE_USER_PERMISSION_ADMIN,
     WORKSPACE_USER_PERMISSION_MEMBER,
@@ -163,6 +164,7 @@ def test_workspace_restored(mock_broadcast_to_users, data_fixture):
             "generative_ai_models_enabled": {},
         },
         "tables": [],
+        "last_viewed": None,
     }
     assert len(args) == 2
     call_1 = args[1][0]
@@ -181,6 +183,29 @@ def test_workspace_restored(mock_broadcast_to_users, data_fixture):
     assert call_2[1]["type"] == "group_restored"
     assert call_2[1]["workspace"]["id"] == workspace_user.workspace_id
     assert call_2[1]["applications"] == [expected_database_json]
+
+
+@pytest.mark.django_db(transaction=True)
+@patch("jadawel.ws.signals.broadcast_to_users")
+@pytest.mark.websockets
+def test_workspace_restored_carries_the_users_last_viewed(
+    mock_broadcast_to_users, data_fixture
+):
+    user = data_fixture.create_user()
+    workspace = data_fixture.create_workspace(user=user)
+    dashboard = data_fixture.create_dashboard_application(workspace=workspace)
+    with freeze_time("2026-01-01T12:00:00Z"):
+        LastViewedHandler.mark_viewed(
+            user.id, "dashboard", dashboard.id, datetime.now(tz=timezone.utc)
+        )
+    TrashHandler.trash(user, workspace, None, workspace)
+
+    TrashHandler.restore_item(user, "workspace", workspace.id)
+
+    (payload,) = [call[0][1] for call in mock_broadcast_to_users.delay.call_args_list]
+    assert [a["last_viewed"] for a in payload["applications"]] == [
+        "2026-01-01T12:00:00Z"
+    ]
 
 
 @pytest.mark.django_db(transaction=True)
@@ -409,6 +434,8 @@ def test_application_updated(mock_broadcast_to_permitted_users, data_fixture):
     assert args[0][4]["type"] == "application_updated"
     assert args[0][4]["application_id"] == database.id
     assert args[0][4]["application"]["id"] == database.id
+    # Personal, so it is only delivered by `last_viewed_updated`.
+    assert "last_viewed" not in args[0][4]["application"]
 
 
 @pytest.mark.django_db(transaction=True)

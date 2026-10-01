@@ -22,6 +22,26 @@ three-way merge (upstream file before the PR → after the PR, renamed `baserow`
 are in `docs/UPSTREAM_2_4_PORT.md`. Files that exist only because of the port (new
 components, migrations, tests) are not listed.
 
+### Workspace homepage (upstream #5977, #5980, #5992, #6001, #6002, #6107, #6108, #6176, #6205)
+
+The landing page after sign-in becomes upstream's "Your workspaces" page; the
+workspace page shows one list of everything in the workspace.
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/core/{handler,registries,permission_manager,service,cache}.py`, `api/applications/{views,serializers}.py`, `api/polymorphic.py`, `contrib/{database,builder,automation}/application_types.py`, `contrib/automation/{workflows/handler.py,api/workflows/serializers.py}`, `contrib/builder/api/theme/serializers.py` | Applications of all workspaces are permission-filtered in one pass (`filter_queryset_for_workspaces`; per-workspace fallback for permission managers without it, such as the fork's table grants) and serialized with `many=True`; workflows annotated with their published state | Listing every workspace's items on one page without a query per workspace |
+| `backend/src/jadawel/core/{models,apps,registries,tasks}.py` (+ new `core/last_viewed/`, `api/last_viewed/`, `core/pagination.py`), `celery_singleton_backend.py`, `ws/{signals,tasks}.py`, `contrib/{database/views,builder/pages,dashboard,automation/workflows}/…` signals/receivers, `contrib/database/api/views/views.py`, `contrib/builder/api/elements/views.py`, `contrib/dashboard/api/widgets/views.py`, `contrib/automation/api/nodes/views.py`, `contrib/database/api/tables/serializers.py`, `api/admin/users/views.py`, `api/authentication.py` | `UserLastViewedItem` and its tracking from the view, page, dashboard and workflow loads; `/api/last-viewed/`; `last_viewed` on applications and in realtime updates. `broadcast_to_users(record=)` is accepted but has no effect (the fork does not record events for replay). Builder pages are not trashable here, so `page_deleted` forgets them | Sorting and "recently viewed" |
+| `backend/src/jadawel/core/{models,user/handler,user/utils}.py` (+ `preference_types.py`, `user/registries.py`), `api/user/*` | `UserProfile.preferences` and `PATCH /api/user/preferences/` | Remember sort and view mode |
+| `backend/src/jadawel/core/action/{handler,registries,scopes}.py`, `core/apps.py` | Undo/redo scope for actions taken on the all-workspaces page | Undo on that page |
+| `web-frontend/modules/core/{routes,plugin,plugins}.js`, `layouts/app.vue`, `components/sidebar/{Sidebar,SidebarMenu,SidebarUserContext}.vue`, `utils/{constants,undoRedoConstants,date}.js`, `store/{auth,workspace,notification}.js`, `services/auth.js`, `mixins/dropdown.js`, `plugins/realTimeHandler.js`, `plugins/global.js` | `/all-workspaces` (with its own sidebar) and `/recently-viewed`; `/dashboard` redirects to the former; the workspace sidebar gets a back-to-home link and "Recents"; preferences in the auth store; Dropdown renders its selected value before items register | Homepage |
+| `web-frontend/modules/core/{middleware/workspacesAndApplications.js,utils/workspace.js}`, `middleware/impersonate.js` | The remembered-workspace cookie is removed, as upstream: a workspace is selected only from the route | No page needs a selected workspace any more |
+| `web-frontend/modules/core/pages/workspace.vue`, `assets/scss/components/{dashboard,sidebar,…}.scss` | Rebuilt on upstream's 2.4 page: Templates card and resource links, then "Your items" (`RecentlyViewed`), then the fork's Overview panel; the per-application list and the featured-template cards go | One list instead of separate rows |
+| `web-frontend/modules/{database,automation,builder,dashboard}/{plugin,applicationTypes}.js`, stores | Last-viewed item types; navigation to `all-workspaces` | Same |
+| Removed: `core/pages/dashboard.vue`, `middleware/dashboardRedirect.js`, `components/dashboard/{DashboardApplication,DashboardTemplateCard}.vue`, `components/template/{TemplateCard,TemplateIllustration}.vue`, the template illustration SVGs and their stylesheets | Unused after the change, as upstream |  |
+| `backend/src/jadawel/contrib/automation/operations.py`, `contrib/builder/operations.py` | `ListAutomationWorkflowsOperationType` / `ListPagesBuilderOperationType` declare the scope of what they list (`object_scope_name`), as upstream did in 2.3 | The batched filter restricts a listing to one workspace through that scope; only the new multi-workspace code reads it |
+| `web-frontend/modules/core/directives/tooltip.js`, `assets/scss/components/tooltip.scss` | The new `right` tooltip position opens toward the inline end (left of the element in Arabic), arrow mirrored | The sidebar's back-to-home tooltip would otherwise open off-screen in RTL |
+| Added from 2.4 as dependencies: `components/SkeletonBlock.vue`, `assets/scss/components/skeleton.scss`, `composables/usePageAsyncData.js` | The new components use them | |
+
 ### Images in rich text long text fields (upstream #5775 `5d0bef8f`, with its prerequisite #5721 `3a4a5724`)
 
 Baserow 2.4 adds images to rich text, not tables, so tables were not added.

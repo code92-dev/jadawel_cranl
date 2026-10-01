@@ -592,9 +592,8 @@
   "dashboard": {
     "title": "لوحة التحكم",
     "becomeGithubSponsor": "كن أحد رعاة GitHub",
-    "suggestedTemplates": "ابدأ من قالب",
-    "browseAllTemplates": "عرض كل القوالب",
-    "browseTemplates": "تصفَّح القوالب",
+    "templates": "القوالب",
+    "templatesMessage": "ابدأ بحل جاهز",
     "resources": "الموارد",
     "apiDocumentation": "وثائق واجهة برمجة التطبيقات",
     "apiDocumentationMessage": "تعرف على المزيد حول الكود الخاص بنا",
@@ -621,46 +620,6 @@
     "untitledDatabase": "قاعدة بيانات بدون عنوان",
     "otherDatabases": "قواعد بيانات أخرى ({count})",
     "activitySummary": "أُضيف {total} صفًا خلال {days} يومًا"
-  },
-  "dashboardTemplates": {
-    "projectManagement": {
-      "name": "إدارة المشاريع",
-      "description": "مهام ومشاريع ومكلَّفون، مع حالة وأولوية وتاريخ استحقاق."
-    },
-    "performanceReview": {
-      "name": "تقييم الأداء",
-      "description": "دورات تقييم وأهداف وملاحظات لكل موظف على مدار السنة."
-    }
-  },
-  "dashboardApplication": {
-    "createdAt": "تاريخ الإنشاء",
-    "tableCount": {
-      "zero": "لا جداول",
-      "one": "جدول واحد",
-      "two": "جدولان",
-      "few": "{count} جداول",
-      "many": "{count} جدولًا",
-      "other": "{count} جدول"
-    },
-    "fieldCount": {
-      "zero": "لا أعمدة",
-      "one": "عمود واحد",
-      "two": "عمودان",
-      "few": "{count} أعمدة",
-      "many": "{count} عمودًا",
-      "other": "{count} عمود"
-    },
-    "rowCount": {
-      "zero": "لا صفوف",
-      "one": "صف واحد",
-      "two": "صفان",
-      "few": "{count} صفوف",
-      "many": "{count} صفًا",
-      "other": "{count} صف"
-    }
-  },
-  "templateCard": {
-    "viewMore": "عرض المزيد"
   },
   "userSessionExpiredToast": {
     "title": "انتهت صلاحية الجلسة",
@@ -758,7 +717,8 @@
     "title": "القوالب"
   },
   "templateHeader": {
-    "use": "استخدم هذا القالب"
+    "use": "استخدم هذا القالب",
+    "selectWorkspace": "اختيار مساحة العمل"
   },
   "createApplicationContext": {
     "fromTemplate": "القوالب الجاهزة",
@@ -900,6 +860,51 @@
     "page": "صفحة",
     "of": "من {pages}"
   },
+  "allWorkspaces": {
+    "title": "مساحات العمل",
+    "searchResults": "نتائج البحث",
+    "searchPlaceholder": "بحث",
+    "allItems": "كل العناصر",
+    "itemsSelected": "{count} نوع | {count} أنواع",
+    "createWorkspace": "إنشاء مساحة عمل",
+    "expandedView": "عرض موسَّع",
+    "compactView": "عرض مضغوط",
+    "collapseAll": "طيّ الكل",
+    "expandAll": "توسيع الكل",
+    "workspacesSection": "مساحات العمل",
+    "itemsSection": "العناصر",
+    "noResultsTitle": "لا توجد نتائج",
+    "noResultsDescription": "لم نجد أي شيء يطابق «{search}». تحقق من الإملاء أو جرّب كلمات أخرى.",
+    "clearSearch": "مسح البحث",
+    "membersCount": "لا أعضاء | عضو واحد | {count} أعضاء",
+    "itemsCount": "لا عناصر | عنصر واحد | {count} عناصر",
+    "moreElements": "{count} عنصر آخر | {count} عناصر أخرى",
+    "noApplications": "لا توجد عناصر بعد",
+    "noFilterMatches": "لا توجد عناصر من الأنواع المختارة.",
+    "create": "إنشاء",
+    "members": "الأعضاء",
+    "settings": "الإعدادات"
+  },
+  "recentlyViewed": {
+    "title": "المعروضة مؤخرًا",
+    "yourItems": "عناصرك",
+    "name": "الاسم",
+    "lastViewed": "آخر عرض",
+    "workspace": "مساحة العمل",
+    "allWorkspaces": "كل مساحات العمل",
+    "workspacesSelected": "{count} مساحة عمل | {count} مساحات عمل",
+    "allItems": "كل العناصر",
+    "itemTypesSelected": "{count} نوع | {count} أنواع",
+    "tableView": "جدول",
+    "cardsView": "بطاقات",
+    "loadMore": "عرض المزيد",
+    "emptyTitle": "لم تعرض شيئًا مؤخرًا",
+    "emptyDescription": "تظهر هنا العروض والصفحات ولوحات التحكم وسير العمل التي تفتحها.",
+    "noFilterMatchesTitle": "لا توجد عناصر تطابق عوامل التصفية",
+    "noFilterMatchesDescription": "جرّب اختيار مساحات عمل أو أنواع أخرى.",
+    "clearFilters": "مسح عوامل التصفية",
+    "goToWorkspaces": "الانتقال إلى مساحات العمل"
+  },
   "workspaceSearch": {
     "title": "بحث",
     "searchEverything": "بحث...",
@@ -977,7 +982,11 @@
     "logoff": "تسجيل الخروج",
     "errorNoWorkspace": "ليس لديك أي مساحات عمل.",
     "adminTools": "أدوات المشرف",
-    "home": "الرئيسية",
+    "recents": "الأحدث",
+    "allWorkspaces": "كل مساحات العمل",
+    "recentlyViewed": "المعروضة مؤخرًا",
+    "backToHome": "العودة إلى الرئيسية",
+    "templates": "القوالب",
     "dashboard": "لوحة التحكم",
     "trash": "سلة المهملات",
     "settings": "إعداداتي",

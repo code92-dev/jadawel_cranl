@@ -778,6 +778,13 @@ class DatabaseConfig(AppConfig):
         object_scope_type_registry.register(DatabaseViewFilterGroupObjectScopeType())
         object_scope_type_registry.register(TokenObjectScopeType())
 
+        from jadawel.contrib.database.views.last_viewed_types import (
+            DatabaseViewLastViewedItemType,
+        )
+        from jadawel.core.registries import last_viewed_item_type_registry
+
+        last_viewed_item_type_registry.register(DatabaseViewLastViewedItemType())
+
         from jadawel.contrib.database.views.operations import (
             CanReceiveNotificationOnSubmitFormViewOperationType,
             ReadViewDefaultValuesOperationType,

@@ -49,6 +49,7 @@ import SwitchInput from '@jadawel/modules/core/components/SwitchInput'
 import Tab from '@jadawel/modules/core/components/Tab'
 import Tabs from '@jadawel/modules/core/components/Tabs'
 import Thumbnail from '@jadawel/modules/core/components/Thumbnail'
+import SkeletonBlock from '@jadawel/modules/core/components/SkeletonBlock'
 import autoOverflowScroll from '@jadawel/modules/core/directives/autoOverflowScroll'
 import autoScroll from '@jadawel/modules/core/directives/autoScroll'
 import clickOutside from '@jadawel/modules/core/directives/clickOutside'
@@ -110,6 +111,7 @@ function setupVue(app) {
   app.component('SegmentControl', SegmentControl)
   app.component('SwitchButton', SwitchButton)
   app.component('Icon', Icon)
+  app.component('SkeletonBlock', SkeletonBlock)
 
   app.directive('scroll', scroll)
   app.directive('preventParentScroll', preventParentScroll)

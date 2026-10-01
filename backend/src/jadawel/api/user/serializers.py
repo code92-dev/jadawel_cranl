@@ -5,7 +5,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import AbstractUser
 
-from drf_spectacular.utils import extend_schema_serializer
+from drf_spectacular.utils import extend_schema_field, extend_schema_serializer
 from opentelemetry import metrics
 from rest_framework import serializers
 from rest_framework.request import Request
@@ -16,6 +16,7 @@ from rest_framework_simplejwt.serializers import (
 )
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from jadawel.api.mixins import UnknownFieldRaisesExceptionSerializerMixin
 from jadawel.api.sessions import set_user_session_data_from_request
 from jadawel.api.two_factor_auth.tokens import TwoFactorAccessToken
 from jadawel.api.user.jwt import get_user_from_token
@@ -36,7 +37,9 @@ from jadawel.core.two_factor_auth.handler import TwoFactorAuthHandler
 from jadawel.core.user.actions import SignInUserActionType
 from jadawel.core.user.exceptions import DeactivatedUserException
 from jadawel.core.user.handler import UserHandler
+from jadawel.core.user.registries import user_preference_type_registry
 from jadawel.core.user.utils import (
+    IMPERSONATED_BY_CLAIM,
     generate_session_tokens_for_user,
     normalize_email_address,
 )
@@ -61,6 +64,31 @@ class SubjectUserSerializer(serializers.ModelSerializer):
             "first_name": {"read_only": True},
             "email": {"read_only": True},
         }
+
+
+class UserPreferencesSerializer(serializers.Serializer):
+    """
+    One field per registered user preference type; every value is always present
+    in a response, validated by the type that owns it.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for preference_type in user_preference_type_registry.get_all():
+            self.fields[preference_type.type] = preference_type.get_serializer_field()
+
+
+class UpdateUserPreferencesSerializer(
+    UnknownFieldRaisesExceptionSerializerMixin, UserPreferencesSerializer
+):
+    """
+    The same fields, all optional, so a PATCH can change any subset.
+    """
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.required = False
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -96,6 +124,10 @@ class UserSerializer(serializers.ModelSerializer):
         required=False,
         help_text="Indicates which guided tour types have been completed.",
     )
+    preferences = serializers.SerializerMethodField(
+        help_text="The value of every registered user preference, falling back to "
+        "its default when the user never changed it."
+    )
 
     class Meta:
         model = User
@@ -110,6 +142,7 @@ class UserSerializer(serializers.ModelSerializer):
             "email_verified",
             "completed_onboarding",
             "completed_guided_tours",
+            "preferences",
         )
         extra_kwargs = {
             "password": {"write_only": True},
@@ -119,6 +152,10 @@ class UserSerializer(serializers.ModelSerializer):
             "completed_onboarding": {"read_only": True},
             "completed_guided_tours": {"read_only": True},
         }
+
+    @extend_schema_field(UserPreferencesSerializer)
+    def get_preferences(self, instance):
+        return UserHandler().get_user_preferences(instance)
 
 
 class PublicUserSerializer(serializers.ModelSerializer):
@@ -410,7 +447,9 @@ class TokenRefreshWithUserSerializer(TokenRefreshSerializer):
         ):
             raise EmailVerificationRequired()
 
-        data = generate_session_tokens_for_user(user)
+        data = generate_session_tokens_for_user(
+            user, impersonated_by_user_id=token.get(IMPERSONATED_BY_CLAIM)
+        )
         data.update(**get_all_user_data_serialized(user, self.context["request"]))
         token_refreshes_counter.add(1)
         return data

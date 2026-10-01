@@ -75,6 +75,12 @@
   gap: 24px;
 }
 
+.dashboard__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .dashboard__wrapper {
   flex-grow: 1;
 }
@@ -83,122 +89,15 @@
   display: flex;
   flex-direction: column;
   gap: 32px;
+
+  // The resources switch layout on the width of this box rather than the
+  // viewport, because the assistant sidebar can take a large part of it.
+  container-type: inline-size;
 }
 
-// Two applications per row. `minmax(0, 1fr)` rather than `1fr`, because `1fr`
-// refuses to shrink below the widest counter line and would push the columns
-// out of the container instead of letting the text ellipsis do its job.
-.dashboard__applications {
-  list-style: none;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  column-gap: 32px;
-  padding: 0;
-  margin: 0;
-
-  @media screen and (max-width: $dashboard-applications-breakpoint) {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-// Grid rows are as tall as their tallest cell, so the separator is pushed to
-// the bottom of the cell rather than left directly under the text. Without
-// this the two hairlines in a row sit at different heights whenever one
-// application's name wraps and its neighbour's does not.
-.dashboard__applications > li {
-  display: flex;
-  flex-direction: column;
-  min-inline-size: 0;
-}
-
-.dashboard__application-more-button {
-  display: none;
-  margin-inline-start: auto;
-}
-
-.dashboard__application {
-  display: flex;
-  list-style: none;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 10px;
-  cursor: pointer;
-
-  @include rounded($rounded-md);
-
-  &:hover {
-    background: var(--jadawel-hover-background, #f0f2f4);
-
-    .dashboard__application-more-button {
-      display: block;
-    }
-  }
-}
-
-// Takes up the slack in a stretched grid cell, so the separator below it stays
-// pinned to the bottom of the row.
-.dashboard__applications > li > .dashboard__application {
-  margin-block-end: auto;
-}
-
-.dashboard__application-wrapper {
-  display: flex;
-  gap: 16px;
-  min-inline-size: 0;
-  inline-size: 100%;
-  align-items: center;
-}
-
-.dashboard__application-icon {
-  display: flex;
-  border: 1px solid var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-raised-background, #fff);
-  inline-size: 40px;
-  block-size: 40px;
-  flex: 0 0 40px;
-  align-items: center;
-  justify-content: center;
-
-  @include rounded($rounded-md);
-  @include elevation($elevation-low);
-}
-
-.dashboard__application-name {
-  font-size: 13px;
-  block-size: 16px;
-  font-weight: 500;
-  display: block;
-}
-
-.dashboard__application-name-text {
-  @extend %ellipsis;
-}
-
-.dashboard__application-details {
-  min-inline-size: 0;
-}
-
-.dashboard__application-more {
-  @extend %ellipsis;
-
-  color: $palette-neutral-900;
-  font-size: 11px;
-  padding-block-start: 8px;
-  font-weight: 500;
-}
-
-.dashboard__application-more-separator {
-  margin: 0 6px;
-  color: $palette-neutral-400;
-}
-
-.dashboard__application-separator {
-  block-size: 1px;
-  background: var(--jadawel-border-color, #e7e9ec);
-  inline-size: calc(100% - 65px);
-  margin-block: 6px;
-  margin-inline: auto 0;
-}
+// The narrowest box in which a single row of the five resource cards leaves
+// each card the 196px its longest word needs.
+$dashboard-resources-row-min-width: 1044px;
 
 .dashboard__no-application {
   border-radius: 6px;
@@ -222,47 +121,35 @@
   flex-direction: column;
   gap: 24px;
 
-  @media screen and (min-width: 1280px) {
-    flex-direction: row;
-  }
-}
+  // Below the items, unless the cards fit in a single row above them.
 
-.dashboard__suggested-templates {
-  @media screen and (min-width: 1280px) {
-    inline-size: 50%;
-  }
-}
-
-/*
- * Jadawel: the wrappers used to be stretched to `calc(100% - 33px)` so the two
- * columns matched each other's height. That sized a panel to its neighbour
- * rather than to its contents — the resources block rendered 190px tall around a
- * single link. Both blocks now size to what is in them.
- */
-.dashboard__suggested-templates-wrapper {
-  display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-}
-
-.dashboard__resources {
-  @media screen and (min-width: 1280px) {
-    inline-size: 50%;
+  @container (min-width: #{$dashboard-resources-row-min-width}) {
+    order: 0;
   }
 }
 
 .dashboard__resources-wrapper {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(0, 1fr);
+
+  // Either every card side by side or every card stacked, never a partial row.
+  @container (min-width: #{$dashboard-resources-row-min-width}) {
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(0, 1fr);
+    grid-template-columns: none;
+  }
 }
 
 .dashboard__resource {
   border: 1px solid var(--jadawel-border-color, #e7e9ec);
   background: var(--jadawel-raised-background, #fff);
-  padding: 9px 12px;
+  padding: 16px 21px;
   text-decoration: none;
   display: flex;
+
+  // The templates resource opens a modal instead of following a link.
+  cursor: pointer;
 
   @include rounded($rounded-md);
 

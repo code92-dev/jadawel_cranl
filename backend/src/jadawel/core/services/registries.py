@@ -602,6 +602,10 @@ class TriggerServiceTypeMixin(ABC):
         """
         Does this trigger can be dispatched immediately. It's possible only if the
         trigger data can be generated
+
+        The given service can be a base `Service` instance instead of the
+        specific one, so implementations must not rely on fields of the specific
+        model and should ideally return a constant.
         """
 
         return False

@@ -12,7 +12,7 @@
     <p v-else class="placeholder__content">{{ content }}</p>
     <div v-if="showBackButton" class="placeholder__action">
       <Button
-        v-if="isAuthenticated && currentRouteName === 'dashboard'"
+        v-if="isAuthenticated && currentRouteName === 'all-workspaces'"
         type="primary"
         icon="iconoir-redo"
         @click="refresh"
@@ -21,9 +21,9 @@
       >
 
       <Button
-        v-else-if="isAuthenticated && currentRouteName !== 'dashboard'"
+        v-else-if="isAuthenticated && currentRouteName !== 'all-workspaces'"
         tag="nuxt-link"
-        :to="{ name: 'dashboard' }"
+        :to="{ name: 'all-workspaces' }"
         type="primary"
         size="large"
         icon="iconoir-nav-arrow-left"

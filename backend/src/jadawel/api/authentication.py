@@ -11,6 +11,7 @@ from jadawel.core.sentry import setup_user_in_sentry
 from jadawel.core.telemetry.utils import setup_user_in_baggage_and_spans
 from jadawel.core.user.cache import get_cached_user, set_cached_user
 from jadawel.core.user.exceptions import DeactivatedUserException
+from jadawel.core.user.utils import set_user_impersonated_from_token
 
 from .sessions import set_user_session_data_from_request
 
@@ -75,6 +76,7 @@ class JSONWebTokenAuthentication(JWTAuthentication):
             )
 
         set_user_session_data_from_request(user, request)
+        set_user_impersonated_from_token(user, token)
         with setup_user_in_baggage_and_spans(user, request):
             setup_user_in_sentry(user)
             return user, token

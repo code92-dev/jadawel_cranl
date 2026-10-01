@@ -44,13 +44,25 @@ class AutomationWorkflowSerializer(serializers.ModelSerializer):
 
     @extend_schema_field(OpenApiTypes.STR)
     def get_published_on(self, obj):
-        published_workflow = AutomationWorkflowHandler().get_published_workflow(obj)
-        return str(published_workflow.created_on) if published_workflow else None
+        try:
+            # Set by `AutomationWorkflowHandler.annotate_published_workflow_data` when
+            # many workflows are serialized at once.
+            published_on = obj.published_workflow_created_on
+        except AttributeError:
+            published_workflow = AutomationWorkflowHandler().get_published_workflow(obj)
+            published_on = published_workflow.created_on if published_workflow else None
+        return str(published_on) if published_on else None
 
     @extend_schema_field(OpenApiTypes.STR)
     def get_state(self, obj):
-        published_workflow = AutomationWorkflowHandler().get_published_workflow(obj)
-        return published_workflow.state if published_workflow else WorkflowState.DRAFT
+        try:
+            # Set by `AutomationWorkflowHandler.annotate_published_workflow_data` when
+            # many workflows are serialized at once.
+            state = obj.published_workflow_state
+        except AttributeError:
+            published_workflow = AutomationWorkflowHandler().get_published_workflow(obj)
+            state = published_workflow.state if published_workflow else None
+        return state if state is not None else WorkflowState.DRAFT
 
     @extend_schema_field(serializers.ListField(child=serializers.IntegerField()))
     def get_notification_recipient_ids(self, obj):

@@ -18,6 +18,9 @@
     "sampleDataCopied": "تم نسخ الحمولة إلى الحافظة",
     "noHtmlContent": "لا تحتوي هذه الرسالة على محتوى HTML."
   },
+  "lastViewedItemType": {
+    "automationWorkflow": "سير العمل"
+  },
   "nodeType": {
     "triggerDeletionError": "لا يمكن حذف المشغلات، بل استبدالها فقط.",
     "localJadawelRowsCreatedLabel": "يتم إنشاء الصفوف في {tableName}",

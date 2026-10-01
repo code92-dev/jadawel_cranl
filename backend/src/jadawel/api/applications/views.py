@@ -43,6 +43,7 @@ from jadawel.core.job_types import DuplicateApplicationJobType
 from jadawel.core.jobs.exceptions import MaxJobCountExceeded
 from jadawel.core.jobs.handler import JobHandler
 from jadawel.core.jobs.registries import job_type_registry
+from jadawel.core.last_viewed.handler import LastViewedHandler
 from jadawel.core.models import Application
 from jadawel.core.operations import CreateApplicationsWorkspaceOperationType
 from jadawel.core.service import CoreService
@@ -54,6 +55,28 @@ from .serializers import (
     PolymorphicApplicationResponseSerializer,
     PolymorphicApplicationUpdateSerializer,
 )
+
+
+def _get_application_serializer_context(request: Request, applications: list) -> dict:
+    """
+    Loads what the serializer needs per user and per workspace up front, with a
+    query count that does not grow with the number of workspaces. The last viewed
+    value can't be a queryset annotation because `specific_queryset` drops
+    annotations.
+
+    :param request: The request of the user the applications are serialized for.
+    :param applications: The applications that are going to be serialized.
+    :return: The context for the `PolymorphicApplicationResponseSerializer`.
+    """
+
+    return {
+        "request": request,
+        "last_viewed_per_application": (
+            LastViewedHandler.get_last_viewed_per_application(
+                request.user, [application.id for application in applications]
+            )
+        ),
+    }
 
 
 class AllApplicationsView(APIView):
@@ -81,23 +104,19 @@ class AllApplicationsView(APIView):
         returned.
         """
 
-        workspaces = CoreService().list_workspaces(request.user).order_by("id")
+        workspaces = list(CoreService().list_workspaces(request.user).order_by("id"))
 
-        all_applications = []
-        for workspace in workspaces:
-            workspace_applications_qs = CoreService().list_applications_in_workspace(
-                request.user, workspace
-            )
-            all_applications += list(workspace_applications_qs.order_by("order", "id"))
+        all_applications = list(
+            CoreService().list_applications_in_workspaces(request.user, workspaces)
+        )
 
-        data = [
+        return Response(
             PolymorphicApplicationResponseSerializer(
-                application, context={"request": request}
+                all_applications,
+                many=True,
+                context=_get_application_serializer_context(request, all_applications),
             ).data
-            for application in all_applications
-        ]
-
-        return Response(data)
+        )
 
 
 class ApplicationsView(APIView):
@@ -148,18 +167,17 @@ class ApplicationsView(APIView):
         """
 
         workspace = CoreService().get_workspace(request.user, workspace_id)
-        applications = CoreService().list_applications_in_workspace(
-            request.user, workspace
+        applications = list(
+            CoreService().list_applications_in_workspace(request.user, workspace)
         )
 
-        data = [
+        return Response(
             PolymorphicApplicationResponseSerializer(
-                application, context={"request": request}
+                applications,
+                many=True,
+                context=_get_application_serializer_context(request, applications),
             ).data
-            for application in applications
-        ]
-
-        return Response(data)
+        )
 
     @extend_schema(
         parameters=[
@@ -220,7 +238,8 @@ class ApplicationsView(APIView):
 
         return Response(
             PolymorphicApplicationResponseSerializer(
-                application, context={"request": request}
+                application,
+                context=_get_application_serializer_context(request, [application]),
             ).data
         )
 
@@ -266,7 +285,8 @@ class ApplicationView(APIView):
 
         return Response(
             PolymorphicApplicationResponseSerializer(
-                application, context={"request": request}
+                application,
+                context=_get_application_serializer_context(request, [application]),
             ).data
         )
 
@@ -337,7 +357,8 @@ class ApplicationView(APIView):
 
         return Response(
             PolymorphicApplicationResponseSerializer(
-                application, context={"request": request}
+                application,
+                context=_get_application_serializer_context(request, [application]),
             ).data
         )
 

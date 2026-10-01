@@ -787,7 +787,7 @@
   },
   "apiDocsDatabase": {
     "pageTitle": "{name} database API documentation",
-    "back": "Back to dashboard",
+    "back": "Back to overview",
     "openDatabase": "open database"
   },
   "apiDocsComponent": {
@@ -796,7 +796,7 @@
     "settings": "settings",
     "selectApplicationTitle": "For which database do you want to see the documentation?",
     "signIn": "Sign in to get started",
-    "back": "Back to dashboard"
+    "back": "Back to overview"
   },
   "viewAggregationType": {
     "count": "Count",
@@ -1234,5 +1234,8 @@
     "includeHeader": "Include field names as header",
     "includeRowId": "Include row ID",
     "includePrimaryField": "Include primary field"
+  },
+  "lastViewedItemType": {
+    "databaseView": "{name} view"
   }
 }

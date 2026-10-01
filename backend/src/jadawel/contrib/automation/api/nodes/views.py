@@ -75,6 +75,9 @@ from jadawel.contrib.automation.workflows.exceptions import (
 )
 from jadawel.contrib.automation.workflows.handler import AutomationWorkflowHandler
 from jadawel.contrib.automation.workflows.service import AutomationWorkflowService
+from jadawel.contrib.automation.workflows.signals import (
+    automation_workflow_loaded,
+)
 
 AUTOMATION_NODES_TAG = "Automation nodes"
 
@@ -187,6 +190,10 @@ class AutomationNodesView(APIView):
             ).data
             for node in nodes
         ]
+
+        automation_workflow_loaded.send(
+            sender=self, workflow=workflow, user=request.user
+        )
 
         return Response(data)
 

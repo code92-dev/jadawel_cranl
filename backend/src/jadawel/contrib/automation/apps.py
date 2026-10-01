@@ -109,6 +109,13 @@ class AutomationConfig(AppConfig):
         object_scope_type_registry.register(AutomationWorkflowObjectScopeType())
         object_scope_type_registry.register(AutomationNodeObjectScopeType())
 
+        from jadawel.contrib.automation.workflows.last_viewed_types import (
+            AutomationWorkflowLastViewedItemType,
+        )
+        from jadawel.core.registries import last_viewed_item_type_registry
+
+        last_viewed_item_type_registry.register(AutomationWorkflowLastViewedItemType())
+
         operation_type_registry.register(CreateAutomationWorkflowOperationType())
         operation_type_registry.register(DeleteAutomationWorkflowOperationType())
         operation_type_registry.register(DuplicateAutomationWorkflowOperationType())
@@ -221,6 +228,7 @@ class AutomationConfig(AppConfig):
         # The signals must always be imported last because they use
         # the registries which need to be filled first.
         import jadawel.contrib.automation.nodes.ws.signals  # noqa: F403, F401
+        import jadawel.contrib.automation.workflows.receivers  # noqa: F401
         import jadawel.contrib.automation.workflows.signals  # noqa: F403, F401
         import jadawel.contrib.automation.workflows.ws.signals  # noqa: F403, F401
         import jadawel.contrib.integrations.tasks  # noqa: F403, F401

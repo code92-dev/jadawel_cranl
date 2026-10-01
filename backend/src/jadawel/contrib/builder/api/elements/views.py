@@ -56,6 +56,7 @@ from jadawel.contrib.builder.elements.registries import element_type_registry
 from jadawel.contrib.builder.elements.service import ElementService
 from jadawel.contrib.builder.pages.exceptions import PageDoesNotExist, PageNotInBuilder
 from jadawel.contrib.builder.pages.handler import PageHandler
+from jadawel.contrib.builder.pages.signals import page_loaded
 
 
 class ElementsView(APIView):
@@ -111,6 +112,8 @@ class ElementsView(APIView):
             element_type_registry.get_serializer(element, ElementSerializer).data
             for element in elements
         ]
+        page_loaded.send(sender=self, page=page, user=request.user)
+
         return Response(data)
 
     @extend_schema(

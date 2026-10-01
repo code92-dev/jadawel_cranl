@@ -600,3 +600,38 @@ def test_an_organization_workspace_refuses_guest_invitations(
     )
     assert response.status_code == HTTP_401_UNAUTHORIZED
     assert not PendingTableGrant.objects.exists()
+
+
+@pytest.mark.django_db
+def test_guest_sees_only_granted_databases_on_the_all_workspaces_homepage(
+    api_client, data_fixture
+):
+    """
+    The homepage lists the applications of every workspace in one request,
+    filtered for all workspaces at once. The guest restriction must hold in that
+    batched path as it does for a single workspace, without touching the
+    workspaces where the same user is a normal member.
+    """
+
+    admin = data_fixture.create_user()
+    guest_workspace = data_fixture.create_workspace(user=admin)
+    granted_database = data_fixture.create_database_application(
+        workspace=guest_workspace
+    )
+    granted_table = data_fixture.create_database_table(database=granted_database)
+    secret_database = data_fixture.create_database_application(
+        workspace=guest_workspace
+    )
+    data_fixture.create_database_table(database=secret_database)
+    guest, token, _ = make_guest(data_fixture, guest_workspace, granted_table)
+
+    own_workspace = data_fixture.create_workspace(user=guest)
+    own_database = data_fixture.create_database_application(workspace=own_workspace)
+
+    response = api_client.get(
+        reverse("api:applications:list"), HTTP_AUTHORIZATION=f"JWT {token}"
+    )
+
+    assert response.status_code == HTTP_200_OK
+    ids = {application["id"] for application in response.json()}
+    assert ids == {granted_database.id, own_database.id}

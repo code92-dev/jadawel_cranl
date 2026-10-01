@@ -48,6 +48,7 @@ from jadawel.contrib.database.table.models import Table
 from jadawel.contrib.database.views.registries import view_aggregation_type_registry
 from jadawel.core.handler import CoreHandler
 from jadawel.core.import_export.utils import file_chunk_generator
+from jadawel.core.last_viewed.handler import LastViewedHandler
 from jadawel.core.registries import ImportExportConfig
 from jadawel.core.storage import ExportZipFile
 from jadawel.core.user_files.handler import UserFileHandler
@@ -59,6 +60,7 @@ from .exceptions import (
     GridViewAggregationDoesNotSupportField,
 )
 from .handler import ViewHandler
+from .last_viewed_types import DatabaseViewLastViewedItemType
 from .models import (
     FormView,
     FormViewFieldOptions,
@@ -699,6 +701,15 @@ class FormViewType(ViewType):
             FormViewFieldOptions.objects_and_trash.filter(
                 field__in=[f.id for f in fields_cannot_be_in_form_view], enabled=True
             ).update(enabled=False)
+
+    def after_field_options_loaded(self, view, user):
+        # The form editor only requests the field options, there is no rows endpoint
+        # that would send `view_loaded` like the other view types do. `view_loaded`
+        # itself is not sent here: its other receivers do row related maintenance and
+        # need the generated table model, which this endpoint otherwise never builds.
+        LastViewedHandler.schedule_mark_viewed(
+            user, DatabaseViewLastViewedItemType.type, view.id
+        )
 
     def before_field_options_update(self, view, field_options, fields):
         """

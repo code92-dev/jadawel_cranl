@@ -9,6 +9,7 @@ class BuilderOperationType(OperationType, metaclass=ABCMeta):
 
 class ListPagesBuilderOperationType(BuilderOperationType):
     type = "builder.list_pages"
+    object_scope_name = "builder_page"
 
 
 class OrderPagesBuilderOperationType(BuilderOperationType):

@@ -60,6 +60,7 @@ def broadcast_to_users(
     payload: Dict[Any, Any],
     ignore_web_socket_id: Optional[int] = None,
     send_to_all_users: bool = False,
+    record: bool = True,
 ):
     """
     Broadcasts a JSON payload the provided users.
@@ -73,6 +74,9 @@ def broadcast_to_users(
     :param send_to_all_users: If set to True all users will be sent the payload and
         the user_ids parameter will be ignored. ignore_web_socket_id however will still
         be respected.
+    :param record: Whether the event is kept for replay to reconnecting clients.
+        Pass False for events a fresh page load makes redundant anyway. Accepted
+        for upstream compatibility: this fork does not record events for replay.
     """
 
     from asgiref.sync import async_to_sync
@@ -349,6 +353,7 @@ def broadcast_application_created(
         PolymorphicApplicationResponseSerializer,
     )
     from jadawel.core.handler import CoreHandler
+    from jadawel.core.last_viewed.handler import LastViewedHandler
     from jadawel.core.models import Application, WorkspaceUser
     from jadawel.core.operations import ReadApplicationOperationType
 
@@ -376,12 +381,21 @@ def broadcast_application_created(
     ]
 
     users_in_workspace_id_map = {user.id: user for user in users_in_workspace}
+    # Payloads are per user, so the restore of a trashed application can carry
+    # the value the user had before.
+    last_viewed_per_user = LastViewedHandler.get_last_viewed_per_user_and_application(
+        [application.id], user_ids
+    )
 
     payload_map = {}
     for user_id in user_ids:
         user = users_in_workspace_id_map[user_id]
         application_serialized = PolymorphicApplicationResponseSerializer(
-            application, context={"user": user}
+            application,
+            context={
+                "user": user,
+                "last_viewed_per_application": last_viewed_per_user.get(user_id, {}),
+            },
         ).data
 
         payload_map[str(user_id)] = {

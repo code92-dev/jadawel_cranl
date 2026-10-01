@@ -1,5 +1,6 @@
 import { defineNuxtPlugin } from '#app'
 import { DatabaseApplicationType } from '@jadawel/modules/database/applicationTypes'
+import { DatabaseViewLastViewedItemType } from '@jadawel/modules/database/lastViewedItemTypes'
 import {
   DuplicateTableJobType,
   SyncDataSyncTableJobType,
@@ -403,6 +404,10 @@ export default defineNuxtPlugin({
 
     $registry.register('plugin', new DatabasePlugin(context))
     $registry.register('application', new DatabaseApplicationType(context))
+    $registry.register(
+      'lastViewedItem',
+      new DatabaseViewLastViewedItemType(context)
+    )
 
     $registry.register('job', new DuplicateTableJobType(context))
     $registry.register('job', new SyncDataSyncTableJobType(context))

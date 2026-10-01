@@ -34,7 +34,13 @@
 }
 
 .templates__install {
+  @include flex-align-items(12px);
+
   margin-inline-start: auto;
+}
+
+.templates__install-workspace {
+  inline-size: 220px;
 }
 
 .templates__sidebar {

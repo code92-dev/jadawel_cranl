@@ -108,7 +108,9 @@ def forward(apps, schema_editor):
 
 def reverse(apps, schema_editor):
     with connection.cursor() as cursor:
-        cursor.execute("DROP FUNCTION IF EXISTS _get_jadawel_table_rich_text_file_uniques(INT)")
+        cursor.execute(
+            "DROP FUNCTION IF EXISTS _get_jadawel_table_rich_text_file_uniques(INT)"
+        )
         cursor.execute(ORIGINAL_DISTINCT_FILE_UNIQUES_FUNC)
 
 

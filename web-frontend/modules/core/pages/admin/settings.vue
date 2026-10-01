@@ -252,6 +252,11 @@ import SettingsService from '@jadawel/modules/core/services/settings'
 import { copyToClipboard } from '@jadawel/modules/database/utils/clipboard'
 import { EMAIL_VERIFICATION_OPTIONS } from '@jadawel/modules/core/enums'
 
+definePageMeta({
+  layout: 'app',
+  middleware: 'staff',
+})
+
 const { $registry, $client, $jadawelVersion, $i18n } = useNuxtApp()
 const { t: $t } = useI18n()
 const store = useStore()

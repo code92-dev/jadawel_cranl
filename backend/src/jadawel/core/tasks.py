@@ -5,6 +5,11 @@ from celery_singleton import Singleton
 from jadawel.config.celery import app
 
 from .action.tasks import cleanup_old_actions, setup_periodic_action_tasks
+from .last_viewed.tasks import (
+    clean_up_stale_last_viewed_items,
+    mark_item_viewed,
+    setup_periodic_last_viewed_tasks,
+)
 from .snapshots.tasks import delete_expired_snapshots
 from .telemetry.tasks import initialize_otel
 from .trash.tasks import (
@@ -42,4 +47,7 @@ __all__ = [
     "check_pending_account_deletion",
     "delete_expired_snapshots",
     "initialize_otel",
+    "mark_item_viewed",
+    "clean_up_stale_last_viewed_items",
+    "setup_periodic_last_viewed_tasks",
 ]

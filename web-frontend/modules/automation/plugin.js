@@ -5,6 +5,7 @@ import {
 } from '@jadawel/modules/automation/automationSettingTypes'
 
 import { AutomationApplicationType } from '@jadawel/modules/automation/applicationTypes'
+import { AutomationWorkflowLastViewedItemType } from '@jadawel/modules/automation/lastViewedItemTypes'
 import automationApplicationStore from '@jadawel/modules/automation/store/automationApplication'
 import automationWorkflowStore from '@jadawel/modules/automation/store/automationWorkflow'
 import automationWorkflowNodeStore from '@jadawel/modules/automation/store/automationWorkflowNode'
@@ -77,6 +78,10 @@ export default defineNuxtPlugin({
 
     // Automation data providers
     $registry.register('application', new AutomationApplicationType(context))
+    $registry.register(
+      'lastViewedItem',
+      new AutomationWorkflowLastViewedItemType(context)
+    )
     $registry.register(
       'automationDataProvider',
       new PreviousNodeDataProviderType(context)

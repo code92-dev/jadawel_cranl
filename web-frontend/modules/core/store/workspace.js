@@ -1,9 +1,5 @@
 import { StoreItemLookupError } from '@jadawel/modules/core/errors'
 import WorkspaceService from '@jadawel/modules/core/services/workspace'
-import {
-  setWorkspaceCookie,
-  unsetWorkspaceCookie,
-} from '@jadawel/modules/core/utils/workspace'
 import { CORE_ACTION_SCOPES } from '@jadawel/modules/core/utils/undoRedoConstants'
 import PermissionsService from '@jadawel/modules/core/services/permissions'
 import RolesService from '@jadawel/modules/core/services/roles'
@@ -23,16 +19,17 @@ export function populateWorkspace(workspace) {
   return workspace
 }
 
-const appendRoleTranslations = (roles, registry) => {
-  const translationMap = Object.values(
-    registry.getAll('permissionManager')
-  ).reduce(
+export const getRoleTranslations = (registry) =>
+  Object.values(registry.getAll('permissionManager')).reduce(
     (translations, manager) => ({
       ...translations,
       ...manager.getRolesTranslations(),
     }),
     {}
   )
+
+const appendRoleTranslations = (roles, registry) => {
+  const translationMap = getRoleTranslations(registry)
   return roles.map((role) => {
     if (translationMap[role.uid]) {
       const { uid, ...rest } = role
@@ -331,10 +328,10 @@ export const actions = {
     })
 
     if (workspace._.selected) {
-      // Navigate to the dashboard if selected because any of those related pages
-      // can't be accessed anymore.
+      // Navigate to the all workspaces homepage if selected because any of those
+      // related pages can't be accessed anymore.
       await dispatch('unselect', workspace)
-      await this.$router.push({ name: 'dashboard' })
+      await this.$router.push({ name: 'all-workspaces' })
       await pageFinished(this.app)
       await nextTick()
     }
@@ -387,12 +384,9 @@ export const actions = {
    * Select a workspace and fetch all the applications related to that workspace.
    */
   async select({ commit, dispatch }, workspace) {
-    const nuxtApp = this
-
     await dispatch('fetchPermissions', workspace)
     await dispatch('fetchRoles', workspace)
     commit('SET_SELECTED', workspace)
-    setWorkspaceCookie(workspace.id, nuxtApp)
     dispatch(
       'undoRedo/updateCurrentScopeSet',
       CORE_ACTION_SCOPES.workspace(workspace.id),
@@ -417,10 +411,7 @@ export const actions = {
    * Unselect a workspace if selected and clears all the fetched applications.
    */
   unselect({ commit, dispatch, getters }, workspace) {
-    const nuxtApp = this
-
     commit('UNSELECT', {})
-    unsetWorkspaceCookie(nuxtApp)
     dispatch(
       'undoRedo/updateCurrentScopeSet',
       CORE_ACTION_SCOPES.workspace(null),

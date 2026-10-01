@@ -576,7 +576,14 @@
     "friday": "الجمعة",
     "saturday": "السبت",
     "sunday": "الأحد",
-    "value": "قيمة"
+    "value": "قيمة",
+    "created": "تاريخ الإنشاء",
+    "lastViewed": "آخر عرض",
+    "nameAsc": "الاسم (أ-ي)",
+    "nameDesc": "الاسم (ي-أ)",
+    "neverViewed": "لم يُعرض بعد",
+    "createdAgo": "أُنشئ {ago}",
+    "viewedAgo": "عُرض {ago}"
   },
   "action": {
     "close": "إغلاق",

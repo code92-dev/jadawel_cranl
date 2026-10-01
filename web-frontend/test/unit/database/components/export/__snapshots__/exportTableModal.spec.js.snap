@@ -1763,11 +1763,18 @@ exports[`Preview exportTableModal > Modal with view 1`] = `
                       class="dropdown__selected"
                     >
                       
+                      
+                      <i
+                        class="dropdown__selected-icon iconoir-menu"
+                      />
+                      <!--v-if-->
                       <span
-                        class="dropdown__selected-placeholder"
+                        class="dropdown__selected-text"
+                        title="mock_view_1"
                       >
-                        action.makeChoice
+                        mock_view_1
                       </span>
+                      
                       
                       <i
                         class="dropdown__toggle-icon iconoir-nav-arrow-down"

@@ -21,6 +21,7 @@ from jadawel.core.user_files.models import UserFile
 
 from .action.models import Action
 from .integrations.models import Integration
+from .last_viewed.models import UserLastViewedItem
 from .mixins import (
     CreatedAndUpdatedOnMixin,
     HierarchicalModelMixin,
@@ -35,6 +36,7 @@ from .services.models import Service
 
 __all__ = [
     "Settings",
+    "UserLastViewedItem",
     "Workspace",
     "WorkspaceUser",
     "WorkspaceInvitation",
@@ -228,6 +230,13 @@ class UserProfile(models.Model):
         default=list,
         blank=True,
         null=True,
+    )
+    preferences = models.JSONField(
+        default=dict,
+        db_default={},
+        blank=True,
+        help_text="Values of the registered user preference types, keyed by type. "
+        "Only explicitly changed preferences are stored here.",
     )
 
     def iat_before_last_password_change(self, iat: int) -> bool:

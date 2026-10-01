@@ -1,0 +1,38 @@
+@keyframes skeleton-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.45;
+  }
+}
+
+.skeleton {
+  pointer-events: none;
+  user-select: none;
+}
+
+.skeleton-block {
+  flex: 0 0 auto;
+  max-inline-size: 100%;
+  background-color: $palette-neutral-200;
+  animation: skeleton-pulse 1.2s ease-in-out infinite;
+
+  @media (prefers-reduced-motion: reduce) {
+    animation: none;
+  }
+}
+
+.skeleton-block--rounded {
+  @include rounded($rounded);
+}
+
+.skeleton-block--square {
+  @include rounded($rounded-lg);
+}
+
+.skeleton-block--circle {
+  border-radius: 100%;
+}

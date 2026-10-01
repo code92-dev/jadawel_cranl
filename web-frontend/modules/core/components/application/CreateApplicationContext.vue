@@ -99,6 +99,7 @@
 </template>
 
 <script>
+import { notifyIf } from '@jadawel/modules/core/utils/error'
 import CreateApplicationModal from '@jadawel/modules/core/components/application/CreateApplicationModal'
 import TemplateModal from '@jadawel/modules/core/components/template/TemplateModal'
 import ImportWorkspaceModal from '@jadawel/modules/core/components/import/ImportWorkspaceModal.vue'
@@ -138,8 +139,13 @@ export default {
   },
   methods: {
     async fetchRolesAndPermissions() {
-      await this.$store.dispatch('workspace/fetchPermissions', this.workspace)
-      await this.$store.dispatch('workspace/fetchRoles', this.workspace)
+      try {
+        await this.$store.dispatch('workspace/fetchPermissions', this.workspace)
+        await this.$store.dispatch('workspace/fetchRoles', this.workspace)
+      } catch (error) {
+        this.hide()
+        notifyIf(error, 'workspace')
+      }
     },
     openTemplateModal() {
       if (!this.canCreateCreateApplication) {

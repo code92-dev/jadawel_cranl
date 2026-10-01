@@ -43,6 +43,10 @@ term exists).
 | Cell | خلية | |
 | Primary field | الحقل الأساسي | |
 | Dashboard | لوحة التحكم | |
+| Item (homepage) | عنصر | pl. عناصر. Anything listed on the workspaces homepage: a database, application, dashboard, workflow, view or page. |
+| Your workspaces (homepage) | مساحات العمل | The page that lists every workspace and its items. |
+| Recently viewed | المعروضة مؤخرًا | Items by the time the user last opened them; "last viewed" = آخر عرض, "viewed 5 minutes ago" = عُرض منذ 5 دقائق. |
+| Recents (sidebar) | الأحدث | The workspace sidebar entry that opens the workspace's recent items. |
 | My dashboards | لوحاتي | The user's own page collecting dashboards from their workspaces and by link (docs/MY_DASHBOARDS.md). Plural of the term: لوحات التحكم. |
 | Widget | عنصر | Dashboard widget. |
 | Size | الحجم | Widget size on the dashboard grid, in columns × rows. |
@@ -169,6 +173,10 @@ Sanad's tool labels and skills repeat them.
 | Step (automation) | خطوة | One action of a workflow: "Step 2 of 4" is الخطوة 2 من 4. |
 | Trigger / starting event | حدث البدء | What starts a workflow. The periodic one is جدول زمني, never الزناد. |
 | Recipe (automation) | وصفة جاهزة | A ready-made workflow built in one click from the start screen. |
+| Response (step) | الرد على الطلب | The step that sets what a web request's caller gets back; "wait for workflow response" = انتظار رد سير العمل. |
+| Email trigger | عند وصول بريد إلكتروني | Starts a workflow when mail reaches the workflow's own address. |
+| Cancel a run | إلغاء التشغيل | Stopping a workflow run from its history; "cancelled" = أُلغي. |
+| Sync history (data sync) | سجل المزامنة | Previous runs of a table's data sync. |
 | Needs setup | تحتاج إعدادًا | A step whose settings are still incomplete. |
 
 ## Sanad AI assistant

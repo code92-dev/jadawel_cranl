@@ -18,6 +18,7 @@ from jadawel.core import signals
 from jadawel.core.db import specific_iterator
 from jadawel.core.handler import CoreHandler
 from jadawel.core.jobs import signals as jobs_signals
+from jadawel.core.last_viewed.handler import LastViewedHandler
 from jadawel.core.models import Application, WorkspaceUser
 from jadawel.core.operations import (
     ListApplicationsWorkspaceOperationType,
@@ -204,11 +205,17 @@ def workspace_restored(sender, workspace_user, user, **kwargs):
         applications_qs,
         workspace=workspace_user.workspace,
     )
-    applications_qs = specific_iterator(applications_qs)
+    applications_qs = list(specific_iterator(applications_qs))
+    context = {
+        "user": workspace_user.user,
+        "last_viewed_per_application": (
+            LastViewedHandler.get_last_viewed_per_application(
+                workspace_user.user, [a.id for a in applications_qs]
+            )
+        ),
+    }
     applications = [
-        PolymorphicApplicationResponseSerializer(
-            application, context={"user": workspace_user.user}
-        ).data
+        PolymorphicApplicationResponseSerializer(application, context=context).data
         for application in applications_qs
     ]
 

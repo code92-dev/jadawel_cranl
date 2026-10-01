@@ -1346,6 +1346,18 @@ JADAWEL_ROW_HISTORY_CLEANUP_INTERVAL_MINUTES = int(
 JADAWEL_ROW_HISTORY_RETENTION_DAYS = int(
     os.getenv("JADAWEL_ROW_HISTORY_RETENTION_DAYS", 180)
 )
+# Delay between a user opening an item and the "last viewed" write, so bursts of
+# requests for the same item collapse into one database write.
+JADAWEL_LAST_VIEWED_DEBOUNCE_SECONDS = int(
+    os.getenv("JADAWEL_LAST_VIEWED_DEBOUNCE_SECONDS") or 2
+)
+# Minimum age of a stored "last viewed" value before it is refreshed again.
+JADAWEL_LAST_VIEWED_UPDATE_INTERVAL_SECONDS = int(
+    os.getenv("JADAWEL_LAST_VIEWED_UPDATE_INTERVAL_SECONDS") or 60
+)
+JADAWEL_LAST_VIEWED_CLEANUP_INTERVAL_MINUTES = int(
+    os.getenv("JADAWEL_LAST_VIEWED_CLEANUP_INTERVAL_MINUTES") or 60 * 24
+)
 JADAWEL_MAX_ROW_REPORT_ERROR_COUNT = int(
     os.getenv("JADAWEL_MAX_ROW_REPORT_ERROR_COUNT", 30)
 )

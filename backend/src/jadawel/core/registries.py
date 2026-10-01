@@ -592,19 +592,22 @@ class ApplicationType(
 
         return queryset
 
-    def enhance_and_filter_queryset(
+    def enhance_and_filter_queryset_for_workspaces(
         self,
         queryset: QuerySet["Application"],
         user: "AbstractUser",
-        workspace: "Workspace",
+        workspaces: List["Workspace"],
     ) -> QuerySet["Application"]:
         """
         Same as `enhance_queryset` but also filters the queryset based on the user's
-        permissions.
+        permissions. The queryset can hold the applications of several workspaces so
+        the nested permission filtering can be batched across all of them at once.
 
-        :param queryset: The queryset to enhance and filter.
+        :param queryset: The queryset to enhance and filter, containing applications of
+            all the given workspaces.
         :param user: The user that is trying to access the queryset.
-        :param workspace: The workspace that the queryset is related to.
+        :param workspaces: The workspaces the queryset is related to.
+        :return: The enhanced and filtered queryset.
         """
 
         return queryset
@@ -649,6 +652,42 @@ class ApplicationTypeRegistry(
     name = "application"
     does_not_exist_exception_class = ApplicationTypeDoesNotExist
     already_registered_exception_class = ApplicationTypeAlreadyRegistered
+
+
+@dataclasses.dataclass(frozen=True)
+class WorkspaceFilterDecision:
+    """
+    The decision of a permission manager for one workspace when filtering a
+    queryset across multiple workspaces at once. See
+    `PermissionManagerType.filter_queryset_for_workspaces`.
+    """
+
+    q: Optional[Q] = None
+    """
+    An extra filter to apply to the rows belonging to this workspace. `None` means the
+    manager doesn't restrict the rows of this workspace.
+
+    All decisions are combined into a single `filter` call, so the Q must be self
+    contained, like a filter on the row ids or a subquery. A condition spanning a multi
+    valued relation can behave differently than it would with a sequential `filter`
+    call and must be expressed as a subquery instead.
+    """
+
+    deny: bool = False
+    """
+    If True, none of this workspace's rows are visible. A denied workspace is final: no
+    later permission manager is consulted for it.
+    """
+
+    stop: bool = False
+    """
+    If True, no later permission manager is consulted for this workspace, like the
+    `(queryset, True)` return value of `filter_queryset`.
+    """
+
+
+WORKSPACE_FILTER_ALLOW_ALL = WorkspaceFilterDecision(stop=True)
+WORKSPACE_FILTER_DENY_ALL = WorkspaceFilterDecision(deny=True)
 
 
 class PermissionManagerType(abc.ABC, Instance):
@@ -803,6 +842,96 @@ class PermissionManagerType(abc.ABC, Instance):
         :param workspace: An optional workspace into which the operation takes place.
         :return: The queryset potentially filtered.
         """
+
+    def filter_queryset_for_workspaces(
+        self,
+        actor: Actor,
+        operation_name: str,
+        queryset: QuerySet,
+        workspaces: List["Workspace"],
+    ) -> Optional[Dict[int, WorkspaceFilterDecision]]:
+        """
+        Multi workspace version of `filter_queryset` used by
+        `CoreHandler().filter_queryset_for_workspaces()` when a queryset spanning
+        multiple workspaces must be filtered in one pass. Instead of returning a
+        queryset, it returns a `WorkspaceFilterDecision` per workspace id. Workspaces
+        omitted from the result are not restricted by this manager. Returning `None`
+        means the manager has no opinion at all.
+
+        Like `filter_queryset`, a permission manager can only ever restrict the rows,
+        never add any. A denied workspace is therefore final and later managers aren't
+        consulted for it anymore.
+
+        The default implementation delegates to the single workspace `filter_queryset`
+        per workspace so existing permission managers keep working unchanged, only
+        without the performance benefit of batching. A `filter_queryset` returning the
+        exact queryset object it received is interpreted as "no restriction"; returning
+        an equal but cloned queryset is interpreted as a restriction and translated into
+        a subquery.
+
+        :param actor: The actor whom we want to filter the queryset for.
+        :param operation_name: The operation name for which we want to filter the
+            queryset for.
+        :param queryset: The base queryset, containing rows of all the given workspaces,
+            the decisions apply to.
+        :param workspaces: The workspaces to decide for.
+        :return: A dict mapping workspace ids to decisions, or None.
+        """
+
+        # `filter_queryset` can also be assigned on the instance, tests do this for
+        # example, so the implementation can't be detected on the class alone.
+        filter_queryset = self.filter_queryset
+        if (
+            getattr(filter_queryset, "__func__", filter_queryset)
+            is PermissionManagerType.filter_queryset
+        ):
+            # The manager doesn't implement `filter_queryset`, so there is
+            # nothing to fall back to.
+            return None
+
+        object_scope = operation_type_registry.get(operation_name).object_scope
+
+        decisions = {}
+        for workspace in workspaces:
+            if len(workspaces) == 1:
+                # A single workspace queryset only contains that workspace's rows, so it
+                # can be passed as is, exactly like `filter_queryset` always received
+                # it.
+                workspace_queryset = queryset
+            else:
+                # Restrict the queryset to the workspace so the translated condition
+                # below stays bounded to that workspace's rows.
+                workspace_queryset = queryset.filter(
+                    object_scope.get_filter_for_scopes([workspace])
+                )
+            result = self.filter_queryset(
+                actor, operation_name, workspace_queryset, workspace=workspace
+            )
+
+            if result is None:
+                continue
+
+            if isinstance(result, tuple):
+                filtered_queryset, stop = result
+            else:
+                filtered_queryset, stop = result, False
+
+            if filtered_queryset is workspace_queryset:
+                if stop:
+                    decisions[workspace.id] = WORKSPACE_FILTER_ALLOW_ALL
+                continue
+
+            if filtered_queryset.query.is_empty():
+                decisions[workspace.id] = WorkspaceFilterDecision(deny=True, stop=stop)
+            else:
+                # The permission managers only ever restrict the queryset, so the
+                # filtered result can safely be translated into an extra condition on
+                # this workspace's rows.
+                decisions[workspace.id] = WorkspaceFilterDecision(
+                    q=Q(pk__in=filtered_queryset.values("pk")), stop=stop
+                )
+
+        return decisions or None
 
     def get_roles(self) -> List:
         """
@@ -1364,6 +1493,148 @@ class EmailContextRegistry(Registry[EmailContextType]):
         return context
 
 
+class LastViewedItemType(CustomFieldsInstanceMixin, ModelInstanceMixin, Instance):
+    """
+    A leaf item whose "last viewed" moments are tracked per user, like a view or a
+    builder page. Only leaves are registered: applications and workspaces derive
+    their value from their children.
+    """
+
+    list_operation_type: str = None
+    """
+    The list operation whose object scope is `model_class`. Used to filter the items
+    a user may see when listing what was recently viewed, so RBAC and the other
+    permission managers apply exactly like in the regular list endpoints.
+    """
+
+    serializer_field_names = ["id", "name"]
+    """
+    The fields of `model_class` exposed by the recently viewed listing. Types add
+    what the frontend needs to navigate to the item, like the table of a view.
+    """
+
+    def get_visible_queryset(self) -> QuerySet:
+        """
+        Items that exist and are not trashed, also not through a trashed parent.
+        Membership and permissions are deliberately not part of it: the listing
+        applies them once for all types, and the write path adds the membership
+        check in `get_queryset_for_user`.
+
+        :return: The items that can be shown to anyone with access.
+        """
+
+        raise NotImplementedError
+
+    def get_queryset_for_user(self, user_id: int) -> QuerySet:
+        """
+        Resolves an item that is about to be recorded as viewed. It must leave out
+        trashed items, items under a trashed parent and items in workspaces the
+        user is not a member of, because the "loaded" endpoints also serve template
+        previews. Use `select_related` for what the getters below need.
+
+        :param user_id: The id of the user that opened the item.
+        :return: The items the user can have viewed.
+        """
+
+        raise NotImplementedError
+
+    def get_application_id(self, instance) -> int:
+        """
+        :param instance: An item fetched with `get_queryset_for_user`.
+        :return: The id of the application the item belongs to.
+        """
+
+        raise NotImplementedError
+
+    def get_workspace_id(self, instance) -> int:
+        """
+        :param instance: An item fetched with `get_queryset_for_user`.
+        :return: The id of the workspace the item belongs to.
+        """
+
+        raise NotImplementedError
+
+    def get_sub_types(self) -> List[str]:
+        """
+        A type whose items are polymorphic, like a view, exposes the sub types here
+        so they can be filtered on individually. The sub type is never stored with
+        the last viewed row because the item already knows its own type.
+
+        :return: The sub type names, empty when the items are homogeneous.
+        """
+
+        return []
+
+    def filter_queryset_by_sub_types(
+        self, queryset: QuerySet, sub_types: Iterable[str]
+    ) -> QuerySet:
+        """
+        Only called for types with sub types.
+
+        :param queryset: A queryset of `model_class`.
+        :param sub_types: A subset of `get_sub_types()`.
+        :return: The queryset limited to items of those sub types.
+        """
+
+        raise NotImplementedError
+
+    def get_sub_type(self, instance) -> Optional[str]:
+        """
+        :param instance: An item fetched with `enhance_list_queryset`.
+        :return: The sub type of the item, `None` for homogeneous types.
+        """
+
+        return None
+
+    def enhance_list_queryset(self, queryset: QuerySet) -> QuerySet:
+        """
+        Adds the `select_related` the serializer needs, so listing a page of items
+        costs one query per type.
+
+        :param queryset: The visible queryset limited to the items of a page.
+        :return: The enhanced queryset.
+        """
+
+        return queryset
+
+    def get_existing_item_ids_queryset(self) -> QuerySet:
+        """
+        Items that still exist in any state. Trashed items are intentionally
+        included because they can be restored; the rows disappear once an item is
+        permanently deleted, see `get_item_ids_of_permanently_deleted`.
+
+        :return: The queryset used to detect stale last viewed rows.
+        """
+
+        manager = getattr(self.model_class, "objects_and_trash", None)
+        if manager is None:
+            manager = self.model_class.objects
+        return manager.all()
+
+    def get_item_ids_of_permanently_deleted(
+        self, trash_item_type: str, trash_item
+    ) -> Iterable[int]:
+        """
+        Called right before any trash item is permanently deleted, so the rows of
+        the items of this type that disappear with it can be removed. Parents
+        cascade at the database level without a signal per child, which is why a
+        type may have to answer for its parents too.
+
+        :param trash_item_type: The type of the `TrashableItemType` being deleted.
+        :param trash_item: The instance being deleted.
+        :return: The ids of the items of this type that are gone, empty when the
+            deletion is unrelated.
+        """
+
+        return []
+
+
+class LastViewedItemTypeRegistry(
+    Registry[LastViewedItemType], ModelRegistryMixin[Any, LastViewedItemType]
+):
+    name = "last_viewed_item"
+
+
 # A default plugin and application registry is created here, this is the one that is
 # used throughout the whole Jadawel application. To add a new plugin or application use
 # these registries.
@@ -1375,6 +1646,9 @@ permission_manager_type_registry: PermissionManagerTypeRegistry = (
     PermissionManagerTypeRegistry()
 )
 object_scope_type_registry: ObjectScopeTypeRegistry = ObjectScopeTypeRegistry()
+last_viewed_item_type_registry: LastViewedItemTypeRegistry = (
+    LastViewedItemTypeRegistry()
+)
 subject_type_registry: SubjectTypeRegistry = SubjectTypeRegistry()
 operation_type_registry: OperationTypeRegistry = OperationTypeRegistry()
 serialization_processor_registry: SerializationProcessorRegistry = (

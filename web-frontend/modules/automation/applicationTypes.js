@@ -26,6 +26,10 @@ export class AutomationApplicationType extends ApplicationType {
     return 'jadawel-icon-automation'
   }
 
+  getIconColor() {
+    return 'yellow'
+  }
+
   getName() {
     const { $i18n: i18n } = this.app
     return i18n.t('applicationType.automation')
@@ -94,7 +98,10 @@ export class AutomationApplicationType extends ApplicationType {
     ).some((workflow) => workflow._.selected)
 
     if (workflowSelected) {
-      $router.push({ name: 'dashboard' })
+      $router.push({
+        name: 'workspace',
+        params: { workspaceId: application.workspace.id },
+      })
     }
   }
 

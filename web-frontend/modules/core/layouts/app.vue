@@ -5,7 +5,16 @@
 
     <div ref="app" class="layout">
       <div class="layout__col-1" :style="{ width: col1Width + 'px' }">
+        <SidebarAllWorkspaces
+          v-if="sidebarType === SIDEBAR_TYPES.ALL_WORKSPACES"
+          :workspaces="workspaces"
+          :selected-workspace="selectedWorkspace"
+          :collapsed="isCollapsed"
+          :width="col1Width"
+          @set-col1-width="col1Width = $event"
+        />
         <Sidebar
+          v-else
           :workspaces="workspaces"
           :selected-workspace="selectedWorkspace"
           :applications="applications"
@@ -20,7 +29,7 @@
         class="layout__col-2"
         :style="{
           insetInlineStart: col1Width + 'px',
-          insetInlineEnd: col3Visible ? col3Width + 'px' : 0,
+          insetInlineEnd: col3Shown ? col3Width + 'px' : 0,
         }"
       >
         <slot />
@@ -32,7 +41,7 @@
       </div>
 
       <div
-        v-if="col3Visible"
+        v-if="col3Shown"
         class="layout__col-3"
         :style="{ width: col3Width + 'px', insetInlineEnd: 0 }"
       >
@@ -49,7 +58,7 @@
       />
 
       <HorizontalResize
-        v-if="col3Visible"
+        v-if="col3Shown"
         class="layout__resize"
         :width="col3Width"
         :style="{ insetInlineEnd: col3Width - 3 + 'px' }"
@@ -71,22 +80,27 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useStore } from 'vuex'
 
 import Toasts from '@jadawel/modules/core/components/toasts/Toasts.vue'
 import Sidebar from '@jadawel/modules/core/components/sidebar/Sidebar.vue'
+import SidebarAllWorkspaces from '@jadawel/modules/core/components/sidebar/SidebarAllWorkspaces.vue'
 import RightSidebar from '@jadawel/modules/core/components/sidebar/RightSidebar.vue'
 import HorizontalResize from '@jadawel/modules/core/components/HorizontalResize.vue'
 import GuidedTour from '@jadawel/modules/core/components/guidedTour/GuidedTour.vue'
 import WorkspaceSearchModal from '@jadawel/modules/core/components/workspace/WorkspaceSearchModal.vue'
 import AppUtilities from '@jadawel/modules/core/components/AppUtilities.vue'
-import { CORE_ACTION_SCOPES } from '@jadawel/modules/core/utils/undoRedoConstants'
+import {
+  CORE_ACTION_SCOPES,
+  getSidebarActionScopes,
+} from '@jadawel/modules/core/utils/undoRedoConstants'
 import {
   isOsSpecificModifierPressed,
   keyboardShortcutsToPriorityEventBus,
 } from '@jadawel/modules/core/utils/events'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
+import { SIDEBAR_TYPES } from '@jadawel/modules/core/utils/constants'
 
 const store = useStore()
 const { $registry, $priorityBus, $realtime, $bus } = useNuxtApp()
@@ -108,6 +122,51 @@ const MOBILE_LAYOUT_BREAKPOINT = 700
 const route = useRoute()
 const router = useRouter()
 
+// Pages can render an alternative sidebar via
+// `definePageMeta({ sidebarType: SIDEBAR_TYPES.ALL_WORKSPACES })`.
+const sidebarType = computed(
+  () => route.meta.sidebarType ?? SIDEBAR_TYPES.WORKSPACE
+)
+
+// The sidebar decides which workspace and application level actions the user
+// can undo, so the corresponding scopes follow it and the store selections here
+// rather than in every page. The selections stay in the store when navigating
+// to a page that doesn't select anything (settings, the homepage), so the
+// scopes are re-derived from them whenever the sidebar changes.
+const selectedApplication = computed(
+  () => store.getters['application/getSelected']
+)
+watch(
+  () => [
+    sidebarType.value,
+    selectedWorkspace.value?.id ?? null,
+    selectedApplication.value?.id ?? null,
+  ],
+  ([type, workspaceId, applicationId]) => {
+    store.dispatch(
+      'undoRedo/updateCurrentScopeSet',
+      getSidebarActionScopes({ sidebarType: type, workspaceId, applicationId })
+    )
+  },
+  { immediate: true }
+)
+
+// The all workspaces sidebar shows no selected application, and application
+// types redirect away on delete while their application is still selected, so
+// the selection of a previously opened application must not linger.
+watch(sidebarType, (type) => {
+  if (type === SIDEBAR_TYPES.ALL_WORKSPACES) {
+    store.dispatch('application/unselect')
+  }
+})
+
+// The right sidebar contains workspace specific components, like the assistant, so
+// it must not render on pages without a workspace context. The open state is kept,
+// so it shows again when navigating back to a workspace page.
+const col3Shown = computed(
+  () => col3Visible.value && sidebarType.value === 'workspace'
+)
+
 // Preserve authentication logic
 if (route.query.token) {
   const newQuery = { ...route.query }
@@ -116,7 +175,7 @@ if (route.query.token) {
 }
 
 function openWorkspaceSearch() {
-  if (selectedWorkspace.value && workspaceSearchModal.value) {
+  if (selectedWorkspace.value?.id && workspaceSearchModal.value) {
     workspaceSearchModal.value.show()
   }
 }

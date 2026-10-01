@@ -15,11 +15,13 @@ from rest_framework.status import (
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
 )
+from rest_framework_simplejwt.tokens import AccessToken, RefreshToken
 
 from jadawel.core.models import (
     WORKSPACE_USER_PERMISSION_ADMIN,
     WORKSPACE_USER_PERMISSION_MEMBER,
 )
+from jadawel.core.user.utils import IMPERSONATED_BY_CLAIM
 
 User = get_user_model()
 invalid_passwords = [
@@ -931,3 +933,38 @@ def test_admin_impersonate_staff_or_superuser(api_client, data_fixture):
     assert response.status_code == HTTP_400_BAD_REQUEST
     response_json = response.json()
     assert response_json["user"][0].startswith("Invalid pk")
+
+
+@pytest.mark.django_db
+@override_settings(DEBUG=True)
+def test_admin_impersonate_tokens_are_marked_and_stay_marked_after_refresh(
+    api_client, data_fixture
+):
+    staff, token = data_fixture.create_user_and_token(is_staff=True)
+    user_to_impersonate = data_fixture.create_user()
+
+    response = api_client.post(
+        reverse("api:admin:users:impersonate"),
+        {"user": user_to_impersonate.id},
+        format="json",
+        HTTP_AUTHORIZATION=f"JWT {token}",
+    )
+    assert response.status_code == HTTP_200_OK
+    tokens = response.json()
+    assert AccessToken(tokens["access_token"])[IMPERSONATED_BY_CLAIM] == staff.id
+    assert RefreshToken(tokens["refresh_token"])[IMPERSONATED_BY_CLAIM] == staff.id
+
+    # A refreshed access token must keep telling the support session apart.
+    response = api_client.post(
+        reverse("api:user:token_refresh"),
+        {"refresh_token": tokens["refresh_token"]},
+        format="json",
+    )
+    assert response.status_code == HTTP_200_OK
+    assert AccessToken(response.json()["access_token"])[IMPERSONATED_BY_CLAIM] == (
+        staff.id
+    )
+
+    # The user's own tokens carry no such claim.
+    own = str(RefreshToken.for_user(user_to_impersonate).access_token)
+    assert IMPERSONATED_BY_CLAIM not in AccessToken(own)

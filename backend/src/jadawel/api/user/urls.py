@@ -15,6 +15,7 @@ from .views import (
     SendResetPasswordEmailView,
     SendVerifyEmailView,
     UndoView,
+    UserPreferencesView,
     UserView,
     VerifyEmailAddressView,
     VerifyJSONWebToken,
@@ -24,6 +25,7 @@ app_name = "jadawel.api.user"
 
 urlpatterns = [
     re_path(r"^account/$", AccountView.as_view(), name="account"),
+    re_path(r"^preferences/$", UserPreferencesView.as_view(), name="preferences"),
     re_path(
         r"^schedule-account-deletion/$",
         ScheduleAccountDeletionView.as_view(),

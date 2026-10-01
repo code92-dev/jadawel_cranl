@@ -105,7 +105,7 @@ function setDeactivatedModalRef(type, el) {
 const bus = nuxtApp.$bus
 
 function workspaceDeleted() {
-  router.push({ name: 'dashboard' })
+  router.push({ name: 'all-workspaces' })
 }
 
 onMounted(() => {

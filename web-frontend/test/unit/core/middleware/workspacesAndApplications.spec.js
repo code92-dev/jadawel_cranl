@@ -22,7 +22,11 @@ describe('workspace and application startup', () => {
     await testApp.afterEach()
   })
 
-  const run = () => middleware({ params: {}, meta: {} })
+  const run = (workspaceId) =>
+    middleware({
+      params: workspaceId ? { workspaceId: String(workspaceId) } : {},
+      meta: {},
+    })
 
   test('starts loading applications while the workspace request is pending', async () => {
     const workspace = createWorkspace(testApp.mock, {})
@@ -36,7 +40,7 @@ describe('workspace and application startup', () => {
         })
     )
 
-    const loading = run()
+    const loading = run(workspace.id)
     await flushPromises()
     const applicationsStarted = testApp.mock.history.get.some(
       (request) => request.url === '/applications/'
@@ -62,7 +66,7 @@ describe('workspace and application startup', () => {
         })
     )
     let finished = false
-    const loading = run().then(() => {
+    const loading = run(workspace.id).then(() => {
       finished = true
     })
     await flushPromises()
@@ -94,5 +98,16 @@ describe('workspace and application startup', () => {
     testApp.store.state.auth.authenticated = false
     await run()
     expect(testApp.mock.history.get).toHaveLength(0)
+  })
+
+  test('selects no workspace when the route does not name one', async () => {
+    const workspace = createWorkspace(testApp.mock, {})
+    createApplication(testApp.mock, {})
+    testApp.mockServer.loadPermissions(workspace)
+
+    await run()
+
+    expect(testApp.store.getters['workspace/getAll']).toHaveLength(1)
+    expect(testApp.store.getters['workspace/getSelected'].id).toBeUndefined()
   })
 })

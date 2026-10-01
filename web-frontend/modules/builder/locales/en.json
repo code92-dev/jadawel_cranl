@@ -1094,5 +1094,8 @@
   "previewPublishGuidedTourStep": {
     "title": "Preview & Publish Your App",
     "content": "Click **Preview** to test your app privately. When ready, click **Publish** to share it with the public via a domain."
+  },
+  "lastViewedItemType": {
+    "builderPage": "Page"
   }
 }

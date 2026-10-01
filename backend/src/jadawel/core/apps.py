@@ -394,6 +394,7 @@ class CoreConfig(AppConfig):
         action_type_registry.register(ChangeEmailActionType())
 
         from jadawel.core.action.scopes import (
+            AllWorkspacesActionScopeType,
             ApplicationActionScopeType,
             RootActionScopeType,
             WorkspaceActionScopeType,
@@ -401,6 +402,7 @@ class CoreConfig(AppConfig):
 
         action_scope_registry.register(RootActionScopeType())
         action_scope_registry.register(WorkspaceActionScopeType())
+        action_scope_registry.register(AllWorkspacesActionScopeType())
         action_scope_registry.register(ApplicationActionScopeType())
 
         from jadawel.core.jobs.registries import job_type_registry
@@ -428,6 +430,21 @@ class CoreConfig(AppConfig):
 
         user_data_registry.register(GlobalPermissionsDataType())
         user_data_registry.register(UnreadUserNotificationsCountPermissionsDataType())
+
+        from jadawel.core.preference_types import (
+            AllWorkspacesSortByPreferenceType,
+            AllWorkspacesViewModePreferenceType,
+            RecentlyViewedViewModePreferenceType,
+            WorkspaceRecentlyViewedViewModePreferenceType,
+        )
+        from jadawel.core.user.registries import user_preference_type_registry
+
+        user_preference_type_registry.register(AllWorkspacesSortByPreferenceType())
+        user_preference_type_registry.register(AllWorkspacesViewModePreferenceType())
+        user_preference_type_registry.register(RecentlyViewedViewModePreferenceType())
+        user_preference_type_registry.register(
+            WorkspaceRecentlyViewedViewModePreferenceType()
+        )
 
         from jadawel.core.auth_provider.auth_provider_types import (
             PasswordAuthProviderType,
@@ -509,6 +526,7 @@ class CoreConfig(AppConfig):
         if settings.SENTRY_DSN:
             patch_user_model_str()
 
+        import jadawel.core.last_viewed.receivers  # noqa: F401
         import jadawel.core.receivers  # noqa: F401
         from jadawel.core.telemetry.telemetry import setup_logging
 

@@ -22,6 +22,13 @@ class DashboardConfig(AppConfig):
 
         object_scope_type_registry.register(DashboardObjectScopeType())
 
+        from jadawel.contrib.dashboard.last_viewed_types import (
+            DashboardLastViewedItemType,
+        )
+        from jadawel.core.registries import last_viewed_item_type_registry
+
+        last_viewed_item_type_registry.register(DashboardLastViewedItemType())
+
         from jadawel.contrib.dashboard.data_sources.object_scopes import (
             DashboardDataSourceObjectScopeType,
         )
@@ -95,6 +102,7 @@ class DashboardConfig(AppConfig):
             AllowIfTemplatePermissionManagerType(prev_manager)
         )
 
+        import jadawel.contrib.dashboard.receivers  # noqa: F401
         from jadawel.contrib.dashboard.data_sources.actions import (
             UpdateDashboardDataSourceActionType,
         )

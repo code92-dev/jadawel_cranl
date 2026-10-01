@@ -22,12 +22,19 @@ denial is the first definitive answer and no core file is edited.
 
 from typing import Any, Dict, Iterable, List, Optional, Set
 
+from django.db.models import Q, Subquery
+
 from arabase.table_access.constants import WORKSPACE_USER_PERMISSION_GUEST
 from arabase.table_access.models import TableAccessLevel, TableGrant
 from jadawel.core.cache import local_cache
 from jadawel.core.exceptions import UserInvalidWorkspacePermissionsError
 from jadawel.core.models import WorkspaceUser
-from jadawel.core.registries import PermissionManagerType, object_scope_type_registry
+from jadawel.core.registries import (
+    PermissionManagerType,
+    WorkspaceFilterDecision,
+    object_scope_type_registry,
+    operation_type_registry,
+)
 from jadawel.core.subjects import UserSubjectType
 
 # Operations whose context is the workspace or a database rather than a table.
@@ -332,6 +339,49 @@ class TableGrantPermissionManagerType(PermissionManagerType):
         # empty queryset is the allowlist stance: a list we have not reviewed
         # must not leak rows from tables the guest was never granted.
         return queryset.none()
+
+    def filter_queryset_for_workspaces(
+        self, actor, operation_name, queryset, workspaces
+    ) -> Optional[Dict[int, WorkspaceFilterDecision]]:
+        """
+        Multi-workspace listing (the homepage lists every workspace at once). Only
+        a workspace where the actor is a GUEST is restricted. The memberships are
+        read from `workspaceuser_set`, which the multi-workspace callers prefetch,
+        so every other workspace costs no query; the guest workspaces then go
+        through `filter_queryset` like a single listing.
+        """
+
+        actor_id = getattr(actor, "id", None)
+        if actor_id is None or not workspaces:
+            return None
+
+        guest_workspace_ids = {
+            workspace.id
+            for workspace in workspaces
+            if any(
+                workspace_user.user_id == actor_id
+                and workspace_user.permissions == WORKSPACE_USER_PERMISSION_GUEST
+                for workspace_user in workspace.workspaceuser_set.all()
+            )
+        }
+        if not guest_workspace_ids:
+            return None
+
+        object_scope = operation_type_registry.get(operation_name).object_scope
+        decisions = {}
+        for workspace in workspaces:
+            if workspace.id not in guest_workspace_ids:
+                continue
+            filtered = self.filter_queryset(
+                actor,
+                operation_name,
+                queryset.filter(object_scope.get_filter_for_scopes([workspace])),
+                workspace=workspace,
+            )
+            decisions[workspace.id] = WorkspaceFilterDecision(
+                q=Q(id__in=Subquery(filtered.values("id")))
+            )
+        return decisions
 
     # -- frontend --------------------------------------------------------
 

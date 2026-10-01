@@ -55,6 +55,7 @@ import {
   PublishBuilderJobType,
 } from '@jadawel/modules/builder/jobTypes'
 import { BuilderApplicationType } from '@jadawel/modules/builder/applicationTypes'
+import { BuilderPageLastViewedItemType } from '@jadawel/modules/builder/lastViewedItemTypes'
 import { PublicSiteErrorPageType } from '@jadawel/modules/builder/errorPageTypes'
 import {
   DataSourcesPageHeaderItemType,
@@ -195,6 +196,10 @@ export default defineNuxtPlugin({
     $registry.registerNamespace('collectionField')
 
     $registry.register('application', new BuilderApplicationType(context))
+    $registry.register(
+      'lastViewedItem',
+      new BuilderPageLastViewedItemType(context)
+    )
     $registry.register('job', new DuplicatePageJobType(context))
     $registry.register('job', new PublishBuilderJobType(context))
 

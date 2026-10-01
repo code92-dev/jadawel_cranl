@@ -255,8 +255,8 @@ class AutomationApplicationType(ApplicationType):
 
         base_queryset = Automation.objects.filter(id=automation.id)
         if user:
-            instance = self.enhance_and_filter_queryset(
-                base_queryset, user, automation.workspace
+            instance = self.enhance_and_filter_queryset_for_workspaces(
+                base_queryset, user, [automation.workspace]
             ).first()
             return instance and list(instance.workflows.all()) or []
         else:
@@ -264,29 +264,30 @@ class AutomationApplicationType(ApplicationType):
             return instance and list(instance.workflows.all()) or []
 
     def _get_workflows_queryset(self) -> QuerySet[AutomationWorkflow]:
-        return AutomationWorkflow.objects.select_related(
+        queryset = AutomationWorkflow.objects.select_related(
             "automation__workspace"
         ).prefetch_related("notification_recipients")
+        return AutomationWorkflowHandler().annotate_published_workflow_data(queryset)
 
     def enhance_queryset(self, queryset):
         return queryset.prefetch_related(
             Prefetch("workflows", queryset=self._get_workflows_queryset())
         )
 
-    def enhance_and_filter_queryset(
+    def enhance_and_filter_queryset_for_workspaces(
         self,
         queryset: QuerySet[Automation],
         user: AbstractUser,
-        workspace: Workspace,
+        workspaces: List[Workspace],
     ) -> QuerySet[Automation]:
         return queryset.prefetch_related(
             Prefetch(
                 "workflows",
-                queryset=CoreHandler().filter_queryset(
+                queryset=CoreHandler().filter_queryset_for_workspaces(
                     user,
                     ListAutomationWorkflowsOperationType.type,
                     self._get_workflows_queryset(),
-                    workspace=workspace,
+                    workspaces,
                 ),
             ),
         )

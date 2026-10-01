@@ -45,5 +45,8 @@
   },
   "trashType": {
     "widget": "عنصر"
+  },
+  "lastViewedItemType": {
+    "dashboard": "لوحة التحكم"
   }
 }
