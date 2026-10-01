@@ -1,6 +1,7 @@
 from jadawel.contrib.integrations.core.service_types import (
     CoreHTTPRequestServiceType,
     CorePeriodicServiceType,
+    CoreResponseServiceType,
     CoreRouterServiceType,
     CoreServiceType,
     CoreSMTPEmailServiceType,
@@ -19,4 +20,5 @@ def test_core_service_type_dispatch_types():
         CoreSMTPEmailServiceType.type: [DispatchTypes.ACTION],
         CoreRouterServiceType.type: [DispatchTypes.ACTION],
         CorePeriodicServiceType.type: [DispatchTypes.EVENT],
+        CoreResponseServiceType.type: [DispatchTypes.ACTION],
     }

@@ -54,6 +54,7 @@ class IntegrationsConfig(AppConfig):
             CoreHTTPTriggerServiceType,
             CoreIteratorServiceType,
             CorePeriodicServiceType,
+            CoreResponseServiceType,
             CoreRouterServiceType,
             CoreSMTPEmailServiceType,
         )
@@ -64,6 +65,7 @@ class IntegrationsConfig(AppConfig):
         service_type_registry.register(CoreHTTPTriggerServiceType())
         service_type_registry.register(CoreIteratorServiceType())
         service_type_registry.register(CorePeriodicServiceType())
+        service_type_registry.register(CoreResponseServiceType())
 
         from jadawel.contrib.integrations.ai.service_types import AIAgentServiceType
 

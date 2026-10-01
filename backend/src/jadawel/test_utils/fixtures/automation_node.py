@@ -12,6 +12,7 @@ from jadawel.contrib.automation.nodes.node_types import (
     CoreHTTPTriggerNodeType,
     CoreIteratorNodeType,
     CorePeriodicTriggerNodeType,
+    CoreResponseNodeType,
     CoreRouterActionNodeType,
     LocalJadawelCreateRowNodeType,
     LocalJadawelDeleteRowNodeType,
@@ -134,6 +135,13 @@ class AutomationNodeFixtures:
         return self.create_automation_node(
             user=user,
             type=CoreRouterActionNodeType.type,
+            **kwargs,
+        )
+
+    def create_core_response_action_node(self, user=None, **kwargs):
+        return self.create_automation_node(
+            user=user,
+            type=CoreResponseNodeType.type,
             **kwargs,
         )
 

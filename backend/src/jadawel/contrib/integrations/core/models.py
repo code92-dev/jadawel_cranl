@@ -1,5 +1,6 @@
 import uuid
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.db import models
@@ -8,6 +9,7 @@ from jadawel.contrib.integrations.core.constants import (
     BODY_TYPE,
     HTTP_METHOD,
     PERIODIC_INTERVAL_CHOICES,
+    RESPONSE_BODY_TYPE,
 )
 from jadawel.core.formula.field import FormulaField
 from jadawel.core.integrations.models import Integration
@@ -55,6 +57,40 @@ class CoreIteratorService(Service):
     source = FormulaField(
         help_text="The path of the array.",
     )
+
+
+class CoreResponseService(Service):
+    """
+    A service for defining the response returned by an automation workflow.
+    """
+
+    status_code = FormulaField(
+        help_text="The HTTP status code to return.",
+    )
+    body_type = models.CharField(
+        max_length=10,
+        choices=RESPONSE_BODY_TYPE.choices,
+        default=RESPONSE_BODY_TYPE.EMPTY,
+        help_text="The type of response body to return.",
+    )
+    body = FormulaField(
+        blank=True,
+        help_text="The response body content.",
+    )
+
+
+class CoreResponseHeader(models.Model):
+    """
+    Model to store workflow response headers.
+    """
+
+    service = models.ForeignKey(
+        CoreResponseService,
+        on_delete=models.CASCADE,
+        related_name="headers",
+    )
+    key = models.CharField(max_length=255, help_text="The header key.")
+    value = FormulaField(blank=True, help_text="The header value.")
 
 
 class CoreHTTPRequestService(Service):
@@ -270,4 +306,22 @@ class CoreHTTPTriggerService(Service):
     is_public = models.BooleanField(
         default=False,
         help_text="Defines whether the service is published or not.",
+    )
+
+    wait_for_response = models.BooleanField(
+        default=False,
+        db_default=False,
+        help_text="Whether the caller should wait for the workflow response.",
+    )
+    response_timeout_seconds = models.PositiveSmallIntegerField(
+        default=10,
+        db_default=10,
+        validators=[
+            MinValueValidator(1, message="Value cannot be less than 1."),
+            MaxValueValidator(
+                settings.AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS,
+                message="Value exceeds the maximum workflow response timeout.",
+            ),
+        ],
+        help_text="The maximum time to wait for the workflow response in seconds.",
     )

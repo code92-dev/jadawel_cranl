@@ -31,6 +31,7 @@
     "httpRequestLabel": "إرسال طلب HTTP",
     "smtpEmailLabel": "إرسال بريد إلكتروني",
     "routerLabel": "اتبع أحد فروع {edgeCount}",
+    "responseLabel": "الرد على الطلب",
     "iterationLabel": "كرر على العناصر",
     "defaultEdgeLabelFallback": "افتراضي",
     "routerWithOutputNodesDeleteError": "لا يمكن حذفه حتى تتم إزالة عقد الإخراج {outputCount} الخاصة به.",
@@ -72,7 +73,8 @@
     "periodicTriggerTriggeredAt": "وقت التشغيل",
     "errorIntervalMissing": "مطلوب فاصل زمني.",
     "coreHTTPTrigger": "مشغل HTTP",
-    "coreHTTPTriggerDescription": "تلقي طلبات HTTP لبدء سير العمل"
+    "coreHTTPTriggerDescription": "تلقي طلبات HTTP لبدء سير العمل",
+    "responseLabel": "الرد على الطلب"
   },
   "workflowEditor": {
     "chooseEvent": "اختر حدثًا..."

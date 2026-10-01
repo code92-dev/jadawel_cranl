@@ -20,6 +20,7 @@ import slackIntegration from '@jadawel/modules/integrations/slack/assets/images/
 import localJadawelIntegration from '@jadawel/modules/integrations/localJadawel/assets/images/localJadawelIntegration.svg?url'
 import {
   CoreHTTPRequestServiceType,
+  CoreResponseServiceType,
   CoreRouterServiceType,
   CoreSMTPEmailServiceType,
   CoreHTTPTriggerServiceType,
@@ -613,6 +614,24 @@ export class CoreHttpRequestNodeType extends ActionNodeTypeMixin(NodeType) {
   }
 }
 
+export class CoreResponseNodeType extends ActionNodeTypeMixin(NodeType) {
+  static getType() {
+    return 'response'
+  }
+
+  getOrder() {
+    return 8
+  }
+
+  get name() {
+    return this.app.$i18n.t('nodeType.responseLabel')
+  }
+
+  get serviceType() {
+    return this.app.$registry.get('service', CoreResponseServiceType.getType())
+  }
+}
+
 export class CoreIteratorNodeType extends containerNodeTypeMixin(
   ActionNodeTypeMixin(UtilityNodeMixin(NodeType))
 ) {
@@ -621,7 +640,7 @@ export class CoreIteratorNodeType extends containerNodeTypeMixin(
   }
 
   getOrder() {
-    return 8
+    return 9
   }
 
   get name() {

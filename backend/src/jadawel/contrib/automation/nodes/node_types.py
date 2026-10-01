@@ -23,6 +23,7 @@ from jadawel.contrib.automation.nodes.models import (
     CoreHTTPTriggerNode,
     CoreIteratorActionNode,
     CorePeriodicTriggerNode,
+    CoreResponseActionNode,
     CoreRouterActionNode,
     CoreSMTPEmailActionNode,
     LocalJadawelAggregateRowsActionNode,
@@ -46,6 +47,7 @@ from jadawel.contrib.integrations.core.service_types import (
     CoreHTTPTriggerServiceType,
     CoreIteratorServiceType,
     CorePeriodicServiceType,
+    CoreResponseServiceType,
     CoreRouterServiceType,
     CoreSMTPEmailServiceType,
 )
@@ -61,6 +63,10 @@ from jadawel.contrib.integrations.local_jadawel.service_types import (
 )
 from jadawel.contrib.integrations.slack.service_types import (
     SlackWriteMessageServiceType,
+)
+from jadawel.core.formula.types import (
+    JADAWEL_FORMULA_MODE_RAW,
+    JadawelFormulaObject,
 )
 from jadawel.core.registry import Instance
 from jadawel.core.services.models import Service
@@ -183,6 +189,33 @@ class CoreSMTPEmailNodeType(AutomationNodeActionNodeType):
     type = "smtp_email"
     model_class = CoreSMTPEmailActionNode
     service_type = CoreSMTPEmailServiceType.type
+
+
+class CoreResponseNodeType(AutomationNodeActionNodeType):
+    type = "response"
+    model_class = CoreResponseActionNode
+    service_type = CoreResponseServiceType.type
+
+    def prepare_values(
+        self,
+        values: Dict[str, Any],
+        user: AbstractUser,
+        instance: AutomationNode = None,
+    ) -> Dict[str, Any]:
+        """Default new response nodes to a raw 204 status-code formula."""
+
+        if instance is None:
+            service_values = values.get("service") or {}
+            values = {
+                **values,
+                "service": {
+                    "status_code": JadawelFormulaObject.create(
+                        "204", mode=JADAWEL_FORMULA_MODE_RAW
+                    ),
+                    **service_values,
+                },
+            }
+        return super().prepare_values(values, user, instance)
 
 
 class AIAgentActionNodeType(AutomationNodeActionNodeType):
@@ -366,6 +399,7 @@ class AutomationNodeTriggerType(AutomationNodeType):
         # For perf reasons, store the trigger<->service relationship.
         service_map = {service.id: service for service in services}
 
+        histories = []
         for trigger in triggers:
             # If we've received a callable payload, call it with the specific service,
             # this can give us a payload that is specific to the trigger's service.
@@ -376,13 +410,17 @@ class AutomationNodeTriggerType(AutomationNodeType):
             )
 
             workflow = trigger.workflow
-            AutomationWorkflowHandler().async_start_workflow(
+            history = AutomationWorkflowHandler().async_start_workflow(
                 workflow,
                 service_payload,
             )
+            if history is not None:
+                histories.append(history)
 
             # We don't want subsequent events to trigger a new test run
             AutomationWorkflowHandler().reset_workflow_temporary_states(workflow)
+
+        return histories
 
 
 class LocalJadawelRowsCreatedNodeTriggerType(AutomationNodeTriggerType):

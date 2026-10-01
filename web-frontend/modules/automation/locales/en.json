@@ -140,6 +140,7 @@
     "httpRequestLabel": "Send an HTTP request",
     "smtpEmailLabel": "Send an email",
     "routerLabel": "Follow 1 of {edgeCount} branches",
+    "responseLabel": "Response",
     "iterationLabel": "Iterate on items",
     "defaultEdgeLabelFallback": "Default",
     "routerWithOutputNodesDeleteError": "Cannot be deleted until its {outputCount} output nodes are removed.",
@@ -181,7 +182,8 @@
     "periodicTriggerTriggeredAt": "Triggered at",
     "errorIntervalMissing": "An interval is required.",
     "coreHTTPTrigger": "HTTP trigger",
-    "coreHTTPTriggerDescription": "Receive HTTP requests to trigger workflows"
+    "coreHTTPTriggerDescription": "Receive HTTP requests to trigger workflows",
+    "responseLabel": "Response"
   },
   "workflowEditor": {
     "chooseEvent": "Choose an event..."

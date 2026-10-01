@@ -66,6 +66,7 @@ export const STEP_CATALOG = {
   iterator: { category: 'logic', icon: 'iconoir-repeat' },
   ai_agent: { category: 'ai', icon: 'iconoir-sparks' },
   http_request: { category: 'web', icon: 'iconoir-send' },
+  response: { category: 'web', icon: 'iconoir-reply' },
 }
 
 /** A node type's place in the catalogue; unknown types fall back sensibly. */

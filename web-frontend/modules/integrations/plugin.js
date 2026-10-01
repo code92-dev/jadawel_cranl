@@ -21,6 +21,7 @@ import {
   CoreSMTPEmailServiceType,
   CoreHTTPTriggerServiceType,
   CoreIteratorServiceType,
+  CoreResponseServiceType,
 } from '@jadawel/modules/integrations/core/serviceTypes'
 import { AIAgentServiceType } from '@jadawel/modules/integrations/ai/serviceTypes'
 import { SlackWriteMessageServiceType } from '@jadawel/modules/integrations/slack/serviceTypes'
@@ -61,6 +62,7 @@ export default defineNuxtPlugin({
     $registry.register('service', new CoreRouterServiceType(context))
     $registry.register('service', new CoreHTTPTriggerServiceType(context))
     $registry.register('service', new CoreIteratorServiceType(context))
+    $registry.register('service', new CoreResponseServiceType(context))
     $registry.register('service', new AIAgentServiceType(context))
     $registry.register('service', new PeriodicTriggerServiceType(context))
     $registry.register('service', new SlackWriteMessageServiceType(context))

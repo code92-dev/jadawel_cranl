@@ -867,6 +867,10 @@
       "http_request": {
         "name": "Call a web address",
         "description": "Sends a request to another system's API and uses its answer."
+      },
+      "response": {
+        "name": "Reply to the caller",
+        "description": "Sends the answer back to the system whose web request started this workflow."
       }
     }
   },

@@ -9,6 +9,7 @@ import CoreSMTPEmailServiceForm from '@jadawel/modules/integrations/core/compone
 import CoreRouterServiceForm from '@jadawel/modules/integrations/core/components/services/CoreRouterServiceForm'
 import CoreIteratorServiceForm from '@jadawel/modules/integrations/core/components/services/CoreIteratorServiceForm'
 import CorePeriodicServiceForm from '@jadawel/modules/integrations/core/components/services/CorePeriodicServiceForm.vue'
+import CoreResponseServiceForm from '@jadawel/modules/integrations/core/components/services/CoreResponseServiceForm.vue'
 
 export class CoreHTTPRequestServiceType extends WorkflowActionServiceTypeMixin(
   ServiceType
@@ -251,6 +252,53 @@ export class CoreIteratorServiceType extends WorkflowActionServiceTypeMixin(
 
   getOrder() {
     return 5
+  }
+}
+
+export class CoreResponseServiceType extends WorkflowActionServiceTypeMixin(
+  ServiceType
+) {
+  static getType() {
+    return 'response'
+  }
+
+  get name() {
+    return this.app.$i18n.t('serviceType.coreResponse')
+  }
+
+  get description() {
+    return this.app.$i18n.t('serviceType.coreResponseDescription')
+  }
+
+  get icon() {
+    return 'iconoir-reply'
+  }
+
+  get formComponent() {
+    return CoreResponseServiceForm
+  }
+
+  getDataSchema(service) {
+    return service.schema
+  }
+
+  getErrorMessage(params) {
+    const { service } = params
+    const isNoContentResponse =
+      service.status_code?.mode === 'raw' &&
+      service.status_code.formula === '204'
+    if (
+      !isNoContentResponse &&
+      service.body_type === 'json' &&
+      !service.body?.formula?.trim()
+    ) {
+      return this.app.$i18n.t('serviceType.errorResponseBodyMissing')
+    }
+    return super.getErrorMessage(params)
+  }
+
+  getOrder() {
+    return 9
   }
 }
 

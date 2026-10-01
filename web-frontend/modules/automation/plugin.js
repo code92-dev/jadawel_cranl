@@ -25,6 +25,7 @@ import {
   CoreSMTPEmailNodeType,
   CoreRouterNodeType,
   CorePeriodicTriggerNodeType,
+  CoreResponseNodeType,
   AIAgentActionNodeType,
   SlackWriteMessageNodeType,
 } from '@jadawel/modules/automation/nodeTypes'
@@ -103,6 +104,7 @@ export default defineNuxtPlugin({
     $registry.register('node', new CoreHttpRequestNodeType(context))
     $registry.register('node', new CoreSMTPEmailNodeType(context))
     $registry.register('node', new CoreRouterNodeType(context))
+    $registry.register('node', new CoreResponseNodeType(context))
     $registry.register('node', new CoreIteratorNodeType(context))
     $registry.register('node', new SlackWriteMessageNodeType(context))
     $registry.register('node', new LocalJadawelDeleteRowActionNodeType(context))

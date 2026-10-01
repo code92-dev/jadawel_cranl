@@ -1,16 +1,21 @@
-from django.db import transaction
+from django.http import HttpResponse
 
 from drf_spectacular.utils import extend_schema
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.status import HTTP_204_NO_CONTENT
+from rest_framework.status import HTTP_204_NO_CONTENT, HTTP_504_GATEWAY_TIMEOUT
 from rest_framework.views import APIView
 
 from jadawel.api.decorators import map_exceptions
 from jadawel.api.schemas import get_error_schema
+from jadawel.contrib.automation.history.handler import AutomationHistoryHandler
 from jadawel.contrib.integrations.core.api.webhooks.errors import (
     ERROR_CORE_HTTP_TRIGGER_SERVICE_DOES_NOT_EXIST,
     ERROR_CORE_HTTP_TRIGGER_SERVICE_METHOD_NOT_ALLOWED,
+)
+from jadawel.contrib.integrations.core.constants import (
+    DISALLOWED_WORKFLOW_RESPONSE_HEADERS,
+    RESPONSE_BODY_TYPE,
 )
 from jadawel.contrib.integrations.core.exceptions import (
     CoreHTTPTriggerServiceDoesNotExist,
@@ -19,6 +24,7 @@ from jadawel.contrib.integrations.core.exceptions import (
 from jadawel.core.services.registries import service_type_registry
 
 CORE_WEBHOOKS_TAG = "Core webhooks"
+WORKFLOW_RESPONSE_CONTENT_SECURITY_POLICY = "sandbox"
 
 
 def webhook_schema(method):
@@ -65,12 +71,52 @@ class CoreHTTPTriggerView(APIView):
             "user_agent": request.META.get("HTTP_USER_AGENT", ""),
         }
 
+    def response_to_http_response(self, workflow_response):
+        """Builds a browser-sandboxed HTTP response from a workflow response."""
+
+        headers = {
+            key: value
+            for key, value in (workflow_response.headers or {}).items()
+            if key.lower() not in DISALLOWED_WORKFLOW_RESPONSE_HEADERS
+        }
+        headers["Content-Security-Policy"] = WORKFLOW_RESPONSE_CONTENT_SECURITY_POLICY
+        status = workflow_response.status_code
+
+        if workflow_response.body_type == RESPONSE_BODY_TYPE.TEXT:
+            content_type = next(
+                (
+                    value
+                    for key, value in headers.items()
+                    if key.lower() == "content-type"
+                ),
+                "text/plain",
+            )
+            headers = {
+                key: value
+                for key, value in headers.items()
+                if key.lower() != "content-type"
+            }
+            return HttpResponse(
+                workflow_response.body or "",
+                status=status,
+                headers=headers,
+                content_type=content_type,
+            )
+
+        if workflow_response.body_type == RESPONSE_BODY_TYPE.EMPTY:
+            return Response(status=status, headers=headers)
+
+        return Response(
+            data=workflow_response.body,
+            status=status,
+            headers=headers,
+        )
+
     @webhook_schema("GET")
     @webhook_schema("POST")
     @webhook_schema("PUT")
     @webhook_schema("PATCH")
     @webhook_schema("DELETE")
-    @transaction.atomic
     @map_exceptions(
         {
             CoreHTTPTriggerServiceDoesNotExist: ERROR_CORE_HTTP_TRIGGER_SERVICE_DOES_NOT_EXIST,
@@ -82,7 +128,23 @@ class CoreHTTPTriggerView(APIView):
         simulate = request.GET.get("test", "").lower() == "true"
 
         service_type = service_type_registry.get("http_trigger")
-        service_type.process_webhook_request(webhook_uid, request_data, simulate)
+        service, history = service_type.process_webhook_request(
+            webhook_uid, request_data, simulate
+        )
+
+        if (
+            service.wait_for_response
+            and history is not None
+            and history.simulate_until_node_id is None
+        ):
+            history_handler = AutomationHistoryHandler()
+            workflow_response = history_handler.wait_for_workflow_response(
+                history,
+                service.response_timeout_seconds,
+            )
+            if workflow_response is None:
+                return Response(status=HTTP_504_GATEWAY_TIMEOUT)
+            return self.response_to_http_response(workflow_response)
 
         return Response(status=HTTP_204_NO_CONTENT)
 

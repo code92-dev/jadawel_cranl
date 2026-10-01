@@ -22,6 +22,25 @@ three-way merge (upstream file before the PR → after the PR, renamed `baserow`
 are in `docs/UPSTREAM_2_4_PORT.md`. Files that exist only because of the port (new
 components, migrations, tests) are not listed.
 
+### Return responses from workflows (upstream #5595 `e83d5923`, fixes #6168 `d6853c80`, #6182 `0813d110`)
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/contrib/integrations/core/{constants,models,service_types}.py`, `api/serializers.py` | `CoreResponseService` + headers, `CoreResponseServiceType`, HTTP trigger `wait_for_response` / `response_timeout_seconds` (`uid` stays writable, as in the fork), HTTP request headers gain lowercase aliases | The Response step and the trigger that waits for it |
+| `backend/src/jadawel/contrib/integrations/core/api/webhooks/views.py` | Waits for the run's response outside a transaction and returns it sandboxed (`Content-Security-Policy: sandbox`, cookie/HSTS/CSP headers dropped) | The webhook caller gets the workflow's answer |
+| `backend/src/jadawel/contrib/automation/history/{handler,models}.py`, `nodes/{handler,models,node_types}.py`, `workflows/{handler,tasks}.py`, `apps.py` | `AutomationWorkflowHistoryResponse`; a default `204` is recorded when a run fails or ends without a Response step; `async_start_workflow`/`on_event` return the history | Something to wait on in every outcome |
+| `backend/src/jadawel/core/services/registries.py` | `should_resolve_service_formula` hook | A `204` skips resolving the body |
+| `backend/src/jadawel/config/settings/base.py`, `docker-compose*.yml`, `web-frontend/{env-remap.mjs,modules/core/module.js}` | `JADAWEL_AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS` | Bounds the wait |
+| `web-frontend/modules/integrations/core/{serviceTypes.js,components/services/CoreHTTPTriggerServiceForm.vue}`, `integrations/plugin.js`, `automation/{nodeTypes,plugin}.js`, `core/assets/scss/components/services/service_form.scss` | Response service/node types; "Wait for workflow response" on the HTTP trigger | UI |
+| `web-frontend/modules/arabase/automation/stepCatalog.js` | `response` in the Web category ("Reply to the caller") | Fork's step gallery |
+
+Not taken: the parts that only serve 2.3 features the fork does not have — the
+Start-workflow node waiting on a child run (`resume_deferred_node_celery_task`,
+deferred `DispatchResult` fields), the Manual trigger's response settings, and the
+builder's start-workflow action. Upstream's status-code picker uses the formula
+input's raw mode (#5643), which the fork's formula input lacks;
+`CoreResponseServiceForm.vue` switches between a picker and a formula itself instead.
+
 ### Stop a running workflow (upstream #5924, `16ddb091`)
 
 | File | Change | Reason |

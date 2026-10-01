@@ -1,7 +1,9 @@
+import time
 from datetime import datetime
 from typing import Dict, List, Optional, Union
 
 from django.contrib.auth.models import AbstractUser
+from django.db import IntegrityError, transaction
 from django.db.models import Prefetch, QuerySet
 from django.utils import timezone
 
@@ -16,12 +18,18 @@ from jadawel.contrib.automation.history.models import (
     AutomationNodeHistory,
     AutomationNodeResult,
     AutomationWorkflowHistory,
+    AutomationWorkflowHistoryResponse,
 )
 from jadawel.contrib.automation.nodes.models import AutomationNode
 from jadawel.contrib.automation.workflows.models import AutomationWorkflow
+from jadawel.contrib.integrations.core.constants import RESPONSE_BODY_TYPE
 
 
 class AutomationHistoryHandler:
+    RESPONSE_POLL_INITIAL_INTERVAL_SECONDS = 0.1
+    RESPONSE_POLL_MAX_INTERVAL_SECONDS = 1.0
+    RESPONSE_POLL_BACKOFF_MULTIPLIER = 2
+
     def get_workflow_histories(
         self, workflow: AutomationWorkflow, base_queryset: Optional[QuerySet] = None
     ) -> QuerySet[AutomationWorkflowHistory]:
@@ -225,3 +233,97 @@ class AutomationHistoryHandler:
             raise AutomationWorkflowHistoryNodeResultDoesNotExist()
 
         return node_result.result
+
+    def create_workflow_history_response(
+        self,
+        workflow_history: AutomationWorkflowHistory,
+        status_code: int,
+        headers: Optional[Dict[str, str]] = None,
+        body=None,
+        body_type: str = RESPONSE_BODY_TYPE.EMPTY,
+        source_node: Optional[AutomationNode] = None,
+        is_default: bool = False,
+    ) -> tuple[AutomationWorkflowHistoryResponse, bool]:
+        """
+        Creates the workflow response if one doesn't already exist.
+        """
+
+        try:
+            with transaction.atomic():
+                return (
+                    AutomationWorkflowHistoryResponse.objects.create(
+                        workflow_history=workflow_history,
+                        status_code=status_code,
+                        headers=headers or {},
+                        body=body,
+                        body_type=body_type,
+                        source_node=source_node,
+                        is_default=is_default,
+                    ),
+                    True,
+                )
+        except IntegrityError:
+            return (
+                AutomationWorkflowHistoryResponse.objects.get(
+                    workflow_history=workflow_history
+                ),
+                False,
+            )
+
+    def ensure_default_response(
+        self, workflow_history: AutomationWorkflowHistory
+    ) -> AutomationWorkflowHistoryResponse:
+        """
+        Ensures the workflow history has a default empty 204 response.
+        """
+
+        response, _ = self.create_workflow_history_response(
+            workflow_history,
+            status_code=204,
+            headers={},
+            body=None,
+            body_type=RESPONSE_BODY_TYPE.EMPTY,
+            is_default=True,
+        )
+        return response
+
+    def get_workflow_history_response(
+        self, workflow_history: AutomationWorkflowHistory
+    ) -> Optional[AutomationWorkflowHistoryResponse]:
+        try:
+            return AutomationWorkflowHistoryResponse.objects.get(
+                workflow_history=workflow_history
+            )
+        except AutomationWorkflowHistoryResponse.DoesNotExist:
+            return None
+
+    def wait_for_workflow_response(
+        self,
+        workflow_history: AutomationWorkflowHistory,
+        timeout_seconds: int,
+    ) -> Optional[AutomationWorkflowHistoryResponse]:
+        """
+        Polls with bounded backoff until a response exists or the timeout expires.
+        """
+
+        deadline = time.monotonic() + timeout_seconds
+        poll_interval = self.RESPONSE_POLL_INITIAL_INTERVAL_SECONDS
+        while time.monotonic() < deadline:
+            workflow_history.refresh_from_db(fields=["status", "completed_on"])
+            if response := self.get_workflow_history_response(workflow_history):
+                return response
+
+            if workflow_history.status != HistoryStatusChoices.STARTED:
+                return self.ensure_default_response(workflow_history)
+
+            remaining_seconds = deadline - time.monotonic()
+            if remaining_seconds <= 0:
+                break
+
+            time.sleep(min(poll_interval, remaining_seconds))
+            poll_interval = min(
+                poll_interval * self.RESPONSE_POLL_BACKOFF_MULTIPLIER,
+                self.RESPONSE_POLL_MAX_INTERVAL_SECONDS,
+            )
+
+        return None

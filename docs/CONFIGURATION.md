@@ -51,6 +51,14 @@ keyring through Nuxt, API output, logs, or MCP model configuration.
 | `JADAWEL_MCP_PROTECTION_ALLOW_SHARED_REDIS` | Allows the vault to fall back to `REDIS_URL`. Use only for tests or local development; keep disabled in production. | `false` |
 | `JADAWEL_MCP_PROTECTION_REDIS_MEM_LIMIT` | Container memory limit for the dedicated protection Redis service in Compose. The service itself is capped at 128 MiB with `noeviction`. | `256m` |
 
+## Automations
+
+Carried over from Baserow 2.4 (`docs/UPSTREAM_2_4_PORT.md`).
+
+| Variable | Description | Default |
+|---|---|---|
+| `JADAWEL_AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS` | Upper bound for an HTTP trigger's "Wait for workflow response" timeout. The web request is held open while the run reaches its Response step, so a long wait ties up a web worker; and with the single Celery worker this deployment runs, a busy worker makes the caller wait or time out (`504`). Read by both the backend and the web-frontend. | `20` |
+
 ## Database backups
 
 Read by `arabase.backup` and the `arabase.tasks.backup_database` Celery task. All of

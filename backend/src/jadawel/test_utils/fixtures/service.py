@@ -6,6 +6,7 @@ from jadawel.contrib.integrations.core.models import (
     CoreHTTPTriggerService,
     CoreIteratorService,
     CorePeriodicService,
+    CoreResponseService,
     CoreRouterService,
     CoreSMTPEmailService,
 )
@@ -111,6 +112,9 @@ class ServiceFixtures:
 
     def create_core_iterator_service(self, **kwargs):
         return self.create_service(CoreIteratorService, **kwargs)
+
+    def create_core_response_service(self, **kwargs):
+        return self.create_service(CoreResponseService, **kwargs)
 
     def create_core_router_service(self, **kwargs):
         return self.create_service(CoreRouterService, **kwargs)

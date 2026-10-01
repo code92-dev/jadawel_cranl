@@ -23,6 +23,7 @@ class AutomationConfig(AppConfig):
             CoreHTTPTriggerNodeType,
             CoreIteratorNodeType,
             CorePeriodicTriggerNodeType,
+            CoreResponseNodeType,
             CoreRouterActionNodeType,
             CoreSMTPEmailNodeType,
             LocalJadawelAggregateRowsNodeType,
@@ -176,6 +177,7 @@ class AutomationConfig(AppConfig):
         automation_node_type_registry.register(CoreIteratorNodeType())
         automation_node_type_registry.register(CoreSMTPEmailNodeType())
         automation_node_type_registry.register(CoreRouterActionNodeType())
+        automation_node_type_registry.register(CoreResponseNodeType())
         automation_node_type_registry.register(LocalJadawelRowsCreatedNodeTriggerType())
         automation_node_type_registry.register(LocalJadawelRowsUpdatedNodeTriggerType())
         automation_node_type_registry.register(LocalJadawelRowsDeletedNodeTriggerType())

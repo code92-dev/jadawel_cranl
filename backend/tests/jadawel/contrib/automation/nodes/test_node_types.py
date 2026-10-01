@@ -25,6 +25,7 @@ from jadawel.contrib.integrations.core.constants import (
 )
 from jadawel.contrib.integrations.core.models import CorePeriodicService
 from jadawel.contrib.integrations.core.service_types import CorePeriodicServiceType
+from jadawel.core.formula.types import JADAWEL_FORMULA_MODE_RAW, JadawelFormulaObject
 from jadawel.core.handler import CoreHandler
 from jadawel.core.services.registries import service_type_registry
 from jadawel.core.services.types import DispatchResult
@@ -698,3 +699,30 @@ def test_periodic_trigger_node_on_event_only_updates_dispatched_services(data_fi
         # `trigger_node_b2` is the only due service which we've found to be
         # appropriate for dispatching (its workflow is live/published).
         assert list(services_dispatched) == [trigger_node_b2.service]
+
+
+@pytest.mark.django_db
+def test_core_response_node_defaults_status_code_to_raw_204(data_fixture):
+    user = data_fixture.create_user()
+    workflow = data_fixture.create_automation_workflow(user=user)
+    node_type = automation_node_type_registry.get("response")
+
+    values = node_type.prepare_values({"workflow": workflow}, user)
+
+    assert values["service"].specific.status_code == JadawelFormulaObject.create(
+        "204", mode=JADAWEL_FORMULA_MODE_RAW
+    )
+
+
+@pytest.mark.django_db
+def test_core_response_node_preserves_provided_status_code(data_fixture):
+    user = data_fixture.create_user()
+    workflow = data_fixture.create_automation_workflow(user=user)
+    node_type = automation_node_type_registry.get("response")
+    status_code = JadawelFormulaObject.create("201", mode=JADAWEL_FORMULA_MODE_RAW)
+
+    values = node_type.prepare_values(
+        {"workflow": workflow, "service": {"status_code": status_code}}, user
+    )
+
+    assert values["service"].specific.status_code == status_code
