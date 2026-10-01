@@ -946,6 +946,9 @@
     "maxGroupBysReached": "يمكنك التجميع حسب ما يصل إلى {count} حقول.",
     "collapseAllGroups": "طيّ الكل",
     "expandAllGroups": "توسيع الكل",
+    "layout": "طريقة عرض المجموعات",
+    "layoutSection": "أقسام",
+    "layoutColumn": "أعمدة",
     "hiddenFieldWarning": "يشير تجميع واحد أو أكثر إلى حقول مخفية لن تكون ظاهرة للمحررين والأدوار الأدنى."
   },
   "viewGroupBy": {

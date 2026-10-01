@@ -54,13 +54,11 @@ exports[`GridView component with decoration > Default component with first_cell 
             class="grid-view__placeholder"
             style="height: 66px; width: 72px;"
           >
-            <div
-              class="grid-view__placeholder-groups"
-              style="width: 0px;"
-            />
+            <!--v-if-->
             
             
           </div>
+          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -141,6 +139,7 @@ exports[`GridView component with decoration > Default component with first_cell 
       <div
         class="grid-view__foot"
       >
+        <!--v-if-->
         <div
           class="grid-view__foot-info"
         >
@@ -300,6 +299,7 @@ exports[`GridView component with decoration > Default component with first_cell 
             />
             
           </div>
+          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -377,6 +377,7 @@ exports[`GridView component with decoration > Default component with first_cell 
         class="grid-view__foot"
       >
         <!--v-if-->
+        <!--v-if-->
         
         <div
           style="width: 200px;"
@@ -437,7 +438,7 @@ exports[`GridView component with decoration > Default component with first_cell 
     />
     <div
       class="grid-view__row-target"
-      style="width: 472px; top: 0px;"
+      style="width: 472px; top: 0px; display: none;"
     />
   </div>
 </div>
@@ -497,13 +498,11 @@ exports[`GridView component with decoration > Default component with row wrapper
             class="grid-view__placeholder"
             style="height: 66px; width: 72px;"
           >
-            <div
-              class="grid-view__placeholder-groups"
-              style="width: 0px;"
-            />
+            <!--v-if-->
             
             
           </div>
+          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -586,6 +585,7 @@ exports[`GridView component with decoration > Default component with row wrapper
       <div
         class="grid-view__foot"
       >
+        <!--v-if-->
         <div
           class="grid-view__foot-info"
         >
@@ -745,6 +745,7 @@ exports[`GridView component with decoration > Default component with row wrapper
             />
             
           </div>
+          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -830,6 +831,7 @@ exports[`GridView component with decoration > Default component with row wrapper
         class="grid-view__foot"
       >
         <!--v-if-->
+        <!--v-if-->
         
         <div
           style="width: 200px;"
@@ -890,7 +892,7 @@ exports[`GridView component with decoration > Default component with row wrapper
     />
     <div
       class="grid-view__row-target"
-      style="width: 472px; top: 0px;"
+      style="width: 472px; top: 0px; display: none;"
     />
   </div>
 </div>
@@ -950,13 +952,11 @@ exports[`GridView component with decoration > Default component with unavailable
             class="grid-view__placeholder"
             style="height: 66px; width: 72px;"
           >
-            <div
-              class="grid-view__placeholder-groups"
-              style="width: 0px;"
-            />
+            <!--v-if-->
             
             
           </div>
+          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -1031,6 +1031,7 @@ exports[`GridView component with decoration > Default component with unavailable
       <div
         class="grid-view__foot"
       >
+        <!--v-if-->
         <div
           class="grid-view__foot-info"
         >
@@ -1190,6 +1191,7 @@ exports[`GridView component with decoration > Default component with unavailable
             />
             
           </div>
+          <!--v-if-->
           <div
             class="grid-view__rows"
             style="transform: translateY(0px) translateX(0px); left: 0px;"
@@ -1267,6 +1269,7 @@ exports[`GridView component with decoration > Default component with unavailable
         class="grid-view__foot"
       >
         <!--v-if-->
+        <!--v-if-->
         
         <div
           style="width: 200px;"
@@ -1327,7 +1330,7 @@ exports[`GridView component with decoration > Default component with unavailable
     />
     <div
       class="grid-view__row-target"
-      style="width: 472px; top: 0px;"
+      style="width: 472px; top: 0px; display: none;"
     />
   </div>
 </div>

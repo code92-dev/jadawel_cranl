@@ -596,6 +596,10 @@ export class GridViewType extends ViewType {
       storePrefix + 'view/grid/setRowHeight',
       GRID_VIEW_SIZE_TO_ROW_HEIGHT_MAPPING[view.row_height_size]
     )
+    await store.dispatch(
+      storePrefix + 'view/grid/setGroupByLayout',
+      view.group_by_layout || 'section'
+    )
     await store.dispatch(storePrefix + 'view/grid/fetchInitial', {
       gridId: view.id,
       fields,

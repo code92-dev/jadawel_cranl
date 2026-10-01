@@ -22,6 +22,15 @@ three-way merge (upstream file before the PR → after the PR, renamed `baserow`
 are in `docs/UPSTREAM_2_4_PORT.md`. Files that exist only because of the port (new
 components, migrations, tests) are not listed.
 
+### Improved Group By views (upstream #5787 `667cfdd8`, #6022 `479e616e`)
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/contrib/database/views/{models,view_types}.py` | `GridView.group_by_layout` (`section` / `column`), exported and importable; not in `copyable_view_attributes`, which belongs to the copy-view-configuration feature the port leaves out | Columns layout |
+| `web-frontend/modules/database/components/view/grid/{GridView,GridViewSection,GridViewGroupByRows,GridViewGroupByBanner,GridViewHead,GridViewRowDragging}.vue`, `view/ViewGroupByContext.vue`, `core/components/HorizontalResize.vue` | Rows drag within and between groups (the row takes the target group's value, then moves, as one undo group); Columns layout with resizable group columns and a layout switch. New inline positions use `insetInlineStart` and `.grid-view__group-columns` uses logical insets, as the fork's grid does for RTL | Group By |
+| `web-frontend/modules/database/{store/view/grid.js,utils/gridGroupBy.js,utils/gridGroupByRender.js,services/row.js}` | `moveRow` across groups; `RowService.update/move` take the view and an undo/redo action group | Same |
+| `web-frontend/modules/core/assets/scss/components/{group_bys,views/grid}.scss` | Columns layout styles (new lines in logical properties) | Same |
+
 ### Trigger workflows with inbound email (upstream #5730, `620fcc9a`)
 
 | File | Change | Reason |

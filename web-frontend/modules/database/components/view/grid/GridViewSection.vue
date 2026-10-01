@@ -18,16 +18,19 @@
       class="grid-view__group-by-divider"
       :style="{ left: left + 'px' }"
     ></div>
-    <HorizontalResize
-      v-for="({ groupBy, left }, index) in groupByDividers"
-      :key="'group-by-width-' + index"
-      class="grid-view__head-group-width-handle"
-      :style="{ left: left + 'px' }"
-      :width="groupBy.width"
-      :min="GRID_VIEW_MIN_FIELD_WIDTH"
-      @move="moveGroupWidth(groupBy, view, $event)"
-      @update="updateGroupWidth(groupBy, view, database, readOnly, $event)"
-    ></HorizontalResize>
+    <template v-if="!groupByWidthsAreResponsivelyFitted || resizingGroupWidth">
+      <HorizontalResize
+        v-for="({ groupBy, left }, index) in groupByDividers"
+        :key="'group-by-width-' + index"
+        class="grid-view__head-group-width-handle"
+        :style="{ left: left + 'px' }"
+        :width="renderedGroupByWidths[index]"
+        :min="GRID_VIEW_MIN_FIELD_WIDTH"
+        @dragging="resizingGroupWidth = $event"
+        @move="moveGroupWidth(groupBy, view, $event)"
+        @update="updateGroupWidth(groupBy, view, database, readOnly, $event)"
+      ></HorizontalResize>
+    </template>
     <div class="grid-view__inner" :style="{ 'min-width': width + 'px' }">
       <GridViewHead
         :database="database"
@@ -41,6 +44,7 @@
           includeGridViewIdentifierDropdown
         "
         :include-group-by="includeGroupBy"
+        :group-by-widths="renderedGroupByWidths"
         :show-group-by-field-background="!useGroupByRows"
         :read-only="readOnly"
         :store-prefix="storePrefix"
@@ -70,6 +74,13 @@
             :include-group-by="includeGroupBy"
             :store-prefix="storePrefix"
           ></GridViewPlaceholder>
+          <GridViewGroupByColumns
+            v-if="useGroupByRows && includeGroupBy"
+            :all-fields-in-table="allFieldsInTable"
+            :workspace-id="database.workspace.id"
+            :store-prefix="storePrefix"
+            :group-by-widths="renderedGroupByWidths"
+          ></GridViewGroupByColumns>
           <GridViewGroupByRows
             v-if="useGroupByRows"
             ref="rows"
@@ -81,9 +92,11 @@
             :workspace-id="database.workspace.id"
             :decorations-by-place="decorationsByPlace"
             :left-offset="fieldsLeftOffset"
+            :group-columns-width="groupColumnsWidth"
             :include-row-details="includeRowDetails"
             :read-only="readOnly"
             :can-add-row="canCreateRow"
+            :can-drag="canMoveRow"
             :store-prefix="storePrefix"
             @update="$emit('update', $event)"
             @paste="$emit('paste', $event)"
@@ -123,13 +136,7 @@
             :include-row-details="includeRowDetails"
             :include-group-by="includeGroupBy"
             :read-only="readOnly"
-            :can-drag="
-              $hasPermission(
-                'database.table.update_row',
-                table,
-                database.workspace.id
-              )
-            "
+            :can-drag="canMoveRow"
             :store-prefix="storePrefix"
             @update="$emit('update', $event)"
             @paste="$emit('paste', $event)"
@@ -170,6 +177,10 @@
         </div>
       </div>
       <div class="grid-view__foot">
+        <div
+          v-if="includeGroupBy"
+          :style="{ width: groupColumnsWidth + 'px' }"
+        ></div>
         <div v-if="includeRowDetails" class="grid-view__foot-info">
           {{ $t('gridView.rowCount', { count }) }}
         </div>
@@ -197,6 +208,7 @@ import GridViewHead from '@jadawel/modules/database/components/view/grid/GridVie
 import GridViewPlaceholder from '@jadawel/modules/database/components/view/grid/GridViewPlaceholder'
 import GridViewRows from '@jadawel/modules/database/components/view/grid/GridViewRows'
 import GridViewGroupByRows from '@jadawel/modules/database/components/view/grid/GridViewGroupByRows'
+import GridViewGroupByColumns from '@jadawel/modules/database/components/view/grid/GridViewGroupByColumns'
 import GridViewRowAdd from '@jadawel/modules/database/components/view/grid/GridViewRowAdd'
 import gridViewHelpers from '@jadawel/modules/database/mixins/gridViewHelpers'
 import GridViewFieldFooter from '@jadawel/modules/database/components/view/grid/GridViewFieldFooter'
@@ -212,6 +224,7 @@ export default {
     GridViewPlaceholder,
     GridViewRows,
     GridViewGroupByRows,
+    GridViewGroupByColumns,
     GridViewRowAdd,
     GridViewFieldFooter,
   },
@@ -254,6 +267,11 @@ export default {
       type: Boolean,
       required: false,
       default: () => false,
+    },
+    groupByWidths: {
+      type: Array,
+      required: false,
+      default: () => [],
     },
     includeAddField: {
       type: Boolean,
@@ -311,6 +329,9 @@ export default {
       fieldsLeftOffset: 0,
       resizeObserver: null,
       horizontalScrollEvent: null,
+      // Keep the active handle mounted until mouseup can persist its width, even
+      // when dragging past the available space activates responsive fitting.
+      resizingGroupWidth: false,
     }
   },
   computed: {
@@ -328,7 +349,7 @@ export default {
         width += this.gridViewRowDetailsWidth
       }
       if (this.includeGroupBy) {
-        width += this.activeGroupByWidth
+        width += this.groupColumnsWidth
       }
 
       // The add button has a width of 100 and we reserve 100 at the right side.
@@ -338,20 +359,38 @@ export default {
 
       return width
     },
+    renderedGroupByWidths() {
+      return this.activeGroupBys.map(
+        (groupBy, index) => this.groupByWidths[index] ?? groupBy.width
+      )
+    },
+    groupByWidthsAreResponsivelyFitted() {
+      const configuredWidth = this.activeGroupBys.reduce(
+        (total, groupBy) =>
+          total + Math.max(groupBy.width, this.GRID_VIEW_MIN_FIELD_WIDTH),
+        0
+      )
+      return this.groupColumnsWidth < configuredWidth - 0.01
+    },
+    groupColumnsWidth() {
+      if (!this.includeGroupBy) {
+        return 0
+      }
+      return this.renderedGroupByWidths.reduce(
+        (total, width) => total + width,
+        0
+      )
+    },
     groupByDividers() {
       if (!this.includeGroupBy) {
         return []
       }
 
       let last = 0
-      const dividers = this.activeGroupBys
-        .filter((groupBy, index) => index < this.activeGroupBys.length - 1)
-        .map((groupBy) => {
-          last += groupBy.width
-          return { groupBy, left: last }
-        })
-
-      return dividers
+      return this.activeGroupBys.map((groupBy, index) => {
+        last += this.renderedGroupByWidths[index]
+        return { groupBy, left: last }
+      })
     },
     useGroupByRows() {
       return this.activeGroupBys.length > 0
@@ -367,6 +406,21 @@ export default {
         ) ||
           this.$hasPermission(
             'database.table.view.create_row',
+            this.view,
+            this.database.workspace.id
+          ))
+      )
+    },
+    canMoveRow() {
+      return (
+        !this.readOnly &&
+        (this.$hasPermission(
+          'database.table.update_row',
+          this.table,
+          this.database.workspace.id
+        ) ||
+          this.$hasPermission(
+            'database.table.view.update_row',
             this.view,
             this.database.workspace.id
           ))
