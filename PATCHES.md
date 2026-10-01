@@ -22,6 +22,17 @@ three-way merge (upstream file before the PR → after the PR, renamed `baserow`
 are in `docs/UPSTREAM_2_4_PORT.md`. Files that exist only because of the port (new
 components, migrations, tests) are not listed.
 
+### Stop a running workflow (upstream #5924, `16ddb091`)
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/contrib/automation/history/{constants,exceptions,handler,models,service}.py` | `CANCELLED` status (status column widened to 16), `cancellation_requested_by/_on`, request + finalize cancellation, permission check on the editable workflow | Cooperative cancellation: the request is recorded, the runner stops before its next node |
+| `backend/src/jadawel/contrib/automation/nodes/handler.py` | `dispatch_node` finalizes a requested cancellation instead of dispatching | Where the run actually stops |
+| `backend/src/jadawel/contrib/automation/workflows/{handler,signals}.py`, `workflows/ws/signals.py` | Timeout sweep resolves a cancel-requested run as cancelled; realtime event for the request | Hung runs and other open editors |
+| `backend/src/jadawel/contrib/automation/api/urls.py`, `api/workflows/serializers.py` | Mounts the new `api/history/` package (only the cancel endpoint; the fork has no 2.3 node-history API) and exposes `cancellation_requested_on` | API surface |
+| `web-frontend/modules/automation/{realtime,services/history,store/automationHistory}.js` | Cancel action with out-of-order-response guard; refetch on the new event | UI state |
+| `web-frontend/modules/automation/components/workflow/sidePanels/{WorkflowHistory,HistorySidePanel}.vue` | "Cancel this workflow run" link; `useStore` added because the fork's component predates it | UI |
+
 ### Data Sync history (upstream #5706, `3486ba23`)
 
 | File | Change | Reason |

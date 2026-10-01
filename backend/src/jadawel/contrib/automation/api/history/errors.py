@@ -1,0 +1,19 @@
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+
+ERROR_AUTOMATION_WORKFLOW_HISTORY_DOES_NOT_EXIST = (
+    "ERROR_AUTOMATION_WORKFLOW_HISTORY_DOES_NOT_EXIST",
+    HTTP_404_NOT_FOUND,
+    "The automation workflow history does not exist.",
+)
+
+ERROR_AUTOMATION_WORKFLOW_HISTORY_NOT_RUNNING = (
+    "ERROR_AUTOMATION_WORKFLOW_HISTORY_NOT_RUNNING",
+    HTTP_400_BAD_REQUEST,
+    "The automation workflow history is not running anymore.",
+)
+
+ERROR_AUTOMATION_WORKFLOW_HISTORY_CANCELLATION_ALREADY_REQUESTED = (
+    "ERROR_AUTOMATION_WORKFLOW_HISTORY_CANCELLATION_ALREADY_REQUESTED",
+    HTTP_400_BAD_REQUEST,
+    "The cancellation of the automation workflow history was already requested.",
+)

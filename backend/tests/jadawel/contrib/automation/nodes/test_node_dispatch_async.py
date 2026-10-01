@@ -1,10 +1,13 @@
 from unittest.mock import ANY, patch
 
+from django.utils import timezone
+
 import pytest
 from celery.canvas import Signature
 
 from jadawel.config.celery import clear_local
 from jadawel.contrib.automation.history.constants import HistoryStatusChoices
+from jadawel.contrib.automation.history.handler import AutomationHistoryHandler
 from jadawel.contrib.automation.history.models import (
     AutomationNodeHistory,
     AutomationNodeResult,
@@ -1578,3 +1581,112 @@ def test_handle_workflow_dispatch_done_sends_signal_on_error(
         mock_dispatch_done_signal.send.call_args.kwargs["workflow_history"].id
         == workflow_history.id
     )
+
+
+@pytest.mark.django_db
+def test_dispatch_node_finalizes_requested_cancellation(data_fixture):
+    """
+    When a cancellation was requested, the runner stops before dispatching the
+    next node: the node is not executed, no node history is written and the run
+    is marked as cancelled.
+    """
+
+    user = data_fixture.create_user(first_name="Ada")
+    data = create_workflow(data_fixture, user=user)
+    action_node = data["action_node"]
+    action_table = data["action_table"]
+    workflow_history = data["workflow_history"]
+    workflow_history.cancellation_requested_by = user
+    workflow_history.cancellation_requested_on = timezone.now()
+    workflow_history.save()
+
+    result = AutomationNodeHandler().dispatch_node(
+        action_node.id, history_id=workflow_history.id
+    )
+
+    assert result is None
+    assert action_table.get_model().objects.count() == 0
+    assert not AutomationNodeHistory.objects.filter(
+        workflow_history=workflow_history
+    ).exists()
+
+    workflow_history.refresh_from_db()
+    assert workflow_history.status == HistoryStatusChoices.CANCELLED
+    assert workflow_history.message == f"Cancelled by Ada ({user.id})."
+    assert workflow_history.completed_on is not None
+
+
+@pytest.mark.django_db
+def test_dispatch_node_skips_already_cancelled_run(data_fixture):
+    """
+    The remaining tasks of a run can still fire after it was finalized (e.g. the
+    tasks of an iterator's chain, or after the timeout sweep). They must not
+    execute anything nor touch the resolved run.
+    """
+
+    data = create_workflow(data_fixture)
+    action_node = data["action_node"]
+    action_table = data["action_table"]
+    workflow_history = data["workflow_history"]
+    completed_on = timezone.now()
+    workflow_history.status = HistoryStatusChoices.CANCELLED
+    workflow_history.message = "Cancelled."
+    workflow_history.completed_on = completed_on
+    workflow_history.save()
+
+    result = AutomationNodeHandler().dispatch_node(
+        action_node.id, history_id=workflow_history.id
+    )
+
+    assert result is None
+    assert action_table.get_model().objects.count() == 0
+    assert not AutomationNodeHistory.objects.filter(
+        workflow_history=workflow_history
+    ).exists()
+
+    workflow_history.refresh_from_db()
+    assert workflow_history.status == HistoryStatusChoices.CANCELLED
+    assert workflow_history.message == "Cancelled."
+    assert workflow_history.completed_on == completed_on
+
+
+@pytest.mark.django_db
+def test_dispatch_node_cancellation_requested_mid_run(data_fixture):
+    """
+    End-to-end: the trigger runs, the user requests a cancellation, the next
+    node is not dispatched and the dispatch-done handler does not flip the
+    cancelled run back to success.
+    """
+
+    user = data_fixture.create_user(first_name="Ada")
+    data = create_workflow(data_fixture, user=user)
+    trigger_node = data["trigger_node"]
+    action_node = data["action_node"]
+    action_table = data["action_table"]
+    workflow_history = data["workflow_history"]
+    handler = AutomationNodeHandler()
+
+    result = handler.dispatch_node(trigger_node.id, history_id=workflow_history.id)
+    assert_dispatches_next_node(result, (action_node, workflow_history, None))
+
+    AutomationHistoryHandler().request_workflow_history_cancellation(
+        workflow_history, user
+    )
+
+    result = handler.dispatch_node(action_node.id, history_id=workflow_history.id)
+    assert result is None
+    assert action_table.get_model().objects.count() == 0
+
+    handle_workflow_dispatch_done(history_id=workflow_history.id)
+
+    workflow_history.refresh_from_db()
+    assert workflow_history.status == HistoryStatusChoices.CANCELLED
+    assert workflow_history.message == f"Cancelled by Ada ({user.id})."
+
+    # Only the trigger ran, and its own entry resolved normally.
+    node_histories = list(
+        AutomationNodeHistory.objects.filter(workflow_history=workflow_history)
+    )
+    assert len(node_histories) == 1
+    assert node_histories[0].node_id == trigger_node.id
+    assert node_histories[0].status == HistoryStatusChoices.SUCCESS

@@ -4,15 +4,20 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('database', '0213_viewgroupby_viewsort_priority'),
+        ("database", "0213_viewgroupby_viewsort_priority"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='syncdatasynctablejob',
-            name='triggered_by',
-            field=models.CharField(choices=[('manual', 'manual'), ('periodic', 'periodic')], db_default='manual', default='manual', help_text='Whether this sync run was started manually by a user or by the periodic schedule.', max_length=10),
+            model_name="syncdatasynctablejob",
+            name="triggered_by",
+            field=models.CharField(
+                choices=[("manual", "manual"), ("periodic", "periodic")],
+                db_default="manual",
+                default="manual",
+                help_text="Whether this sync run was started manually by a user or by the periodic schedule.",
+                max_length=10,
+            ),
         ),
     ]

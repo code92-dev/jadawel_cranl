@@ -657,6 +657,7 @@ def test_get_workflow_histories(api_client, data_fixture):
                 "event_payload": None,
                 "node_histories": [],
                 "simulate_until_node": None,
+                "cancellation_requested_on": None,
             },
         ],
     }

@@ -31,6 +31,30 @@
   font-size: 11px;
 }
 
+.workflow-history__cancel {
+  margin-inline-start: 24px;
+  margin-block-start: 8px;
+  font-size: 11px;
+  color: $palette-neutral-600;
+}
+
+.workflow-history__cancel-link {
+  color: $palette-yellow-700;
+  text-decoration: underline;
+  cursor: pointer;
+
+  &:hover {
+    color: $palette-yellow-700;
+    text-decoration: none;
+  }
+
+  &--disabled {
+    color: $palette-neutral-600;
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
 .workflow-history__message {
   font-size: 12px;
   line-height: 16px;

@@ -6,3 +6,5 @@ class HistoryStatusChoices(models.TextChoices):
     ERROR = "error"
     DISABLED = "disabled"
     STARTED = "started"
+    # The run was stopped on request before all of its nodes were dispatched.
+    CANCELLED = "cancelled"

@@ -181,6 +181,7 @@ class AutomationWorkflowHistorySerializer(AutomationHistorySerializer):
             "is_test_run",
             "event_payload",
             "simulate_until_node",
+            "cancellation_requested_on",
             "node_histories",
         )
 

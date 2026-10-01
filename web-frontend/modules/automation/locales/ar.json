@@ -104,6 +104,7 @@
     "statusStarted": "في تَقَدم...",
     "statusSuccess": "ركض بنجاح",
     "statusError": "فشل التشغيل",
+    "statusCancelled": "أُلغي",
     "statusSuccessBadge": "مكتمل",
     "statusErrorBadge": "فشل",
     "statusDisabled": "تم التعطيل بواسطة جداول",
@@ -111,6 +112,10 @@
     "completedInSeconds": "اكتمل في {s} ثواني.",
     "completedInLessThanSecond": "تم الانتهاء منه في أقل من ثانية واحدة.",
     "running": "قيد التشغيل لـ {at}s",
+    "cancelRun": "إلغاء تشغيل سير العمل هذا",
+    "cancelling": "جارٍ إلغاء هذا التشغيل. سيتوقف بعد انتهاء الخطوة الحالية.",
+    "cancellationAlreadyRequestedTitle": "طُلب الإلغاء مسبقًا",
+    "cancellationAlreadyRequested": "طلب شخص آخر إلغاء هذا التشغيل مسبقًا. سيتوقف بعد انتهاء الخطوة الحالية.",
     "failedRuns": "أشواط فاشلة",
     "errorHideDetails": "إخفاء التفاصيل",
     "errorShowDetails": "إظهار التفاصيل",
@@ -137,7 +142,7 @@
   },
   "automationHistoryGuidedTourStep": {
     "title": "عرض تاريخ سير العمل",
-    "content": "استخدم لوحة السجل لمراجعة عمليات الاختبار السابقة وعمليات التنفيذ المنشورة. إنها طريقة رائعة لتصحيح النتائج أو تأكيدها."
+    "content": "استخدم لوحة السجل لمراجعة عمليات التشغيل التجريبية السابقة وعمليات التنفيذ المنشورة. إنها طريقة رائعة لتتبّع الأخطاء أو تأكيد النتائج، ويمكنك منها أيضًا إلغاء تشغيل ما زال جاريًا."
   },
   "automationPublishGuidedTourStep": {
     "title": "نشر سير العمل الخاص بك",

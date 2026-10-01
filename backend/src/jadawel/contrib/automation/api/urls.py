@@ -1,5 +1,6 @@
 from django.urls import include, path, re_path
 
+from jadawel.contrib.automation.api.history import urls as history_urls
 from jadawel.contrib.automation.api.nodes import urls as node_urls
 from jadawel.contrib.automation.api.workflows import urls as workflow_urls
 
@@ -28,6 +29,13 @@ paths_without_automation_id = [
         include(
             node_urls,
             namespace="nodes",
+        ),
+    ),
+    path(
+        "",
+        include(
+            history_urls,
+            namespace="history",
         ),
     ),
 ]
