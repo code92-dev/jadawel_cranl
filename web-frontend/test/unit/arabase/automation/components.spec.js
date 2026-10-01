@@ -11,7 +11,7 @@ describe('automation editor components', () => {
     const recipes = availableRecipes($registry)
     const triggers = $registry
       .getOrderedList('node')
-      .filter((type) => type.isTrigger)
+      .filter((type) => type.isTrigger && type.isEnabled())
 
     expect(wrapper.findAll('.recipe-card')).toHaveLength(recipes.length)
     expect(wrapper.findAll('.event-card')).toHaveLength(triggers.length)

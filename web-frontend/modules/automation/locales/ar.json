@@ -15,7 +15,8 @@
     "sampleDataModalSubTitle": "حمولة JSON",
     "sampleDataCopy": "نسخ",
     "errorOccurred": "حدث خطأ...",
-    "sampleDataCopied": "تم نسخ الحمولة إلى الحافظة"
+    "sampleDataCopied": "تم نسخ الحمولة إلى الحافظة",
+    "noHtmlContent": "لا تحتوي هذه الرسالة على محتوى HTML."
   },
   "nodeType": {
     "triggerDeletionError": "لا يمكن حذف المشغلات، بل استبدالها فقط.",

@@ -21,6 +21,7 @@ class AutomationConfig(AppConfig):
             AIAgentActionNodeType,
             CoreHttpRequestNodeType,
             CoreHTTPTriggerNodeType,
+            CoreInboundEmailTriggerNodeType,
             CoreIteratorNodeType,
             CorePeriodicTriggerNodeType,
             CoreResponseNodeType,
@@ -183,6 +184,7 @@ class AutomationConfig(AppConfig):
         automation_node_type_registry.register(LocalJadawelRowsDeletedNodeTriggerType())
         automation_node_type_registry.register(CorePeriodicTriggerNodeType())
         automation_node_type_registry.register(CoreHTTPTriggerNodeType())
+        automation_node_type_registry.register(CoreInboundEmailTriggerNodeType())
         automation_node_type_registry.register(AIAgentActionNodeType())
         automation_node_type_registry.register(SlackWriteMessageActionNodeType())
 

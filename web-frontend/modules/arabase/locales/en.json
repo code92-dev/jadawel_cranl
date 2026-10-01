@@ -797,7 +797,8 @@
     "triggerCategories": {
       "records": "Table events",
       "schedule": "Schedule",
-      "web": "Web"
+      "web": "Web",
+      "messages": "Email"
     },
     "types": {
       "local_jadawel_rows_created": {
@@ -819,6 +820,10 @@
       "http_trigger": {
         "name": "When a web request arrives",
         "description": "Starts when another system calls this workflow's web address."
+      },
+      "email_trigger": {
+        "name": "When an email arrives",
+        "description": "Starts when an email is sent to this workflow's own address."
       },
       "local_jadawel_create_row": {
         "name": "Add a row",
@@ -940,6 +945,14 @@
           "step1": "Add it to the log"
         }
       },
+      "email_to_row": {
+        "name": "Save incoming emails as rows",
+        "description": "Each email sent to the workflow's address becomes a row.",
+        "labels": {
+          "trigger": "Email arrives",
+          "step1": "Save it as a row"
+        }
+      },
       "daily_digest": {
         "name": "Daily digest",
         "description": "Every morning at 8:00, the rows that need attention, in one email.",
@@ -983,6 +996,15 @@
         "labels": {
           "trigger": "Web request",
           "step1": "Save it as a row"
+        }
+      },
+      "answer_web_request": {
+        "name": "Answer a web request from a table",
+        "description": "Another system asks for a record; the workflow looks it up and replies with it.",
+        "labels": {
+          "trigger": "Web request",
+          "step1": "Find the row",
+          "step2": "Reply with it"
         }
       },
       "send_to_system": {

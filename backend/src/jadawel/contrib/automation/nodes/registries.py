@@ -2,6 +2,8 @@ from typing import Any, Dict, Optional
 
 from django.contrib.auth.models import AbstractUser
 
+from rest_framework.exceptions import PermissionDenied
+
 from jadawel.contrib.automation.automation_dispatch_context import (
     AutomationDispatchContext,
 )
@@ -10,6 +12,7 @@ from jadawel.contrib.automation.nodes.models import AutomationNode
 from jadawel.contrib.automation.nodes.types import AutomationNodeDict, NodePositionType
 from jadawel.contrib.automation.workflows.models import AutomationWorkflow
 from jadawel.core.integrations.models import Integration
+from jadawel.core.models import Workspace
 from jadawel.core.registry import (
     CustomFieldsRegistryMixin,
     EasyImportExportMixin,
@@ -19,6 +22,9 @@ from jadawel.core.registry import (
     ModelRegistryMixin,
     PublicCustomFieldsInstanceMixin,
     Registry,
+)
+from jadawel.core.services.exceptions import (
+    ServiceImproperlyConfiguredDispatchException,
 )
 from jadawel.core.services.handler import ServiceHandler
 from jadawel.core.services.registries import ServiceTypeSubClass, service_type_registry
@@ -47,6 +53,17 @@ class AutomationNodeType(
     is_container = False
 
     class SerializedDict(AutomationNodeDict): ...
+
+    def is_deactivated(self, workspace: Workspace) -> bool:
+        """
+        Returns whether this automation node type is deactivated for the workspace.
+        """
+
+        return False
+
+    def raise_if_deactivated(self, workspace: Workspace) -> None:
+        if self.is_deactivated(workspace):
+            raise PermissionDenied("This automation node type is deactivated.")
 
     @property
     def allowed_fields(self):
@@ -288,6 +305,13 @@ class AutomationNodeType(
         automation_node: AutomationNode,
         dispatch_context: AutomationDispatchContext,
     ) -> DispatchResult:
+        if self.is_deactivated(
+            automation_node.workflow.get_original().automation.workspace
+        ):
+            raise ServiceImproperlyConfiguredDispatchException(
+                "This node type is not available for this workspace."
+            )
+
         return ServiceHandler().dispatch_service(
             automation_node.service.specific, dispatch_context
         )

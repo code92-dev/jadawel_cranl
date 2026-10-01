@@ -240,6 +240,39 @@ services:
     stdin_open: true
     tty: true
 
+  # Inbound email receiver (mox) for the "Start workflow by email" automation
+  # trigger. Opt-in via the base file's "inbound-email" profile: `just mox up`
+  # starts it next to a natively running backend, and
+  # `COMPOSE_PROFILES=optional,inbound-email` starts it as part of
+  # `just dc-dev up`. Same `email-receiver` role as production, but built from
+  # the dev image so no Go toolchain or `brew install mox` is needed.
+  email-receiver:
+    image: jadawel_backend:dev
+    # Inherited from the base file, repeated here so it is not mistaken for an
+    # omission: the receiver only exists under this profile.
+    profiles: ["inbound-email"]
+    build:
+      dockerfile: ./backend/Dockerfile
+      context: .
+      target: dev
+      args:
+        UID: $UID
+        GID: $GID
+    # The SMTP port mapping comes from the base file and is env-driven:
+    # .env.docker-dev publishes it on 127.0.0.1:2025 (off port 25, like mailhog).
+    # The web API is published on loopback too so a natively running backend
+    # (`just dev`) can delete handed-over messages through it.
+    ports:
+      - "${JADAWEL_HOST_PUBLISH_IP:-127.0.0.1}:${JADAWEL_INBOUND_EMAIL_WEBAPI_HOST_PORT:-8880}:${JADAWEL_INBOUND_EMAIL_WEBAPI_PORT:-8880}"
+    # Lets the container reach a backend running natively on the host.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    # The dev image expects the source and plugin helpers bind-mounted, like
+    # the backend service above.
+    volumes:
+      - ./backend:/jadawel/backend
+      - ./deploy/plugins/:/jadawel/plugins/
+
   mailhog:
     image: mailhog/mailhog
     logging:

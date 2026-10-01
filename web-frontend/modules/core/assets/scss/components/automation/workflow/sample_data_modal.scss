@@ -33,3 +33,19 @@
     overflow-wrap: break-word;
   }
 }
+
+.sample-data-modal__html-preview {
+  display: block;
+  inline-size: 100%;
+  block-size: 50vh;
+  border: 1px solid $palette-neutral-200;
+  background-color: $palette-neutral-0;
+
+  @include rounded($rounded);
+}
+
+.sample-data-modal__notice {
+  padding: 16px 0;
+  color: $palette-neutral-900;
+  font-size: 13px;
+}

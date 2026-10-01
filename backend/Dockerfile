@@ -27,6 +27,21 @@ RUN --mount=type=cache,target=/var/cache/apt,sharing=locked \
 
 
 # =============================================================================
+# Builder for mox (inbound SMTP receiver for the email trigger feature)
+# =============================================================================
+FROM golang:1.25-bookworm AS mox-builder
+ARG MOX_VERSION=v0.0.17
+
+SHELL ["/bin/bash", "-o", "pipefail", "-c"]
+
+# `go install` verifies the module against the Go checksum database
+# (sum.golang.org), so the pinned version is integrity-checked.
+RUN CGO_ENABLED=0 GOFLAGS=-trimpath go install "github.com/mjl-/mox@${MOX_VERSION}" && \
+    mv "$(go env GOPATH)/bin/mox" /usr/local/bin/mox && \
+    chmod 0755 /usr/local/bin/mox
+
+
+# =============================================================================
 # Production base builder stage: builds runtime dependencies only
 # =============================================================================
 FROM ${PYTHON_BASE_IMAGE} AS builder-prod-base
@@ -193,6 +208,7 @@ RUN groupadd --system --gid $GID ${DOCKER_USER} && \
 
 COPY --from=tool-builder /usr/local/bin/su-exec /usr/local/bin/su-exec
 COPY --from=tool-builder /usr/bin/tini /usr/bin/tini
+COPY --from=mox-builder /usr/local/bin/mox /usr/local/bin/mox
 # hadolint ignore=DL3022
 COPY --from=ghcr.io/astral-sh/uv:0.9.26 /uv /uvx /bin/
 
@@ -270,6 +286,7 @@ RUN getent group $GID || groupadd --system --gid $GID ${DOCKER_USER} && \
 
 COPY --from=tool-builder /usr/local/bin/su-exec /usr/local/bin/su-exec
 COPY --from=tool-builder /usr/bin/tini /usr/bin/tini
+COPY --from=mox-builder /usr/local/bin/mox /usr/local/bin/mox
 COPY --from=tool-builder /usr/bin/dos2unix /usr/local/bin/dos2unix
 # hadolint ignore=DL3022
 COPY --from=ghcr.io/astral-sh/uv:0.9.26 /uv /uvx /bin/
@@ -352,6 +369,7 @@ RUN groupadd --system --gid $GID ${DOCKER_USER} && \
 COPY ./backend/docker/mime.types /etc/
 COPY --from=tool-builder /usr/local/bin/su-exec /usr/local/bin/su-exec
 COPY --from=tool-builder /usr/bin/tini /usr/bin/tini
+COPY --from=mox-builder /usr/local/bin/mox /usr/local/bin/mox
 
 RUN mkdir -p /jadawel/media && chown -R $UID:$GID /jadawel/
 

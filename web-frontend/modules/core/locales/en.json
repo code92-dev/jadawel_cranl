@@ -1204,6 +1204,18 @@
     "nameFieldRequired": "A header name is required.",
     "nameFieldInvalid": "Header names can only contain letters, numbers, dashes, and underscores, and cannot start with a dash or underscore."
   },
+  "inboundEmailTriggerServiceForm": {
+    "title": "Email address",
+    "addressVersionTest": "Test",
+    "addressVersionPublished": "Published",
+    "copyAddress": "Copy email address",
+    "description": "Any email sent to this address will start the workflow with the email's sender, subject, body and attachment details as the payload.",
+    "limits": "Emails up to {size} MB are accepted, and the text and HTML bodies are passed on up to 1 MB each. Attachments are not stored: only their name, type and size are included in the payload.",
+    "autoForwardTip": "Tip: you can also add this address as an auto-forward rule in your own inbox, so the workflow runs whenever you receive an email.",
+    "secretWarning": "Treat this address as a secret: anyone who knows it can start this workflow.",
+    "regenerate": "Regenerate address",
+    "notConfigured": "This Jadawel instance is not configured to receive inbound email. Set the JADAWEL_INBOUND_EMAIL_DOMAIN environment variable to enable this trigger."
+  },
   "twoFactorAuthEmpty": {
     "title": "You have not yet enabled 2FA",
     "description": "Add an extra layer of security to your account.",

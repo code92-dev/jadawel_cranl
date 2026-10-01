@@ -204,6 +204,7 @@
     "sampleDataModalSubTitle": "JSON payload",
     "sampleDataCopy": "Copy",
     "errorOccurred": "An error occurred...",
-    "sampleDataCopied": "Payload copied to clipboard"
+    "sampleDataCopied": "Payload copied to clipboard",
+    "noHtmlContent": "This email has no HTML body."
   }
 }

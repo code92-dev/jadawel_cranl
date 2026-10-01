@@ -9,7 +9,8 @@
  *
  * A step is a node type, or `{ type, children }` for a container whose steps
  * run inside it (a loop). A recipe with a `schedule` sets its periodic trigger
- * to it, in the local time of whoever builds it. Names and descriptions are in
+ * to it, in the local time of whoever builds it; `triggerValues` are set on the
+ * trigger's service as they are. Names and descriptions are in
  * the locales under `automationRecipes.recipes.<key>`; the step names are
  * `labels.trigger`, then `labels.step1`… in reading order, children included.
  */
@@ -63,6 +64,12 @@ export const RECIPES = [
     trigger: 'local_jadawel_rows_deleted',
     steps: ['local_jadawel_create_row'],
   },
+  {
+    key: 'email_to_row',
+    category: 'records',
+    trigger: 'email_trigger',
+    steps: ['local_jadawel_create_row'],
+  },
   // On a schedule
   {
     key: 'daily_digest',
@@ -103,6 +110,14 @@ export const RECIPES = [
     category: 'connect',
     trigger: 'http_trigger',
     steps: ['local_jadawel_create_row'],
+  },
+  {
+    key: 'answer_web_request',
+    category: 'connect',
+    trigger: 'http_trigger',
+    steps: ['local_jadawel_get_row', 'response'],
+    // The caller waits for the Response step's answer.
+    triggerValues: { wait_for_response: true },
   },
   {
     key: 'send_to_system',
@@ -166,11 +181,15 @@ export function scheduleValues(schedule, now = new Date()) {
   return values
 }
 
-/** The recipes whose every node type is registered here. */
+/**
+ * The recipes whose every node type is registered here and enabled on this
+ * instance (the email trigger needs inbound email configured).
+ */
 export function availableRecipes(registry) {
-  return RECIPES.filter((recipe) =>
-    recipeTypes(recipe).every((type) => registry.exists('node', type))
-  )
+  const usable = (type) =>
+    registry.exists('node', type) &&
+    (registry.get?.('node', type).isEnabled?.() ?? true)
+  return RECIPES.filter((recipe) => recipeTypes(recipe).every(usable))
 }
 
 /** The available recipes by group, groups without a recipe left out. */
@@ -233,10 +252,11 @@ export async function buildRecipe({ store, client, workflow, recipe, labels }) {
       if (labels[index]) {
         values.label = labels[index]
       }
-      if (index === 0 && recipe.schedule) {
+      if (index === 0 && (recipe.schedule || recipe.triggerValues)) {
         values.service = {
           ...(stored?.service || node.service),
-          ...scheduleValues(recipe.schedule),
+          ...(recipe.schedule ? scheduleValues(recipe.schedule) : {}),
+          ...(recipe.triggerValues || {}),
         }
       }
       if (Object.keys(values).length === 0) {

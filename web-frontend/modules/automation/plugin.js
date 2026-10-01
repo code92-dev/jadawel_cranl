@@ -19,6 +19,7 @@ import {
   LocalJadawelRowsUpdatedTriggerNodeType,
   LocalJadawelRowsDeletedTriggerNodeType,
   CoreHTTPTriggerNodeType,
+  CoreInboundEmailTriggerNodeType,
   LocalJadawelAggregateRowsActionNodeType,
   CoreHttpRequestNodeType,
   CoreIteratorNodeType,
@@ -99,6 +100,7 @@ export default defineNuxtPlugin({
       new LocalJadawelRowsDeletedTriggerNodeType(context)
     )
     $registry.register('node', new CoreHTTPTriggerNodeType(context))
+    $registry.register('node', new CoreInboundEmailTriggerNodeType(context))
     $registry.register('node', new LocalJadawelCreateRowActionNodeType(context))
     $registry.register('node', new LocalJadawelUpdateRowActionNodeType(context))
     $registry.register('node', new CoreHttpRequestNodeType(context))

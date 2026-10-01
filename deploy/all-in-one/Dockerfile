@@ -79,6 +79,7 @@ RUN ln -s /opt/yarn-v1.22.22/bin/yarn /usr/local/bin/yarn
 
 # Copy su-exec from backend image (already built with pinned version + SHA256 verification)
 COPY --from=backend_image /usr/local/bin/su-exec /usr/local/bin/su-exec
+COPY --from=backend_image /usr/local/bin/mox /usr/local/bin/mox
 
 ENV POSTGRES_LOCATION=/etc/postgresql/15/main \
     UV_PROJECT_ENVIRONMENT=/jadawel/venv \
@@ -126,6 +127,8 @@ HEALTHCHECK --interval=60s CMD ["/bin/bash", "/jadawel/backend/docker/docker-ent
 ENTRYPOINT ["/jadawel.sh"]
 CMD ["start"]
 EXPOSE 80
+# SMTP for the optional email-receiver role (only bound when enabled).
+EXPOSE 25
 
 
 # =============================================================================
@@ -172,3 +175,5 @@ HEALTHCHECK --interval=60s CMD ["/bin/bash", "/jadawel/backend/docker/docker-ent
 ENTRYPOINT ["/jadawel.sh"]
 CMD ["start"]
 EXPOSE 80
+# SMTP for the optional email-receiver role (only bound when enabled).
+EXPOSE 25

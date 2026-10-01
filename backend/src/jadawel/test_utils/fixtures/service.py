@@ -4,6 +4,7 @@ from jadawel.contrib.integrations.ai.models import AIAgentService
 from jadawel.contrib.integrations.core.models import (
     CoreHTTPRequestService,
     CoreHTTPTriggerService,
+    CoreInboundEmailTriggerService,
     CoreIteratorService,
     CorePeriodicService,
     CoreResponseService,
@@ -144,6 +145,11 @@ class ServiceFixtures:
             kwargs["uid"] = uuid4()
 
         return self.create_service(CoreHTTPTriggerService, **kwargs)
+
+    def create_core_inbound_email_trigger_service(
+        self, **kwargs
+    ) -> CoreInboundEmailTriggerService:
+        return self.create_service(CoreInboundEmailTriggerService, **kwargs)
 
     def create_core_periodic_service(self, **kwargs) -> CorePeriodicService:
         return self.create_service(CorePeriodicService, **kwargs)

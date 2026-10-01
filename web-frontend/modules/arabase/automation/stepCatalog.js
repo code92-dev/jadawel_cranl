@@ -11,7 +11,7 @@ import { isSubstringOfStrings } from '@jadawel/modules/core/utils/string'
 import { pluralKeys } from '@jadawel/modules/core/utils/plural'
 
 /** What starts a workflow, in the order the start screen shows them. */
-export const TRIGGER_CATEGORIES = ['records', 'schedule', 'web']
+export const TRIGGER_CATEGORIES = ['records', 'schedule', 'web', 'messages']
 
 /** What a step does, in the order the step gallery shows them. */
 export const ACTION_CATEGORIES = ['records', 'messages', 'logic', 'ai', 'web']
@@ -43,6 +43,7 @@ export const STEP_CATALOG = {
   local_jadawel_rows_deleted: { category: 'records', icon: 'iconoir-trash' },
   periodic: { category: 'schedule', icon: 'iconoir-clock' },
   http_trigger: { category: 'web', icon: 'iconoir-globe' },
+  email_trigger: { category: 'messages', icon: 'iconoir-mail-in' },
   local_jadawel_create_row: { category: 'records', icon: 'iconoir-add-square' },
   local_jadawel_update_row: {
     category: 'records',
@@ -130,6 +131,9 @@ export function stepSections(
     return index === -1 ? order.length : index
   }
   const matching = nodeTypes
+    // A type the instance is not configured for (the email trigger without
+    // inbound email) is left out, like upstream's add-node menu does.
+    .filter((type) => !type.isEnabled || type.isEnabled())
     .filter((type) =>
       isSubstringOfStrings(
         [type.name || '', type.description || '', ...describe(type)],

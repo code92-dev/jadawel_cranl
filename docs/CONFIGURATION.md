@@ -59,6 +59,31 @@ Carried over from Baserow 2.4 (`docs/UPSTREAM_2_4_PORT.md`).
 |---|---|---|
 | `JADAWEL_AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS` | Upper bound for an HTTP trigger's "Wait for workflow response" timeout. The web request is held open while the run reaches its Response step, so a long wait ties up a web worker; and with the single Celery worker this deployment runs, a busy worker makes the caller wait or time out (`504`). Read by both the backend and the web-frontend. | `20` |
 
+### Inbound email (the "When an email arrives" trigger)
+
+The trigger gives each workflow its own address, `<token>@<domain>`. Mail reaches
+it through a bundled [mox](https://www.xmox.nl/) receiver, which accepts SMTP on
+port 25 and posts each message to the backend's inbound-email webhook. The trigger
+stays hidden, and the receiver idles, until the domain, the webhook secret and the
+receiver URL are all set.
+
+| Variable | Description | Default |
+|---|---|---|
+| `JADAWEL_INBOUND_EMAIL_DOMAIN` | Domain addresses are generated under. Its MX record must point at the host running the receiver. | — |
+| `JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET` | Shared secret the receiver sends with every webhook. Requests without it are refused. | — |
+| `JADAWEL_INBOUND_EMAIL_RECEIVER_URL` | Where the backend reaches the receiver's web API to delete each message after hand-over (mox keeps every message otherwise). Set automatically in the all-in-one image. | `http://localhost:8880` (all-in-one) |
+| `JADAWEL_INBOUND_EMAIL_RECEIVER_PASSWORD` | Password for that web API. Empty reuses the webhook secret. | webhook secret |
+| `JADAWEL_INBOUND_EMAIL_MAX_MESSAGE_SIZE_MB` | Largest email the receiver accepts; shown next to the address. | `25` |
+
+The all-in-one image starts the receiver under supervisor once the domain and secret
+are set, and exposes port 25. **CranL routes HTTP only**, so on the current
+deployment the receiver cannot be reached by sending mail servers: running the
+trigger there needs the receiver on a host that accepts inbound SMTP (any VPS with
+port 25 open), pointed at the app's webhook with `JADAWEL_INBOUND_EMAIL_WEBHOOK_URL`.
+The remaining receiver knobs (`JADAWEL_INBOUND_EMAIL_SMTP_HOSTNAME`, `_TLS_*`,
+`_WEBAPI_*`) are read by `backend/docker/generate-mox-config.sh`; see the
+`email-receiver` service in `docker-compose.yml`.
+
 ## Database backups
 
 Read by `arabase.backup` and the `arabase.tasks.backup_database` Celery task. All of

@@ -22,6 +22,19 @@ three-way merge (upstream file before the PR → after the PR, renamed `baserow`
 are in `docs/UPSTREAM_2_4_PORT.md`. Files that exist only because of the port (new
 components, migrations, tests) are not listed.
 
+### Trigger workflows with inbound email (upstream #5730, `620fcc9a`)
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/contrib/integrations/core/{models,service_types,exceptions}.py`, `integrations/{apps,tasks}.py` | `CoreInboundEmailTriggerService` (token address, test-/published versions), its service type, the message-sweep task (task name pinned `jadawel.…` like the rest) | The trigger and its receiver hand-over |
+| `backend/src/jadawel/contrib/automation/nodes/{models,node_types,registries,service}.py`, `nodes/ws/signals.py`, `apps.py` | `CoreInboundEmailTriggerNodeType`; upstream's `is_deactivated`/`raise_if_deactivated` hook, which the fork lacked, enforced on create, replace and dispatch | The trigger is refused until inbound email is configured |
+| `backend/src/jadawel/api/settings/serializers.py` | Public `inbound_email_enabled` | The UI hides the trigger otherwise |
+| `backend/src/jadawel/config/settings/{base,dev}.py`, `docker-compose*.yml`, `.env.docker-dev.example`, `justfile` (+ new `mox.just`) | `JADAWEL_INBOUND_EMAIL_*`, the opt-in `email-receiver` service (`inbound-email` profile), dev recipes | Running the receiver |
+| `backend/Dockerfile`, `backend/docker/docker-entrypoint.sh`, `deploy/all-in-one/{Dockerfile,supervisor/start.sh,supervisor/default_jadawel_env.sh}` | Builds mox v0.0.17 in a Go stage; `email-receiver` entrypoint role and healthcheck; supervisor program enabled only when configured; `EXPOSE 25` | Same image runs the receiver when asked |
+| `web-frontend/modules/automation/components/{sidebar/SampleDataModal,form/SimulateDispatchNodeForm}.vue`, `core/assets/scss/components/automation/workflow/sample_data_modal.scss` | Sandboxed HTML tab for an email's sample data. Upstream did this in `core/components/SampleDataModal.vue`, which only exists after a 2.3 move the fork did not take | Preview a received email safely |
+| `web-frontend/modules/automation/{nodeTypes,plugin,realtime}.js`, `store/automationWorkflowNode.js`, `components/workflow/WorkflowAddNodeMenu.vue`, `core/serviceTypes.js`, `integrations/{core/serviceTypes,plugin}.js`, `core/assets/scss/components/all.scss` | Email trigger node/service types, `isEnabled()` gate, refetch on token regeneration | UI |
+| `web-frontend/modules/arabase/automation/{stepCatalog,recipes}.js` | Email trigger in a new "Email" start category; gallery and recipes skip types that are not enabled; recipes can set trigger values; recipes "Save incoming emails as rows" and "Answer a web request from a table" | Fork's step gallery requires every step in a recipe |
+
 ### Return responses from workflows (upstream #5595 `e83d5923`, fixes #6168 `d6853c80`, #6182 `0813d110`)
 
 | File | Change | Reason |

@@ -52,6 +52,7 @@ class IntegrationsConfig(AppConfig):
         from jadawel.contrib.integrations.core.service_types import (
             CoreHTTPRequestServiceType,
             CoreHTTPTriggerServiceType,
+            CoreInboundEmailTriggerServiceType,
             CoreIteratorServiceType,
             CorePeriodicServiceType,
             CoreResponseServiceType,
@@ -63,6 +64,7 @@ class IntegrationsConfig(AppConfig):
         service_type_registry.register(CoreSMTPEmailServiceType())
         service_type_registry.register(CoreRouterServiceType())
         service_type_registry.register(CoreHTTPTriggerServiceType())
+        service_type_registry.register(CoreInboundEmailTriggerServiceType())
         service_type_registry.register(CoreIteratorServiceType())
         service_type_registry.register(CorePeriodicServiceType())
         service_type_registry.register(CoreResponseServiceType())

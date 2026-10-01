@@ -160,6 +160,7 @@ class AutomationNodeService:
             workspace=workflow.automation.workspace,
             context=workflow,
         )
+        node_type.raise_if_deactivated(workflow.automation.workspace)
 
         try:
             reference_node = (
@@ -381,6 +382,7 @@ class AutomationNodeService:
 
         if not existing_node:
             new_node_type = automation_node_type_registry.get(new_node_type_str)
+            new_node_type.raise_if_deactivated(automation.workspace)
             node_type.before_replace(node_to_replace, new_node_type)
 
             prepared_values = new_node_type.prepare_values({}, user)

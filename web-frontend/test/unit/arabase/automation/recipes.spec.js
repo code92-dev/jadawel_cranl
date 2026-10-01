@@ -14,6 +14,21 @@ const lookup = (messages, key) =>
   key.split('.').reduce((value, part) => value?.[part], messages)
 
 describe('automation recipes', () => {
+  // Every recipe is offered on an instance configured for every trigger; the
+  // email trigger is the one that depends on configuration (inbound email).
+  let settings
+  beforeEach(() => {
+    const { $store } = useNuxtApp()
+    settings = $store.getters['settings/get']
+    $store.commit('settings/SET_SETTINGS', {
+      ...settings,
+      inbound_email_enabled: true,
+    })
+  })
+  afterEach(() => {
+    useNuxtApp().$store.commit('settings/SET_SETTINGS', settings)
+  })
+
   test('every recipe starts with a trigger, continues with actions and is named', () => {
     const { $registry } = useNuxtApp()
 
@@ -191,5 +206,19 @@ describe('automation recipes', () => {
     expect([local.getDay(), local.getHours(), local.getMinutes()]).toEqual([
       0, 8, 30,
     ])
+  })
+
+  test('the email recipe is only offered once inbound email is configured', () => {
+    const { $registry, $store } = useNuxtApp()
+    const offered = () =>
+      availableRecipes($registry).map((recipe) => recipe.key)
+
+    expect(offered()).toContain('email_to_row')
+
+    $store.commit('settings/SET_SETTINGS', {
+      ...settings,
+      inbound_email_enabled: false,
+    })
+    expect(offered()).not.toContain('email_to_row')
   })
 })

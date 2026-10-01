@@ -919,6 +919,36 @@ INTEGRATION_ALLOW_SMTP_SERVICE_TO_USE_INSTANCE_SETTINGS = str_to_bool(
     os.getenv("JADAWEL_INTEGRATION_ALLOW_SMTP_SERVICE_TO_USE_INSTANCE_SETTINGS", "true")
 )
 
+# The domain used to generate inbound email addresses for email triggers, e.g.
+# "inbound.jadawel.io" results in addresses like "{token}@inbound.jadawel.io".
+# When empty, the email trigger feature is not configured on this instance.
+INBOUND_EMAIL_DOMAIN = os.getenv("JADAWEL_INBOUND_EMAIL_DOMAIN", "")
+# The shared secret the inbound mail server must send in the Authorization
+# header when delivering inbound email webhooks to this instance. When empty,
+# the inbound email webhook endpoint rejects all requests.
+INBOUND_EMAIL_WEBHOOK_SECRET = os.getenv("JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET", "")
+# The password the backend authenticates with when deleting handed-over messages
+# through the bundled mail server's web API. Empty means the webhook secret is
+# used (see `inbound_email_receiver.py`), so one secret configures the whole
+# feature; set it to keep the secret that travels in every webhook request out
+# of the receiver's credentials.
+INBOUND_EMAIL_RECEIVER_PASSWORD = os.getenv(
+    "JADAWEL_INBOUND_EMAIL_RECEIVER_PASSWORD", ""
+)
+# The largest raw email, in MB, the bundled inbound mail server accepts. The
+# limit itself is enforced by the mail server (see generate-mox-config.sh); it
+# is mirrored here so it can be shown next to the trigger's address.
+INBOUND_EMAIL_MAX_MESSAGE_SIZE_MB = int(
+    os.getenv("JADAWEL_INBOUND_EMAIL_MAX_MESSAGE_SIZE_MB") or 25
+)
+# Where the backend reaches the bundled inbound mail server's web API. Mox keeps
+# every accepted message on disk and has no retention setting, so the backend
+# deletes each message through this API shortly after receiving its webhook.
+# Empty disables that (see `inbound_email_receiver.py`).
+INBOUND_EMAIL_RECEIVER_URL = os.getenv("JADAWEL_INBOUND_EMAIL_RECEIVER_URL", "").rstrip(
+    "/"
+)
+
 AUTOMATION_HISTORY_PAGE_SIZE_LIMIT = int(
     os.getenv("JADAWEL_AUTOMATION_HISTORY_PAGE_SIZE_LIMIT", 100)
 )

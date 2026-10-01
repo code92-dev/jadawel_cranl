@@ -100,6 +100,11 @@ x-backend-variables: &backend-variables
   JADAWEL_INTEGRATION_LOCAL_JADAWEL_PAGE_SIZE_LIMIT:
   JADAWEL_AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS:
   JADAWEL_INTEGRATION_ALLOW_SMTP_SERVICE_TO_USE_INSTANCE_SETTINGS:
+  JADAWEL_INBOUND_EMAIL_DOMAIN:
+  JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET:
+  JADAWEL_INBOUND_EMAIL_RECEIVER_URL: ${JADAWEL_INBOUND_EMAIL_RECEIVER_URL:-http://email-receiver:8880}
+  JADAWEL_INBOUND_EMAIL_RECEIVER_PASSWORD:
+  JADAWEL_INBOUND_EMAIL_MAX_MESSAGE_SIZE_MB:
   BATCH_ROWS_SIZE_LIMIT:
   INITIAL_TABLE_DATA_LIMIT:
   JADAWEL_FILE_UPLOAD_SIZE_LIMIT_MB:
@@ -171,7 +176,7 @@ x-backend-variables: &backend-variables
   POSTHOG_PROJECT_API_KEY:
   POSTHOG_HOST:
 
-  PRIVATE_BACKEND_URL: http://backend:8000
+  PRIVATE_BACKEND_URL: ${PRIVATE_BACKEND_URL:-http://backend:8000}
   PUBLIC_BACKEND_URL:
   PUBLIC_WEB_FRONTEND_URL:
   JADAWEL_EMBEDDED_SHARE_URL:
@@ -534,6 +539,52 @@ services:
     networks:
       local:
 
+  # Receives inbound email for the "Start workflow by email" automation trigger
+  # and forwards it to the backend. Opt-in through the "inbound-email" Compose
+  # profile (COMPOSE_PROFILES=inbound-email): Compose cannot publish a port
+  # conditionally, so without the profile the SMTP port below would be bound on
+  # the host of every installation, including the ones that never use the
+  # trigger. Also set JADAWEL_INBOUND_EMAIL_DOMAIN and
+  # JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET; the service idles until both are
+  # present. Runs as root because mox binds its sockets as root and then drops
+  # privileges itself.
+  email-receiver:
+    image: jadawel/backend:${JADAWEL_VERSION:-2.2.2}
+    profiles: ["inbound-email"]
+    restart: unless-stopped
+    user: root
+    command: email-receiver
+    ports:
+      - "${JADAWEL_INBOUND_EMAIL_HOST_PUBLISH_IP:-${HOST_PUBLISH_IP:-0.0.0.0}}:${JADAWEL_INBOUND_EMAIL_HOST_SMTP_PORT:-25}:25"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/jadawel/backend/docker/docker-entrypoint.sh email-receiver-healthcheck",
+        ]
+    environment:
+      JADAWEL_INBOUND_EMAIL_DOMAIN:
+      JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET:
+      JADAWEL_INBOUND_EMAIL_WEBHOOK_URL:
+      JADAWEL_INBOUND_EMAIL_SMTP_HOSTNAME:
+      JADAWEL_INBOUND_EMAIL_SMTP_PORT:
+      JADAWEL_INBOUND_EMAIL_TLS_MODE:
+      JADAWEL_INBOUND_EMAIL_TLS_CERT_FILE:
+      JADAWEL_INBOUND_EMAIL_TLS_KEY_FILE:
+      JADAWEL_INBOUND_EMAIL_MAX_MESSAGE_SIZE_MB:
+      JADAWEL_INBOUND_EMAIL_WEBAPI_PORT:
+      JADAWEL_INBOUND_EMAIL_WEBAPI_BIND_IP:
+      JADAWEL_INBOUND_EMAIL_RECEIVER_PASSWORD:
+      PRIVATE_BACKEND_URL: ${PRIVATE_BACKEND_URL:-http://backend:8000}
+      JADAWEL_DEPLOYMENT_ENV:
+      OTEL_RESOURCE_ATTRIBUTES:
+    depends_on:
+      - backend
+    volumes:
+      - mox_data:/jadawel/data/mox
+    networks:
+      local:
+
   db:
     image: pgvector/pgvector:pg15
     # If you were using a previous version, perform the update by uncommenting the
@@ -619,6 +670,7 @@ volumes:
   redisdata:
   mcp_protection_redisdata:
   media:
+  mox_data:
   caddy_data:
   caddy_config:
 

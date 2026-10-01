@@ -10,6 +10,7 @@ from jadawel.contrib.automation.nodes.models import (
 )
 from jadawel.contrib.automation.nodes.node_types import (
     CoreHTTPTriggerNodeType,
+    CoreInboundEmailTriggerNodeType,
     CoreIteratorNodeType,
     CorePeriodicTriggerNodeType,
     CoreResponseNodeType,
@@ -196,6 +197,13 @@ class AutomationNodeFixtures:
         return self.create_automation_node(
             user=user,
             type=CoreHTTPTriggerNodeType.type,
+            **kwargs,
+        )
+
+    def create_inbound_email_trigger_node(self, user=None, **kwargs):
+        return self.create_automation_node(
+            user=user,
+            type=CoreInboundEmailTriggerNodeType.type,
             **kwargs,
         )
 

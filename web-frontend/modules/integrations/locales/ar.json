@@ -269,6 +269,8 @@
     "localJadawelRowsDeletedDescription": "يتم تشغيله عند حذف الصفوف في جدول جداول.",
     "coreHTTPTrigger": "تلقي طلب HTTP",
     "coreHTTPTriggerDescription": "يتم تشغيله عند تلقي طلب HTTP.",
+    "inboundEmailTrigger": "عند وصول بريد إلكتروني",
+    "inboundEmailTriggerDescription": "يبدأ عند وصول رسالة إلى عنوان البريد الإلكتروني الذي أُنشئ لسير العمل.",
     "coreHTTPRequest": "إرسال طلب HTTP",
     "coreHTTPRequestDescription": "يرسل طلب HTTP إلى نقطة نهاية محددة.",
     "coreSMTPEmail": "إرسال البريد الإلكتروني",

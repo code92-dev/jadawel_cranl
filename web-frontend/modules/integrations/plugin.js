@@ -15,6 +15,7 @@ import {
   LocalJadawelRowsDeletedTriggerServiceType,
 } from '@jadawel/modules/integrations/localJadawel/serviceTypes'
 import {
+  CoreInboundEmailTriggerServiceType,
   CoreHTTPRequestServiceType,
   PeriodicTriggerServiceType,
   CoreRouterServiceType,
@@ -61,6 +62,10 @@ export default defineNuxtPlugin({
     $registry.register('service', new CoreSMTPEmailServiceType(context))
     $registry.register('service', new CoreRouterServiceType(context))
     $registry.register('service', new CoreHTTPTriggerServiceType(context))
+    $registry.register(
+      'service',
+      new CoreInboundEmailTriggerServiceType(context)
+    )
     $registry.register('service', new CoreIteratorServiceType(context))
     $registry.register('service', new CoreResponseServiceType(context))
     $registry.register('service', new AIAgentServiceType(context))

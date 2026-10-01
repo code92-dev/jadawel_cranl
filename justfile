@@ -179,7 +179,7 @@ dev *ARGS:
             done
             echo ""
             echo "==> Docker Services"
-            just dc-dev ps redis db mailhog otel-collector 2>/dev/null || echo "  Not running"
+            just dc-dev ps redis db mailhog otel-collector email-receiver 2>/dev/null || echo "  Not running"
             ;;
         tmux)
             just _dev-tmux
@@ -300,6 +300,19 @@ _dev-start:
     echo "$FRONTEND_PID" > /tmp/jadawel-frontend.pid
     echo "$STORYBOOK_PID" > /tmp/jadawel-storybook.pid
 
+    # Inbound email receiver (mox): only when the trigger is configured in
+    # .env.local; `just mox up -d` runs it in Docker next to the native backend.
+    INBOUND_EMAIL_STATUS="not configured (set JADAWEL_INBOUND_EMAIL_DOMAIN and JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET in .env.local)"
+    if [[ -n "${JADAWEL_INBOUND_EMAIL_DOMAIN:-}" && -n "${JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET:-}" ]]; then
+        echo ""
+        echo "==> Starting inbound email receiver (mox) in Docker..."
+        if just mox up -d; then
+            INBOUND_EMAIL_STATUS="SMTP on localhost:${JADAWEL_INBOUND_EMAIL_HOST_SMTP_PORT:-2025} for ${JADAWEL_INBOUND_EMAIL_DOMAIN} (just mox address)"
+        else
+            INBOUND_EMAIL_STATUS="failed to start (see output above; run 'just mox up' to retry)"
+        fi
+    fi
+
     echo ""
     echo "=============================================="
     echo "Jadawel local development environment started!"
@@ -310,6 +323,7 @@ _dev-start:
     echo "  Frontend:  http://localhost:3000"
     echo "  Storybook: http://localhost:6006"
     echo "  Mailhog:   http://localhost:8025"
+    echo "  Inbound email: ${INBOUND_EMAIL_STATUS}"
     echo ""
     echo "Commands:"
     echo "  just dev logs              # View logs"
@@ -364,6 +378,9 @@ _dev-stop:
         rm -f /tmp/jadawel-storybook.pid
     fi
 
+    # Stop the inbound email receiver if `just dev up` started it, before the
+    # stack's network goes away underneath it.
+    just mox _down-docker 2>/dev/null || true
     # Stop docker services
     echo "Stopping Docker services..."
     just dc-dev down
@@ -417,6 +434,11 @@ _dev-tmux:
     create_window "celery"    "$ROOT/backend"       "just run-dev-celery"
     create_window "db"        "$ROOT"               "just dc-dev logs -f db"       "PGPASSWORD=${DATABASE_PASSWORD:-jadawel} just dc-dev exec db psql -U ${DATABASE_USER:-jadawel} -d ${DATABASE_NAME:-jadawel}"
     create_window "redis"     "$ROOT"               "just dc-dev logs -f redis"    "just dc-dev exec redis redis-cli -a ${REDIS_PASSWORD:-jadawel}"
+    # Inbound email receiver (mox), only when the trigger is configured in
+    # .env.local: the receiver in the left pane, the trigger addresses on the right.
+    if [[ -n "${JADAWEL_INBOUND_EMAIL_DOMAIN:-}" && -n "${JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET:-}" ]]; then
+        create_window "mox"   "$ROOT"               "just mox up"                  "just mox address"
+    fi
 
     # Kill the temporary window
     tmux kill-window -t $SESSION:_tmp
@@ -442,6 +464,12 @@ frontend *args:
 
 # Shortcut alias for frontend
 alias f := frontend
+
+# Run any mox recipe for local "Start workflow by email" testing
+[group('1 - local-dev')]
+[doc("Run mox command: just mox <cmd> (e.g., mox init, mox up, mox send)")]
+mox *args:
+    @just --justfile mox.just {{ args }}
 
 # Run all linters (backend + frontend)
 [group('1 - local-dev')]
@@ -532,6 +560,19 @@ dc-dev *ARGS:
             mkdir -p web-frontend/node_modules
         fi
 
+        # Enable the "inbound-email" profile (mox receiver) automatically once
+        # .env.docker-dev configures the trigger, so no COMPOSE_PROFILES edit is
+        # needed. Read from the file on purpose: the native `just dev` flow
+        # starts its own receiver via `just mox up -d`.
+        _env_value() { grep -E "^$1=" .env.docker-dev 2>/dev/null | tail -1 | cut -d= -f2- | sed 's/[[:space:]]*#.*$//; s/^["'"'"']//; s/["'"'"']$//'; }
+        if [[ -n "$(_env_value JADAWEL_INBOUND_EMAIL_DOMAIN)" && -n "$(_env_value JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET)" ]]; then
+            PROFILES="${COMPOSE_PROFILES:-$(_env_value COMPOSE_PROFILES)}"
+            case ",${PROFILES}," in
+                *,inbound-email,*) ;;
+                *) PROFILES="${PROFILES:+${PROFILES},}inbound-email" ;;
+            esac
+            export COMPOSE_PROFILES="$PROFILES"
+        fi
         DC="docker compose --env-file .env.docker-dev -f docker-compose.yml -f docker-compose.dev.yml"
         ALLARGS=({{ ARGS }})
         CMD="${ALLARGS[0]:-}"
@@ -599,6 +640,12 @@ _dc-dev-tmux:
     create_window "celery"   "just dc-dev exec celery bash" "just dc-dev logs -f celery celery-beat-worker celery-export-worker"
     create_window "db"       "just dc-dev exec db psql -U jadawel" "just dc-dev logs -f db"
     create_window "redis"    "just dc-dev exec redis redis-cli"   "just dc-dev logs -f redis"
+    # Inbound email receiver (mox): `just dc-dev up` starts it when
+    # .env.docker-dev sets both variables, so give it a window too.
+    if grep -qE '^JADAWEL_INBOUND_EMAIL_DOMAIN=.+' .env.docker-dev 2>/dev/null \
+        && grep -qE '^JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET=.+' .env.docker-dev 2>/dev/null; then
+        create_window "mox"  "just dc-dev exec email-receiver bash" "just dc-dev logs -f email-receiver"
+    fi
 
     # Kill the temporary window
     tmux kill-window -t $SESSION:_tmp
@@ -695,6 +742,12 @@ _dc-dev-tabs *ARGS:
     launch_tab_and_attach "celery" "celery"
     launch_tab_and_attach "export worker" "celery-export-worker"
     launch_tab_and_attach "beat worker" "celery-beat-worker"
+    # Inbound email receiver (mox), started by `just dc-dev up` when
+    # .env.docker-dev sets both variables.
+    if grep -qE '^JADAWEL_INBOUND_EMAIL_DOMAIN=.+' .env.docker-dev 2>/dev/null \
+        && grep -qE '^JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET=.+' .env.docker-dev 2>/dev/null; then
+        launch_tab_and_attach "mox" "email-receiver"
+    fi
 
     # Open lint tabs
     launch_tab_and_exec "web frontend lint" \

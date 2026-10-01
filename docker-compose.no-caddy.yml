@@ -15,6 +15,11 @@
 #      to the URL the user's browser can access the files on.
 #   4. Ensure requests sent to the backend in /ws path are upgraded to websocket
 #      connections.
+#   5. (Optional) To use the "Start workflow by email" automation trigger, enable
+#      the "inbound-email" profile (COMPOSE_PROFILES=inbound-email) and set
+#      JADAWEL_INBOUND_EMAIL_DOMAIN, JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET and
+#      JADAWEL_INBOUND_EMAIL_HOST_PUBLISH_IP=0.0.0.0 so the email-receiver's SMTP
+#      port is reachable by sending mail servers. See the email-receiver service.
 #
 # Example reverse-proxy configurations live under `deploy/nginx/` and `deploy/apache/`.
 #
@@ -128,7 +133,7 @@ x-backend-variables:
   POSTHOG_PROJECT_API_KEY:
   POSTHOG_HOST:
 
-  PRIVATE_BACKEND_URL: http://backend:8000
+  PRIVATE_BACKEND_URL: ${PRIVATE_BACKEND_URL:-http://backend:8000}
   JADAWEL_PUBLIC_URL:
   MEDIA_URL:
   MEDIA_ROOT:
@@ -167,6 +172,11 @@ x-backend-variables:
   JADAWEL_WEBHOOKS_REQUEST_TIMEOUT_SECONDS:
   JADAWEL_INTEGRATIONS_ALLOW_PRIVATE_ADDRESS:
   JADAWEL_INTEGRATIONS_PERIODIC_MINUTE_MIN:
+  JADAWEL_INBOUND_EMAIL_DOMAIN:
+  JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET:
+  JADAWEL_INBOUND_EMAIL_RECEIVER_URL: ${JADAWEL_INBOUND_EMAIL_RECEIVER_URL:-http://email-receiver:8880}
+  JADAWEL_INBOUND_EMAIL_RECEIVER_PASSWORD:
+  JADAWEL_INBOUND_EMAIL_MAX_MESSAGE_SIZE_MB:
   JADAWEL_ENTERPRISE_AUDIT_LOG_CLEANUP_INTERVAL_MINUTES:
   JADAWEL_ENTERPRISE_AUDIT_LOG_RETENTION_DAYS:
   JADAWEL_ALLOW_MULTIPLE_SSO_PROVIDERS_FOR_SAME_ACCOUNT:
@@ -344,6 +354,58 @@ services:
     networks:
       local:
 
+  # Receives inbound email for the "Start workflow by email" automation trigger
+  # and forwards it to the backend. Opt-in through the "inbound-email" Compose
+  # profile (COMPOSE_PROFILES=inbound-email): Compose cannot publish a port
+  # conditionally, so without the profile the SMTP port below would be bound on
+  # the host of every installation, including the ones that never use the
+  # trigger. Also set JADAWEL_INBOUND_EMAIL_DOMAIN and
+  # JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET; the service idles until both are
+  # present. Runs as root because mox binds its sockets as root and then drops
+  # privileges itself.
+  #
+  # Like the other services in this file, the SMTP port is only published on the
+  # loopback address by default. Sending mail servers connect to port 25 directly
+  # (a HTTP reverse proxy cannot forward SMTP), so to receive inbound email set
+  # JADAWEL_INBOUND_EMAIL_HOST_PUBLISH_IP=0.0.0.0 to publish only this port on all
+  # interfaces without also exposing the backend and web-frontend ports.
+  email-receiver:
+    image: jadawel/backend:${JADAWEL_VERSION:-2.2.2}
+    profiles: ["inbound-email"]
+    restart: unless-stopped
+    user: root
+    command: email-receiver
+    ports:
+      - "${JADAWEL_INBOUND_EMAIL_HOST_PUBLISH_IP:-${HOST_PUBLISH_IP:-127.0.0.1}}:${JADAWEL_INBOUND_EMAIL_HOST_SMTP_PORT:-25}:25"
+    healthcheck:
+      test:
+        [
+          "CMD-SHELL",
+          "/jadawel/backend/docker/docker-entrypoint.sh email-receiver-healthcheck",
+        ]
+    environment:
+      JADAWEL_INBOUND_EMAIL_DOMAIN:
+      JADAWEL_INBOUND_EMAIL_WEBHOOK_SECRET:
+      JADAWEL_INBOUND_EMAIL_WEBHOOK_URL:
+      JADAWEL_INBOUND_EMAIL_SMTP_HOSTNAME:
+      JADAWEL_INBOUND_EMAIL_SMTP_PORT:
+      JADAWEL_INBOUND_EMAIL_TLS_MODE:
+      JADAWEL_INBOUND_EMAIL_TLS_CERT_FILE:
+      JADAWEL_INBOUND_EMAIL_TLS_KEY_FILE:
+      JADAWEL_INBOUND_EMAIL_MAX_MESSAGE_SIZE_MB:
+      JADAWEL_INBOUND_EMAIL_WEBAPI_PORT:
+      JADAWEL_INBOUND_EMAIL_WEBAPI_BIND_IP:
+      JADAWEL_INBOUND_EMAIL_RECEIVER_PASSWORD:
+      PRIVATE_BACKEND_URL: ${PRIVATE_BACKEND_URL:-http://backend:8000}
+      JADAWEL_DEPLOYMENT_ENV:
+      OTEL_RESOURCE_ATTRIBUTES:
+    depends_on:
+      - backend
+    volumes:
+      - mox_data:/jadawel/data/mox
+    networks:
+      local:
+
   db:
     image: pgvector/pgvector:pg15
     restart: unless-stopped
@@ -407,6 +469,7 @@ volumes:
   pgdata:
   mcp_protection_redisdata:
   media:
+  mox_data:
   caddy_data:
   caddy_config:
 
