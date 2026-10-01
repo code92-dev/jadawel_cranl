@@ -788,6 +788,7 @@ class DatabaseConfig(AppConfig):
         from .airtable.operations import RunAirtableImportJobOperationType
         from .data_sync.operations import (
             GetIncludingPublicValuesOperationType,
+            ListDataSyncJobsOperationType,
             ListPropertiesOperationType,
             SyncTableOperationType,
         )
@@ -1005,6 +1006,7 @@ class DatabaseConfig(AppConfig):
         operation_type_registry.register(DeleteViewFilterGroupOperationType())
         operation_type_registry.register(ReadViewFilterGroupOperationType())
         operation_type_registry.register(SyncTableOperationType())
+        operation_type_registry.register(ListDataSyncJobsOperationType())
         operation_type_registry.register(ListPropertiesOperationType())
         operation_type_registry.register(GetIncludingPublicValuesOperationType())
 

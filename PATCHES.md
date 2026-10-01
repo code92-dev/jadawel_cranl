@@ -14,6 +14,24 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Baserow 2.4 feature port (2026-10-01)
+
+Seven Baserow 2.4.0 features, each carried over from its upstream pull request by a
+three-way merge (upstream file before the PR → after the PR, renamed `baserow` →
+`jadawel`, applied onto the fork file). Scope, upstream commits and every adaptation
+are in `docs/UPSTREAM_2_4_PORT.md`. Files that exist only because of the port (new
+components, migrations, tests) are not listed.
+
+### Data Sync history (upstream #5706, `3486ba23`)
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/core/jobs/{handler,registries,tasks}.py`, `api/jobs/{serializers,views}.py` | Job listing accepts per-type filters and lets a job type widen the user scope; `JobType.enhance_queryset` / `get_filters_serializer` hooks | Other members' and periodic sync runs must be listable for a data sync |
+| `backend/src/jadawel/contrib/database/data_sync/{job_types,models,operations}.py`, `api/data_sync/serializers.py`, `apps.py` | `SyncDataSyncTableJob.triggered_by`, `ListDataSyncJobsOperationType`, run listing scoped by that permission, sync errors persisted from `on_error`; takes upstream's 2.3 one-run-per-data-sync guard and cancel cleanup along with it | Record every run and show it in the table's sync settings |
+| `web-frontend/modules/core/{mixins/job.js,store/job.js}` | Job store/mixin can poll a job that was started elsewhere | "Previous runs" attaches to an in-flight run |
+| `web-frontend/modules/database/components/dataSync/SyncTableModal.vue` | Shows the run history and attaches to a running run; keeps the fork's `jobProgress` poller (`startJobPoller`) instead of upstream's `createAndMonitorJob` | Fork's data sync modals use the older poller |
+| `web-frontend/modules/database/{configureDataSyncTypes,plugin}.js`, `services/dataSync.js`, `core/assets/scss/components/all.scss` | New "Sync history" tab, run-list service call, stylesheet import | UI entry points |
+
 ## Right-sized in-app logo (2026-10-01)
 
 | File | Change | Reason |

@@ -8,7 +8,18 @@
   "configureDataSyncModal": {
     "title": "مزامنة البيانات",
     "syncedFields": "الحقول المتزامنة",
-    "syncSettings": "إعدادات المزامنة"
+    "syncSettings": "إعدادات المزامنة",
+    "syncHistory": "سجل المزامنة"
+  },
+  "dataSyncRuns": {
+    "title": "سجل المزامنة",
+    "description": "أحدث عمليات المزامنة لهذا الجدول، أيًّا كان من بدأها أو ما بدأها.",
+    "previousRuns": "عمليات المزامنة السابقة",
+    "noRuns": "لم تتم مزامنة هذا الجدول بعد.",
+    "triggerManual": "يدوية",
+    "triggerPeriodic": "دورية",
+    "byUser": "بواسطة {name}",
+    "duration": "{seconds} ث"
   },
   "configureDataSyncSettings": {
     "title": "تغيير مزامنة البيانات",

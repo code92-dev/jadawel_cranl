@@ -361,6 +361,7 @@ import {
 import {
   SyncedFieldsConfigureDataSyncType,
   SettingsConfigureDataSyncType,
+  SyncHistoryConfigureDataSyncType,
 } from '@jadawel/modules/database/configureDataSyncTypes'
 import { DatabaseGuidedTourType } from '@jadawel/modules/database/guidedTourTypes'
 import {
@@ -1070,6 +1071,10 @@ export default defineNuxtPlugin({
     $registry.register(
       'configureDataSync',
       new SettingsConfigureDataSyncType(context)
+    )
+    $registry.register(
+      'configureDataSync',
+      new SyncHistoryConfigureDataSyncType(context)
     )
 
     $registry.register('guidedTour', new DatabaseGuidedTourType(context))

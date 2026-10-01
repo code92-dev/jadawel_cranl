@@ -1,7 +1,7 @@
 <template>
   <Modal
     ref="modal"
-    :can-close="!syncLoading && !jobIsRunning"
+    :can-close="!syncLoading && (!jobIsRunning || attachedToExistingRun)"
     @hidden="hidden"
   >
     <template #content>
@@ -16,18 +16,18 @@
       <Error :error="error"></Error>
       <div class="modal-progress__actions margin-top-2">
         <ProgressBar
-          v-if="syncLoading || jobIsRunning || jobHasSucceeded"
+          v-if="syncLoading || jobIsRunning || jobIsFinished"
           :value="job?.progress_percentage || 0"
           :status="jobHumanReadableState"
         />
         <div class="align-right">
           <Button
-            v-if="!jobHasSucceeded"
+            v-if="!jobIsFinished"
             type="primary"
             size="large"
             :disabled="syncLoading || jobIsRunning"
             :loading="syncLoading || jobIsRunning"
-            @click="syncTable(table)"
+            @click="startSync()"
           >
             {{ $t('syncTableModal.sync') }}
           </Button>
@@ -36,6 +36,13 @@
           }}</Button>
         </div>
       </div>
+      <div v-if="table.data_sync" class="margin-top-3">
+        <h3>{{ $t('dataSyncRuns.previousRuns') }}</h3>
+        <DataSyncRunsList
+          :data-sync-id="table.data_sync.id"
+          @running-job="attachToRunningJob"
+        />
+      </div>
     </template>
   </Modal>
 </template>
@@ -43,9 +50,11 @@
 <script>
 import modal from '@jadawel/modules/core/mixins/modal'
 import dataSync from '@jadawel/modules/database/mixins/dataSync'
+import DataSyncRunsList from '@jadawel/modules/database/components/dataSync/DataSyncRunsList'
 
 export default {
   name: 'SyncTableModal',
+  components: { DataSyncRunsList },
   mixins: [modal, dataSync],
   props: {
     table: {
@@ -53,11 +62,28 @@ export default {
       required: true,
     },
   },
+  data() {
+    return {
+      attachedToExistingRun: false,
+    }
+  },
   methods: {
     show() {
       this.job = null
+      this.attachedToExistingRun = false
       this.hideError()
       modal.methods.show.bind(this)()
+    },
+    startSync() {
+      this.attachedToExistingRun = false
+      return this.syncTable(this.table)
+    },
+    // Show an in-flight run's progress instead of failing with "already running".
+    attachToRunningJob(job) {
+      if (!this.jobIsRunning) {
+        this.attachedToExistingRun = true
+        this.startJobPoller(job)
+      }
     },
     hidden() {
       this.stopPollIfRunning()
