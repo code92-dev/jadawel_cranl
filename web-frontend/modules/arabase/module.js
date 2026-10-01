@@ -36,6 +36,13 @@ export default defineNuxtModule({
       src: resolve('./registryPlugin.js'),
     })
 
+    // Serves translations from cached JS chunks instead of the uncacheable
+    // messages.json route. Explanation in the plugin file.
+    addPlugin({
+      src: resolve('./i18nBundledMessages.client.js'),
+      mode: 'client',
+    })
+
     // Global RTL / Arabic-first stylesheet. Pushed after core's default.scss
     // (core registers in its own module setup) so it can layer on top. See 1.2.
     nuxt.options.css.push(resolve('./assets/scss/arabase.scss'))

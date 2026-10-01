@@ -14,6 +14,14 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Right-sized in-app logo (2026-10-01)
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `web-frontend/modules/core/static/img/logo.png` | Replaced the 1654×548, 188 KB master with a 350×116 (4× the 29 px display height), 64-colour PNG of 3.6 KB | It was downloaded on every first visit to render a 29 px tall image. At 3.6 KB Vite now inlines it into the page, so it costs no request at all. The full-size master stays in `server/public/img/logo.png`, which transactional email still links to |
+
+Measured findings and the matching translation-loading change (additive, in `modules/arabase/`) are in `docs/PERFORMANCE_2026-10-01.md`.
+
 ## Platform logo and simplified MCP setup (2026-09-22)
 
 | File                                                                                                                                           | Change                                                                                                             | Reason                                                                                                    | Merge risk |
