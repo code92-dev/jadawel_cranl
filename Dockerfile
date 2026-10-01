@@ -17,7 +17,19 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-09-30 from commit d096a849, tag 2.3.17-security-audit.
+# Published 2026-10-01 from commit 76fa6d2d, tag 2.3.18-faster-loads.
+# Page loads: the browser now takes translations from the build's cached JS
+# chunks instead of /_i18n/*/messages.json, which CranL's CDN forces to
+# no-cache — that was ~1.1 s on every load and refresh (Arabic, then the
+# English fallback, back to back). The in-app logo went from 188 KB to 3.6 KB
+# and is inlined. Security: uvicorn no longer writes the realtime socket's
+# ?jwt_token= into the log (redacted), security.txt's Canonical lost its double
+# slash, CI actions are pinned to commit SHAs. Measurements in
+# docs/PERFORMANCE_2026-10-01.md. **No migration. No environment changes.**
+# Previous deployment pin (2.3.17-security-audit):
+# sha256:082e15441952b97b8b5b2888ab57c951da79de2eb17374c5301257644b1dabe6.
+#
+# Previously published 2026-09-30 from commit d096a849, tag 2.3.17-security-audit.
 # Applies the 2026-09-30 security audit (reports in security-reports/): backend
 # dependency bumps — PyJWT 2.15.1 (CVE-2026-102268 CRITICAL + 5 HIGH), anyio
 # 4.15.1 (CVE-2026-63374 CRITICAL), httpx2/httpcore2 2.13.1 — the tarfile
@@ -348,7 +360,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:082e15441952b97b8b5b2888ab57c951da79de2eb17374c5301257644b1dabe6
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:02db3c7f3b26b0c00367996a3ef913b0eaa3dad320c4599eae92a86c1e1f57de
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
