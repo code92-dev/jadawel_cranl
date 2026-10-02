@@ -17,7 +17,26 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-10-01 from commit 76fa6d2d, tag 2.3.18-faster-loads.
+# Published 2026-10-02 from commit 54f7520e, tag 2.3.19-baserow-2.4.
+# Seven Baserow 2.4 features (docs/UPSTREAM_2_4_PORT.md): the "Your workspaces"
+# homepage with recently viewed, and a workspace page that reads Overview, Items,
+# Dashboard, Templates and API; images in rich text cells; workflows started by
+# inbound email (hidden until JADAWEL_INBOUND_EMAIL_* is set, and it needs a mail
+# host with port 25, which CranL does not route); a Response step that answers the
+# HTTP caller; stopping a running workflow; Group By rows dragged between groups
+# and a Columns layout; Data Sync run history. The sidebar name now leads to the
+# homepage. Security: the Caddyfile serves workflow replies with
+# `sandbox; frame-ancestors 'self'` so their HTML never runs as this origin.
+# **Migrations: core 0118-0120, database 0214-0216, automation 0030-0032,
+# integrations 0031-0032 (new tables, columns and an index; additive). The
+# previous image does not expect the new NOT NULL columns, so a rollback after
+# migrating needs the database backup taken before this deploy.** Optional
+# environment: JADAWEL_AUTOMATION_WORKFLOW_RESPONSE_TIMEOUT_MAX_SECONDS (default
+# 20) and JADAWEL_INBOUND_EMAIL_* (off unless set); nothing is required.
+# Previous deployment pin (2.3.18-faster-loads):
+# sha256:02db3c7f3b26b0c00367996a3ef913b0eaa3dad320c4599eae92a86c1e1f57de.
+#
+# Previously published 2026-10-01 from commit 76fa6d2d, tag 2.3.18-faster-loads.
 # Page loads: the browser now takes translations from the build's cached JS
 # chunks instead of /_i18n/*/messages.json, which CranL's CDN forces to
 # no-cache — that was ~1.1 s on every load and refresh (Arabic, then the
@@ -360,7 +379,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:02db3c7f3b26b0c00367996a3ef913b0eaa3dad320c4599eae92a86c1e1f57de
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:4f836d2f1c4e01be34c667d18e871a0f5e34a4394b1e1511982b995da2870b37
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
