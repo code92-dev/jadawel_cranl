@@ -28,6 +28,7 @@ the same light frame as a workspace on the homepage.
 | `web-frontend/modules/core/assets/scss/components/dashboard.scss` | `.dashboard__section` frame (border, white, rounded, low elevation); stat, resource and chart cards share the homepage card look | Shows which cards belong to which section |
 | `e2e-tests/pages/components/sidebar.ts` | `openUserContext()` clicks the arrows button | The middle of the row is now the home link |
 | `web-frontend/modules/core/layouts/app.vue` | The bell and utilities menu are not rendered with the all workspaces sidebar | Reaching the homepage from a workspace (now the name's job) left them over its header; after a reload they were already absent |
+| `web-frontend/modules/core/components/allWorkspaces/AllWorkspacesWorkspaceBox.vue`, `core/locales/{en,ar}.json` | The workspace box has no "Settings" button (nor its modal and string) | The fork unregisters the only workspace settings page, so it opened an empty modal; the workspace menu (⋮) already shows Settings only when a page exists |
 
 ## Workspace page sections and recently viewed titles (2026-10-02)
 

@@ -99,14 +99,6 @@
           "
           >{{ $t('allWorkspaces.members') }}</Button
         >
-        <Button
-          class="workspace-box__action workspace-box__action--collapsible"
-          type="secondary"
-          size="tiny"
-          tag="a"
-          @click="$refs.workspaceSettingsModal.show()"
-          >{{ $t('allWorkspaces.settings') }}</Button
-        >
         <ButtonIcon
           class="workspace-box__action workspace-box__more"
           type="secondary"
@@ -190,17 +182,12 @@
       ref="createApplicationContext"
       :workspace="workspace"
     ></CreateApplicationContext>
-    <WorkspaceSettingsModal
-      ref="workspaceSettingsModal"
-      :workspace="workspace"
-    ></WorkspaceSettingsModal>
   </div>
 </template>
 
 <script>
 import editWorkspace from '@jadawel/modules/core/mixins/editWorkspace'
 import WorkspaceContext from '@jadawel/modules/core/components/workspace/WorkspaceContext'
-import WorkspaceSettingsModal from '@jadawel/modules/core/components/workspace/WorkspaceSettingsModal'
 import CreateApplicationContext from '@jadawel/modules/core/components/application/CreateApplicationContext'
 import SearchHighlight from '@jadawel/modules/core/components/SearchHighlight'
 import AllWorkspacesApplicationCard from '@jadawel/modules/core/components/allWorkspaces/AllWorkspacesApplicationCard'
@@ -212,7 +199,6 @@ export default {
   name: 'AllWorkspacesWorkspaceBox',
   components: {
     WorkspaceContext,
-    WorkspaceSettingsModal,
     CreateApplicationContext,
     SearchHighlight,
     AllWorkspacesApplicationCard,
