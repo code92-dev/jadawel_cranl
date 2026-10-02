@@ -37,7 +37,8 @@ export class LoginPage extends JadawelPage {
   async loginWithPassword(email: string, password: string) {
     await this.fillCredentials(email, password);
     await this.submit();
-    await this.page.waitForURL(/\/(workspace\/\d+|dashboard)/);
+    // Signing in lands on the workspaces homepage (`/dashboard` redirects there).
+    await this.page.waitForURL(/\/(all-workspaces|workspace\/\d+|dashboard)/);
   }
 
   async loginExpectingFailure(email: string, password: string) {

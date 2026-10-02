@@ -23,6 +23,7 @@ definePageMeta({
     'settings',
     'authenticated',
     'workspacesAndApplications',
+    'selectWorkspaceAutomationWorkflow',
     'pendingJobs',
   ],
 })

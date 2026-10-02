@@ -75,6 +75,6 @@ test.describe("Arabic and right to left layout", () => {
     await expect(
       workspacePage.sidebar.root,
       "The sidebar is translated after the switch."
-    ).toContainText("الرئيسية");
+    ).toContainText("الأحدث");
   });
 });
