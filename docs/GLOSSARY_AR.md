@@ -47,6 +47,8 @@ term exists).
 | Your workspaces (homepage) | مساحات العمل | The page that lists every workspace and its items. |
 | Recently viewed | المعروضة مؤخرًا | Items by the time the user last opened them; "last viewed" = آخر عرض, "viewed 5 minutes ago" = عُرض منذ 5 دقائق. |
 | Recents (sidebar) | الأحدث | The workspace sidebar entry that opens the workspace's recent items. |
+| Workspace page sections | نظرة عامة · العناصر · لوحة التحكم · القوالب وواجهة API | The workspace page, top to bottom: Overview, Items, Dashboard (its charts), Templates and API. |
+| API documentation | توثيق API | Keep `API` and `REST` as Latin tokens. |
 | My dashboards | لوحاتي | The user's own page collecting dashboards from their workspaces and by link (docs/MY_DASHBOARDS.md). Plural of the term: لوحات التحكم. |
 | Widget | عنصر | Dashboard widget. |
 | Size | الحجم | Widget size on the dashboard grid, in columns × rows. |

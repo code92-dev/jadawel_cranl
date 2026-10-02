@@ -22,6 +22,25 @@ export class DatabaseViewLastViewedItemType extends LastViewedItemType {
     })
   }
 
+  /**
+   * Views are mostly named after their type, so listed by their own name they
+   * read "Grid, Grid, Grid". The table is what tells them apart.
+   */
+  getTitle(entry) {
+    return entry.item.table.name
+  }
+
+  /**
+   * The view's own name when it says more than its type, like "Active
+   * customers", otherwise the type, like "Grid view".
+   */
+  getLabel(entry) {
+    const viewType = this.getViewType(entry.sub_type)
+    return entry.item.name === viewType.getName()
+      ? this.getName(entry)
+      : entry.item.name
+  }
+
   getIconClass(entry) {
     return this.getViewTypeIconClass(this.getViewType(entry.sub_type))
   }
@@ -41,8 +60,9 @@ export class DatabaseViewLastViewedItemType extends LastViewedItemType {
     }))
   }
 
+  // The table is already the title.
   getParentPath(entry) {
-    return [entry.application.name, entry.item.table.name]
+    return [entry.application.name]
   }
 
   getRoute(entry) {

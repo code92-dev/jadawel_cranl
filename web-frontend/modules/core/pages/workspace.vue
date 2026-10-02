@@ -80,6 +80,11 @@
       class="dashboard__scroll-container"
       ph-autocapture="dashboard-container"
     >
+      <!--
+        Jadawel fork: the workspace page reads top to bottom as its overview
+        numbers, everything in the workspace, the charts, then templates and
+        the API.
+      -->
       <div class="dashboard__main">
         <component
           :is="component"
@@ -87,110 +92,89 @@
           :key="index"
           :workspace="selectedWorkspace"
         ></component>
-        <div class="dashboard__extras">
-          <div class="dashboard__resources">
-            <div class="dashboard__resources-wrapper">
-              <a
-                v-if="canCreateCreateApplication"
-                class="dashboard__resource"
-                role="button"
-                tabindex="0"
-                @click="$refs.templateModal.show()"
-                @keydown.enter.prevent="$refs.templateModal.show()"
-                @keydown.space.prevent="$refs.templateModal.show()"
-              >
-                <div class="dashboard__resource-inner">
-                  <span class="dashboard__resource-icon">
-                    <i class="iconoir-page"></i
-                  ></span>
-
-                  <div class="dashboard__resource-content">
-                    <h4 class="dashboard__resource-title">
-                      {{ $t('dashboard.templates') }}
-                    </h4>
-                    <p class="dashboard__resource-text">
-                      {{ $t('dashboard.templatesMessage') }}
-                    </p>
-                  </div>
-                </div>
-              </a>
-              <component
-                :is="component"
-                v-for="(component, index) in resourceLinksComponents"
-                :key="index"
-              ></component>
-            </div>
-          </div>
-        </div>
-        <div class="dashboard__wrapper">
-          <!--
-            One list for everything in the workspace (databases, applications,
-            dashboards, automations and the views and pages inside them), most
-            recently viewed first, instead of one list per application type.
-          -->
-          <RecentlyViewed
-            v-if="orderedApplicationsInSelectedWorkspace.length"
+        <template v-if="orderedApplicationsInSelectedWorkspace.length">
+          <DashboardOverview
             :workspace="selectedWorkspace"
-            :title="$t('recentlyViewed.yourItems')"
-            view-mode-preference-key="workspace_recently_viewed_view_mode"
+            :applications="orderedApplicationsInSelectedWorkspace"
+            :stats="databaseStats"
+            :stats-loading="databaseStatsLoading"
+          />
+          <WorkspaceItems
+            :workspace="selectedWorkspace"
+            :applications="orderedApplicationsInSelectedWorkspace"
+          />
+          <DashboardCharts
+            :applications="orderedApplicationsInSelectedWorkspace"
+            :stats="databaseStats"
+            :activity="workspaceActivity"
+          />
+        </template>
+        <div v-else class="dashboard__no-application">
+          <img
+            src="@jadawel/modules/core/assets/images/empty_workspace_illustration.png"
+            srcset="
+              @jadawel/modules/core/assets/images/empty_workspace_illustration@2x.png 2x
+            "
+          />
+          <h4>{{ $t('dashboard.emptyWorkspace') }}</h4>
+          <p v-if="canCreateCreateApplication">
+            {{ $t('dashboard.emptyWorkspaceMessage') }}
+          </p>
+          <span
+            v-if="canCreateCreateApplication"
+            ref="createApplicationContextLink2"
           >
-            <template #empty-action>
-              <span
-                v-if="canCreateCreateApplication"
-                ref="createApplicationContextLink2"
-              >
-                <Button
-                  icon="iconoir-plus"
-                  tag="a"
-                  @click="
-                    $refs.createApplicationContext.toggle(
-                      $refs.createApplicationContextLink2
-                    )
-                  "
-                  >{{ $t('dashboard.addNew') }}</Button
-                >
-              </span>
-            </template>
-          </RecentlyViewed>
-          <div v-else class="dashboard__no-application">
-            <img
-              src="@jadawel/modules/core/assets/images/empty_workspace_illustration.png"
-              srcset="
-                @jadawel/modules/core/assets/images/empty_workspace_illustration@2x.png 2x
+            <Button
+              icon="iconoir-plus"
+              tag="a"
+              @click="
+                $refs.createApplicationContext.toggle(
+                  $refs.createApplicationContextLink2
+                )
               "
-            />
-            <h4>{{ $t('dashboard.emptyWorkspace') }}</h4>
-            <p v-if="canCreateCreateApplication">
-              {{ $t('dashboard.emptyWorkspaceMessage') }}
-            </p>
-            <span
-              v-if="canCreateCreateApplication"
-              ref="createApplicationContextLink2"
+              >{{ $t('dashboard.addNew') }}</Button
             >
-              <Button
-                icon="iconoir-plus"
-                tag="a"
-                @click="
-                  $refs.createApplicationContext.toggle(
-                    $refs.createApplicationContextLink2
-                  )
-                "
-                >{{ $t('dashboard.addNew') }}</Button
-              >
-            </span>
-          </div>
+          </span>
         </div>
-        <!--
-          Jadawel fork: the workspace's own numbers (databases, tables, rows,
-          members and recent activity) stay under the list of items.
-        -->
-        <DashboardOverview
-          v-if="orderedApplicationsInSelectedWorkspace.length"
-          :workspace="selectedWorkspace"
-          :applications="orderedApplicationsInSelectedWorkspace"
-          :stats="databaseStats"
-          :activity="workspaceActivity"
-        />
+        <section
+          v-if="canCreateCreateApplication || resourceLinksComponents.length"
+          class="dashboard__section"
+        >
+          <h2 class="dashboard__section-title">
+            {{ $t('dashboard.resourcesTitle') }}
+          </h2>
+          <div class="dashboard__resources-wrapper">
+            <a
+              v-if="canCreateCreateApplication"
+              class="dashboard__resource"
+              role="button"
+              tabindex="0"
+              @click="$refs.templateModal.show()"
+              @keydown.enter.prevent="$refs.templateModal.show()"
+              @keydown.space.prevent="$refs.templateModal.show()"
+            >
+              <div class="dashboard__resource-inner">
+                <span class="dashboard__resource-icon">
+                  <i class="iconoir-page"></i
+                ></span>
+
+                <div class="dashboard__resource-content">
+                  <h4 class="dashboard__resource-title">
+                    {{ $t('dashboard.templates') }}
+                  </h4>
+                  <p class="dashboard__resource-text">
+                    {{ $t('dashboard.templatesMessage') }}
+                  </p>
+                </div>
+              </div>
+            </a>
+            <component
+              :is="component"
+              v-for="(component, index) in resourceLinksComponents"
+              :key="index"
+            ></component>
+          </div>
+        </section>
       </div>
       <CreateApplicationContext
         ref="createApplicationContext"
@@ -217,9 +201,10 @@ import { useHead, useAsyncData } from '#imports'
 
 import WorkspaceContext from '@jadawel/modules/core/components/workspace/WorkspaceContext'
 import CreateApplicationContext from '@jadawel/modules/core/components/application/CreateApplicationContext'
-import RecentlyViewed from '@jadawel/modules/core/components/recentlyViewed/RecentlyViewed'
 import editWorkspace from '@jadawel/modules/core/mixins/editWorkspace'
 import DashboardOverview from '@jadawel/modules/core/components/dashboard/DashboardOverview'
+import DashboardCharts from '@jadawel/modules/core/components/dashboard/DashboardCharts'
+import WorkspaceItems from '@jadawel/modules/core/components/dashboard/WorkspaceItems'
 import TemplateModal from '@jadawel/modules/core/components/template/TemplateModal'
 import DatabaseStatsService from '@jadawel/modules/arabase/services/databaseStats'
 import WorkspaceActivityService from '@jadawel/modules/arabase/services/workspaceActivity'
@@ -253,6 +238,7 @@ const { $store, $registry, $i18n, $hasPermission, $client } = nuxtApp
  * page as slow as the largest workspace.
  */
 const databaseStats = ref({})
+const databaseStatsLoading = ref(false)
 
 /**
  * Rows created per day over the last month, or null until it resolves.
@@ -356,6 +342,7 @@ watchEffect(async () => {
   if (!workspace) return
 
   databaseStats.value = {}
+  databaseStatsLoading.value = true
   workspaceActivity.value = null
 
   try {
@@ -366,6 +353,10 @@ watchEffect(async () => {
     }
   } catch {
     databaseStats.value = {}
+  } finally {
+    if (selectedWorkspace.value?.id === workspace.id) {
+      databaseStatsLoading.value = false
+    }
   }
 
   try {

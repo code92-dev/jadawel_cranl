@@ -865,7 +865,7 @@
   },
   "databaseDashboardResourceLinks": {
     "title": "API documentation",
-    "description": "Learn more about our code"
+    "description": "Connect your own tools to your data through the REST API"
   },
   "formViewField": {
     "required": "required",

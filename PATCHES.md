@@ -14,6 +14,24 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Workspace page sections and recently viewed titles (2026-10-02)
+
+The workspace page reads top to bottom as Overview (headline numbers), Items
+(everything in the workspace as the homepage's cards), Dashboard (the charts), then
+Templates and API. Upstream 2.4 put the resource links first and listed recently
+viewed views and pages as "Your items", where default named views showed as "Grid,
+Grid, Grid". The recently viewed list now titles a view with its table.
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `web-frontend/modules/core/pages/workspace.vue` | Sections reordered; "Your items" is now `WorkspaceItems` (the workspace's databases, applications, dashboards and automations) instead of `RecentlyViewed`; the overview's tables and rows show a skeleton while their counts load | Items listed by their own name and type, in the order the owner asked for |
+| `web-frontend/modules/core/assets/scss/components/dashboard.scss` | Section headings, stat cards with an icon, the items grid, and the resources as full cards with their description at the end; the container-query chip layout (`.dashboard__extras`) is gone | The new layout |
+| `web-frontend/modules/core/assets/scss/components/workspace_box.scss` | Item cards are at least 300px wide (capped at the column on a phone) instead of 260px, on the homepage, the workspace page and recently viewed | Four narrow columns cut off every "Viewed … ago" line |
+| `web-frontend/modules/core/lastViewedItemTypes.js`, `core/components/recentlyViewed/RecentlyViewed.vue` | `getTitle(entry)` and `getLabel(entry)` hooks, defaulting to the item's name and its kind | Lets a type choose what it is listed as |
+| `web-frontend/modules/database/lastViewedItemTypes.js` | A view is titled with its table; the label is the view's name when it differs from its type's, otherwise the type; the parent path drops the table | Default named views ("Grid", "Kanban") could not be told apart |
+| `web-frontend/modules/database/locales/{en,ar}.json` | API card: "API documentation" / "توثيق API" and a description that says what the API is for | The card now shows its description |
+| `web-frontend/test/unit/core/lastViewedItemTypes.spec.js`, `test/unit/core/components/recentlyViewed/recentlyViewed.spec.js` | Expectations follow the table titles | Same |
+
 ## Baserow 2.4 feature port (2026-10-01)
 
 Seven Baserow 2.4.0 features, each carried over from its upstream pull request by a

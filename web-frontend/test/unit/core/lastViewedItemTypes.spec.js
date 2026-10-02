@@ -45,11 +45,28 @@ describe('lastViewedItem registry types', () => {
     expect(type.getName(view)).toBe('lastViewedItemType.databaseView')
     expect(type.getIconClass(view)).toBe('jadawel-icon-form color-warning')
     expect(type.getIconColor(view)).toBeNull()
-    expect(type.getParentPath(view)).toEqual(['CRM', 'Customers'])
+    // Jadawel fork: a view is listed by its table, so default named views
+    // ("Grid", "Grid", "Grid") can be told apart.
+    expect(type.getTitle(view)).toBe('Customers')
+    expect(type.getLabel(view)).toBe('Signup')
+    expect(type.getParentPath(view)).toEqual(['CRM'])
     expect(type.getRoute(view)).toEqual({
       name: 'database-table',
       params: { databaseId: 7, tableId: 5, viewId: 11 },
     })
+  })
+
+  test('a view named after its type is labelled with the type', () => {
+    const type = registry.get('lastViewedItem', 'database_view')
+    const formName = registry.get('view', 'form').getName()
+    const view = entry('database_view', 'form', {
+      id: 11,
+      name: formName,
+      table: { id: 5, name: 'Customers' },
+    })
+
+    expect(type.getTitle(view)).toBe('Customers')
+    expect(type.getLabel(view)).toBe('lastViewedItemType.databaseView')
   })
 
   test('database views offer one filter option per view type', () => {

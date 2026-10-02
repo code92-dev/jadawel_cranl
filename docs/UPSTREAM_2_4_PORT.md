@@ -49,9 +49,14 @@ last viewed them (or created, or by name), filterable by type and searchable
 (`Ctrl K`). A dedicated sidebar lists the workspaces; `/recently-viewed` lists the
 views, pages, dashboards and workflows the user opened, across workspaces.
 
-The workspace page (`/workspace/<id>`) now shows the Templates card and the resource
-links, then **one list of everything in the workspace** ("Your items") instead of one
-row per application, and keeps Jadawel's Overview panel underneath.
+The workspace page (`/workspace/<id>`) reads top to bottom as **Overview** (databases,
+tables, rows, members), **Items** (everything in the workspace as the homepage's cards,
+with the same type filter and sort), **Dashboard** (rows per database and rows added
+over the last 30 days), then **Templates and API**. This differs from upstream, which
+puts the resource links first and lists the recently viewed views and pages as "Your
+items"; there, views named after their type read "Grid, Grid, Grid". Recently viewed
+(`/recently-viewed`) keeps upstream's list, but titles a view with its table and shows
+the view's own name underneath when it differs from its type.
 
 Backend: `UserLastViewedItem` records what each user opens (views, builder pages,
 dashboards, workflows), batched through a Celery singleton task;

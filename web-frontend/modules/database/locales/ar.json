@@ -315,8 +315,8 @@
     "addDecorator": "إضافة الديكور"
   },
   "databaseDashboardResourceLinks": {
-    "title": "API",
-    "description": "تعرف على المزيد حول الكود الخاص بنا"
+    "title": "توثيق API",
+    "description": "اربط أدواتك ببياناتك عبر REST API"
   },
   "formViewField": {
     "required": "مطلوب",

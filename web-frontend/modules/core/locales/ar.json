@@ -601,7 +601,8 @@
     "emptyWorkspaceMessage": "ابدأ بإنشاء قاعدة بيانات أو تطبيق جديد.",
     "addNew": "إضافة جديد...",
     "noWorkspace": "لا توجد مساحة عمل",
-    "noWorkspaceDescription": "ابدأ بإنشاء مساحة عمل جديدة"
+    "noWorkspaceDescription": "ابدأ بإنشاء مساحة عمل جديدة",
+    "resourcesTitle": "القوالب وواجهة API"
   },
   "dashboardOverview": {
     "title": "نظرة عامة",
@@ -619,7 +620,8 @@
     "noActivity": "لا يوجد نشاط في هذه الفترة",
     "untitledDatabase": "قاعدة بيانات بدون عنوان",
     "otherDatabases": "قواعد بيانات أخرى ({count})",
-    "activitySummary": "أُضيف {total} صفًا خلال {days} يومًا"
+    "activitySummary": "أُضيف {total} صفًا خلال {days} يومًا",
+    "title": "لوحة التحكم"
   },
   "userSessionExpiredToast": {
     "title": "انتهت صلاحية الجلسة",
@@ -1272,5 +1274,8 @@
     "openCompactMenu": "فتح القائمة",
     "closeCompactMenu": "إغلاق القائمة",
     "compactMenuLabel": "القائمة"
+  },
+  "workspaceItems": {
+    "title": "العناصر"
   }
 }

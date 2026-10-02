@@ -81,23 +81,12 @@
   gap: 8px;
 }
 
-.dashboard__wrapper {
-  flex-grow: 1;
-}
-
 .dashboard__main {
   display: flex;
   flex-direction: column;
-  gap: 32px;
-
-  // The resources switch layout on the width of this box rather than the
-  // viewport, because the assistant sidebar can take a large part of it.
-  container-type: inline-size;
+  gap: 40px;
+  max-inline-size: 1400px;
 }
-
-// The narrowest box in which a single row of the five resource cards leaves
-// each card the 196px its longest word needs.
-$dashboard-resources-row-min-width: 1044px;
 
 .dashboard__no-application {
   border-radius: 6px;
@@ -110,58 +99,44 @@ $dashboard-resources-row-min-width: 1044px;
   padding: 40px 0;
 }
 
-// Jadawel fork: the `order` declarations that used to live here are gone on
-// purpose. `.dashboard__main` is a flex column, so `order` silently overrode DOM
-// order — upstream used `order: 1` to push this block last on narrow screens and
-// `order: 0` to pull it back above the application list on wide ones. The block
-// now sits after the application list in the markup for every breakpoint, so
-// reordering the template is enough and there is no invisible rule to fight.
-.dashboard__extras {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-
-  // Below the items, unless the cards fit in a single row above them.
-
-  @container (min-width: #{$dashboard-resources-row-min-width}) {
-    order: 0;
-  }
-}
-
+/*
+ * Jadawel: templates and the API sit at the end of the workspace page as full
+ * cards, with the sentence that says what each one is for.
+ */
 .dashboard__resources-wrapper {
   display: grid;
   gap: 16px;
-  grid-template-columns: minmax(0, 1fr);
-
-  // Either every card side by side or every card stacked, never a partial row.
-  @container (min-width: #{$dashboard-resources-row-min-width}) {
-    grid-auto-flow: column;
-    grid-auto-columns: minmax(0, 1fr);
-    grid-template-columns: none;
-  }
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
 }
 
 .dashboard__resource {
   border: 1px solid var(--jadawel-border-color, #e7e9ec);
   background: var(--jadawel-raised-background, #fff);
-  padding: 16px 21px;
+  padding: 16px;
   text-decoration: none;
   display: flex;
 
   // The templates resource opens a modal instead of following a link.
   cursor: pointer;
 
-  @include rounded($rounded-md);
+  @include rounded($rounded-lg);
 
   &:hover {
     text-decoration: none;
     border-color: $palette-neutral-400;
     background: var(--jadawel-hover-background, #f0f2f4);
   }
+
+  &:focus-visible {
+    outline: 2px solid $color-primary-500;
+    outline-offset: 2px;
+  }
 }
 
 .dashboard__resource-inner {
-  @include flex-align-items(15px);
+  @include flex-align-items(14px);
+
+  min-inline-size: 0;
 }
 
 .dashboard__resource--large {
@@ -179,32 +154,24 @@ $dashboard-resources-row-min-width: 1044px;
 }
 
 .dashboard__resource-icon {
-  inline-size: 16px;
-  block-size: 16px;
-  color: $palette-neutral-700;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 15px;
-  flex-shrink: 0;
+  @extend %dashboard-icon-chip;
+}
+
+.dashboard__resource-content {
+  min-inline-size: 0;
 }
 
 .dashboard__resource-title {
-  font-size: 12px;
-  font-weight: 500;
+  font-size: 14px;
+  font-weight: 600;
   color: $palette-neutral-1200;
-  margin: 0;
+  margin: 0 0 2px;
 }
 
-/*
- * The description is what made each resource a 21px-padded card. As a chip the
- * title carries the link on its own, so the sentence underneath is hidden rather
- * than deleted: the markup comes from a plugin extension point this fork does
- * not own, and dropping the element would mean editing every plugin that
- * provides one.
- */
 .dashboard__resource-text {
-  display: none;
+  font-size: 13px;
+  color: $palette-neutral-900;
+  margin: 0;
 }
 
 .dashboard__help {
@@ -215,21 +182,51 @@ $dashboard-resources-row-min-width: 1044px;
  * Jadawel: workspace overview — stat tiles and the two charts.
  * -------------------------------------------------------------------------- */
 
+// A tinted square holding an icon, in the active theme's colour. The lightest
+// step of a theme can be white, so the tint is mixed rather than taken from it.
+%dashboard-icon-chip {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 40px;
+  inline-size: 40px;
+  block-size: 40px;
+  border-radius: 10px;
+  background: color-mix(in srgb, #{$color-primary-500} 10%, $white);
+  color: $color-primary-600;
+  font-size: 20px;
+}
+
 .dashboard__section-title {
-  font-size: 13px;
-  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 16px;
+  font-weight: 600;
   color: $palette-neutral-1200;
-  margin: 0 0 12px;
+  margin: 0 0 16px;
+}
+
+.dashboard__section-count {
+  padding: 1px 8px;
+  border-radius: 10px;
+  background: $palette-neutral-100;
+  font-size: 12px;
+  font-weight: 500;
+  color: $palette-neutral-900;
+  font-variant-numeric: tabular-nums;
 }
 
 .dashboard__section-head {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
+  margin-block-end: 16px;
 
   .dashboard__section-title {
-    margin-block-end: 12px;
+    margin: 0;
   }
 }
 
@@ -247,35 +244,84 @@ $dashboard-resources-row-min-width: 1044px;
 
 .dashboard__stat-tiles {
   display: grid;
-  gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
-  margin-block-end: 16px;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
 .dashboard__stat-tile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px;
+  border: 1px solid var(--jadawel-border-color, #e7e9ec);
   background: var(--jadawel-raised-background, #fff);
-  padding: 12px 14px;
 
-  @include rounded($rounded-md);
+  @include rounded($rounded-lg);
+}
+
+.dashboard__stat-tile-icon {
+  @extend %dashboard-icon-chip;
+}
+
+.dashboard__stat-tile-body {
+  min-inline-size: 0;
 }
 
 .dashboard__stat-tile-label {
-  font-size: 11.5px;
+  font-size: 13px;
   color: $palette-neutral-900;
-  margin-block-end: 6px;
+  margin-block-end: 4px;
 }
 
 .dashboard__stat-tile-value {
-  font-size: 22px;
-  font-weight: 500;
+  font-size: 24px;
+  font-weight: 600;
   color: $palette-neutral-1200;
   line-height: 1.1;
+  font-variant-numeric: tabular-nums;
+}
+
+.dashboard__stat-tile-skeleton {
+  display: block;
 }
 
 .dashboard__charts {
   display: grid;
-  gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+}
+
+.workspace-items__controls {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.workspace-items__filter {
+  inline-size: 150px;
+
+  // The panel must not be constrained to the narrow trigger width.
+  .dropdown__items {
+    inset-inline-end: auto;
+    min-inline-size: 200px;
+  }
+}
+
+.workspace-items__sort {
+  inline-size: 150px;
+}
+
+.workspace-items__grid {
+  @extend %all-workspaces-grid;
+}
+
+.workspace-items__no-match {
+  padding: 24px;
+  border: 1px dashed $palette-neutral-400;
+  color: $palette-neutral-900;
+  text-align: center;
+
+  @include rounded($rounded-lg);
 }
 
 .chart {

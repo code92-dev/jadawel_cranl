@@ -22,6 +22,21 @@ export class LastViewedItemType extends Registerable {
   }
 
   /**
+   * What the item is listed as. Its own name, unless the type names it better.
+   */
+  getTitle(entry) {
+    return entry.item.name
+  }
+
+  /**
+   * The line under the title, next to when it was viewed. The kind of item,
+   * unless the type has something more telling to say there.
+   */
+  getLabel(entry) {
+    return this.getName(entry)
+  }
+
+  /**
    * The classes of the `<i>` element that represents the item.
    */
   getIconClass(entry) {

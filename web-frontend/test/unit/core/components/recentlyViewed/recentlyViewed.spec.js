@@ -101,9 +101,11 @@ describe('RecentlyViewed', () => {
     ).toBe(true)
 
     const first = rows[0]
-    expect(first.find('.recently-viewed__name').text()).toBe('All customers')
+    // Jadawel fork: views are listed by their table, with the view's own
+    // name underneath.
+    expect(first.find('.recently-viewed__name').text()).toBe('Customers')
     expect(first.find('.recently-viewed__path').text()).toBe(
-      'lastViewedItemType.databaseView•CRM›Customers'
+      'All customers•CRM'
     )
     expect(first.find('.item-icon i').classes()).toEqual(
       expect.arrayContaining(['iconoir-menu', 'color-primary'])
@@ -158,11 +160,9 @@ describe('RecentlyViewed', () => {
     expect(wrapper.find('.recently-viewed__table').exists()).toBe(false)
     const cards = wrapper.findAll('.item-card')
     expect(cards).toHaveLength(4)
-    expect(cards[0].find('.item-card__name').text()).toBe('All customers')
-    expect(cards[0].find('.item-card__meta').text()).toContain(
-      'lastViewedItemType.databaseView'
-    )
-    expect(cards[0].attributes('title')).toBe('CRM › Customers')
+    expect(cards[0].find('.item-card__name').text()).toBe('Customers')
+    expect(cards[0].find('.item-card__meta').text()).toContain('All customers')
+    expect(cards[0].attributes('title')).toBe('CRM')
     expect(testApp.mock.history.patch[0].data).toBe(
       JSON.stringify({ recently_viewed_view_mode: 'cards' })
     )

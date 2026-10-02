@@ -1,43 +1,38 @@
 <template>
-  <section class="dashboard__overview">
-    <h4 class="dashboard__section-title">
+  <section class="dashboard__section">
+    <h2 class="dashboard__section-title">
       {{ $t('dashboardOverview.title') }}
-    </h4>
+    </h2>
 
     <div class="dashboard__stat-tiles">
       <div v-for="tile in tiles" :key="tile.key" class="dashboard__stat-tile">
-        <div class="dashboard__stat-tile-label">{{ tile.label }}</div>
-        <div class="dashboard__stat-tile-value">{{ tile.value }}</div>
+        <span class="dashboard__stat-tile-icon">
+          <i :class="tile.icon"></i>
+        </span>
+        <div class="dashboard__stat-tile-body">
+          <div class="dashboard__stat-tile-label">{{ tile.label }}</div>
+          <SkeletonBlock
+            v-if="tile.loading"
+            class="dashboard__stat-tile-skeleton"
+            width="48px"
+            height="24px"
+          ></SkeletonBlock>
+          <div v-else class="dashboard__stat-tile-value">{{ tile.value }}</div>
+        </div>
       </div>
-    </div>
-
-    <div class="dashboard__charts">
-      <DashboardBarChart
-        :title="$t('dashboardCharts.rowsPerDatabase')"
-        :items="rowsPerDatabase"
-        :empty-message="$t('dashboardCharts.noDatabases')"
-      />
-      <DashboardAreaChart
-        :title="$t('dashboardCharts.rowsAddedOverTime', { days: activityDays })"
-        :series="activitySeries"
-        :empty-message="$t('dashboardCharts.noActivity')"
-      />
     </div>
   </section>
 </template>
 
 <script>
-import DashboardBarChart from '@jadawel/modules/core/components/dashboard/DashboardBarChart'
-import DashboardAreaChart from '@jadawel/modules/core/components/dashboard/DashboardAreaChart'
+import { rowCountsAreExact } from '@jadawel/modules/core/utils/workspaceStats'
 
-// Beyond this the chart is a wall of near-identical bars that answers nothing.
-// The remainder is folded into one row rather than dropped, so the totals in the
-// tiles above still reconcile with what the chart shows.
-const MAX_BARS = 6
-
+/**
+ * The workspace's headline numbers. Databases and members are known from the
+ * store straight away; tables and rows come from the stats request.
+ */
 export default {
   name: 'DashboardOverview',
-  components: { DashboardBarChart, DashboardAreaChart },
   props: {
     workspace: {
       type: Object,
@@ -55,97 +50,51 @@ export default {
       type: Object,
       required: true,
     },
-    /**
-     * `{ days, complete, total, series }`, or null until it resolves.
-     */
-    activity: {
-      type: Object,
+    statsLoading: {
+      type: Boolean,
       required: false,
-      default: null,
+      default: false,
     },
   },
   computed: {
-    statEntries() {
-      return Object.entries(this.stats)
-    },
-    /**
-     * Row totals are only shown when every database reported an exact count.
-     * One database that gave up on counting would make the workspace total an
-     * undercount presented as fact, which is worse than showing a dash.
-     */
-    rowsAreExact() {
-      return this.statEntries.every(([, stat]) => stat.rows_exact)
-    },
     tiles() {
-      const tables = this.statEntries.reduce(
-        (sum, [, stat]) => sum + stat.table_count,
-        0
-      )
-      const rows = this.statEntries.reduce(
-        (sum, [, stat]) => sum + (stat.row_count || 0),
-        0
-      )
+      const stats = Object.values(this.stats)
+      const tables = stats.reduce((sum, stat) => sum + stat.table_count, 0)
+      const rows = stats.reduce((sum, stat) => sum + (stat.row_count || 0), 0)
+      const databases = this.applications.filter(
+        (application) => application.type === 'database'
+      ).length
 
       return [
         {
           key: 'databases',
+          icon: 'iconoir-db',
           label: this.$t('dashboardOverview.databases'),
-          value: this.format(this.statEntries.length),
+          value: this.format(databases),
+          loading: false,
         },
         {
           key: 'tables',
+          icon: 'iconoir-table',
           label: this.$t('dashboardOverview.tables'),
           value: this.format(tables),
+          loading: this.statsLoading,
         },
         {
           key: 'rows',
+          icon: 'iconoir-table-rows',
           label: this.$t('dashboardOverview.rows'),
-          value: this.rowsAreExact ? this.format(rows) : '—',
+          value: rowCountsAreExact(this.stats) ? this.format(rows) : '—',
+          loading: this.statsLoading,
         },
         {
           key: 'members',
+          icon: 'iconoir-group',
           label: this.$t('dashboardOverview.members'),
           value: this.format(this.workspace.users?.length || 0),
+          loading: false,
         },
       ]
-    },
-    rowsPerDatabase() {
-      if (!this.rowsAreExact) {
-        return []
-      }
-
-      const named = this.statEntries
-        .map(([id, stat]) => ({
-          key: id,
-          label:
-            this.applications.find((a) => String(a.id) === String(id))?.name ||
-            this.$t('dashboardCharts.untitledDatabase'),
-          value: stat.row_count || 0,
-        }))
-        .sort((a, b) => b.value - a.value)
-
-      if (named.length <= MAX_BARS) {
-        return named
-      }
-
-      const shown = named.slice(0, MAX_BARS - 1)
-      const rest = named.slice(MAX_BARS - 1)
-      return [
-        ...shown,
-        {
-          key: 'other',
-          label: this.$t('dashboardCharts.otherDatabases', {
-            count: rest.length,
-          }),
-          value: rest.reduce((sum, item) => sum + item.value, 0),
-        },
-      ]
-    },
-    activitySeries() {
-      return this.activity?.complete ? this.activity.series : []
-    },
-    activityDays() {
-      return this.activity?.days || 30
     },
   },
   methods: {

@@ -143,9 +143,9 @@ function presentEntry(entry) {
   return {
     key,
     entry,
-    name: entry.item.name,
+    name: itemType.getTitle(entry),
     route: itemType.getRoute(entry),
-    typeName: itemType.getName(entry),
+    typeName: itemType.getLabel(entry),
     iconClass: itemType.getIconClass(entry),
     iconColor: itemType.getIconColor(entry),
     parentPath: itemType.getParentPath(entry),

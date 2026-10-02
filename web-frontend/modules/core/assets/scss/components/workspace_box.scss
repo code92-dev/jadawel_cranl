@@ -1,6 +1,10 @@
 %all-workspaces-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+
+  // Jadawel: 300px rather than 260px, so a card's "Database • Viewed 44
+  // minutes ago" line fits instead of being cut off; never wider than a
+  // narrow phone's column.
+  grid-template-columns: repeat(auto-fill, minmax(min(300px, 100%), 1fr));
   gap: 16px;
 }
 

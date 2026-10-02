@@ -581,7 +581,8 @@
     "emptyWorkspaceMessage": "Get started by creating a new database or application.",
     "addNew": "Add new...",
     "noWorkspace": "No workspace",
-    "noWorkspaceDescription": "Get started by creating a new workspace"
+    "noWorkspaceDescription": "Get started by creating a new workspace",
+    "resourcesTitle": "Templates and API"
   },
   "dashboardOverview": {
     "title": "Overview",
@@ -599,7 +600,8 @@
     "noActivity": "No activity in this period",
     "untitledDatabase": "Untitled database",
     "otherDatabases": "{count} other databases",
-    "activitySummary": "{total} rows added over {days} days"
+    "activitySummary": "{total} rows added over {days} days",
+    "title": "Dashboard"
   },
   "login": {
     "title": "Welcome back",
@@ -1272,5 +1274,8 @@
     "openCompactMenu": "Open menu",
     "closeCompactMenu": "Close menu",
     "compactMenuLabel": "Menu"
+  },
+  "workspaceItems": {
+    "title": "Items"
   }
 }
