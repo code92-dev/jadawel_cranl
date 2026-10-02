@@ -337,6 +337,9 @@
 }
 
 .chart {
+  // The anchor of the hidden data table, which would otherwise be placed against
+  // the document and stretch it below the bottom of the window.
+  position: relative;
   border: 1px solid $palette-neutral-200;
   background: $white;
   padding: 14px 16px;

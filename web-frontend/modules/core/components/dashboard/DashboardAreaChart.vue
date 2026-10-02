@@ -91,25 +91,31 @@
       plots thirty points that exist only as path geometry, so the values are
       given to assistive technology here.
     -->
-    <table v-if="series.length" class="chart__sr-only">
-      <caption>
-        {{
-          title
-        }}
-      </caption>
-      <thead>
-        <tr>
-          <th scope="col">{{ $t('dashboardCharts.date') }}</th>
-          <th scope="col">{{ $t('dashboardCharts.rowsAdded') }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="point in series" :key="point.date">
-          <th scope="row">{{ formatDate(point.date) }}</th>
-          <td>{{ formatValue(point.count) }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <!--
+      Hidden by a wrapper because a table ignores the 1px box: hidden on itself,
+      its thirty rows still stretched the page below the bottom of the window.
+    -->
+    <div v-if="series.length" class="chart__sr-only">
+      <table>
+        <caption>
+          {{
+            title
+          }}
+        </caption>
+        <thead>
+          <tr>
+            <th scope="col">{{ $t('dashboardCharts.date') }}</th>
+            <th scope="col">{{ $t('dashboardCharts.rowsAdded') }}</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="point in series" :key="point.date">
+            <th scope="row">{{ formatDate(point.date) }}</th>
+            <td>{{ formatValue(point.count) }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </template>
 
