@@ -193,6 +193,24 @@ class TableGrantPermissionManagerType(PermissionManagerType):
             if roles.get(actor.id) == WORKSPACE_USER_PERMISSION_GUEST
         }
 
+    def _is_guest(self, actor, workspace) -> bool:
+        """
+        Whether the actor holds the GUEST role in the workspace. A multi-workspace
+        listing prefetches `workspaceuser_set`, which answers it without a query.
+        Core also sends every single-workspace listing (workspace search runs one
+        per result type) through the multi-workspace path, without a prefetch;
+        those go through the request cache, so they share one query.
+        """
+
+        prefetched = getattr(workspace, "_prefetched_objects_cache", {})
+        if "workspaceuser_set" in prefetched:
+            return any(
+                workspace_user.user_id == actor.id
+                and workspace_user.permissions == WORKSPACE_USER_PERMISSION_GUEST
+                for workspace_user in prefetched["workspaceuser_set"]
+            )
+        return actor.id in self._guest_user_ids(workspace, [actor])
+
     def _grants(self, workspace, user_ids, include_trash=False):
         """Map of user id -> {table id: level}; see `table_grants_for`."""
 
@@ -345,24 +363,16 @@ class TableGrantPermissionManagerType(PermissionManagerType):
     ) -> Optional[Dict[int, WorkspaceFilterDecision]]:
         """
         Multi-workspace listing (the homepage lists every workspace at once). Only
-        a workspace where the actor is a GUEST is restricted. The memberships are
-        read from `workspaceuser_set`, which the multi-workspace callers prefetch,
-        so every other workspace costs no query; the guest workspaces then go
-        through `filter_queryset` like a single listing.
+        a workspace where the actor is a GUEST is restricted; see `_is_guest` for
+        what that costs. The guest workspaces then go through `filter_queryset`
+        like a single listing.
         """
 
-        actor_id = getattr(actor, "id", None)
-        if actor_id is None or not workspaces:
+        if getattr(actor, "id", None) is None or not workspaces:
             return None
 
         guest_workspace_ids = {
-            workspace.id
-            for workspace in workspaces
-            if any(
-                workspace_user.user_id == actor_id
-                and workspace_user.permissions == WORKSPACE_USER_PERMISSION_GUEST
-                for workspace_user in workspace.workspaceuser_set.all()
-            )
+            workspace.id for workspace in workspaces if self._is_guest(actor, workspace)
         }
         if not guest_workspace_ids:
             return None
