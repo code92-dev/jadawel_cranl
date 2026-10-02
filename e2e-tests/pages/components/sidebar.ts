@@ -72,6 +72,11 @@ export class Sidebar {
    * links (settings, log out).
    */
   async openUserContext() {
+    // A click before Nuxt has hydrated the page has no handler yet and is lost,
+    // which is what a test that reloads and then opens the menu runs into.
+    await this.page.waitForFunction(
+      () => (window as any).useNuxtApp?.().isHydrating === false,
+    );
     await this.workspaceMenuToggle.click();
     await this.logoutLink.waitFor();
   }
