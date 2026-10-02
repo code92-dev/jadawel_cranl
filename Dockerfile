@@ -17,7 +17,15 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-10-02 from commit f699b49b, tag 2.3.20-baserow-2.4.
+# Published 2026-10-02 from commit 870ec24e, tag 2.3.21-workspace-settings.
+# The workspace boxes on the homepage lose their "Settings" button, which
+# opened an empty modal: Jadawel has no workspace settings pages, and the
+# workspace menu (⋮) already shows Settings only when one exists.
+# **No migration. No environment changes.**
+# Previous deployment pin (2.3.20-baserow-2.4):
+# sha256:4975c2d35bc016db360e1e6ff127855ec216352c0b175206ce2507eb1a05ff3a.
+#
+# Previously published 2026-10-02 from commit f699b49b, tag 2.3.20-baserow-2.4.
 # Seven Baserow 2.4 features (docs/UPSTREAM_2_4_PORT.md): the "Your workspaces"
 # homepage with recently viewed, and a workspace page that reads Overview, Items,
 # Dashboard, Templates and API; images in rich text cells; workflows started by
@@ -382,7 +390,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:4975c2d35bc016db360e1e6ff127855ec216352c0b175206ce2507eb1a05ff3a
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:54b0d3add1e47ac1d0277d37211459c9c0081b283a80f5960ea5f217bfc7964d
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
