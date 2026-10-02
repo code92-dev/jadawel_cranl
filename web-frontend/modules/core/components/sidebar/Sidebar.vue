@@ -34,35 +34,55 @@
         >
           <i class="iconoir-nav-arrow-left"></i>
         </nuxt-link>
+        <!--
+          Jadawel: the name leads to the workspaces homepage and the arrows
+          beside it open the menu (other workspaces, settings, log out).
+          Collapsed, only the avatar is left, so it opens the menu.
+        -->
         <a
+          v-if="collapsed"
           class="sidebar__workspaces-selector-link"
-          @click="
-            $refs.workspacesContext.toggle(
-              $refs.workspaceContextAnchor,
-              'bottom',
-              'left',
-              4,
-              16
-            )
-          "
+          @click="toggleWorkspacesContext()"
         >
           <Avatar
             :initials="
               $filters.nameAbbreviation(selectedWorkspace.name || name)
             "
           ></Avatar>
+        </a>
+        <nuxt-link
+          v-else
+          class="sidebar__workspaces-selector-link"
+          :to="{ name: 'all-workspaces' }"
+        >
+          <Avatar
+            :initials="
+              $filters.nameAbbreviation(selectedWorkspace.name || name)
+            "
+          ></Avatar>
+          <span class="sidebar__workspaces-selector-selected-workspace">{{
+            selectedWorkspace.name || name
+          }}</span>
           <span
-            v-show="!collapsed"
-            class="sidebar__workspaces-selector-selected-workspace"
-            >{{ selectedWorkspace.name || name }}</span
-          >
-          <span
-            v-show="!collapsed"
             v-if="unreadNotificationsInOtherWorkspaces"
             class="sidebar__unread-notifications-icon"
           ></span>
+        </nuxt-link>
+        <a
+          v-show="!collapsed"
+          v-tooltip="$t('sidebar.openWorkspacesMenu')"
+          tooltip-position="right"
+          tooltip-no-arrow
+          tooltip-show-delay="500"
+          class="sidebar__workspaces-selector-toggle"
+          role="button"
+          tabindex="0"
+          :aria-label="$t('sidebar.openWorkspacesMenu')"
+          @click="toggleWorkspacesContext()"
+          @keydown.enter.prevent="toggleWorkspacesContext()"
+          @keydown.space.prevent="toggleWorkspacesContext()"
+        >
           <i
-            v-show="!collapsed"
             class="sidebar__workspaces-selector-icon jadawel-icon-up-down-arrows"
           ></i>
         </a>
@@ -189,6 +209,15 @@ export default {
     )
   },
   methods: {
+    toggleWorkspacesContext() {
+      this.$refs.workspacesContext.toggle(
+        this.$refs.workspaceContextAnchor,
+        'bottom',
+        'left',
+        4,
+        16
+      )
+    },
     setShowAdmin(value) {
       this.showAdmin = value
       this.$forceUpdate()

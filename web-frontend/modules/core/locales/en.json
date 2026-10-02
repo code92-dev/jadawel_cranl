@@ -111,7 +111,8 @@
     "adminSettings": "Admin settings",
     "general": "General",
     "people": "People",
-    "licenses": "Licenses"
+    "licenses": "Licenses",
+    "openWorkspacesMenu": "Workspaces and account"
   },
   "interfaceTheme": {
     "title": "Interface color",

@@ -34,8 +34,18 @@
       >
         <slot />
 
+        <!--
+          Jadawel: not on the pages with the all workspaces sidebar. Their header
+          leaves no room for it, and a workspace is only still selected there
+          when the user came from one, so it would overlap the header then and be
+          missing after a reload.
+        -->
         <AppUtilities
-          v-if="selectedWorkspace && selectedWorkspace.id"
+          v-if="
+            sidebarType !== SIDEBAR_TYPES.ALL_WORKSPACES &&
+            selectedWorkspace &&
+            selectedWorkspace.id
+          "
           :workspace="selectedWorkspace"
         />
       </div>

@@ -14,6 +14,21 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Sidebar name leads home; framed workspace page sections (2026-10-02)
+
+The name at the top of the sidebar (the user's on the homepage, the workspace's
+inside one) is a link to the workspaces homepage; the arrows beside it open the
+menu that the whole row used to open. Each section of the workspace page sits in
+the same light frame as a workspace on the homepage.
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `web-frontend/modules/core/components/sidebar/{Sidebar,SidebarAllWorkspaces}.vue` | Name and avatar link to `all-workspaces`; a separate arrows button opens the workspaces and account menu; collapsed, the avatar still opens the menu | The owner wants the name to lead to the landing page; the menu keeps settings and log out reachable |
+| `web-frontend/modules/core/assets/scss/components/sidebar.scss` | `.sidebar__workspaces-selector-toggle`; the selector link inherits the selector's colour | The new button; on a coloured theme the name was dark on the coloured band |
+| `web-frontend/modules/core/assets/scss/components/dashboard.scss` | `.dashboard__section` frame (border, white, rounded, low elevation); stat, resource and chart cards share the homepage card look | Shows which cards belong to which section |
+| `e2e-tests/pages/components/sidebar.ts` | `openUserContext()` clicks the arrows button | The middle of the row is now the home link |
+| `web-frontend/modules/core/layouts/app.vue` | The bell and utilities menu are not rendered with the all workspaces sidebar | Reaching the homepage from a workspace (now the name's job) left them over its header; after a reload they were already absent |
+
 ## Workspace page sections and recently viewed titles (2026-10-02)
 
 The workspace page reads top to bottom as Overview (headline numbers), Items

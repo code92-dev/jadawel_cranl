@@ -5,6 +5,7 @@ export class Sidebar {
   page: Page;
   readonly root: Locator;
   readonly workspaceSelector: Locator;
+  readonly workspaceMenuToggle: Locator;
   readonly logoutLink: Locator;
   readonly mySettingsLink: Locator;
   private createNewAppButton: Locator;
@@ -14,6 +15,11 @@ export class Sidebar {
     this.page = page;
     this.root = page.locator(".sidebar");
     this.workspaceSelector = page.locator(".sidebar__workspaces-selector");
+    // The name in the selector links to the workspaces homepage; the arrows
+    // beside it open the menu.
+    this.workspaceMenuToggle = page.locator(
+      ".sidebar__workspaces-selector-toggle",
+    );
     // The labels in this menu are translated, so anchor on the icons, which
     // are the same in every language.
     this.logoutLink = page.locator(
@@ -66,7 +72,7 @@ export class Sidebar {
    * links (settings, log out).
    */
   async openUserContext() {
-    await this.workspaceSelector.click();
+    await this.workspaceMenuToggle.click();
     await this.logoutLink.waitFor();
   }
 

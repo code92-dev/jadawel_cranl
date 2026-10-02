@@ -76,10 +76,39 @@
 
   flex: 1 1 auto;
   min-inline-size: 0;
-  color: $palette-neutral-1200;
+
+  // Jadawel: the selector's own colour, which is white on a coloured theme.
+  color: inherit;
 
   &:hover {
     text-decoration: none;
+  }
+}
+
+// Jadawel: the name is a link to the workspaces homepage, so the menu has its
+// own button.
+.sidebar__workspaces-selector-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  inline-size: 28px;
+  block-size: 28px;
+  margin-inline-end: -6px;
+  border-radius: $rounded-md;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba($white, 0.16);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 1px;
+  }
+
+  [data-interface-theme='white'] &:hover {
+    background: rgba($palette-neutral-1300, 0.06);
   }
 }
 

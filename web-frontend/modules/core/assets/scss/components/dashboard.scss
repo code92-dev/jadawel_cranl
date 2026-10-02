@@ -84,8 +84,20 @@
 .dashboard__main {
   display: flex;
   flex-direction: column;
-  gap: 40px;
+  gap: 24px;
   max-inline-size: 1400px;
+}
+
+// Jadawel: each section of the workspace page (overview, items, dashboard,
+// templates and API) sits in one light frame, the same as a workspace on the
+// homepage, so it is clear which cards belong together.
+.dashboard__section {
+  padding: 20px;
+  border: 1px solid $palette-neutral-200;
+  background-color: $white;
+
+  @include rounded($rounded-lg);
+  @include elevation($elevation-low);
 }
 
 .dashboard__no-application {
@@ -110,8 +122,8 @@
 }
 
 .dashboard__resource {
-  border: 1px solid var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-raised-background, #fff);
+  border: 1px solid $palette-neutral-200;
+  background: $palette-neutral-25;
   padding: 16px;
   text-decoration: none;
   display: flex;
@@ -124,7 +136,7 @@
   &:hover {
     text-decoration: none;
     border-color: $palette-neutral-400;
-    background: var(--jadawel-hover-background, #f0f2f4);
+    background: $palette-neutral-100;
   }
 
   &:focus-visible {
@@ -253,8 +265,8 @@
   align-items: center;
   gap: 14px;
   padding: 16px;
-  border: 1px solid var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-raised-background, #fff);
+  border: 1px solid $palette-neutral-200;
+  background: $palette-neutral-25;
 
   @include rounded($rounded-lg);
 }
@@ -325,12 +337,12 @@
 }
 
 .chart {
-  border: 1px solid var(--jadawel-border-color, #e7e9ec);
-  background: var(--jadawel-raised-background, #fff);
+  border: 1px solid $palette-neutral-200;
+  background: $white;
   padding: 14px 16px;
   min-inline-size: 0;
 
-  @include rounded($rounded-md);
+  @include rounded($rounded-lg);
 }
 
 .chart__title {

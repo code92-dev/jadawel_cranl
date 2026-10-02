@@ -997,7 +997,8 @@
     "adminSettings": "إعدادات المشرف",
     "general": "عام",
     "people": "الأشخاص",
-    "licenses": "التراخيص"
+    "licenses": "التراخيص",
+    "openWorkspacesMenu": "مساحات العمل والحساب"
   },
   "interfaceTheme": {
     "title": "لون الواجهة",

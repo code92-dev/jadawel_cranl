@@ -68,6 +68,10 @@ Adaptations:
 
 - The workspace cookie that reopened the last workspace is gone, as upstream: a page
   selects a workspace only when its route names one.
+- The name at the top of the sidebar (the user's on the homepage, the workspace's
+  inside one) links to the homepage; the arrows beside it open the menu that the
+  whole row opens upstream. Each section of the workspace page has its own frame,
+  like a workspace on the homepage.
 - Jadawel has no workspace plan or row-usage badges (those come from Baserow's paid
   editions), so a workspace box shows members and items only.
 - Builder pages are not trashable in Jadawel, so a deleted page's last-viewed rows are
