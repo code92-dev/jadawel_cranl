@@ -17,7 +17,18 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-10-02 from commit 870ec24e, tag 2.3.21-workspace-settings.
+# Published 2026-10-03 from commit 4d00b7c0, tag 2.3.22-app-wide-tools.
+# The tools menu (top right) covers the whole system: it is on the workspaces
+# homepage, recently viewed and a new Members page (/members: every workspace
+# with its members, also in the workspaces sidebar); Invite asks which
+# workspace to invite to. The workspace page's sections stretch with the
+# window. Fixes an intermittent hydration mismatch on "Viewed … ago" labels
+# and drops the tools button's clipped tooltip.
+# **No migration. No environment changes.**
+# Previous deployment pin (2.3.21-workspace-settings):
+# sha256:54b0d3add1e47ac1d0277d37211459c9c0081b283a80f5960ea5f217bfc7964d.
+#
+# Previously published 2026-10-02 from commit 870ec24e, tag 2.3.21-workspace-settings.
 # The workspace boxes on the homepage lose their "Settings" button, which
 # opened an empty modal: Jadawel has no workspace settings pages, and the
 # workspace menu (⋮) already shows Settings only when one exists.
@@ -390,7 +401,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:54b0d3add1e47ac1d0277d37211459c9c0081b283a80f5960ea5f217bfc7964d
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:87b2068b2130eda93a5e51263bafec156d88066ce6c12b262532b729506761f1
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
