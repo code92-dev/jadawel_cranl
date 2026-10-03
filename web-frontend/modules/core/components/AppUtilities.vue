@@ -39,7 +39,6 @@
 
     <a
       ref="utilitiesAnchor"
-      v-tooltip="$t('sidebar.quickTools')"
       class="app-utilities__item"
       :class="{ 'app-utilities__item--active': utilitiesOpen }"
       :aria-label="$t('sidebar.quickTools')"
