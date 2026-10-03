@@ -5,6 +5,7 @@ import AdminGenerativeAISettings from '@jadawel/modules/arabase/generativeAI/Adm
 import SanadPanel from '@jadawel/modules/arabase/sanad/components/SanadPanel'
 import AddToMyDashboards from '@jadawel/modules/arabase/savedDashboards/components/AddToMyDashboards'
 import MyDashboardsMenuItem from '@jadawel/modules/arabase/savedDashboards/components/MyDashboardsMenuItem'
+import MembersSidebarItem from '@jadawel/modules/arabase/components/MembersSidebarItem'
 
 /**
  * Fork-level UI that core modules render through their plugin hooks. Using the
@@ -33,6 +34,11 @@ export class ArabasePlugin extends JadawelPlugin {
       ...(isMember ? [AddToMyDashboards] : []),
       ...(canShare ? [ShareDashboardLink] : []),
     ]
+  }
+
+  /** The members of every workspace, in the workspaces sidebar. */
+  getSidebarAllWorkspacesComponents() {
+    return [MembersSidebarItem]
   }
 
   /** "My dashboards" (لوحاتي), directly above "My settings". */

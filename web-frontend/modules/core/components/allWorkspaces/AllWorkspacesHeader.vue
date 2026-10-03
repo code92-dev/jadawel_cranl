@@ -132,11 +132,15 @@
       >
       <CreateWorkspaceModal ref="createWorkspaceModal"></CreateWorkspaceModal>
     </template>
+
+    <!-- Jadawel: the app-wide tools, here in the header row, which scrolls. -->
+    <AppUtilities></AppUtilities>
   </div>
 </template>
 
 <script>
 import CreateWorkspaceModal from '@jadawel/modules/core/components/workspace/CreateWorkspaceModal'
+import AppUtilities from '@jadawel/modules/core/components/AppUtilities'
 import { isMac } from '@jadawel/modules/core/utils/events'
 import {
   isTypeFilterActive,
@@ -148,7 +152,7 @@ import {
 
 export default {
   name: 'AllWorkspacesHeader',
-  components: { CreateWorkspaceModal },
+  components: { CreateWorkspaceModal, AppUtilities },
   props: {
     search: {
       type: String,

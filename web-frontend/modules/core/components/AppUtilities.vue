@@ -8,12 +8,20 @@
     `.dashboard__header` reserve the band with a padding, so this never lands on
     top of the header's own controls.
 
+    The tools apply to the whole system, so the pages that span every
+    workspace (the homepage, recently viewed, members) have them too, without a
+    workspace (`workspace` is null): Members and Invite cover every workspace,
+    and the notifications, which belong to one workspace, are left out. Those
+    pages scroll as a whole, so they place the tools in their own header row
+    rather than in a corner the content would scroll under.
+
     There is deliberately no search icon here: the view header already carries
     one, and two magnifiers in the same bar is exactly the duplication this
     layout is meant to remove. Global search stays on Ctrl/⌘ K.
   -->
-  <div class="app-utilities">
+  <div class="app-utilities" :class="{ 'app-utilities--inline': !workspace }">
     <a
+      v-if="workspace"
       v-tooltip="$t('sidebar.notifications')"
       class="app-utilities__item"
       :aria-label="$t('sidebar.notifications')"
@@ -62,19 +70,9 @@
       </div>
       <ul class="context__menu app-utilities__menu" role="menu">
         <nuxt-link
-          v-if="
-            $hasPermission(
-              'workspace.list_workspace_users',
-              workspace,
-              workspace.id
-            )
-          "
           v-slot="{ href, navigate }"
           custom
-          :to="{
-            name: 'settings-members',
-            params: { workspaceId: workspace.id },
-          }"
+          :to="{ name: 'arabase-workspace-members' }"
         >
           <li class="context__menu-item" role="none">
             <a
@@ -85,22 +83,12 @@
               @click="openMembers(navigate, $event)"
             >
               <i class="context__menu-item-icon iconoir-group"></i>
-              {{ membersTooltip }}
+              {{ $t('sidebar.members') }}
             </a>
           </li>
         </nuxt-link>
 
-        <li
-          v-if="
-            $hasPermission(
-              'workspace.create_invitation',
-              workspace,
-              workspace.id
-            )
-          "
-          class="context__menu-item"
-          role="none"
-        >
+        <li v-if="canInviteSomewhere" class="context__menu-item" role="none">
           <a
             class="context__menu-item-link"
             role="menuitem"
@@ -166,10 +154,11 @@
       </div>
     </Context>
 
-    <NotificationPanel ref="notificationPanel" />
+    <NotificationPanel v-if="workspace" ref="notificationPanel" />
     <WorkspaceMemberInviteModal
       ref="inviteModal"
       :workspace="workspace"
+      :workspaces="workspaces"
       @invite-submitted="handleInvite"
     />
     <TrashModal ref="trashModal" :initial-workspace="workspace"></TrashModal>
@@ -202,9 +191,14 @@ export default {
     Context,
   },
   props: {
+    /**
+     * The workspace being worked in, or null on the pages that span every
+     * workspace (the workspaces homepage, recently viewed, members).
+     */
     workspace: {
       type: Object,
-      required: true,
+      required: false,
+      default: null,
     },
   },
   data() {
@@ -221,22 +215,29 @@ export default {
       }))
     },
     /**
-     * The member count used to sit next to a text label. An icon has no room
-     * for it, so it moves into the tooltip rather than being dropped.
+     * Tools other modules add through `getWorkspaceUtilityComponents`. They act
+     * on the open workspace (Sanad opens beside it), so they need one.
      */
-    membersTooltip() {
-      const label = this.$t('sidebar.members')
-      const count = this.workspace.users?.length
-      return count ? `${label} (${count})` : label
-    },
-    /** Tools other modules add through `getWorkspaceUtilityComponents`. */
     pluginUtilityComponents() {
+      if (!this.workspace) {
+        return []
+      }
       return Object.values(this.$registry.getAll('plugin')).flatMap(
         (plugin) => plugin.getWorkspaceUtilityComponents(this.workspace) || []
       )
     },
+    /**
+     * Inviting is admin only, and the user's own role is known for every
+     * workspace without loading its permissions.
+     */
+    canInviteSomewhere() {
+      return this.workspaces.some(
+        (workspace) => workspace.permissions === 'ADMIN'
+      )
+    },
     ...mapGetters({
       unreadNotificationCount: 'notification/getUnreadCount',
+      workspaces: 'workspace/getAllSorted',
     }),
   },
   mounted() {
@@ -259,11 +260,21 @@ export default {
       this.$refs.utilitiesContext.hide()
       this.$refs.trashModal.show()
     },
-    handleInvite() {
+    /**
+     * Shows the pending invitations of the workspace invited to, as before.
+     * The members page stays put: it is where the user chose to be.
+     */
+    handleInvite(workspace) {
+      if (this.$route.name === 'arabase-workspace-members') {
+        this.$store.dispatch('toast/success', {
+          title: this.$t('sidebar.inviteSent', { name: workspace.name }),
+        })
+        return
+      }
       if (this.$route.name !== 'settings-invites') {
         this.$router.push({
           name: 'settings-invites',
-          params: { workspaceId: this.workspace.id },
+          params: { workspaceId: workspace.id },
         })
       }
     },

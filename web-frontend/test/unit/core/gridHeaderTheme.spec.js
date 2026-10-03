@@ -82,8 +82,9 @@ describe('interface theme styling', () => {
     expect(dashboardStyles).toMatch(
       /\.dashboard__scroll-container \{[^}]*background:\s*\$white/s
     )
+    // Jadawel: shared with the tools in the cross-workspace pages' header rows.
     expect(appUtilitiesStyles).toMatch(
-      /\.layout__col-2:has\(\.dashboard__header\) \.app-utilities__item \{[^}]*color:\s*\$palette-neutral-800/s
+      /:is\(\.layout__col-2:has\(\.dashboard__header\), \.app-utilities--inline\)\s*\.app-utilities__item \{[^}]*color:\s*\$palette-neutral-800/s
     )
   })
 

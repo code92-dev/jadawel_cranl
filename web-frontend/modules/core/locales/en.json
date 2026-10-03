@@ -111,7 +111,8 @@
     "general": "General",
     "people": "People",
     "licenses": "Licenses",
-    "openWorkspacesMenu": "Workspaces and account"
+    "openWorkspacesMenu": "Workspaces and account",
+    "inviteSent": "Invitation sent to join {name}"
   },
   "interfaceTheme": {
     "title": "Interface color",
@@ -837,7 +838,9 @@
           "title": "User is already in the workspace.",
           "text": "It is not possible to send an invitation when the user is already a member of the workspace."
         }
-      }
+      },
+      "workspace": "Workspace",
+      "noInvitableWorkspace": "You can invite members only to the workspaces you are an admin of, and you are not an admin of any."
     }
   },
   "memberSelectionList": {

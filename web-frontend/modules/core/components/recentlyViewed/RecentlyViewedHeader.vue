@@ -61,6 +61,12 @@
         )
       "
     ></SegmentControl>
+
+    <!--
+      Jadawel: the app-wide tools, on the page that spans every workspace. The
+      workspace page has its own, from the layout.
+    -->
+    <AppUtilities v-if="showWorkspaceFilter"></AppUtilities>
   </div>
 </template>
 
@@ -70,6 +76,7 @@ import { useStore } from 'vuex'
 import { useNuxtApp } from '#app'
 
 import SegmentControl from '@jadawel/modules/core/components/SegmentControl'
+import AppUtilities from '@jadawel/modules/core/components/AppUtilities'
 
 // Stored as user preferences, so the values must stay in sync with the
 // `*_recently_viewed_view_mode` preference types of the backend.

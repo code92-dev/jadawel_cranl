@@ -31,8 +31,8 @@
 .app-utilities__item {
   position: relative;
   flex: 0 0 auto;
-  inline-size: 30px;
-  block-size: 30px;
+  inline-size: var(--app-utilities-item-size, 30px);
+  block-size: var(--app-utilities-item-size, 30px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -71,8 +71,11 @@
 
 // Workspace home deliberately keeps its header white. The utilities occupy
 // that header's end-side band, so they return to their normal dark treatment
-// there while remaining white on table and builder top bars.
-.layout__col-2:has(.dashboard__header) .app-utilities__item {
+// there while remaining white on table and builder top bars. The pages that
+// span every workspace place them in their own white header row
+// (`--inline`), so they take the same treatment.
+:is(.layout__col-2:has(.dashboard__header), .app-utilities--inline)
+  .app-utilities__item {
   color: $palette-neutral-800;
 
   &:hover {
@@ -189,4 +192,14 @@
   &.badge-counter--one-digit {
     padding: 2px 5px;
   }
+}
+
+// The pages that span every workspace put the tools in their own header row,
+// which scrolls with the page, so they flow with the other controls there.
+.app-utilities.app-utilities--inline {
+  --app-utilities-item-size: 36px;
+
+  position: static;
+  block-size: auto;
+  padding-inline: 0;
 }

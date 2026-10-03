@@ -22,6 +22,12 @@ export const routes = [
     file: path.resolve(__dirname, 'pages/myDashboard.vue'),
   },
   {
+    // Every workspace with its members, from the app-wide tools menu.
+    name: 'arabase-workspace-members',
+    path: '/members',
+    file: path.resolve(__dirname, 'pages/workspaceMembers.vue'),
+  },
+  {
     name: 'arabase-public-dashboard',
     path: '/public/dashboard/:slug',
     file: path.resolve(__dirname, 'pages/publicDashboard.vue'),

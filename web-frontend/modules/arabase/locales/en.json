@@ -1116,5 +1116,13 @@
         "message": "The server this dashboard is on could not be reached. Try again later."
       }
     }
+  },
+  "workspaceMembers": {
+    "title": "Members",
+    "invite": "Invite members",
+    "inviteShort": "Invite",
+    "manage": "Manage",
+    "you": "You",
+    "adminsOnly": "Only the admins of this workspace can see its members."
   }
 }

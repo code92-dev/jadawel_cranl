@@ -14,6 +14,23 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## App-wide tools menu: members of every workspace, invite to any (2026-10-03)
+
+The tools menu (⊞, top right) covers the whole system: Members opens a page with
+every workspace and its members (`/members`, in arabase, also in the workspaces
+sidebar), and Invite asks which workspace to invite to. The pages that span every
+workspace (homepage, recently viewed, members) show the menu in their own header
+row, without notifications. The workspace page's sections now stretch with the
+window instead of stopping at 1400px.
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `web-frontend/modules/core/components/workspace/WorkspaceMemberInviteModal.vue` | `workspace` optional; new `workspaces` prop shows a workspace dropdown, loads permissions and roles of the workspaces where the user is an admin, and offers those; emits the workspace invited to | One invite dialog for every workspace |
+| `web-frontend/modules/core/components/{allWorkspaces/AllWorkspacesHeader,recentlyViewed/RecentlyViewedHeader}.vue` | Render the tools menu in the header row (recently viewed: only on the cross-workspace page) | The menu must be on these pages, and they scroll as a whole |
+| `web-frontend/modules/core/assets/scss/components/dashboard.scss` | `.dashboard__main` no longer capped at 1400px | Sections stayed narrow on wide windows while the header stretched |
+| `web-frontend/modules/core/locales/{en,ar}.json` | Invite dialog's workspace label and "no workspace" text; "invitation sent" toast | Strings |
+| `web-frontend/modules/core/composables/useNow.js` | The shared clock starts from the server's moment (carried in the payload via `useState`) while hydrating, then moves to the real time once mounted | Upstream 2.4 takes `Date.now()` on both sides, so an item viewed ~5 s earlier read "just now" on the server and "less than a minute ago" in the browser: an intermittent hydration mismatch on the homepage and workspace page |
+
 ## Sidebar name leads home; framed workspace page sections (2026-10-02)
 
 The name at the top of the sidebar (the user's on the homepage, the workspace's

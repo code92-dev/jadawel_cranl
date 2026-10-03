@@ -54,7 +54,22 @@ describe('AppUtilities component', () => {
     await testApp.afterEach()
   })
 
+  const stubs = {
+    Context: ContextStub,
+    NotificationPanel: EmptyOverlayStub,
+    WorkspaceMemberInviteModal: EmptyOverlayStub,
+    TrashModal: EmptyOverlayStub,
+    BadgeCounter: true,
+  }
+
   test('defaults to white first and keeps green as the second interface color', async () => {
+    // Inviting is offered when the user is an admin of some workspace.
+    await testApp.store.dispatch('workspace/forceCreate', {
+      id: 1,
+      name: 'Acme',
+      permissions: 'ADMIN',
+      users: [],
+    })
     const wrapper = await testApp.mount(AppUtilities, {
       props: {
         workspace: { id: 1, users: [{ id: 1 }, { id: 2 }] },
@@ -110,5 +125,48 @@ describe('AppUtilities component', () => {
       document.documentElement.style.getPropertyValue('--jadawel-border-color')
     ).toBe('#cfe8d9')
     expect(localStorage.getItem(INTERFACE_THEME_STORAGE_KEY)).toBe('sage')
+  })
+
+  test('on the pages spanning every workspace it has no workspace', async () => {
+    await testApp.store.dispatch('workspace/forceCreate', {
+      id: 1,
+      name: 'Acme',
+      permissions: 'MEMBER',
+      users: [],
+    })
+    const wrapper = await testApp.mount(AppUtilities, {
+      global: { stubs },
+    })
+
+    expect(wrapper.classes()).toContain('app-utilities--inline')
+    // Notifications belong to one workspace, so only the tools are shown.
+    expect(wrapper.find('.iconoir-bell').exists()).toBe(false)
+    expect(wrapper.findAll('.app-utilities__item')).toHaveLength(1)
+    // Members covers every workspace.
+    const members = wrapper.get('.context__menu-item-link:has(.iconoir-group)')
+    expect(members.attributes('href')).toBe('/members')
+    // Not an admin anywhere, so there is nobody to invite to.
+    expect(wrapper.find('.context__menu .iconoir-add-user').exists()).toBe(
+      false
+    )
+    expect(wrapper.find('.context__menu .iconoir-bin').exists()).toBe(true)
+  })
+
+  test('inside a workspace members still covers every workspace', async () => {
+    const workspace = { id: 1, name: 'Acme', permissions: 'ADMIN', users: [] }
+    await testApp.store.dispatch('workspace/forceCreate', workspace)
+    const wrapper = await testApp.mount(AppUtilities, {
+      props: { workspace },
+      global: { stubs },
+    })
+
+    expect(wrapper.classes()).not.toContain('app-utilities--inline')
+    expect(wrapper.find('.iconoir-bell').exists()).toBe(true)
+    expect(
+      wrapper
+        .get('.context__menu-item-link:has(.iconoir-group)')
+        .attributes('href')
+    ).toBe('/members')
+    expect(wrapper.find('.context__menu .iconoir-add-user').exists()).toBe(true)
   })
 })
