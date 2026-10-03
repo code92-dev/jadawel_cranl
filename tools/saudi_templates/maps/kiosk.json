@@ -1,0 +1,308 @@
+{
+ "source": "order-kiosk",
+ "slug": "saudi-order-kiosk",
+ "icon": "iconoir-glass-half",
+ "ar": {
+  "name": "كشك طلبات العصائر",
+  "keywords": [
+   "كشك طلبات",
+   "عصائر",
+   "مقهى",
+   "طلبات ذاتية",
+   "قائمة المشروبات",
+   "نقاط البيع",
+   "kiosk",
+   "juice bar",
+   "Saudi"
+  ]
+ },
+ "en": {
+  "name": "Saudi Juice Bar Order Kiosk",
+  "keywords": [
+   "orders",
+   "juice bar",
+   "kiosk application",
+   "self-service",
+   "drinks",
+   "Saudi"
+  ]
+ },
+ "money_fields": [
+  "Basic price",
+  "Subtotal price",
+  "Total price"
+ ],
+ "scale": 4.0,
+ "strings": {
+  "Order Kiosk": [
+   "كشك الطلبات",
+   "Order Kiosk"
+  ],
+  "Name": "الاسم",
+  "Description": "الوصف",
+  "Basic price": "السعر الأساسي",
+  "Image": "الصورة",
+  "Favorite from": "مشروب الموسم من",
+  "Favorite until": "مشروب الموسم حتى",
+  "Is flavor of the month": "مشروب الموسم؟",
+  "Ingredients": "المكونات",
+  "Order details": "تفاصيل الطلبات",
+  "Amount of orders": "عدد الطلبات",
+  "Flavor icon": "شارة الموسم",
+  "Beverages": "المشروبات",
+  "All beverages": "جميع المشروبات",
+  "Flavor of the month": "مشروب الموسم",
+  "Gallery: all beverages": "معرض: جميع المشروبات",
+  "Calendar: flavor of the month schedule": "تقويم: جدول مشروب الموسم",
+  "Category": "الفئة",
+  "🍓 Fruit": "🍓 فواكه",
+  "💦 Liquid": "💦 سوائل",
+  "🍦 Creamy": "🍦 كريمي",
+  "🍡 Topping": "🍡 إضافات",
+  "🥒 Vegetable": "🥒 خضار",
+  "Number of beverages": "عدد المشروبات",
+  "Number of times ordered": "مرات الطلب",
+  "All ingredients": "جميع المكونات",
+  "Ingredients used in multiple beverages": "مكونات في أكثر من مشروب",
+  "Ingredients used in only one beverage": "مكونات في مشروب واحد",
+  "Ingredients by category": "المكونات حسب الفئة",
+  "Extra charge": "معامل السعر",
+  "Display name": "الاسم المعروض",
+  "Cups": "الأكواب",
+  "All cup sizes": "جميع أحجام الأكواب",
+  "Order ID": "رقم الطلب",
+  "Date": "التاريخ",
+  "Is completed": "مكتمل؟",
+  "Total price": "السعر الإجمالي",
+  "Amount of beverages": "عدد المشروبات",
+  "Pickup number": "رقم الاستلام",
+  "Date (format)": "التاريخ (منسّق)",
+  "Day": "اليوم",
+  "Orders": "الطلبات",
+  "All orders": "جميع الطلبات",
+  "All orders grouped by day": "الطلبات حسب اليوم",
+  "Completed orders": "الطلبات المكتملة",
+  "Open orders": "الطلبات المفتوحة",
+  "Orders with a single beverage": "طلبات بمشروب واحد",
+  "Orders with multiple beverages": "طلبات بعدة مشروبات",
+  "Order": "الطلب",
+  "Beverage": "المشروب",
+  "Size": "الحجم",
+  "Subtotal price": "المجموع الفرعي",
+  "Quantity": "الكمية",
+  "Size name": "اسم الحجم",
+  "Order number": "رقم الطلب (نص)",
+  "Is ready": "جاهز؟",
+  "All order details": "جميع تفاصيل الطلبات",
+  "All order details grouped by order": "التفاصيل حسب الطلب",
+  "All order details grouped by order and size": "التفاصيل حسب الطلب والحجم",
+  "Quantities": "الكميات",
+  "All quantities": "جميع الكميات",
+  "Welcome": "الترحيب",
+  "👋 Welcome": "👋 أهلًا وسهلًا",
+  "👉 Start your order": "👈 ابدأ طلبك",
+  "Menu": "القائمة",
+  "🥤 Menu": "🥤 قائمة المشروبات",
+  "+ ADD TO ORDER": "+ أضف إلى الطلب",
+  "🧾 VIEW ORDER DETAILS": "🧾 تفاصيل الطلب",
+  "🛒 GO TO CHECKOUT": "🛒 إتمام الطلب",
+  "**Ingredients**": "**المكونات**",
+  "More information about ingredients": "مزيد من المعلومات عن المكونات",
+  "Cup selection": "اختيار الكوب",
+  "Select your cup size": "اختر حجم الكوب",
+  "⬅ BACK TO THE MENU": [
+   "➡ العودة إلى القائمة",
+   "⬅ BACK TO THE MENU"
+  ],
+  "Cup sizes": "أحجام الأكواب",
+  "Quantity selection": "اختيار الكمية",
+  "⬅ BACK TO CUP SELECTION": [
+   "➡ العودة لاختيار الكوب",
+   "⬅ BACK TO CUP SELECTION"
+  ],
+  "Select the quantity": "اختر الكمية",
+  "⬅⬅ BACK TO THE MENU": [
+   "➡➡ العودة إلى القائمة",
+   "⬅⬅ BACK TO THE MENU"
+  ],
+  "Cup size": "حجم الكوب",
+  "Order detail confirmation": "تأكيد الطلب",
+  "⬅⬅ BACK TO CUP SELECTION": [
+   "➡➡ العودة لاختيار الكوب",
+   "⬅⬅ BACK TO CUP SELECTION"
+  ],
+  "⬅ BACK TO QUANTITY SELECTION": [
+   "➡ العودة لاختيار الكمية",
+   "⬅ BACK TO QUANTITY SELECTION"
+  ],
+  "Confirm your order": "أكّد طلبك",
+  "⬅⬅⬅ BACK TO THE MENU": [
+   "➡➡➡ العودة إلى القائمة",
+   "⬅⬅⬅ BACK TO THE MENU"
+  ],
+  "✅ Smoothie added": "✅ أُضيف المشروب",
+  " has been added to your order.": " أُضيف إلى طلبك.",
+  "🧾 Order overview": "🧾 ملخص الطلب",
+  "Unit price": "سعر الوحدة",
+  "Sutotal": "المجموع الفرعي",
+  "❌ REMOVE": "❌ حذف",
+  "Checkout": "إتمام الطلب",
+  "🛒 Checkout": "🛒 إتمام الطلب",
+  "Start new order": "ابدأ طلبًا جديدًا",
+  "Order summary": "ملخص الطلب",
+  "Local Jadawel": "جداول المحلية",
+  "✨ Flavour of the month ✨": [
+   "✨ مشروب الموسم ✨",
+   "✨ Drink of the season ✨"
+  ],
+  "Europe/Brussels": "Asia/Riyadh",
+  "Europe/Amsterdam": "Asia/Riyadh",
+  "**Size: ": "**الحجم: ",
+  "**Quantity: ": "**الكمية: ",
+  "CONFIRM ": "تأكيد ",
+  " ingredients": " مكونات",
+  "**Pick up your order with the number ": "**استلم طلبك بالرقم ",
+  "ORDER ID: ": "رقم الطلب: ",
+  "Date: ": "التاريخ: ",
+  "Amount of beverages: ": "عدد المشروبات: ",
+  "**Total price: € ": [
+   "**الإجمالي (ر.س): ",
+   "**Total price: SAR "
+  ],
+  "Pink passion": [
+   "شغف الفراولة",
+   "Strawberry passion"
+  ],
+  "The best match with summer": "رفيق الصيف المثالي",
+  "Tropical breeze": "نسمة استوائية",
+  "Your taste of the tropics": "طعم المناطق الاستوائية",
+  "Berry blast": "انفجار التوت",
+  "A burst of flavor in every sip": "نكهة غنية في كل رشفة",
+  "Green machine": "الأخضر المنعش",
+  "A refreshing and healthy blend": "خليط صحي منعش",
+  "Peachy paradise": "جنة الخوخ",
+  "A sweet escape to paradise": "رحلة حلوة إلى الجنة",
+  "Choco-banana": "موز بالشوكولاتة",
+  "A decadent treat in every sip": "متعة غنية في كل رشفة",
+  "Citrus sunrise": "شروق الحمضيات",
+  "A bright and tangy start to your day": "بداية منعشة ليومك",
+  "Apple pie": [
+   "تفاح بالقرفة",
+   "Apple & cinnamon"
+  ],
+  "The coziest drink of the fall": [
+   "دفء الشتاء في كوب",
+   "Winter warmth in a cup"
+  ],
+  "Peanut butter cup": [
+   "طحينة بالموز والشوكولاتة",
+   "Banana tahini choco"
+  ],
+  "The perfect balance of sweet and salty": "توازن مثالي بين الحلو والمالح",
+  "Pumpkin spice": [
+   "سوبيا",
+   "Sobia"
+  ],
+  "The ultimate fall favorite": [
+   "مشروب رمضان المفضل في الحجاز",
+   "The Hijazi Ramadan favourite"
+  ],
+  "Blueberry lemon": "توت بالليمون والنعناع",
+  "A refreshing and tart delight": "متعة منعشة بطعم لاذع",
+  "Mango": "مانجو",
+  "A sweet and juicy tropical fruit with a soft, fibrous texture": "فاكهة استوائية حلوة وعصيرية ذات قوام ناعم",
+  "Pineapple": "أناناس",
+  "A tropical fruit with a sweet and tangy flavor, often used in desserts and drinks": "فاكهة استوائية حلوة المذاق تُستخدم في الحلويات والمشروبات",
+  "Coconut milk": "حليب جوز الهند",
+  "A creamy, dairy-free milk made from the flesh of coconuts": "حليب كريمي نباتي من لب جوز الهند",
+  "Ice": "ثلج",
+  "Frozen water used to chill drinks or create a slushy texture": "ماء مجمد لتبريد المشروبات أو جعلها مثلجة",
+  "Strawberries": "فراولة",
+  "A sweet and juicy fruit often used in desserts and smoothies": "فاكهة حلوة تُستخدم في الحلويات والعصائر",
+  "Blueberries": "توت أزرق",
+  "A small, sweet fruit with a dark blue color and a slightly tart flavor": "فاكهة صغيرة حلوة زرقاء داكنة بطعم لاذع قليلًا",
+  "Raspberries": "توت أحمر",
+  "A small, sweet fruit with a red color and a slightly tart flavor": "فاكهة صغيرة حلوة حمراء بطعم لاذع قليلًا",
+  "Honey": [
+   "عسل سدر",
+   "Sidr honey"
+  ],
+  "A sweet, sticky substance produced by bees from nectar": "عسل طبيعي من رحيق أزهار السدر",
+  "Yoghurt": [
+   "لبن زبادي",
+   "Yoghurt"
+  ],
+  "A creamy dairy product made by fermenting milk with bacteria": "منتج ألبان كريمي من الحليب المخمّر",
+  "Kale": "كرنب أجعد",
+  "A leafy green vegetable that is high in nutrients": "خضار ورقية غنية بالعناصر الغذائية",
+  "Spinach": "سبانخ",
+  "Banana": "موز",
+  "A sweet and creamy fruit that is often used in smoothies": "فاكهة حلوة كريمية تُستخدم في العصائر",
+  "Almond milk": "حليب اللوز",
+  "A creamy, dairy-free milk made from almonds": "حليب كريمي نباتي من اللوز",
+  "Peaches": "خوخ",
+  "A flavoring made from vanilla beans": [
+   "فاكهة حلوة عصيرية ذات قشرة مخملية",
+   "A sweet and juicy fruit with a fuzzy skin"
+  ],
+  "Vanilla extract": "خلاصة الفانيليا",
+  "A sweet and juicy fruit with a fuzzy skin": [
+   "منكّه من حبوب الفانيليا",
+   "A flavoring made from vanilla beans"
+  ],
+  "Chocolate chips": "رقائق شوكولاتة",
+  "Small pieces of chocolate often used in baking": "قطع شوكولاتة صغيرة تُستخدم في المخبوزات",
+  "Almond butter": "زبدة اللوز",
+  "A spread made from ground almonds": "معجون من اللوز المطحون",
+  "Oranges": "برتقال",
+  "A citrus fruit with a sweet and tangy flavor": "فاكهة حمضية حلوة المذاق",
+  "Grapefruit": "جريب فروت",
+  "A citrus fruit with a bitter and tangy flavor": "فاكهة حمضية بطعم مرّ لاذع",
+  "Lime": "ليمون",
+  "A tart and acidic juice made from limes": "عصير حامض من الليمون",
+  "Apples": "تفاح",
+  "A crisp and juicy fruit with a sweet flavor": "فاكهة مقرمشة حلوة المذاق",
+  "Cinnamon": "قرفة",
+  "A spice made from the bark of a tree, often used in baking": "بهار من لحاء الشجر يُستخدم في المخبوزات",
+  "Peatnut butter": [
+   "طحينة",
+   "Tahini"
+  ],
+  "A spread made from ground peanuts": [
+   "معجون من السمسم المطحون",
+   "A paste of ground sesame"
+  ],
+  "Pumpkin mash": [
+   "شعير منقوع",
+   "Soaked barley"
+  ],
+  "A cooked and mashed pumpkin often used in baking": [
+   "شعير منقوع أساس مشروب السوبيا",
+   "Soaked barley, the base of sobia"
+  ],
+  "Nutmeg": [
+   "هيل",
+   "Cardamom"
+  ],
+  "A spice made from the seed of a tree, often used in sweet or savory dishes": [
+   "بهار عطري يُستخدم في القهوة السعودية والمشروبات",
+   "An aromatic spice used in Saudi coffee and drinks"
+  ],
+  "Maple syrup": [
+   "دبس التمر",
+   "Date syrup"
+  ],
+  "A sweet syrup made from the sap of maple trees": [
+   "شراب حلو كثيف من التمر",
+   "A thick sweet syrup made from dates"
+  ],
+  "Mint leaves": "أوراق نعناع",
+  "A fragrant herb often used to flavor drinks and dishes": "عشبة عطرية تُستخدم لتنكيه المشروبات والأطباق",
+  "Regular size": "حجم عادي",
+  "Large size": "حجم كبير",
+  "Fill the bottle": [
+   "عبوة لتر",
+   "1 L bottle"
+  ]
+ }
+}

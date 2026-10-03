@@ -164,7 +164,7 @@ class ArabaseConfig(AppConfig):
             reconcile_local_template_catalog_after_migrate,
         )
 
-        # This fork's six bundled templates are the authoritative local-only
+        # This fork's bundled templates are the authoritative local-only
         # catalog. Prevent core's broad post-migration sync from importing all
         # 150+ upstream templates, and constrain any task left in Redis by an
         # older deployment to the same local pattern.

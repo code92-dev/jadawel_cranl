@@ -18,6 +18,29 @@ logger = logging.getLogger(__name__)
 ARABIC_TEMPLATE_CATEGORY = "قوالب عربية"
 ENGLISH_TEMPLATE_CATEGORY = "English Templates"
 
+# Saudi editions of upstream templates, built by tools/saudi_templates: each
+# slug is the Arabic edition and "<slug>-en" its English counterpart.
+SAUDI_EDITIONS = [
+    # Databases
+    "saudi-restaurant-management",
+    "saudi-business-expenses",
+    "saudi-employee-onboarding",
+    "saudi-school-management",
+    "saudi-nonprofit-management",
+    # Automations
+    "saudi-inspections-compliance",
+    "saudi-intake-qualification",
+    "saudi-work-management",
+    "saudi-password-reset",
+    "saudi-leave-management",
+    # Applications
+    "saudi-compliance-assessment",
+    "saudi-property-management",
+    "saudi-order-kiosk",
+    "saudi-crm",
+    "saudi-purchase-orders",
+]
+
 LOCAL_TEMPLATE_CATALOG = {
     "arabic-performance-review": ARABIC_TEMPLATE_CATEGORY,
     "arabic-project-management": ARABIC_TEMPLATE_CATEGORY,
@@ -25,6 +48,8 @@ LOCAL_TEMPLATE_CATALOG = {
     "performance-reviews": ENGLISH_TEMPLATE_CATEGORY,
     "project-management-en": ENGLISH_TEMPLATE_CATEGORY,
     "saudi-budget-consolidation-en": ENGLISH_TEMPLATE_CATEGORY,
+    **{slug: ARABIC_TEMPLATE_CATEGORY for slug in SAUDI_EDITIONS},
+    **{f"{slug}-en": ENGLISH_TEMPLATE_CATEGORY for slug in SAUDI_EDITIONS},
 }
 
 LOCAL_TEMPLATE_PATTERN = "^(?:{})$".format(
@@ -77,15 +102,19 @@ def local_template_catalog_is_current() -> bool:
 
 
 def reconcile_local_template_catalog() -> dict:
-    """Import the six bundled templates and remove obsolete catalog previews.
+    """Import the bundled templates and remove obsolete catalog previews.
 
     This is intentionally fail-safe: imports happen first, and no old template is
-    removed unless all six approved slugs exist afterward. The operation is
+    removed unless every approved slug exists afterward. The operation is
     idempotent, so normal restarts only perform the inexpensive state check.
     """
 
     if local_template_catalog_is_current():
-        return {"changed": False, "removed": 0, "templates": 6}
+        return {
+            "changed": False,
+            "removed": 0,
+            "templates": len(LOCAL_TEMPLATE_CATALOG),
+        }
 
     CoreHandler().sync_templates(pattern=LOCAL_TEMPLATE_PATTERN)
 

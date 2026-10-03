@@ -14,7 +14,6 @@ from jadawel.contrib.builder.data_sources.builder_dispatch_context import (
     BuilderDispatchContext,
 )
 from jadawel.contrib.builder.elements.element_types import NavigationElementManager
-from jadawel.contrib.builder.formula_importer import import_formula
 from jadawel.contrib.builder.workflow_actions.models import (
     AIAgentWorkflowAction,
     CoreHTTPRequestWorkflowAction,
@@ -331,6 +330,11 @@ class BuilderWorkflowServiceActionType(BuilderWorkflowActionType):
                 )
                 integration = Integration.objects.get(id=integration_id)
 
+            # Jadawel fork: no import_formula here. The action's import_formulas
+            # (registries.py) also yields the service formulas, with the element
+            # import context, so importing them here too remapped every id twice:
+            # a new id that matched another old id in the export pointed the
+            # formula at the wrong field or action.
             return ServiceHandler().import_service(
                 integration,
                 serialized_service,
@@ -338,7 +342,6 @@ class BuilderWorkflowServiceActionType(BuilderWorkflowActionType):
                 storage=storage,
                 cache=cache,
                 files_zip=files_zip,
-                import_formula=import_formula,
             )
         return super().deserialize_property(
             prop_name,

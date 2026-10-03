@@ -14,6 +14,17 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Builder service actions import their formulas once (2026-10-03)
+
+Installing an application template could fail, or silently point a step at the
+wrong row or data source, depending on which ids the database handed out. Found
+by the Saudi template editions (`docs/SAUDI_TEMPLATES.md`), whose install test
+failed on `saudi-work-management` only when the test database had grown.
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/contrib/builder/workflow_actions/workflow_action_types.py` | `BuilderWorkflowServiceActionType.deserialize_property` no longer passes `import_formula` to `ServiceHandler().import_service`; the now-unused import is dropped | The service's formulas were imported there and again by the action's `import_formulas`, whose `formula_generator` also yields them. The second pass mapped already-new ids as if they were old ones, so a new id that matched another old id in the export was remapped again (`previous_action.515` → `496` → a refresh action, raising `AttributeError`). The remaining pass runs with the element import context. `tests/arabase/test_builder_service_action_import.py` covers it. |
+
 ## App-wide tools menu: members of every workspace, invite to any (2026-10-03)
 
 The tools menu (⊞, top right) covers the whole system: Members opens a page with

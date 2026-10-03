@@ -1,0 +1,342 @@
+{
+ "source": "compliance-assessment-builder",
+ "slug": "saudi-compliance-assessment",
+ "include": [
+  "workmgmt"
+ ],
+ "domains": {
+  "@example.com": "@example.sa"
+ },
+ "ar": {
+  "name": "تقييم الامتثال",
+  "keywords": [
+   "الامتثال",
+   "الضوابط الأساسية للأمن السيبراني",
+   "الهيئة الوطنية للأمن السيبراني",
+   "نظام حماية البيانات الشخصية",
+   "سدايا",
+   "تقييم",
+   "استبيان",
+   "compliance",
+   "NCA ECC",
+   "PDPL",
+   "Saudi"
+  ]
+ },
+ "en": {
+  "name": "Saudi Compliance Assessment Builder",
+  "keywords": [
+   "compliance assessments",
+   "NCA ECC",
+   "PDPL",
+   "cybersecurity",
+   "data protection",
+   "questionnaire builder",
+   "Saudi"
+  ]
+ },
+ "strings": {
+  "Compliance Assessment builder": [
+   "منشئ تقييمات الامتثال",
+   "Compliance Assessment Builder"
+  ],
+  "Description": "الوصف",
+  "Responses": "الاستجابات",
+  "Assessment questions": "أسئلة التقييم",
+  "Count questions": "عدد الأسئلة",
+  "Count responses": "عدد الاستجابات",
+  "First question type": "نوع السؤال الأول",
+  "Count complete responses": "الاستجابات المكتملة",
+  "Responders": "المستجيبون",
+  "Responder": "المستجيب",
+  "Incomplete responses": "الاستجابات غير المكتملة",
+  "Is available": "متاح؟",
+  "Assessments": "التقييمات",
+  "All assessments": "جميع التقييمات",
+  "Available assessments": "التقييمات المتاحة",
+  "Assessments with incomplete responses": "تقييمات لها استجابات غير مكتملة",
+  "Assessments without responses": "تقييمات بلا استجابات",
+  "Label": "نص السؤال",
+  "Type": "نوع السؤال",
+  "Choice names": "أسماء الخيارات",
+  "Choice values": "قيم الخيارات",
+  "Response details": "تفاصيل الإجابات",
+  "Assessment IDs": "أرقام التقييمات",
+  "Assessment ID": "رقم التقييم",
+  "Count assessments": "عدد التقييمات",
+  "Questions": "الأسئلة",
+  "All questions": "جميع الأسئلة",
+  "Questions used in multiple assessments": "أسئلة مستخدمة في أكثر من تقييم",
+  "Choice questions": "أسئلة الاختيار",
+  "Text questions": "الأسئلة النصية",
+  "Rating questions": "أسئلة التقييم بالنجوم",
+  "Assessment": "التقييم",
+  "Question": "السؤال",
+  "Order": "الترتيب",
+  "Next": "التالي",
+  "Question type": "نوع السؤال (رمز)",
+  "Next question path": "مسار السؤال التالي",
+  "Question label": "نص السؤال (مرجع)",
+  "Order up": "الترتيب للأعلى",
+  "Order down": "الترتيب للأسفل",
+  "All questions for all assessments": "أسئلة جميع التقييمات",
+  "All questions grouped by assessment": "الأسئلة حسب التقييم",
+  "Session ID": "معرّف الجلسة",
+  "Created on (format)": "تاريخ الإنشاء (منسّق)",
+  "Count answers": "عدد الإجابات",
+  "Response complete": "مكتملة؟",
+  "All responses": "جميع الاستجابات",
+  "All responses grouped by responder": "الاستجابات حسب المستجيب",
+  "Non-complete responses": "استجابات غير مكتملة",
+  "Completed responses": "استجابات مكتملة",
+  "Calendar: All responses": "تقويم: جميع الاستجابات",
+  "Value": "الإجابة",
+  "Response session": "جلسة الاستجابة",
+  "Update answer path": "مسار تعديل الإجابة",
+  "Assessment question": "سؤال التقييم",
+  "All response details": "جميع الإجابات",
+  "All response details grouped by question": "الإجابات حسب السؤال",
+  "All response details grouped by assessment": "الإجابات حسب التقييم",
+  "All response details grouped by assessment question": "الإجابات حسب سؤال التقييم",
+  "Job role": "المسمى الوظيفي",
+  "Compliance Manager": "مدير الالتزام",
+  "Assignment IDs": "أرقام التقييمات المسندة",
+  "Employees": "الموظفون",
+  "All employees": "جميع الموظفين",
+  "Other employees": "موظفون آخرون",
+  "Compliance managers": "مديرو الالتزام",
+  "Gallery: All employees": "معرض: جميع الموظفين",
+  "Europe/Amsterdam": "Asia/Riyadh",
+  "Compliance Assessment Builder": [
+   "منشئ تقييمات الامتثال",
+   "Compliance Assessment Builder"
+  ],
+  "Non-completed responses": "استجابات غير مكتملة",
+  "Logout": "تسجيل الخروج",
+  "Column": "عمود",
+  "Non-responded assessments": "تقييمات لم يُجب عنها",
+  "Assessment details": "تفاصيل التقييم",
+  "Employees without response": "موظفون لم يستجيبوا",
+  "Get responses": "جلب الاستجابات",
+  "Question choice": "سؤال اختيار",
+  "Get assessment": "جلب التقييم",
+  "Get question": "جلب السؤال",
+  "Get question details": "جلب تفاصيل السؤال",
+  "Get next question": "جلب السؤال التالي",
+  "Question text": "سؤال نصي",
+  "Question rating": "سؤال تقييم",
+  "Update question choice": "تعديل إجابة اختيار",
+  "Get answer": "جلب الإجابة",
+  "Update question text": "تعديل إجابة نصية",
+  "Update question rating": "تعديل إجابة تقييم",
+  "Response overview": "ملخص الاستجابة",
+  "Non completed responses": "استجابات غير مكتملة",
+  "Answers": "الإجابات",
+  "Continue": "متابعة",
+  "Non-completed responses details": "تفاصيل الاستجابات غير المكتملة",
+  "Get response session": "جلب جلسة الاستجابة",
+  "Get completed responses": "جلب الاستجابات المكتملة",
+  "Get non-completed responses": "جلب الاستجابات غير المكتملة",
+  "Review": "مراجعة",
+  "Add assessment": "إضافة تقييم",
+  "Select questions": "اختيار الأسئلة",
+  "Delete": "حذف",
+  "Add": "إضافة",
+  "Selected questions": "الأسئلة المختارة",
+  "Available questions": "الأسئلة المتاحة",
+  "Count selected questions": "عدد الأسئلة المختارة",
+  "Local Jadawel": "جداول المحلية",
+  "Welcome ": "أهلًا ",
+  "Compliance Assessments": "تقييمات الامتثال",
+  "Sign in ": "دخول",
+  "+ Create new assessment": "+ إنشاء تقييم جديد",
+  "TAKE ASSESSMENT": "ابدأ التقييم",
+  "Already responded": "تمت الإجابة",
+  "Waiting for response": "بانتظار الإجابة",
+  "Edit assessment questions": "تعديل أسئلة التقييم",
+  "Question (": "السؤال (",
+  "Submit answer": "إرسال الإجابة",
+  "Update answer": "تعديل الإجابة",
+  "Response overview: ": "ملخص الاستجابة: ",
+  "Edit": "تعديل",
+  "Completed questions": "الأسئلة المكتملة",
+  "Continue with the next question": "المتابعة إلى السؤال التالي",
+  "Non-completed assessments": "تقييمات غير مكتملة",
+  "Add new assessment": "إضافة تقييم جديد",
+  "+ Add assessment": "+ إضافة التقييم",
+  "NAME": "الاسم",
+  "DESCRIPTION": "الوصف",
+  "Select questions for ": "اختيار أسئلة ",
+  "The assessment is published and available for all employees.": "التقييم منشور ومتاح لجميع الموظفين.",
+  "Update": "تحديث",
+  "Selected questions ": "الأسئلة المختارة ",
+  "- DELETE": "- حذف",
+  "+ ADD": "+ إضافة",
+  "Workplace Safety Audit": [
+   "تقييم الضوابط الأساسية للأمن السيبراني",
+   "NCA Essential Cybersecurity Controls (ECC) assessment"
+  ],
+  "A survey to assess compliance with workplace health and safety standards, including emergency procedures, protective equipment, and hazard reporting.": [
+   "استبيان لقياس الالتزام بالضوابط الأساسية للأمن السيبراني الصادرة عن الهيئة الوطنية للأمن السيبراني: الحوكمة، وإدارة الأصول، والحوادث، والنسخ الاحتياطي، والتوعية.",
+   "A survey on compliance with the National Cybersecurity Authority's Essential Cybersecurity Controls: governance, asset management, incidents, backups and awareness."
+  ],
+  "Data Privacy Compliance Check": [
+   "التحقق من الامتثال لنظام حماية البيانات الشخصية",
+   "Personal Data Protection Law (PDPL) check"
+  ],
+  "A questionnaire to ensure adherence to data protection policies and GDPR requirements, focusing on handling, storage, and sharing of sensitive information.": [
+   "استبيان للتأكد من الالتزام بنظام حماية البيانات الشخصية ولوائحه الصادرة عن سدايا، في جمع البيانات وحفظها ومشاركتها ونقلها خارج المملكة.",
+   "A questionnaire on adherence to the Personal Data Protection Law and SDAIA's regulations when collecting, storing, sharing and transferring data outside the Kingdom."
+  ],
+  "Financial Controls Review": "مراجعة الضوابط المالية",
+  "A survey to evaluate the effectiveness of financial oversight practices, including expense reporting, fraud prevention, and approval workflows.": "استبيان لتقييم فاعلية الرقابة المالية، ومنها الإبلاغ عن المصروفات ومنع الاحتيال ومسارات الاعتماد والفوترة الإلكترونية.",
+  "Policy Awareness Assessment": "تقييم الوعي بالسياسات",
+  "A survey to measure employee awareness and understanding of internal policies such as code of conduct, anti-harassment, and ethical guidelines.": "استبيان لقياس وعي الموظفين بالسياسات الداخلية كمدونة قواعد السلوك ونظام مكافحة التحرش والمبادئ الأخلاقية.",
+  "Vendor Compliance Audit": "تدقيق امتثال الموردين",
+  "A survey to assess whether third-party suppliers and contractors comply with contractual obligations, legal requirements, and corporate policies.": "استبيان للتحقق من التزام الموردين والمقاولين بالتزاماتهم التعاقدية والمتطلبات النظامية وسياسات المنشأة.",
+  "Emergency exits": [
+   "حوكمة الأمن السيبراني",
+   "Cybersecurity governance"
+  ],
+  "Are emergency exits clearly marked and unobstructed?": [
+   "هل لدى الجهة استراتيجية للأمن السيبراني معتمدة من صاحب الصلاحية؟",
+   "Does the organisation have a cybersecurity strategy approved by its authorising official?"
+  ],
+  "Protective equipment": [
+   "إدارة الأصول",
+   "Asset management"
+  ],
+  "Do employees have access to required protective equipment?": [
+   "هل توجد قائمة محدّثة بالأصول المعلوماتية والتقنية؟",
+   "Is there an up-to-date inventory of information and technology assets?"
+  ],
+  "Incident reporting": [
+   "إدارة حوادث الأمن السيبراني",
+   "Cybersecurity incident management"
+  ],
+  "How effective is the current incident reporting process?": [
+   "ما مدى فاعلية الإبلاغ عن حوادث الأمن السيبراني والاستجابة لها؟",
+   "How effective is reporting and responding to cybersecurity incidents?"
+  ],
+  "Fire drills": [
+   "اختبار النسخ الاحتياطية",
+   "Backup testing"
+  ],
+  "How frequently are fire drills conducted?": [
+   "كم مرة تُختبر استعادة النسخ الاحتياطية؟",
+   "How often is restoring backups tested?"
+  ],
+  "Training completed": [
+   "التوعية بالأمن السيبراني",
+   "Cybersecurity awareness"
+  ],
+  "Have employees completed mandatory compliance training?": [
+   "هل أكمل الموظفون برنامج التوعية بالأمن السيبراني؟",
+   "Have employees completed the cybersecurity awareness programme?"
+  ],
+  "Policy access": "إتاحة السياسات",
+  "Are compliance policies easily accessible to employees?": "هل سياسات الامتثال موثّقة ومتاحة للموظفين بسهولة؟",
+  "Data encryption": "تشفير البيانات",
+  "Is sensitive data stored using encryption methods?": "هل تُحفظ البيانات الشخصية الحساسة مشفّرة؟",
+  "Password policy": "سياسة كلمات المرور",
+  "How would you rate the strength of the organization’s password policy?": "كيف تقيّم قوة سياسة كلمات المرور والتحقق متعدد العوامل في الجهة؟",
+  "Confidential documents": [
+   "استضافة البيانات داخل المملكة",
+   "Data hosting in the Kingdom"
+  ],
+  "Are confidential documents stored securely?": [
+   "هل تُستضاف البيانات الشخصية داخل المملكة، أو تُنقل خارجها وفق ضوابط النقل النظامية؟",
+   "Is personal data hosted inside the Kingdom, or transferred out only under the statutory transfer rules?"
+  ],
+  "Data sharing": [
+   "موافقة صاحب البيانات",
+   "Data subject consent"
+  ],
+  "Do employees follow guidelines for data sharing?": [
+   "هل تُؤخذ موافقة صاحب البيانات قبل مشاركتها مع طرف ثالث؟",
+   "Is the data subject's consent obtained before sharing with a third party?"
+  ],
+  "Expense approvals": "اعتماد المصروفات",
+  "Is there a clear process for approving financial expenses?": "هل توجد إجراءات واضحة لاعتماد المصروفات؟",
+  "Fraud prevention": "منع الاحتيال",
+  "How confident are you in the fraud prevention measures?": "ما مدى ثقتك في إجراءات منع الاحتيال؟",
+  "Audit trails": [
+   "الفوترة الإلكترونية والسجلات",
+   "E-invoicing and audit trails"
+  ],
+  "Are financial transactions properly logged and traceable?": [
+   "هل تُسجَّل العمليات المالية ويمكن تتبعها، وتصدر الفواتير إلكترونيًا وفق متطلبات هيئة الزكاة والضريبة والجمارك؟",
+   "Are transactions logged and traceable, with e-invoices issued under ZATCA's requirements?"
+  ],
+  "Vendor screening": "التحقق من الموردين",
+  "Are vendors screened for compliance before contracts are signed?": [
+   "هل يُتحقق من السجل التجاري وشهادة الزكاة والضريبة للمورد قبل التعاقد؟",
+   "Are a vendor's commercial registration and Zakat/VAT certificates checked before signing?"
+  ],
+  "Vendor monitoring": "متابعة الموردين",
+  "How regularly are vendors reviewed for compliance?": "كم مرة يُراجع امتثال الموردين؟",
+  "Policy awareness": "مدونة السلوك",
+  "Do you understand the organization's code of conduct?": "هل تفهم مدونة قواعد السلوك في المنشأة؟",
+  "Whistleblower protection": "حماية المبلّغين",
+  "Do employees feel safe reporting misconduct?": "إلى أي حد يشعر الموظفون بالأمان عند الإبلاغ عن المخالفات؟",
+  "Harassment policy": "مكافحة التحرش",
+  "Are employees aware of the anti-harassment policy?": [
+   "هل يعرف الموظفون نظام مكافحة جريمة التحرش وآلية الإبلاغ؟",
+   "Are employees aware of the Anti-Harassment Law and how to report?"
+  ],
+  "Ethical practices": "الممارسات الأخلاقية",
+  "Do you believe ethical practices are followed in your department?": "هل تُتّبع الممارسات الأخلاقية في إدارتك؟",
+  "Conflict of interest": "تعارض المصالح",
+  "Are potential conflicts of interest disclosed and managed?": "هل يُفصح عن حالات تعارض المصالح وتُدار؟",
+  "Record keeping": "حفظ السجلات",
+  "How accurate and complete are compliance-related records?": "ما مدى دقة سجلات الامتثال واكتمالها؟",
+  "Regulatory updates": "المستجدات التنظيمية",
+  "How often are employees updated on new regulations?": "كم مرة يُبلَّغ الموظفون بالأنظمة واللوائح الجديدة؟",
+  "Compliance culture": "ثقافة الامتثال",
+  "How would you describe the overall culture of compliance?": "كيف تصف ثقافة الامتثال بشكل عام؟",
+  "Improvement suggestions": "مقترحات التحسين",
+  "What improvements would you suggest for compliance processes?": "ما التحسينات التي تقترحها على إجراءات الامتثال؟",
+  "Additional risks": "مخاطر إضافية",
+  "Are there compliance risks not currently being addressed?": "هل توجد مخاطر امتثال لا تُعالج حاليًا؟",
+  "Yes,No,Partially": [
+   "نعم,لا,جزئيًا",
+   "Yes,No,Partially"
+  ],
+  "Monthly,Quarterly,Annually,Never": [
+   "شهريًا,كل ربع سنة,سنويًا,أبدًا",
+   "Monthly,Quarterly,Annually,Never"
+  ],
+  "Yes,No,In progress": [
+   "نعم,لا,قيد التنفيذ",
+   "Yes,No,In progress"
+  ],
+  "Yes,No,Not sure": [
+   "نعم,لا,غير متأكد",
+   "Yes,No,Not sure"
+  ],
+  "Always,Sometimes,Never": [
+   "دائمًا,أحيانًا,أبدًا",
+   "Always,Sometimes,Never"
+  ],
+  "Quarterly,Annually,Ad-hoc,Never": [
+   "كل ربع سنة,سنويًا,عند الحاجة,أبدًا",
+   "Quarterly,Annually,Ad-hoc,Never"
+  ],
+  "Yes": "نعم",
+  "No": "لا",
+  "Partially": "جزئيًا",
+  "Monthly": "شهريًا",
+  "Never": "أبدًا",
+  "In progress": "قيد التنفيذ",
+  "Always": "دائمًا",
+  "I updated the answer": "عدّلت الإجابة",
+  "This is other text": "تفعيل التوعية الدورية عبر البريد",
+  "Nora Mott": [
+   "لمى الجهني",
+   "Lama Al-Juhani"
+  ],
+  "nora.mott@example.sa": "lama.aljuhani@example.sa",
+  "Assessments taken by all  11 employees": "تقييمات أجاب عنها جميع الموظفين (11)",
+  "Created on": "تاريخ الإنشاء"
+ }
+}

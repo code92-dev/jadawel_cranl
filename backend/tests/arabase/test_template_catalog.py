@@ -45,7 +45,11 @@ def test_reconcile_local_template_catalog_imports_then_prunes(
 
     result = reconcile_local_template_catalog()
 
-    assert result == {"changed": True, "removed": 1, "templates": 6}
+    assert result == {
+        "changed": True,
+        "removed": 1,
+        "templates": len(LOCAL_TEMPLATE_CATALOG),
+    }
     assert set(Template.objects.values_list("slug", flat=True)) == set(
         LOCAL_TEMPLATE_CATALOG
     )
@@ -94,7 +98,7 @@ def test_reconcile_local_template_catalog_is_noop_when_current(
     assert reconcile_local_template_catalog() == {
         "changed": False,
         "removed": 0,
-        "templates": 6,
+        "templates": len(LOCAL_TEMPLATE_CATALOG),
     }
     sync_templates.assert_not_called()
 
@@ -131,7 +135,7 @@ def test_reconcile_local_template_catalog_refreshes_changed_template(
     assert reconcile_local_template_catalog() == {
         "changed": True,
         "removed": 0,
-        "templates": 6,
+        "templates": len(LOCAL_TEMPLATE_CATALOG),
     }
     sync_templates.assert_called_once_with(pattern=LOCAL_TEMPLATE_PATTERN)
     assert local_template_catalog_is_current()
@@ -150,12 +154,20 @@ def test_local_catalog_contains_the_default_application_template():
 @override_settings(TESTS=False)
 @patch("arabase.template_catalog.reconcile_local_template_catalog")
 def test_reconcile_local_template_catalog_after_migrate_runs_synchronously(reconcile):
-    reconcile.return_value = {"changed": True, "removed": 151, "templates": 6}
+    reconcile.return_value = {
+        "changed": True,
+        "removed": 151,
+        "templates": len(LOCAL_TEMPLATE_CATALOG),
+    }
 
     result = reconcile_local_template_catalog_after_migrate(sender=None)
 
     reconcile.assert_called_once_with()
-    assert result == {"changed": True, "removed": 151, "templates": 6}
+    assert result == {
+        "changed": True,
+        "removed": 151,
+        "templates": len(LOCAL_TEMPLATE_CATALOG),
+    }
 
 
 @override_settings(TESTS=True)
@@ -183,7 +195,11 @@ def test_reconcile_local_template_catalog_prunes_a_full_legacy_catalog(
 
     result = reconcile_local_template_catalog()
 
-    assert result == {"changed": True, "removed": 151, "templates": 6}
+    assert result == {
+        "changed": True,
+        "removed": 151,
+        "templates": len(LOCAL_TEMPLATE_CATALOG),
+    }
     assert set(Template.objects.values_list("slug", flat=True)) == set(
         LOCAL_TEMPLATE_CATALOG
     )

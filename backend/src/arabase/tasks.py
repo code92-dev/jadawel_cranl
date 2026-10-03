@@ -37,7 +37,7 @@ _SOFT_TIME_LIMIT = dump_timeout_seconds() + 600
     lock_expiry=settings.JADAWEL_SYNC_TEMPLATES_TIME_LIMIT,
 )
 def reconcile_local_template_catalog_task():
-    """Ensure the database picker matches the six bundled local templates."""
+    """Ensure the database picker matches the bundled local templates."""
 
     from arabase.template_catalog import reconcile_local_template_catalog
 
