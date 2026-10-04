@@ -6,13 +6,16 @@ the server refuses creating an automation or an application, or using Sanad,
 to anyone else.
 """
 
+import json
 from unittest.mock import patch
 
 from django.shortcuts import reverse
+from django.test import override_settings
 
 import pytest
 from rest_framework.status import (
     HTTP_200_OK,
+    HTTP_202_ACCEPTED,
     HTTP_400_BAD_REQUEST,
     HTTP_401_UNAUTHORIZED,
     HTTP_403_FORBIDDEN,
@@ -30,6 +33,7 @@ from arabase.feature_access.handler import (
 from arabase.feature_access.models import FeatureAccess, FeatureAccessGrant
 from arabase.sanad.models import SanadChat
 from jadawel.core.handler import CoreHandler
+from jadawel.core.jobs.models import Job
 
 LIST_URL = "api:arabase:admin_feature_access"
 NOTHING = {"automation": False, "builder": False, "sanad": False}
@@ -362,6 +366,50 @@ def test_creating_automations_and_applications_needs_the_feature(
     for type_name in ("automation", "builder"):
         response = create_app(api_client, token, workspace, type_name)
         assert response.status_code == HTTP_200_OK, response.json()
+
+
+@pytest.mark.django_db(transaction=True)
+@patch("jadawel.core.jobs.handler.run_async_job")
+def test_installing_a_template_needs_the_features_it_creates(
+    run_async_job, api_client, data_fixture, tmp_path
+):
+    """A template with an automation is refused like creating one is; the
+    check runs before the job is queued, so the user gets the 403 at once."""
+
+    admin = data_fixture.create_user(is_staff=True)
+    user, token = data_fixture.create_user_and_token(email="member@example.com")
+    workspace = data_fixture.create_workspace(user=user)
+    for slug, types in (
+        ("with-automation", ["database", "automation"]),
+        ("databases-only", ["database"]),
+    ):
+        (tmp_path / f"{slug}.json").write_text(
+            json.dumps({"export": [{"type": t, "name": t} for t in types]})
+        )
+    automation_template = data_fixture.create_template(slug="with-automation")
+    database_template = data_fixture.create_template(slug="databases-only")
+
+    def install(template):
+        return api_client.post(
+            reverse(
+                "api:templates:install_async",
+                kwargs={"workspace_id": workspace.id, "template_id": template.id},
+            ),
+            **auth(token),
+        )
+
+    with override_settings(APPLICATION_TEMPLATES_DIR=str(tmp_path)):
+        response = install(automation_template)
+        assert response.status_code == HTTP_403_FORBIDDEN
+        assert response.json()["error"] == "ERROR_FEATURE_DISABLED"
+        run_async_job.delay.assert_not_called()
+
+        assert install(database_template).status_code == HTTP_202_ACCEPTED
+        # One install job at a time per user; the mocked one never finishes.
+        Job.objects.update(state="finished")
+
+        add_grants(admin, "automation", ["member@example.com"])
+        assert install(automation_template).status_code == HTTP_202_ACCEPTED
 
 
 @pytest.mark.django_db

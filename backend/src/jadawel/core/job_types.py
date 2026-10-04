@@ -1,3 +1,4 @@
+import json
 from contextlib import contextmanager
 from typing import Any, Dict, List
 
@@ -70,6 +71,7 @@ from jadawel.core.operations import (
     ListApplicationsWorkspaceOperationType,
 )
 from jadawel.core.service import CoreService
+from jadawel.core.signals import before_application_created
 from jadawel.core.utils import Progress
 
 
@@ -198,7 +200,16 @@ class InstallTemplateJobType(JobType):
         # ensure everything is ok for the installation, otherwise
         # raise an exception immediately without submitting the job
         template = handler.get_template(values["template_id"])
-        handler.get_valid_template_path_or_raise(template)
+        template_path = handler.get_valid_template_path_or_raise(template)
+
+        # Jadawel fork: a template is refused when it would create an application
+        # type the user may not create (arabase.feature_access), as creating that
+        # type directly is.
+        export = json.loads(template_path.read_text())["export"]
+        for type_name in sorted({application["type"] for application in export}):
+            before_application_created.send(
+                handler, user=user, workspace=workspace, type_name=type_name
+            )
 
         return {
             "workspace": workspace,

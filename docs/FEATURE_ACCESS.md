@@ -17,15 +17,21 @@ upgrade — the three features stay staff-only, exactly as before.
 
 | Feature      | Without access                                                                                           | With access                                   |
 | ------------ | -------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
-| `automation` | "Automation" is not offered in "Add new"; `POST /api/applications/workspace/<id>/` with that type → 403 | Create automations                            |
-| `builder`    | "Application" is not offered in "Add new"; the same API call → 403                                      | Create applications                           |
+| `automation` | "Automation" is not offered in "Add new"; `POST /api/applications/workspace/<id>/` with that type, or installing a template that contains one → 403 | Create automations                            |
+| `builder`    | "Application" is not offered in "Add new"; the same API call, or installing a template that contains one → 403 | Create applications                           |
 | `sanad`      | No Sanad in the workspace tools menu or right sidebar, no "Ask Sanad" box; every Sanad endpoint → 403   | Use Sanad in the workspaces the user belongs to |
 
 The gate is on **creating**, as it was when these were staff-only. Automations and
 applications that already exist in a workspace stay with its members whoever made
 them: they still list, open and edit them under their workspace role. Duplicating
-an existing one or importing a workspace export is not gated either; none of the
-six bundled templates contains an automation or an application.
+an existing one or importing a workspace export is not gated either.
+
+Templates: the catalog includes automation and application templates
+(docs/SAUDI_TEMPLATES.md). Installing one is refused before the install job is
+queued (`InstallTemplateJobType.prepare_values`), so the user sees "Not
+available" at once; the template picker still lists them. A template chosen on the
+sign-up page is installed into the new account's workspace without the check, so
+that sign-up never fails over it.
 
 Sanad creates automations and applications through the same handler, so opening
 Sanad to a user does not open the other two: its `create_automation` and
@@ -54,8 +60,9 @@ Setting a workspace's monthly Sanad allowance stays staff-only.
   active non-staff users without a grant; adding or removing a grant goes to the
   account with that address.
 - **Creation check.** Core's `CoreHandler.create_application` sends
-  `before_application_created` after its permission check (a core patch, see
-  `PATCHES.md`); `refuse_ungranted_application` raises `FeatureNotGranted`, a
+  `before_application_created` after its permission check, and the template
+  install job sends it once per application type in the template (core patches,
+  see `PATCHES.md`); `refuse_ungranted_application` raises `FeatureNotGranted`, a
   `FeatureDisabledException`, which every API view maps to `ERROR_FEATURE_DISABLED`
   (403).
 
