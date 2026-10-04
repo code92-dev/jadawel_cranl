@@ -29,6 +29,17 @@ class ArabaseConfig(AppConfig):
 
         plugin_registry.register(ArabasePlugin())
 
+        from arabase.feature_access.handler import connect_feature_access_signals
+        from arabase.feature_access.user_data_types import FeatureAccessUserDataType
+        from jadawel.api.user.registries import user_data_registry
+
+        # Automations, applications and Sanad: staff, plus whoever an
+        # administrator opens them to (docs/FEATURE_ACCESS.md). The login
+        # response tells the frontend which to show; creating an automation or
+        # an application is refused on the server for anyone else.
+        user_data_registry.register(FeatureAccessUserDataType())
+        connect_feature_access_signals()
+
         from arabase.generative_ai.handler import apply_provider_policy
 
         # AI provider keys are managed by administrators in the admin settings

@@ -1,5 +1,5 @@
 class SanadNotAllowed(Exception):
-    """Sanad is limited to instance staff while it is being introduced."""
+    """Sanad is not available to this user (arabase.feature_access)."""
 
 
 class SanadChatDoesNotExist(Exception):

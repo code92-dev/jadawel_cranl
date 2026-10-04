@@ -14,6 +14,22 @@ question the log still answers is "did we author this, or inherit it?", which is
 decides how an upstream CVE gets applied. **Merge risk** columns in older entries are
 kept as written for the historical record.
 
+## Feature access: automations, applications and Sanad beyond staff (2026-10-03)
+
+An administrator opens each of the three features to every user or to invited
+email addresses (`docs/FEATURE_ACCESS.md`); staff keep all three. The rule,
+models, admin API and settings section are additive under `arabase`. Creating an
+automation or an application was only hidden in the UI before; it is now also
+refused on the server, which needs a hook in core's creation path.
+
+| File | Change | Reason |
+| ---- | ------ | ------ |
+| `backend/src/jadawel/core/signals.py` | New `before_application_created` signal | No registry or permission hook sees the application type being created: `CreateApplicationsWorkspaceOperationType` is checked against the workspace only |
+| `backend/src/jadawel/core/handler.py` | `create_application` sends it after the permission check | One place covers the REST API, the action type and Sanad's tools; a receiver refuses by raising |
+| `web-frontend/modules/{builder,automation}/applicationTypes.js` | `canBeCreated()` reads `arabase_features` from the login data, falling back to `auth/isStaff` | Offer each type to the users it is open to, not only staff |
+| `backend/tests/jadawel/contrib/builder/test_builder_application_type.py`, `tests/jadawel/api/applications/test_application_views.py` | The user in `test_builder_application_creation_does_not_register_an_action` and `test_can_create_different_application_types` is staff | They create builder applications and automations, which now need the feature |
+| `e2e-tests/fixtures/{builder/builder,automation/automation}.ts`, `tests/{builder/builder,dashboard/createApplication}.spec.ts` | `createBuilder` / `createAutomation` grant the feature first (new `fixtures/featureAccess.ts`); comments follow the new rule | The API refuses creation without it |
+
 ## Builder service actions import their formulas once (2026-10-03)
 
 Installing an application template could fail, or silently point a step at the

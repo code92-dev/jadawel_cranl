@@ -99,10 +99,11 @@ def theme_of(builder):
 def test_a_new_app_starts_from_the_jadawel_preset_in_its_creators_language(
     data_fixture,
 ):
-    arabic = data_fixture.create_user()
+    # Staff: creating an application needs the feature (arabase.feature_access).
+    arabic = data_fixture.create_user(is_staff=True)
     arabic.profile.language = "ar"
     arabic.profile.save()
-    english = data_fixture.create_user()
+    english = data_fixture.create_user(is_staff=True)
     english.profile.language = "en"
     english.profile.save()
     workspace = data_fixture.create_workspace(users=[arabic, english])
@@ -122,7 +123,7 @@ def test_a_new_app_starts_from_the_jadawel_preset_in_its_creators_language(
 
 @pytest.mark.django_db
 def test_the_creation_response_carries_the_new_theme(api_client, data_fixture):
-    user, token = data_fixture.create_user_and_token()
+    user, token = data_fixture.create_user_and_token(is_staff=True)
     workspace = data_fixture.create_workspace(user=user)
 
     response = api_client.post(
@@ -140,7 +141,7 @@ def test_the_creation_response_carries_the_new_theme(api_client, data_fixture):
 
 @pytest.mark.django_db
 def test_a_duplicate_keeps_the_theme_it_was_made_with(data_fixture):
-    user = data_fixture.create_user()
+    user = data_fixture.create_user(is_staff=True)
     workspace = data_fixture.create_workspace(user=user)
     builder = CoreHandler().create_application(user, workspace, "builder", name="A")
     builder.colorthemeconfigblock.primary_color = "#aa0000ff"

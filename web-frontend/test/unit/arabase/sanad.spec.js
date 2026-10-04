@@ -4,6 +4,7 @@ import { TestApp } from '@jadawel/test/helpers/testApp'
 import SanadPanel from '@jadawel/modules/arabase/sanad/components/SanadPanel'
 import SanadUtilityItem from '@jadawel/modules/arabase/sanad/components/SanadUtilityItem'
 import AdminGenerativeAISettings from '@jadawel/modules/arabase/generativeAI/AdminGenerativeAISettings'
+import AdminFeatureAccessSettings from '@jadawel/modules/arabase/featureAccess/AdminFeatureAccessSettings'
 import AppUtilities from '@jadawel/modules/core/components/AppUtilities'
 import { ArabasePlugin } from '@jadawel/modules/arabase/plugins'
 import { AutomationApplicationType } from '@jadawel/modules/automation/applicationTypes'
@@ -37,9 +38,10 @@ describe('admin-only features', () => {
     expect(staff.getSidebarWorkspaceComponents({})).toBeNull()
   })
 
-  test('the AI settings join the admin settings page', () => {
+  test('feature access and the AI settings join the admin settings page', () => {
     const plugin = new ArabasePlugin({ app: appFor(true) })
     expect(plugin.getSettingsPageComponents()).toEqual([
+      AdminFeatureAccessSettings,
       AdminGenerativeAISettings,
     ])
   })

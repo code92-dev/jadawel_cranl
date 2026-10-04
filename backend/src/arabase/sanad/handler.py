@@ -8,6 +8,8 @@ from django.contrib.auth.models import AbstractUser
 from django.db import transaction
 from django.utils import timezone
 
+from arabase.feature_access.handler import has_feature
+from arabase.feature_access.models import Feature
 from arabase.sanad import budget
 from arabase.sanad.exceptions import (
     SanadBudgetExceeded,
@@ -41,13 +43,14 @@ BUSY_STATUSES = (SanadMessageStatus.PENDING, SanadMessageStatus.AWAITING_APPROVA
 
 class SanadHandler:
     def check_access(self, user: AbstractUser, workspace: Workspace) -> None:
-        """Sanad is staff-only while it is introduced, and workspace-bound.
+        """Sanad is for staff and whoever an administrator opens it to
+        (arabase.feature_access), and it is workspace-bound.
 
-        :raises SanadNotAllowed: for anyone who is not instance staff.
+        :raises SanadNotAllowed: for anyone the feature is not available to.
         :raises UserNotInWorkspace: when the user is not a workspace member.
         """
 
-        if not user.is_staff:
+        if not has_feature(user, Feature.SANAD):
             raise SanadNotAllowed()
         if not WorkspaceUser.objects.filter(user=user, workspace=workspace).exists():
             raise UserNotInWorkspace(user, workspace)
@@ -76,8 +79,8 @@ class SanadHandler:
     ) -> "budget.BudgetStatus":
         """Set a workspace's own limits; ``None`` uses the instance default.
 
-        Only instance staff may, and that stays so once workspace admins can use
-        Sanad: a budget exists to bound what those admins spend.
+        Only instance staff may, also when Sanad is open to other users: a
+        budget exists to bound what those users spend.
 
         :raises SanadNotAllowed: for anyone who is not instance staff.
         """

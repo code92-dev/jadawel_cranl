@@ -21,6 +21,9 @@ workspace_user_updated = Signal()
 workspace_user_deleted = Signal()
 workspaces_reordered = Signal()
 
+# Jadawel fork: sent by `CoreHandler.create_application` after its permission
+# check; a receiver may refuse the creation by raising (arabase.feature_access).
+before_application_created = Signal()
 application_created = Signal()
 application_updated = Signal()
 application_deleted = Signal()

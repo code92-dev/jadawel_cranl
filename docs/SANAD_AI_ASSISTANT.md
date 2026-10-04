@@ -3,8 +3,9 @@
 Sanad is Jadawel's AI assistant: a chat panel inside the app that builds and works
 with the user's databases, automations and application-builder apps on request. It is the fork's open-source counterpart to
 Baserow's enterprise assistant (Kuma), which this fork cannot ship. Like the
-application builder and automation, it is **limited to instance administrators
-(staff)** while it is being introduced.
+application builder and automation, it is available to instance administrators
+(staff) and to whoever an administrator opens it to, all users or invited email
+addresses (`docs/FEATURE_ACCESS.md`).
 
 ## What it can do
 
@@ -74,7 +75,7 @@ workflow is disabled after more than five consecutive failed runs.
 A Page view (`docs/PAGE_VIEW.md`) was written only from an outside AI client over
 MCP. Sanad writes one from inside Jadawel: the user gives the page's number (its
 view ID, shown on the page's setup panel) or asks from the page itself, whose ID
-travels with the message. Staff also see an **Ask Sanad** box on an empty page's
+travels with the message. Users Sanad is available to also see an **Ask Sanad** box on an empty page's
 setup panel; it opens Sanad with "Design page <number>: " typed in a new chat.
 
 - `get_page_view` returns the fields the page receives (with select options),
@@ -324,12 +325,13 @@ change.
 `GET /api/arabase/sanad/workspace/<id>/budget/` returns the limits in force and
 this month's `turns` and `tokens` to anyone who may use Sanad there; `PUT` sets
 the workspace's own limits (`null` falls back to the default) and is limited to
-instance staff, which stays true once admins can chat.
+instance staff, also when Sanad is open to other users.
 
 ## Security
 
-- **Staff only**, enforced by the API (`ERROR_SANAD_NOT_ALLOWED`), not only hidden
-  in the UI. The user must also be a member of the workspace.
+- **Staff and granted users only** (`docs/FEATURE_ACCESS.md`), enforced by the API
+  (`ERROR_SANAD_NOT_ALLOWED`), not only hidden in the UI. The user must also be a
+  member of the workspace.
 - **A chat is private** to the user who started it.
 - **No privilege of its own**: every tool runs as the chatting user.
 - **Deletes and publishing need approval**: the model's call pauses the turn; the
@@ -369,5 +371,6 @@ instance staff, which stays true once admins can chat.
 - `backend/tests/arabase/test_sanad_page_views.py` — Page view tools: the data
   shape, revisions and restore, the approval boundary, find/replace edits, the
   write checks, workspace isolation, and the skill against the real runtime.
-- `web-frontend/test/unit/arabase/sanad.spec.js` — staff-only visibility for Sanad,
-  the builder and automation, plus the panel's send, poll and approve flow.
+- `web-frontend/test/unit/arabase/sanad.spec.js` — visibility for Sanad, the
+  builder and automation without login data (staff only), plus the panel's send,
+  poll and approve flow; `featureAccess.spec.js` covers granted users.

@@ -30,8 +30,9 @@ test.describe("Creating applications from the sidebar", () => {
 
   /**
    * This fork hides the application builder and automations from the create
-   * menu (see canBeCreated() in their applicationTypes.js) until the features
-   * are ready for our users. Existing applications keep working.
+   * menu (see canBeCreated() in their applicationTypes.js) of users an
+   * administrator has not opened them to (docs/FEATURE_ACCESS.md). A new user
+   * has no grant. Existing applications keep working.
    */
   test("The builder and automations are not offered as new applications @fast", async ({
     workspacePage,

@@ -1468,7 +1468,8 @@ def test_delete_builder_application_with_published_builder(data_fixture):
 
 @pytest.mark.django_db
 def test_builder_application_creation_does_not_register_an_action(data_fixture):
-    user = data_fixture.create_user()
+    # Jadawel fork: staff, since creating an application needs the feature.
+    user = data_fixture.create_user(is_staff=True)
     workspace = data_fixture.create_workspace(user=user)
     assert Action.objects.count() == 0
     action_type_registry.get_by_type(CreateApplicationActionType).do(

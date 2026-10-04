@@ -1,4 +1,5 @@
 import { getClient } from "../../client";
+import { grantFeature } from "../featureAccess";
 import { User } from "../user";
 import { Workspace } from "../workspace";
 
@@ -14,6 +15,7 @@ export async function createBuilder(
   builderName: string,
   workspace: Workspace
 ): Promise<Builder> {
+  await grantFeature(workspace.user, "builder");
   const response: any = await getClient(workspace.user).post(
     `applications/workspace/${workspace.id}/`,
     {

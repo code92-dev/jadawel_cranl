@@ -1,4 +1,5 @@
 import { getClient } from "../../client"
+import { grantFeature } from "../featureAccess"
 import { Workspace } from "../workspace"
 
 export class Automation {
@@ -13,6 +14,7 @@ export async function createAutomation(
   automationName: string,
   workspace: Workspace
 ): Promise<Automation> {
+  await grantFeature(workspace.user, "automation")
   const response: any = await getClient(workspace.user).post(
     `applications/workspace/${workspace.id}/`,
     {

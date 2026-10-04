@@ -17,6 +17,12 @@ from arabase.api.dashboard_share.views import (
     DashboardShareRotateSlugView,
     DashboardShareView,
 )
+from arabase.api.feature_access.views import (
+    AdminFeatureAccessView,
+    AdminFeatureGrantsView,
+    AdminFeatureGrantView,
+    AdminFeatureView,
+)
 from arabase.api.generative_ai.views import (
     AdminGenerativeAIProviderView,
     AdminGenerativeAIView,
@@ -249,5 +255,25 @@ urlpatterns = [
         r"^admin/generative-ai/(?P<provider>[a-z_]+)/$",
         AdminGenerativeAIProviderView.as_view(),
         name="admin_generative_ai_provider",
+    ),
+    re_path(
+        r"^admin/feature-access/$",
+        AdminFeatureAccessView.as_view(),
+        name="admin_feature_access",
+    ),
+    re_path(
+        r"^admin/feature-access/(?P<feature>[a-z_]+)/$",
+        AdminFeatureView.as_view(),
+        name="admin_feature",
+    ),
+    re_path(
+        r"^admin/feature-access/(?P<feature>[a-z_]+)/grants/$",
+        AdminFeatureGrantsView.as_view(),
+        name="admin_feature_grants",
+    ),
+    re_path(
+        r"^admin/feature-access/(?P<feature>[a-z_]+)/grants/(?P<grant_id>[0-9]+)/$",
+        AdminFeatureGrantView.as_view(),
+        name="admin_feature_grant",
     ),
 ]

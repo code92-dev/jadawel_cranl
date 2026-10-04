@@ -10,8 +10,8 @@
 <script>
 /**
  * Opens Sanad from the workspace tools window. The chat itself stays in core's
- * right sidebar, beside the page being worked on. Rendered only for staff
- * (see ArabasePlugin).
+ * right sidebar, beside the page being worked on. Rendered only for users
+ * Sanad is available to (see ArabasePlugin).
  */
 export default {
   name: 'SanadUtilityItem',

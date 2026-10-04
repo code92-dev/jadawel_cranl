@@ -14,6 +14,11 @@ from arabase.dashboard.widgets.models import (
     TextWidget,
     UpcomingDatesWidget,
 )
+from arabase.feature_access.models import (
+    Feature,
+    FeatureAccess,
+    FeatureAccessGrant,
+)
 from arabase.generative_ai.models import GenerativeAIProviderSettings
 from arabase.integrations.local_jadawel.models import (
     LocalJadawelGroupedAggregateRows,
@@ -91,6 +96,9 @@ __all__ = [
     "HtmlPageView",
     "HtmlPageViewFieldOptions",
     "HtmlPageViewRevision",
+    "Feature",
+    "FeatureAccess",
+    "FeatureAccessGrant",
     "GenerativeAIProviderSettings",
     "PendingTableGrant",
     "SanadBudget",

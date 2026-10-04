@@ -192,13 +192,28 @@ Sanad's tool labels and skills repeat them.
 | Model (AI) | النموذج | The generative AI model; keep the provider/model token (e.g. `openai/gpt-5`) in Latin script. |
 | Approve (an action) | الموافقة / وافق | Confirming a destructive action Sanad asked to run. The approval buttons name the action itself: حذف / إبقاء (Delete / Keep) for a deletion, نشر / ليس الآن (Publish / Not now) for publishing a workflow. |
 | Decline | رفض | |
-| Instance administrator | مسؤول الخادم | pl. مسؤولو الخادم (مسؤولي الخادم after a preposition). Staff users: the only ones who can use Sanad and manage AI provider keys. |
+| Instance administrator | مسؤول الخادم | pl. مسؤولو الخادم (مسؤولي الخادم after a preposition). Staff users: they manage AI provider keys and decide who else may use Sanad (see Feature access). |
 | Ask Sanad | الاستعانة بسند | Button that hands a task to Sanad; verbal noun, like الاستعانة بمهارة. |
 | Beta | بيتا | Badge on features still being introduced; matches the existing app-type badge. |
 | Skill (Sanad) | مهارة | pl. مهارات. Expert guidance Sanad loads for one kind of work; "consulted a skill" = الاستعانة بمهارة. |
 | Revision (Page view) | نسخة سابقة | pl. النسخ السابقة. A page's earlier document, kept on every rewrite; restore = استعادة نسخة سابقة. |
 | Monthly allowance (Sanad) | الحصة الشهرية | The per-workspace budget of Sanad messages and tokens; "used up" = استُنفدت. |
 | Public link | رابط عام | A share link anyone can open; sharing a form on one = مشاركة النموذج عبر رابط عام. Its approval reads نشر / ليس الآن like publishing a workflow. |
+
+## Feature access
+
+Terms of the admin settings section that opens automations, applications and
+Sanad to users (docs/FEATURE_ACCESS.md).
+
+| English | Arabic | Notes |
+|---------|--------|-------|
+| Feature | ميزة | pl. مزايا. |
+| Feature access | إتاحة المزايا | The admin settings section; "open a feature" = أتِح الميزة. |
+| Available to everyone | متاحة لجميع المستخدمين | The switch that opens a feature to every user. |
+| Invited users | المستخدمون المدعوون | Email addresses granted a feature; inviting = دعوة. |
+| No account yet | لا يوجد حساب بعد | An invited address no account uses yet. |
+| Automations (feature) | الأتمتة | The feature's name; one automation application is أتمتة, several عمليات الأتمتة. |
+| Applications (feature) | التطبيقات | The application builder as a feature; one application is تطبيق. |
 
 ## Common actions (verbs)
 

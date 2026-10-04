@@ -49,12 +49,15 @@ export class BuilderApplicationType extends ApplicationType {
 
   /**
    * Jadawel fork: the application builder is offered in the "add new" context
-   * to instance administrators (staff) only, while the feature is prepared for
-   * everyone. Existing builder applications keep working for every member —
-   * this only gates creation.
+   * to staff and to whoever an administrator opens it to; the login response
+   * carries the answer (arabase.feature_access). Existing builder applications
+   * keep working for every member — this only gates creation.
    */
   canBeCreated() {
-    return this.app.$store.getters['auth/isStaff']
+    const { $store: store } = this.app
+    const features =
+      store.getters['auth/getAdditionalUserData']?.arabase_features
+    return features ? Boolean(features.builder) : store.getters['auth/isStaff']
   }
 
   getApplicationFormComponent() {

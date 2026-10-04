@@ -1,0 +1,103 @@
+// The feature access section of the admin settings page
+// (modules/arabase/featureAccess). Logical properties only.
+@import '@jadawel/modules/core/assets/scss/colors';
+
+.feature-access__intro {
+  margin-block: 0 16px;
+  color: $palette-neutral-700;
+  max-inline-size: 70ch;
+}
+
+// The row is as tall as the feature's description. `align-content: start`
+// keeps that height from stretching the rows here, which pulled the switch's
+// track away from its knob (the knob sits 2px from the switch's top).
+.feature-access__control {
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  min-inline-size: 320px;
+
+  // At its own size: a full-width switch toggles from the empty space beside it.
+  > .switch {
+    justify-self: start;
+  }
+}
+
+.feature-access__label {
+  margin-block-start: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  color: $palette-neutral-800;
+}
+
+.feature-access__note,
+.feature-access__hint {
+  margin: 0;
+  font-size: 12px;
+  color: $palette-neutral-600;
+}
+
+.feature-access__hint {
+  font-size: 11px;
+}
+
+.feature-access__error {
+  margin: 0;
+  font-size: 12px;
+  color: $palette-red-800;
+}
+
+.feature-access__grants {
+  display: grid;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.feature-access__grant {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-block: 4px;
+  padding-inline: 8px;
+  border: 1px solid $palette-neutral-200;
+  border-radius: 6px;
+}
+
+.feature-access__identity {
+  display: grid;
+  flex: 1;
+  min-inline-size: 0;
+}
+
+.feature-access__email,
+.feature-access__name {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.feature-access__email {
+  font-size: 13px;
+  color: $palette-neutral-900;
+}
+
+.feature-access__name {
+  font-size: 11px;
+  color: $palette-neutral-600;
+}
+
+.feature-access__remove {
+  flex-shrink: 0;
+}
+
+.feature-access__invite {
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+
+  > :first-child {
+    flex: 1;
+  }
+}

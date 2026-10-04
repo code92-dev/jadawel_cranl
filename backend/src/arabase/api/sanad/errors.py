@@ -9,7 +9,7 @@ from rest_framework.status import (
 ERROR_SANAD_NOT_ALLOWED = (
     "ERROR_SANAD_NOT_ALLOWED",
     HTTP_403_FORBIDDEN,
-    "Sanad is only available to instance administrators.",
+    "Sanad is not available to this user.",
 )
 
 ERROR_SANAD_CHAT_DOES_NOT_EXIST = (

@@ -36,7 +36,8 @@ def stub_filter_queryset(u, o, q, *args, **kwargs):
 def test_can_create_different_application_types(
     application_type, api_client, data_fixture
 ):
-    user, token = data_fixture.create_user_and_token()
+    # Jadawel fork: staff, since automations and applications need the feature.
+    user, token = data_fixture.create_user_and_token(is_staff=True)
     workspace = data_fixture.create_workspace(user=user)
 
     response = api_client.post(

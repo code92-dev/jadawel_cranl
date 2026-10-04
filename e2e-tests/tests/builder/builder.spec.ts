@@ -2,12 +2,11 @@ import { expect, test } from "../jadawelTest";
 import { createBuilder } from "../../fixtures/builder/builder";
 
 /**
- * Jadawel fork: the application builder is hidden from the "Add new" menu
- * (canBeCreated() returns false in
- * web-frontend/modules/builder/applicationTypes.js), so these tests create the
- * application over the API — which is how a builder application that predates
- * that change reaches its users. That the creation option is gone is asserted
- * in tests/dashboard/createApplication.spec.ts.
+ * Jadawel fork: the application builder is hidden from the "Add new" menu of
+ * users an administrator has not opened it to (docs/FEATURE_ACCESS.md), so
+ * these tests create the application over the API, after `createBuilder`
+ * grants the feature. That the creation option is gone without a grant is
+ * asserted in tests/dashboard/createApplication.spec.ts.
  */
 test.describe("Builder application test suite", () => {
   test("Can open an existing builder application", async ({

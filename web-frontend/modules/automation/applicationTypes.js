@@ -55,13 +55,18 @@ export class AutomationApplicationType extends ApplicationType {
   }
 
   /**
-   * Jadawel fork: automations are offered in the "add new" context to instance
-   * administrators (staff) only, while the feature is prepared for everyone.
-   * Existing automations keep working for every member — this only gates
-   * creation.
+   * Jadawel fork: automations are offered in the "add new" context to staff
+   * and to whoever an administrator opens them to; the login response carries
+   * the answer (arabase.feature_access). Existing automations keep working for
+   * every member — this only gates creation.
    */
   canBeCreated() {
-    return this.app.$store.getters['auth/isStaff']
+    const { $store: store } = this.app
+    const features =
+      store.getters['auth/getAdditionalUserData']?.arabase_features
+    return features
+      ? Boolean(features.automation)
+      : store.getters['auth/isStaff']
   }
 
   getApplicationContextComponent() {

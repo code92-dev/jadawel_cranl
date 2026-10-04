@@ -94,6 +94,7 @@ from .signals import (
     application_imported,
     application_updated,
     applications_reordered,
+    before_application_created,
     before_workspace_deleted,
     before_workspace_user_deleted,
     before_workspace_user_updated,
@@ -1609,6 +1610,12 @@ class CoreHandler(metaclass=jadawel_trace_methods(tracer, exclude="clear_context
             CreateApplicationsWorkspaceOperationType.type,
             workspace=workspace,
             context=workspace,
+        )
+
+        # Jadawel fork: lets arabase refuse an application type the user may
+        # not use (arabase.feature_access).
+        before_application_created.send(
+            self, user=user, workspace=workspace, type_name=type_name
         )
 
         application_type = application_type_registry.get(type_name)

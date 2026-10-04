@@ -522,13 +522,13 @@
       "SANAD_ERROR_MODEL_FAILED": "The AI provider did not respond successfully. Check the provider configuration and try again.",
       "SANAD_ERROR_TOO_MANY_STEPS": "Sanad stopped because the request needed too many steps. Try splitting it into smaller requests.",
       "SANAD_ERROR_TIMED_OUT": "Sanad did not finish in time. Please try again.",
-      "SANAD_ERROR_NOT_ALLOWED": "Sanad is only available to instance administrators.",
+      "SANAD_ERROR_NOT_ALLOWED": "Sanad is not available to your account. An instance administrator can give you access.",
       "SANAD_ERROR_BUDGET_EXCEEDED": "This workspace has used this month's Sanad allowance. An instance administrator can raise it."
     },
     "apiErrors": {
       "ERROR_SANAD_NOT_ALLOWED": {
         "title": "Not available",
-        "description": "Sanad is only available to instance administrators."
+        "description": "Sanad is not available to your account. An instance administrator can give you access."
       },
       "ERROR_SANAD_NO_MODEL_AVAILABLE": {
         "title": "No AI provider",
@@ -578,6 +578,42 @@
       "anthropic": "Claude models from Anthropic.",
       "ollama": "Models you run on your own server, so data never leaves it.",
       "openrouter": "Many providers' models through one OpenRouter key."
+    }
+  },
+  "adminFeatureAccess": {
+    "title": "Feature access",
+    "description": "Automations, applications and Sanad are available to instance administrators. Open each one to every user, or invite specific users by email.",
+    "everyone": "Available to everyone",
+    "everyoneNote": "Every user can use it.",
+    "invited": "Invited users",
+    "noInvited": "Only instance administrators can use it.",
+    "emails": "Email addresses",
+    "emailsPlaceholder": "name{'@'}example.com, other{'@'}example.com",
+    "emailsHint": "Separate addresses with commas. An address without an account gets access once an account is created with it.",
+    "invite": "Invite",
+    "invalidEmails": "Not a valid email address: {emails}",
+    "noAccount": "No account yet",
+    "deactivated": "Deactivated",
+    "remove": "Remove {email}",
+    "features": {
+      "automation": {
+        "name": "Automations",
+        "description": "Create automations: workflows that run their steps when something happens."
+      },
+      "builder": {
+        "name": "Applications",
+        "description": "Build applications and websites on top of your data."
+      },
+      "sanad": {
+        "name": "Sanad",
+        "description": "The AI assistant that builds and changes databases, automations and applications on request."
+      }
+    },
+    "apiErrors": {
+      "ERROR_FEATURE_DISABLED": {
+        "title": "Not available",
+        "description": "This feature is not available to your account. An instance administrator can give you access."
+      }
     }
   },
   "widgetFrame": {

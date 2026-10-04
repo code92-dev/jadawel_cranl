@@ -17,7 +17,7 @@
 
     <!--
       Sanad writes a page from inside Jadawel, with nothing to connect. Only
-      staff can use Sanad (see ArabasePlugin), so only they see the offer.
+      users Sanad is available to (see ArabasePlugin) see the offer.
     -->
     <section v-if="canAskSanad" class="html-page-onboarding__sanad">
       <div class="html-page-onboarding__sanad-text">
@@ -101,6 +101,7 @@ import McpEndpointService from '@jadawel/modules/core/services/mcpEndpoint'
 import SettingsModal from '@jadawel/modules/core/components/settings/SettingsModal'
 import { copyToClipboard } from '@jadawel/modules/database/utils/clipboard'
 import { askSanad } from '@jadawel/modules/arabase/sanad/utils/askSanad'
+import { hasFeature } from '@jadawel/modules/arabase/featureAccess/featureAccess'
 
 /**
  * What a Page view shows before anything has been written into it.
@@ -138,7 +139,7 @@ export default {
       return this.endpoints.find((e) => e.workspace_id === this.workspaceId)
     },
     canAskSanad() {
-      return this.$store.getters['auth/isStaff']
+      return hasFeature(this.$store, 'sanad')
     },
     prompt() {
       return this.$t('htmlPageOnboarding.promptTemplate', {

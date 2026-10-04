@@ -2,6 +2,8 @@ import { JadawelPlugin } from '@jadawel/modules/core/plugins'
 import ShareDashboardLink from '@jadawel/modules/arabase/dashboard/components/ShareDashboardLink'
 import SanadUtilityItem from '@jadawel/modules/arabase/sanad/components/SanadUtilityItem'
 import AdminGenerativeAISettings from '@jadawel/modules/arabase/generativeAI/AdminGenerativeAISettings'
+import AdminFeatureAccessSettings from '@jadawel/modules/arabase/featureAccess/AdminFeatureAccessSettings'
+import { hasFeature } from '@jadawel/modules/arabase/featureAccess/featureAccess'
 import SanadPanel from '@jadawel/modules/arabase/sanad/components/SanadPanel'
 import AddToMyDashboards from '@jadawel/modules/arabase/savedDashboards/components/AddToMyDashboards'
 import MyDashboardsMenuItem from '@jadawel/modules/arabase/savedDashboards/components/MyDashboardsMenuItem'
@@ -47,24 +49,25 @@ export class ArabasePlugin extends JadawelPlugin {
   }
 
   /**
-   * Sanad (سند), the AI assistant, is limited to instance staff while it is
-   * introduced; the API enforces the same rule. It opens from the workspace
-   * tools window and lives in core's right sidebar, the slot upstream reserved
-   * for its assistant.
+   * Sanad (سند), the AI assistant, is for staff and whoever an administrator
+   * opens it to (featureAccess); the API enforces the same rule. It opens from
+   * the workspace tools window and lives in core's right sidebar, the slot
+   * upstream reserved for its assistant.
    */
   getWorkspaceUtilityComponents(workspace) {
-    return this.app.$store.getters['auth/isStaff'] ? [SanadUtilityItem] : []
+    return hasFeature(this.app.$store, 'sanad') ? [SanadUtilityItem] : []
   }
 
   getRightSidebarWorkspaceComponents(workspace) {
-    return this.app.$store.getters['auth/isStaff'] ? [SanadPanel] : []
+    return hasFeature(this.app.$store, 'sanad') ? [SanadPanel] : []
   }
 
   /**
-   * AI provider keys, managed by administrators on the admin settings page
-   * (arabase.generative_ai). The page is already staff-only.
+   * Who may use automations, applications and Sanad (arabase.feature_access),
+   * then AI provider keys (arabase.generative_ai), both managed by
+   * administrators on the admin settings page. The page is already staff-only.
    */
   getSettingsPageComponents() {
-    return [AdminGenerativeAISettings]
+    return [AdminFeatureAccessSettings, AdminGenerativeAISettings]
   }
 }

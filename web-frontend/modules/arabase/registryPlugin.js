@@ -45,6 +45,14 @@ export default defineNuxtPlugin({
   setup(nuxtApp) {
     const { $registry, $store, $clientErrorMap, $i18n } = nuxtApp
 
+    // Core's code for a feature the user may not use: creating an automation
+    // or an application without access (arabase.feature_access).
+    $clientErrorMap.setError(
+      'ERROR_FEATURE_DISABLED',
+      $i18n.t('adminFeatureAccess.apiErrors.ERROR_FEATURE_DISABLED.title'),
+      $i18n.t('adminFeatureAccess.apiErrors.ERROR_FEATURE_DISABLED.description')
+    )
+
     for (const code of [
       'ERROR_SANAD_NOT_ALLOWED',
       'ERROR_SANAD_NO_MODEL_AVAILABLE',

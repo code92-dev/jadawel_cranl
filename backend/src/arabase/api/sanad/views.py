@@ -1,7 +1,8 @@
 """Sanad (سند) chat API, mounted under ``/api/arabase/sanad/``.
 
-Every endpoint is limited to instance staff who are members of the chat's
-workspace, and a chat is only ever visible to the user who started it.
+Every endpoint is limited to members of the chat's workspace who may use
+Sanad (arabase.feature_access), and a chat is only ever visible to the user who
+started it.
 """
 
 from drf_spectacular.types import OpenApiTypes

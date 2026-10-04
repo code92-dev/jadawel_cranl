@@ -60,6 +60,7 @@ export default defineNuxtModule({
     nuxt.options.css.push(resolve('./assets/scss/table_access.scss'))
     nuxt.options.css.push(resolve('./assets/scss/sanad.scss'))
     nuxt.options.css.push(resolve('./assets/scss/admin_generative_ai.scss'))
+    nuxt.options.css.push(resolve('./assets/scss/admin_feature_access.scss'))
     nuxt.options.css.push(resolve('./assets/scss/my_dashboards.scss'))
     nuxt.options.css.push(resolve('./assets/scss/workspace_members.scss'))
 
