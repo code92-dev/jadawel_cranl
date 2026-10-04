@@ -17,7 +17,21 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-10-03 from commit 4d00b7c0, tag 2.3.22-app-wide-tools.
+# Published 2026-10-04 from commit 248eff6b, tag 2.3.23-feature-access-templates.
+# Admin -> Settings -> Feature access opens automations, applications and Sanad
+# to every user or to invited email addresses (docs/FEATURE_ACCESS.md). Staff
+# keep all three; with nothing set they stay staff-only, as before. Anyone else
+# is refused on the server when creating an automation or an application, or
+# installing a template that holds one. The template catalog grows from 6 to 36
+# with Saudi editions of fifteen templates (docs/SAUDI_TEMPLATES.md).
+# **Migration: arabase 0024_feature_access (two new tables). No environment
+# changes.** The first start imports the 30 new templates during migration:
+# a local boot of this image on a copy of the pre-release data was healthy
+# after about 4 minutes, peaking under 1 GB.
+# Previous deployment pin (2.3.22-app-wide-tools):
+# sha256:87b2068b2130eda93a5e51263bafec156d88066ce6c12b262532b729506761f1.
+#
+# Previously published 2026-10-03 from commit 4d00b7c0, tag 2.3.22-app-wide-tools.
 # The tools menu (top right) covers the whole system: it is on the workspaces
 # homepage, recently viewed and a new Members page (/members: every workspace
 # with its members, also in the workspaces sidebar); Invite asks which
@@ -401,7 +415,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:87b2068b2130eda93a5e51263bafec156d88066ce6c12b262532b729506761f1
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:1e55cf50371395a8ffc4db0b212c5bb9247a1924dd72b6dec0ed92b0c8d15e32
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
