@@ -487,6 +487,8 @@ def test_verify_totp_code_view(api_client, data_fixture):
                 },
                 "username": user.email,
             },
+            # Jadawel fork: which gated features the user may use (arabase).
+            "arabase_features": {"automation": False, "builder": False, "sanad": False},
             "user_notifications": {"unread_count": 0},
             "user_session": AnyStr(),
         }
@@ -572,6 +574,8 @@ def test_verify_totp_backup_code_view(api_client, data_fixture):
             },
             "username": user.email,
         },
+        # Jadawel fork: which gated features the user may use (arabase).
+        "arabase_features": {"automation": False, "builder": False, "sanad": False},
         "user_notifications": {"unread_count": 0},
         "user_session": AnyStr(),
     }
