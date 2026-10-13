@@ -19,6 +19,8 @@ import { StoreItemLookupError } from '@jadawel/modules/core/errors'
 
 definePageMeta({
   layout: 'app',
+  // Draws its own themed bar, so the layout's shared one is left out.
+  ownHeader: true,
   middleware: [
     'settings',
     'authenticated',

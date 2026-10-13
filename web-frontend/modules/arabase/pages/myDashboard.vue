@@ -77,6 +77,8 @@ import { PUBLIC_PLACEHOLDER_ENTITY_ID } from '@jadawel/modules/database/utils/co
 
 definePageMeta({
   layout: 'app',
+  // Draws its own themed bar, so the layout's shared one is left out.
+  ownHeader: true,
   middleware: [
     'settings',
     'authenticated',

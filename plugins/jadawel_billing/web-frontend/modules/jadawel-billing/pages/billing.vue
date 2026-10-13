@@ -419,6 +419,8 @@
 <script setup>
 definePageMeta({
   layout: "app",
+  headerTitle: "billing.title",
+  headerIcon: "iconoir-credit-card",
   middleware: "authenticated",
 });
 </script>

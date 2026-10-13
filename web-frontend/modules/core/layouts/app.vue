@@ -32,21 +32,32 @@
           insetInlineEnd: col3Shown ? col3Width + 'px' : 0,
         }"
       >
-        <slot />
+        <AppHeaderBar
+          v-if="headerBar"
+          :title="headerBar.title"
+          :icon="headerBar.icon"
+        />
+        <div
+          class="layout__col-2-body"
+          :class="{ 'layout__col-2-body--below-bar': headerBar }"
+        >
+          <slot />
+        </div>
 
         <!--
-          Jadawel: not on the pages with the all workspaces sidebar. Their header
-          leaves no room for it, and a workspace is only still selected there
-          when the user came from one, so it would overlap the header then and be
-          missing after a reload.
+          Jadawel: the app-wide tools, in the corner of every page's themed bar.
+          The pages with the all workspaces sidebar span every workspace, so
+          they get the tools without one (no notifications), even when a
+          workspace is still selected from an earlier page.
         -->
         <AppUtilities
-          v-if="
+          :workspace="
             sidebarType !== SIDEBAR_TYPES.ALL_WORKSPACES &&
             selectedWorkspace &&
             selectedWorkspace.id
+              ? selectedWorkspace
+              : null
           "
-          :workspace="selectedWorkspace"
         />
       </div>
 
@@ -101,6 +112,7 @@ import HorizontalResize from '@jadawel/modules/core/components/HorizontalResize.
 import GuidedTour from '@jadawel/modules/core/components/guidedTour/GuidedTour.vue'
 import WorkspaceSearchModal from '@jadawel/modules/core/components/workspace/WorkspaceSearchModal.vue'
 import AppUtilities from '@jadawel/modules/core/components/AppUtilities.vue'
+import AppHeaderBar from '@jadawel/modules/core/components/AppHeaderBar.vue'
 import {
   CORE_ACTION_SCOPES,
   getSidebarActionScopes,
@@ -111,9 +123,10 @@ import {
 } from '@jadawel/modules/core/utils/events'
 import { notifyIf } from '@jadawel/modules/core/utils/error'
 import { SIDEBAR_TYPES } from '@jadawel/modules/core/utils/constants'
+import { resolveHeaderBar } from '@jadawel/modules/core/utils/headerBar'
 
 const store = useStore()
-const { $registry, $priorityBus, $realtime, $bus } = useNuxtApp()
+const { $registry, $priorityBus, $realtime, $bus, $i18n } = useNuxtApp()
 
 const col1Width = ref(240)
 const col3Width = ref(400)
@@ -136,6 +149,11 @@ const router = useRouter()
 // `definePageMeta({ sidebarType: SIDEBAR_TYPES.ALL_WORKSPACES })`.
 const sidebarType = computed(
   () => route.meta.sidebarType ?? SIDEBAR_TYPES.WORKSPACE
+)
+
+// Jadawel: the themed bar across the top of every page; see `resolveHeaderBar`.
+const headerBar = computed(() =>
+  resolveHeaderBar({ route, registry: $registry, store, i18n: $i18n })
 )
 
 // The sidebar decides which workspace and application level actions the user

@@ -69,20 +69,10 @@
   inline-size: 130px;
 }
 
-.all-workspaces__header-divider {
-  inline-size: 1px;
-  block-size: 20px;
-  background-color: $palette-neutral-200;
-}
-
 @media screen and (max-width: 900px) {
   .all-workspaces__search {
     flex-basis: 100%;
     order: 10;
-  }
-
-  .all-workspaces__header-divider {
-    display: none;
   }
 }
 

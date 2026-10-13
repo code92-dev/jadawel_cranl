@@ -33,4 +33,18 @@ describe('All workspaces page', () => {
       testApp.store.getters['undoRedo/getCurrentScope'].all_workspaces
     ).toBe(false)
   })
+
+  test('carries Create workspace on its themed bar', async () => {
+    const wrapper = await testApp.mount(AllWorkspaces)
+
+    const bar = wrapper.get('.app-header-bar')
+    expect(bar.find('.app-header-bar__actions .iconoir-plus').exists()).toBe(
+      true
+    )
+    expect(bar.text()).toContain('allWorkspaces.createWorkspace')
+    // Not twice: the content's own header row no longer has it.
+    expect(wrapper.get('.all-workspaces__header').text()).not.toContain(
+      'allWorkspaces.createWorkspace'
+    )
+  })
 })

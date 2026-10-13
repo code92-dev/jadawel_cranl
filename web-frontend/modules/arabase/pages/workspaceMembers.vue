@@ -13,7 +13,6 @@
           @click="invite(null)"
           >{{ $t('workspaceMembers.invite') }}</Button
         >
-        <AppUtilities></AppUtilities>
       </div>
 
       <div class="workspace-members__boxes">
@@ -120,7 +119,6 @@ import { useStore } from 'vuex'
 import { useRouter } from 'vue-router'
 import { useHead, useNuxtApp } from '#imports'
 
-import AppUtilities from '@jadawel/modules/core/components/AppUtilities'
 import WorkspaceMemberInviteModal from '@jadawel/modules/core/components/workspace/WorkspaceMemberInviteModal'
 import { getRoleTranslations } from '@jadawel/modules/core/store/workspace'
 import { SIDEBAR_TYPES } from '@jadawel/modules/core/utils/constants'
@@ -128,6 +126,8 @@ import { collatedStringCompare } from '@jadawel/modules/core/utils/string'
 
 definePageMeta({
   layout: 'app',
+  headerTitle: 'workspaceMembers.title',
+  headerIcon: 'iconoir-group',
   sidebarType: SIDEBAR_TYPES.ALL_WORKSPACES,
   middleware: [
     'settings',

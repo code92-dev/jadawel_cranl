@@ -138,7 +138,6 @@ describe('AppUtilities component', () => {
       global: { stubs },
     })
 
-    expect(wrapper.classes()).toContain('app-utilities--inline')
     // Notifications belong to one workspace, so only the tools are shown.
     expect(wrapper.find('.iconoir-bell').exists()).toBe(false)
     expect(wrapper.findAll('.app-utilities__item')).toHaveLength(1)
@@ -160,7 +159,6 @@ describe('AppUtilities component', () => {
       global: { stubs },
     })
 
-    expect(wrapper.classes()).not.toContain('app-utilities--inline')
     expect(wrapper.find('.iconoir-bell').exists()).toBe(true)
     expect(
       wrapper

@@ -33,6 +33,12 @@
 <script setup>
 import { useHead } from '#imports'
 
+definePageMeta({
+  // The settings belong to one workspace, so its name heads the themed bar.
+  headerTitle: ({ store }) => store.getters['workspace/getSelected']?.name,
+  headerIcon: 'iconoir-settings',
+})
+
 /* Using Vuex in Nuxt 3 with Composition API */
 
 const route = useRoute()

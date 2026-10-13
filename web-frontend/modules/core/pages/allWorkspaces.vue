@@ -1,102 +1,123 @@
 <template>
-  <div class="layout__col-2-scroll layout__col-2-scroll--white-background">
-    <div class="all-workspaces">
-      <DashboardVerifyEmail
-        class="margin-top-0 margin-bottom-2"
-      ></DashboardVerifyEmail>
-      <WorkspaceInvitation
-        v-for="invitation in workspaceInvitations"
-        :key="'invitation-' + invitation.id"
-        :invitation="invitation"
-        class="margin-top-0 margin-bottom-2"
-      ></WorkspaceInvitation>
-
-      <AllWorkspacesHeader
-        ref="header"
-        v-model:search="search"
-        v-model:selected-types="selectedTypes"
-        v-model:view-mode="viewMode"
-        v-model:sort-by="sortBy"
-        @collapse-all="collapseAll"
-        @expand-all="expandAll"
-      ></AllWorkspacesHeader>
-
-      <div v-if="!searchActive" class="all-workspaces__boxes">
-        <AllWorkspacesWorkspaceBox
-          v-for="workspace in workspaces"
-          :key="workspace.id"
-          :workspace="workspace"
-          :role-name="roleNameOf(workspace)"
-          :component-arguments="workspaceComponentArguments"
-          :component-arguments-loading="workspaceComponentArgumentsLoading"
-          :applications="filteredApplicationsOf(workspace)"
-          :total-application-count="applicationsOf(workspace).length"
-          :collapsed="collapsedIds.has(workspace.id)"
-          :compact="viewMode === 'compact'"
-          :sort-by="sortBy"
-          @toggle-collapsed="toggleCollapsed(workspace.id)"
-          @select-application="selectApplication"
-        ></AllWorkspacesWorkspaceBox>
-      </div>
-
-      <template v-else>
-        <section
-          v-if="matchedWorkspaces.length > 0"
-          class="all-workspaces__section"
+  <div>
+    <!-- Jadawel: the themed bar, carrying this page's main action. -->
+    <AppHeaderBar
+      :title="$t('sidebar.allWorkspaces')"
+      icon="iconoir-home-simple"
+    >
+      <template v-if="$hasPermission('create_workspace')">
+        <Button
+          icon="iconoir-plus"
+          tag="a"
+          @click="createWorkspaceModal.show()"
+          >{{ $t('allWorkspaces.createWorkspace') }}</Button
         >
-          <h2 class="all-workspaces__section-title">
-            {{ $t('allWorkspaces.workspacesSection') }}
-          </h2>
-          <div class="all-workspaces__boxes">
-            <AllWorkspacesWorkspaceBox
-              v-for="workspace in matchedWorkspaces"
-              :key="'search-workspace-' + workspace.id"
-              :workspace="workspace"
-              :role-name="roleNameOf(workspace)"
-              :component-arguments="workspaceComponentArguments"
-              :component-arguments-loading="workspaceComponentArgumentsLoading"
-              :applications="[]"
-              :total-application-count="applicationsOf(workspace).length"
-              :highlight="query"
-              header-only
-            ></AllWorkspacesWorkspaceBox>
-          </div>
-        </section>
-        <section
-          v-if="matchedApplications.length > 0"
-          class="all-workspaces__section"
-        >
-          <h2 class="all-workspaces__section-title">
-            {{ $t('allWorkspaces.itemsSection') }}
-          </h2>
-          <div class="all-workspaces__grid">
-            <AllWorkspacesApplicationCard
-              v-for="match in matchedApplications"
-              :key="'search-application-' + match.application.id"
-              :application="match.application"
-              :workspace="match.workspace"
-              :highlight="query"
-              :sort-by="sortBy"
-              @click="selectApplication(match.application)"
-            ></AllWorkspacesApplicationCard>
-          </div>
-        </section>
-        <div v-if="noResults" class="all-workspaces__empty">
-          <div class="all-workspaces__empty-title">
-            {{ $t('allWorkspaces.noResultsTitle') }}
-          </div>
-          <div class="all-workspaces__empty-description">
-            {{ $t('allWorkspaces.noResultsDescription', { search: query }) }}
-          </div>
-          <Button
-            class="all-workspaces__empty-action"
-            type="secondary"
-            tag="a"
-            @click="search = ''"
-            >{{ $t('allWorkspaces.clearSearch') }}</Button
-          >
-        </div>
+        <CreateWorkspaceModal ref="createWorkspaceModal"></CreateWorkspaceModal>
       </template>
+    </AppHeaderBar>
+    <div
+      class="layout__col-2-scroll layout__col-2-scroll--white-background layout__col-2-scroll--below-bar"
+    >
+      <div class="all-workspaces">
+        <DashboardVerifyEmail
+          class="margin-top-0 margin-bottom-2"
+        ></DashboardVerifyEmail>
+        <WorkspaceInvitation
+          v-for="invitation in workspaceInvitations"
+          :key="'invitation-' + invitation.id"
+          :invitation="invitation"
+          class="margin-top-0 margin-bottom-2"
+        ></WorkspaceInvitation>
+
+        <AllWorkspacesHeader
+          ref="header"
+          v-model:search="search"
+          v-model:selected-types="selectedTypes"
+          v-model:view-mode="viewMode"
+          v-model:sort-by="sortBy"
+          @collapse-all="collapseAll"
+          @expand-all="expandAll"
+        ></AllWorkspacesHeader>
+
+        <div v-if="!searchActive" class="all-workspaces__boxes">
+          <AllWorkspacesWorkspaceBox
+            v-for="workspace in workspaces"
+            :key="workspace.id"
+            :workspace="workspace"
+            :role-name="roleNameOf(workspace)"
+            :component-arguments="workspaceComponentArguments"
+            :component-arguments-loading="workspaceComponentArgumentsLoading"
+            :applications="filteredApplicationsOf(workspace)"
+            :total-application-count="applicationsOf(workspace).length"
+            :collapsed="collapsedIds.has(workspace.id)"
+            :compact="viewMode === 'compact'"
+            :sort-by="sortBy"
+            @toggle-collapsed="toggleCollapsed(workspace.id)"
+            @select-application="selectApplication"
+          ></AllWorkspacesWorkspaceBox>
+        </div>
+
+        <template v-else>
+          <section
+            v-if="matchedWorkspaces.length > 0"
+            class="all-workspaces__section"
+          >
+            <h2 class="all-workspaces__section-title">
+              {{ $t('allWorkspaces.workspacesSection') }}
+            </h2>
+            <div class="all-workspaces__boxes">
+              <AllWorkspacesWorkspaceBox
+                v-for="workspace in matchedWorkspaces"
+                :key="'search-workspace-' + workspace.id"
+                :workspace="workspace"
+                :role-name="roleNameOf(workspace)"
+                :component-arguments="workspaceComponentArguments"
+                :component-arguments-loading="
+                  workspaceComponentArgumentsLoading
+                "
+                :applications="[]"
+                :total-application-count="applicationsOf(workspace).length"
+                :highlight="query"
+                header-only
+              ></AllWorkspacesWorkspaceBox>
+            </div>
+          </section>
+          <section
+            v-if="matchedApplications.length > 0"
+            class="all-workspaces__section"
+          >
+            <h2 class="all-workspaces__section-title">
+              {{ $t('allWorkspaces.itemsSection') }}
+            </h2>
+            <div class="all-workspaces__grid">
+              <AllWorkspacesApplicationCard
+                v-for="match in matchedApplications"
+                :key="'search-application-' + match.application.id"
+                :application="match.application"
+                :workspace="match.workspace"
+                :highlight="query"
+                :sort-by="sortBy"
+                @click="selectApplication(match.application)"
+              ></AllWorkspacesApplicationCard>
+            </div>
+          </section>
+          <div v-if="noResults" class="all-workspaces__empty">
+            <div class="all-workspaces__empty-title">
+              {{ $t('allWorkspaces.noResultsTitle') }}
+            </div>
+            <div class="all-workspaces__empty-description">
+              {{ $t('allWorkspaces.noResultsDescription', { search: query }) }}
+            </div>
+            <Button
+              class="all-workspaces__empty-action"
+              type="secondary"
+              tag="a"
+              @click="search = ''"
+              >{{ $t('allWorkspaces.clearSearch') }}</Button
+            >
+          </div>
+        </template>
+      </div>
     </div>
   </div>
 </template>
@@ -107,6 +128,8 @@ import { useStore } from 'vuex'
 import { useRouter, useNuxtApp, useAsyncData } from '#app'
 import { useHead } from '#imports'
 
+import AppHeaderBar from '@jadawel/modules/core/components/AppHeaderBar'
+import CreateWorkspaceModal from '@jadawel/modules/core/components/workspace/CreateWorkspaceModal'
 import DashboardVerifyEmail from '@jadawel/modules/core/components/dashboard/DashboardVerifyEmail'
 import WorkspaceInvitation from '@jadawel/modules/core/components/workspace/WorkspaceInvitation'
 import AllWorkspacesHeader from '@jadawel/modules/core/components/allWorkspaces/AllWorkspacesHeader'
@@ -134,6 +157,8 @@ const HIDDEN_ROLE_UIDS = ['NO_ACCESS', 'NO_ROLE_LOW_PRIORITY']
 
 definePageMeta({
   layout: 'app',
+  // Draws its own themed bar, to carry Create workspace.
+  ownHeader: true,
   sidebarType: SIDEBAR_TYPES.ALL_WORKSPACES,
   middleware: [
     'settings',
@@ -206,6 +231,7 @@ const workspaceComponentArgumentsLoading = computed(() =>
 )
 
 const header = ref(null)
+const createWorkspaceModal = ref(null)
 
 const search = ref('')
 const query = computed(() => search.value.trim())

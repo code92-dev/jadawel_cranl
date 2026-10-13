@@ -27,6 +27,8 @@ import { SIDEBAR_TYPES } from '@jadawel/modules/core/utils/constants'
 
 definePageMeta({
   layout: 'app',
+  headerTitle: 'sidebar.recentlyViewed',
+  headerIcon: 'iconoir-clock-rotate-right',
   sidebarType: SIDEBAR_TYPES.ALL_WORKSPACES,
   middleware: [
     'settings',

@@ -9,17 +9,16 @@
     top of the header's own controls.
 
     The tools apply to the whole system, so the pages that span every
-    workspace (the homepage, recently viewed, members) have them too, without a
-    workspace (`workspace` is null): Members and Invite cover every workspace,
-    and the notifications, which belong to one workspace, are left out. Those
-    pages scroll as a whole, so they place the tools in their own header row
-    rather than in a corner the content would scroll under.
+    workspace (the homepage, recently viewed, members) have them too, in the
+    same corner of their themed bar, without a workspace (`workspace` is null):
+    Members and Invite cover every workspace, and the notifications, which
+    belong to one workspace, are left out.
 
     There is deliberately no search icon here: the view header already carries
     one, and two magnifiers in the same bar is exactly the duplication this
     layout is meant to remove. Global search stays on Ctrl/⌘ K.
   -->
-  <div class="app-utilities" :class="{ 'app-utilities--inline': !workspace }">
+  <div class="app-utilities">
     <a
       v-if="workspace"
       v-tooltip="$t('sidebar.notifications')"

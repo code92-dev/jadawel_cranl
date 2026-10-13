@@ -19,6 +19,8 @@ import PageEditorContent from '@jadawel/modules/builder/components/PageEditorCon
 
 definePageMeta({
   layout: 'app',
+  // Draws its own themed bar, so the layout's shared one is left out.
+  ownHeader: true,
   middleware: [
     'settings',
     'authenticated',

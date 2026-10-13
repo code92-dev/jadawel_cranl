@@ -40,6 +40,18 @@
   background-color: var(--jadawel-app-background, #f5f6f7);
 }
 
+// Jadawel: the page's own box inside the content column. Pages position
+// themselves against it exactly as they did against the column, and when the
+// layout draws the shared themed bar the box starts below it.
+.layout__col-2-body {
+  position: absolute;
+  inset: 0;
+
+  &.layout__col-2-body--below-bar {
+    inset-block-start: 51px;
+  }
+}
+
 .layout__col-2-scroll {
   @include absolute(0);
 
@@ -47,6 +59,11 @@
 
   &.layout__col-2-scroll--white-background {
     background-color: var(--jadawel-content-background, #fff);
+  }
+
+  // Jadawel: under the themed bar a page renders itself (`AppHeaderBar`).
+  &.layout__col-2-scroll--below-bar {
+    inset-block-start: 51px;
   }
 }
 

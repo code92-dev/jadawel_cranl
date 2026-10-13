@@ -30,6 +30,7 @@ const buttonStyles = readFileSync(
   'modules/core/assets/scss/abstracts/_button.scss',
   'utf8'
 )
+const workspacePage = readFileSync('modules/core/pages/workspace.vue', 'utf8')
 const shareViewComponent = readFileSync(
   'modules/database/components/view/ShareViewLink.vue',
   'utf8'
@@ -55,7 +56,7 @@ describe('interface theme styling', () => {
     )
   })
 
-  test('table top bars and the workspace panel cap use the selected accent', () => {
+  test('every top bar and the workspace panel cap use the selected accent', () => {
     const workspaceSelectorRules = sidebarStyles.match(
       /\.sidebar__workspaces-selector \{(?<rules>[^}]*)\}/s
     )?.groups.rules
@@ -72,20 +73,18 @@ describe('interface theme styling', () => {
       /background-color:\s*\$color-primary-500/
     )
     expect(headerRules).toMatch(/background-color:\s*\$color-primary-500/)
-    expect(dashboardHeaderRules).toMatch(/background:\s*\$white/)
-    expect(dashboardHeaderRules).not.toMatch(
-      /background:\s*\$color-primary-500/
-    )
+    // Jadawel: the workspace home's header is the themed bar every page has.
+    // It paints no colour of its own and takes the `.header` class instead.
+    expect(dashboardHeaderRules).not.toMatch(/background/)
+    expect(workspacePage).toMatch(/class="dashboard__header header"/)
     expect(dashboardStyles).toMatch(
       /\.layout__col-2:has\(\.dashboard__header\) \{[^}]*background-color:\s*\$white/s
     )
     expect(dashboardStyles).toMatch(
       /\.dashboard__scroll-container \{[^}]*background:\s*\$white/s
     )
-    // Jadawel: shared with the tools in the cross-workspace pages' header rows.
-    expect(appUtilitiesStyles).toMatch(
-      /:is\(\.layout__col-2:has\(\.dashboard__header\), \.app-utilities--inline\)\s*\.app-utilities__item \{[^}]*color:\s*\$palette-neutral-800/s
-    )
+    // Every page's tools sit on its themed bar now; none in a white row.
+    expect(appUtilitiesStyles).not.toMatch(/app-utilities--inline/)
   })
 
   test('shared views and the grid menu match the other top bar controls', () => {

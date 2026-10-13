@@ -310,18 +310,27 @@
   background: $color-primary-500;
 }
 
+// Jadawel: the admin sidebar's top takes the theme colour like the workspace
+// selector, so the bar runs unbroken across admin pages as well.
 .sidebar__head {
   @include flex-align-items(15px);
 
-  border-block-end: 1px solid var(--jadawel-border-color, #e7e9ec);
+  background-color: $color-primary-500;
+  border-block-end: 1px solid $color-primary-600;
   padding: 0 16px;
   block-size: 51px;
-  color: $palette-neutral-1200;
+  color: $white;
   font-weight: 500;
 
   .sidebar--collapsed & {
     justify-content: center;
     padding: 0;
+  }
+
+  [data-interface-theme='white'] & {
+    background-color: var(--jadawel-header-background, #f5f6f7);
+    border-block-end-color: var(--jadawel-border-color, #e7e9ec);
+    color: $palette-neutral-1200;
   }
 }
 
@@ -351,6 +360,29 @@
   font-size: 13px;
   font-weight: 500;
   color: $palette-neutral-1200;
+}
+
+// On the themed admin sidebar top, the title and back arrow follow its colour.
+.sidebar__head .sidebar__title {
+  color: inherit;
+}
+
+.sidebar__head .sidebar__back {
+  color: rgba($white, 0.78);
+
+  &:hover {
+    color: $white;
+    background-color: rgba($white, 0.16);
+  }
+
+  [data-interface-theme='white'] & {
+    color: $palette-neutral-900;
+
+    &:hover {
+      color: $palette-neutral-900;
+      background-color: rgba($palette-neutral-1300, 6%);
+    }
+  }
 }
 
 .sidebar__logo {

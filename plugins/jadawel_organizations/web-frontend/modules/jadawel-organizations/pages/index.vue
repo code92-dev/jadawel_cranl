@@ -92,6 +92,8 @@
 <script setup>
 definePageMeta({
   layout: "app",
+  headerTitle: "organizations.title",
+  headerIcon: "iconoir-community",
   middleware: "authenticated",
 });
 </script>

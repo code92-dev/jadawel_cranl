@@ -28,6 +28,8 @@
 <script setup>
 definePageMeta({
   layout: "app",
+  headerTitle: "organizations.accept",
+  headerIcon: "iconoir-community",
   middleware: "authenticated",
 });
 </script>

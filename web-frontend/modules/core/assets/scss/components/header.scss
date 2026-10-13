@@ -14,6 +14,59 @@
   }
 }
 
+// Jadawel: the shared themed bar the app layout draws on pages without a
+// header of their own, laid out like the My dashboards bar it is modelled on.
+.app-header-bar {
+  align-items: center;
+  padding-inline-start: 20px;
+}
+
+.app-header-bar__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-inline-size: 0;
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: inherit;
+}
+
+.app-header-bar__title-text {
+  @extend %ellipsis;
+}
+
+.app-header-bar__actions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+  margin-inline-start: auto;
+  padding-inline-start: 12px;
+}
+
+// On a coloured bar the buttons are translucent chips of the bar's own colour,
+// like the button on a saved dashboard's bar. The white theme's light bar keeps
+// the ordinary buttons.
+:root:not([data-interface-theme='white'])
+  :is(.app-header-bar__actions, .dashboard__header-actions)
+  :is(.button, .button-icon) {
+  border: 1px solid rgba($white, 0.36);
+  background-color: rgba($white, 0.16);
+  box-shadow: none;
+  color: $white;
+
+  &:hover,
+  &:focus-visible {
+    background-color: rgba($white, 0.28);
+    color: $white;
+  }
+
+  i {
+    color: inherit;
+  }
+}
+
 @keyframes header-loading-loop {
   0% {
     inset-inline-start: -32px;

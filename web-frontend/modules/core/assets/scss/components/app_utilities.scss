@@ -22,12 +22,6 @@
   padding-inline: 8px;
 }
 
-// The workspace home page uses a taller header than every other surface, so the
-// group has to match it or it sits visibly high against the workspace title.
-.layout__col-2:has(.dashboard__header) .app-utilities {
-  block-size: 74px;
-}
-
 .app-utilities__item {
   position: relative;
   flex: 0 0 auto;
@@ -56,26 +50,6 @@
 // The white theme also gives table and application pages a light header, so
 // their utility controls need the same dark treatment as the workspace home.
 [data-interface-theme='white'] .app-utilities__item {
-  color: $palette-neutral-800;
-
-  &:hover {
-    color: $palette-neutral-1200;
-    background-color: rgba($palette-neutral-1300, 0.04);
-  }
-
-  &.app-utilities__item--active {
-    color: var(--jadawel-primary-500, #69717d);
-    background-color: var(--jadawel-primary-100, #fff);
-  }
-}
-
-// Workspace home deliberately keeps its header white. The utilities occupy
-// that header's end-side band, so they return to their normal dark treatment
-// there while remaining white on table and builder top bars. The pages that
-// span every workspace place them in their own white header row
-// (`--inline`), so they take the same treatment.
-:is(.layout__col-2:has(.dashboard__header), .app-utilities--inline)
-  .app-utilities__item {
   color: $palette-neutral-800;
 
   &:hover {
@@ -192,14 +166,4 @@
   &.badge-counter--one-digit {
     padding: 2px 5px;
   }
-}
-
-// The pages that span every workspace put the tools in their own header row,
-// which scrolls with the page, so they flow with the other controls there.
-.app-utilities.app-utilities--inline {
-  --app-utilities-item-size: 36px;
-
-  position: static;
-  block-size: auto;
-  padding-inline: 0;
 }

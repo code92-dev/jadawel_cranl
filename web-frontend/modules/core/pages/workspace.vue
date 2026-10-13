@@ -1,6 +1,6 @@
 <template>
   <div v-if="workspaceExists">
-    <div class="dashboard__header" ph-autocapture="dashboard-header">
+    <div class="dashboard__header header" ph-autocapture="dashboard-header">
       <div class="dashboard__header-left">
         <h1
           ref="contextLink"
@@ -211,6 +211,8 @@ import WorkspaceActivityService from '@jadawel/modules/arabase/services/workspac
 
 definePageMeta({
   layout: 'app',
+  // Draws its own themed bar, so the layout's shared one is left out.
+  ownHeader: true,
   // Note: these middlewares must be explicitly listed because child pages
   // don't automatically inherit parent middleware in Nuxt 3's page meta
   middleware: [
