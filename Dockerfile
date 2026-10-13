@@ -17,7 +17,19 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-10-04 from commit 248eff6b, tag 2.3.23-feature-access-templates.
+# Published 2026-10-13 from commit 0bcbe2d3, tag 2.3.24-org-setup-themed-bar.
+# Admin -> Organizations sets an organization up in one step: owner, members,
+# seats and a workspace, everyone added at once with no invitation to accept;
+# emails without an account get one, with a temporary password shown once
+# (docs/PAYMENT_ORGTEAM_ADMIN_MANUAL.md). Every page now has the theme-coloured
+# top bar My dashboards had, level with the sidebar's top; All workspaces puts
+# Create workspace on it and the tools sit in its corner on every page. On the
+# workspaces homepage the name at the top of the sidebar opens the menu.
+# **No migrations, no environment changes.**
+# Previous deployment pin (2.3.23-feature-access-templates):
+# sha256:1e55cf50371395a8ffc4db0b212c5bb9247a1924dd72b6dec0ed92b0c8d15e32.
+#
+# Previously published 2026-10-04 from commit 248eff6b, tag 2.3.23-feature-access-templates.
 # Admin -> Settings -> Feature access opens automations, applications and Sanad
 # to every user or to invited email addresses (docs/FEATURE_ACCESS.md). Staff
 # keep all three; with nothing set they stay staff-only, as before. Anyone else
@@ -415,7 +427,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:1e55cf50371395a8ffc4db0b212c5bb9247a1924dd72b6dec0ed92b0c8d15e32
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:25380e367ae09b90f7ee6e6b24a6d6f737e69dddfb97d2488de2b6288783c58b
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
