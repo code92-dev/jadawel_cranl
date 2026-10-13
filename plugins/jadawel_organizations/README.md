@@ -32,7 +32,10 @@ records, back up the database, and remove Organizations before Billing. The
 packages never delete organization, billing, or workspace records during
 removal.
 
-The namespaced API is mounted under `/api/organizations/`. It includes member
+The namespaced API is mounted under `/api/organizations/`. `admin/setup/` creates
+an organization with its owner, members, seat grant and workspace in one
+request, adding everyone immediately and creating accounts with one-time
+temporary passwords where none exist. It also includes member
 list/add/update/remove, invitation create/list/accept/revoke, restricted owner
 setup invitations with resend/reassign controls, workspace outsider previews,
 bind/unbind and member assignment (ADMIN, MEMBER, or read-only VIEWER), lifecycle

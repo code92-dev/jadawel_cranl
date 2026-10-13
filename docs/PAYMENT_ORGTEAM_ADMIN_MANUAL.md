@@ -38,21 +38,40 @@ organization provisioning, membership controls, invitations and audit history.
 
 ## Create an organization without payment
 
-1. Open **Organization administration** at **Admin → Organizations**.
-2. Enter the organization name and either the active owner's user ID or the
-   email address for a new owner setup.
-3. Choose **Create organization**. The general administrator (`is_staff`) owns
-   the audited operation and the Team BillingAccount is created without a
-   provider call.
-4. Open the related Billing account and use **Complimentary access** to choose
-   a Team plan, seat cap, optional expiry, and a written reason. Review the
-   proposed effective access before saving.
+**Admin → Organizations** sets an organization up in one step, with no
+invitation for anyone to accept:
 
-When a new-owner email is used, the organization remains pending, the owner
-seat is reserved, and a restricted setup invitation is sent after commit. The
-create response includes a one-time setup token for an internal onboarding
-handoff. A general administrator can rotate or reassign it with
-`POST /api/organizations/admin/{id}/owner-setup/`.
+1. Enter the organization name and the owner's email.
+2. Choose **Add member** for each member, enter their email and choose
+   **Member** or **Administrator**.
+3. Choose the complimentary Team plan. The seat limit defaults to the owner
+   plus every member; enter a larger number to leave room. Expiry and reason
+   are optional.
+4. Keep **Create a workspace for the organization** checked to create a
+   workspace with the organization's name, bound to it, where the owner and
+   administrators are workspace administrators and members are workspace
+   members.
+5. Choose **Create organization**.
+
+Everyone is a member the moment the request succeeds. An email that already
+has an active account is added to that account. An email with no account gets
+one on the spot, marked as verified, with a generated temporary password. The
+passwords are shown once under the form, with **Copy emails and passwords**;
+hand them over, and ask each person to change theirs after signing in. They
+are not stored in clear text, so a retried request cannot show them again. A
+deactivated account, or the same email twice, rejects the whole request and
+nothing is created.
+
+The form calls `POST /api/organizations/admin/setup/`, which accepts the
+`Idempotency-Key` header and answers with `Cache-Control: no-store`.
+
+The older `POST /api/organizations/admin/create/` remains for API clients: it
+takes an owner user ID or email, and for an email with no account it leaves the
+organization pending, reserves the owner seat and emails a restricted setup
+invitation. The response carries a one-time setup token, which a general
+administrator can rotate or reassign with
+`POST /api/organizations/admin/{id}/owner-setup/`. Its access grant is set
+separately under **Billing → Complimentary access**.
 
 The owner counts as one Team seat. A complimentary organization can be created
 without a plan first, but member additions remain restricted until a paid

@@ -8,6 +8,7 @@ layers below it:
 - provisioning.py: organization creation, Team provisioning and owner setup.
 - members.py: invitations and membership changes.
 - lifecycle.py: organization settings, snapshots and status transitions.
+- admin_setup.py: the general administrator's one-step organization setup.
 
 This module re-exports every handler, so existing
 ``jadawel_organizations.handlers`` imports keep resolving to the same objects.
@@ -24,6 +25,7 @@ from .access import (
     audit,
     reject_legacy_workspace_membership_mutation,
 )
+from .admin_setup import OrganizationSetup, setup_organization
 from .lifecycle import (
     change_organization_lifecycle,
     organization_snapshot,
@@ -61,6 +63,7 @@ from .workspace_access import (
 )
 
 __all__ = [
+    "OrganizationSetup",
     "User",
     "_can_manage",
     "_disconnect_user_after_commit",
@@ -90,6 +93,7 @@ __all__ = [
     "remove_member",
     "resend_owner_setup",
     "revoke_invitation",
+    "setup_organization",
     "team_occupied_seats",
     "transition_to_personal",
     "unassign_workspace_member",

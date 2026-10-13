@@ -4,6 +4,7 @@ from .views import (
     AcceptInvitationView,
     AdminOrganizationCreateView,
     AdminOrganizationListView,
+    AdminOrganizationSetupView,
     AdminOwnerSetupView,
     AuditView,
     InvitationListCreateView,
@@ -29,6 +30,7 @@ urlpatterns = [
     ),
     path("admin/", AdminOrganizationListView.as_view(), name="admin_list"),
     path("admin/create/", AdminOrganizationCreateView.as_view(), name="admin_create"),
+    path("admin/setup/", AdminOrganizationSetupView.as_view(), name="admin_setup"),
     path(
         "admin/<uuid:organization_id>/owner-setup/",
         AdminOwnerSetupView.as_view(),

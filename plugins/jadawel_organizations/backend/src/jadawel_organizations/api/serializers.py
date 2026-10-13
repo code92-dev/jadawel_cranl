@@ -138,6 +138,30 @@ class CreateOrganizationSerializer(serializers.Serializer[Any]):
         return attrs
 
 
+class SetupMemberSerializer(serializers.Serializer[Any]):
+    email = serializers.EmailField()
+    name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    role = serializers.ChoiceField(
+        choices=[OrganizationMembership.Role.ADMIN, OrganizationMembership.Role.MEMBER],
+        default=OrganizationMembership.Role.MEMBER,
+    )
+
+
+class SetupOrganizationSerializer(serializers.Serializer[Any]):
+    name = serializers.CharField(max_length=160)
+    owner_email = serializers.EmailField()
+    owner_name = serializers.CharField(max_length=150, required=False, allow_blank=True)
+    members = serializers.ListField(
+        child=SetupMemberSerializer(), required=False, max_length=500
+    )
+    plan = serializers.PrimaryKeyRelatedField(queryset=Plan.objects.filter(kind="TEAM"))
+    seat_limit = serializers.IntegerField(min_value=1, max_value=100000, required=False)
+    expires_at = serializers.DateTimeField(required=False, allow_null=True)
+    reason = serializers.CharField(max_length=500, required=False, allow_blank=True)
+    create_workspace = serializers.BooleanField(default=True)
+    creation_key = serializers.UUIDField(required=False, allow_null=True)
+
+
 class StartTeamSerializer(serializers.Serializer[Any]):
     name = serializers.CharField(max_length=160)
     # A client can retry a failed response without creating a second Team

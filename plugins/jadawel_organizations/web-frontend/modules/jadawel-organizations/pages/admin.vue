@@ -18,23 +18,58 @@
         {{ $t("organizations.search") }}
       </Button>
     </form>
-    <form @submit.prevent="create">
+    <form class="organization-setup" @submit.prevent="create">
+      <h2>{{ $t("organizations.setupTitle") }}</h2>
+      <p>{{ $t("organizations.setupNote") }}</p>
       <label>
         {{ $t("organizations.name") }}
         <input v-model="name" required class="input" />
       </label>
       <label>
-        {{ $t("organizations.owner") }}
-        <input v-model.number="owner" type="number" min="1" class="input" />
+        {{ $t("organizations.ownerAccountEmail") }}
+        <input
+          v-model.trim="ownerEmail"
+          type="email"
+          required
+          dir="ltr"
+          class="input"
+        />
       </label>
-      <label>
-        {{ $t("organizations.ownerEmail") }}
-        <input v-model.trim="ownerEmail" type="email" class="input" />
-      </label>
+      <fieldset class="organization-setup__members">
+        <legend>{{ $t("organizations.members") }}</legend>
+        <div
+          v-for="(member, index) in members"
+          :key="member.key"
+          class="organization-setup__member"
+        >
+          <input
+            v-model.trim="member.email"
+            type="email"
+            required
+            dir="ltr"
+            class="input"
+            :placeholder="$t('organizations.email')"
+            :aria-label="$t('organizations.email')"
+          />
+          <select
+            v-model="member.role"
+            class="input"
+            :aria-label="$t('organizations.role')"
+          >
+            <option value="member">{{ $t("organizations.member") }}</option>
+            <option value="admin">{{ $t("organizations.admin") }}</option>
+          </select>
+          <Button type="secondary" @click="members.splice(index, 1)">
+            {{ $t("organizations.remove") }}
+          </Button>
+        </div>
+        <Button type="secondary" @click="addMemberRow">
+          {{ $t("organizations.addMemberRow") }}
+        </Button>
+      </fieldset>
       <label>
         {{ $t("organizations.plan") }}
-        <select v-model="grant.plan" class="input">
-          <option value="">{{ $t("organizations.noGrant") }}</option>
+        <select v-model="grant.plan" required class="input">
           <option
             v-for="plan in plans"
             :key="plan.id"
@@ -45,33 +80,75 @@
           </option>
         </select>
       </label>
-      <label v-if="grant.plan">
+      <label>
         {{ $t("organizations.seatLimit") }}
         <input
           v-model.number="grant.seat_limit"
           type="number"
-          min="1"
-          required
+          :min="minimumSeats"
+          :placeholder="String(minimumSeats)"
           class="input"
         />
+        <small>
+          {{ $t("organizations.seatLimitHint", { count: minimumSeats }) }}
+        </small>
       </label>
-      <label v-if="grant.plan">
+      <label>
         {{ $t("organizations.expiresAt") }}
         <input v-model="grant.expires_at" type="datetime-local" class="input" />
       </label>
-      <label v-if="grant.plan">
-        {{ $t("organizations.reason") }}
-        <textarea
-          v-model="grant.reason"
-          required
-          maxlength="500"
-          class="input"
-        />
+      <label>
+        {{ $t("organizations.reasonOptional") }}
+        <textarea v-model="grant.reason" maxlength="500" class="input" />
       </label>
-      <Button button-type="submit" :disabled="busy">
+      <label class="organization-setup__checkbox">
+        <input v-model="createWorkspace" type="checkbox" />
+        {{ $t("organizations.createWorkspace") }}
+      </label>
+      <Button button-type="submit" :disabled="busy || !plans.length">
         {{ $t("organizations.create") }}
       </Button>
     </form>
+    <section
+      v-if="setupResult"
+      role="status"
+      class="organization-setup__result"
+    >
+      <p>{{ $t("organizations.setupDone", { name: setupResult.name }) }}</p>
+      <template v-if="setupResult.credentials.length">
+        <p>
+          <strong>{{ $t("organizations.credentialsWarning") }}</strong>
+        </p>
+        <table>
+          <thead>
+            <tr>
+              <th>{{ $t("organizations.email") }}</th>
+              <th>{{ $t("organizations.temporaryPassword") }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr
+              v-for="credential in setupResult.credentials"
+              :key="credential.email"
+            >
+              <td>
+                <bdi>{{ credential.email }}</bdi>
+              </td>
+              <td>
+                <code dir="ltr">{{ credential.password }}</code>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <Button type="secondary" @click="copyCredentials">
+          {{
+            copied
+              ? $t("organizations.copied")
+              : $t("organizations.copyCredentials")
+          }}
+        </Button>
+      </template>
+    </section>
     <p v-if="loading" role="status">{{ $t("organizations.loading") }}</p>
     <p v-else-if="!organizations.length">{{ $t("organizations.empty") }}</p>
     <ul v-else>
@@ -169,12 +246,15 @@ export default {
   data() {
     return {
       name: "",
-      owner: null,
       ownerEmail: "",
+      members: [],
+      createWorkspace: true,
+      setupResult: null,
+      copied: false,
       ownerSetupToken: "",
       creationKey: null,
       plans: [],
-      grant: { plan: "", seat_limit: 1, expires_at: "", reason: "" },
+      grant: { plan: "", seat_limit: null, expires_at: "", reason: "" },
       organizations: [],
       organizationsNext: null,
       search: "",
@@ -185,10 +265,26 @@ export default {
       errorDetail: "",
     };
   },
+  computed: {
+    // The server raises the seat limit to fit the owner and every member.
+    minimumSeats() {
+      return 1 + this.members.length;
+    },
+  },
   async mounted() {
     await this.load();
   },
   methods: {
+    addMemberRow() {
+      this.members.push({ key: uuid(), email: "", role: "member" });
+    },
+    async copyCredentials() {
+      const text = this.setupResult.credentials
+        .map((credential) => `${credential.email}\t${credential.password}`)
+        .join("\n");
+      await navigator.clipboard.writeText(text);
+      this.copied = true;
+    },
     // The admin endpoints answer with DRF field errors ("owner":
     // "choose_id_or_email"). Swallowing them left a 400 in the console and no
     // way to tell which field the server rejected.
@@ -212,6 +308,9 @@ export default {
         this.plans = (plans.data.results || plans.data).filter(
           (plan) => plan.kind === "TEAM",
         );
+        if (!this.grant.plan && this.plans.length) {
+          this.grant.plan = this.plans[0].id;
+        }
       } catch (error) {
         this.fail(error);
       } finally {
@@ -222,30 +321,40 @@ export default {
       this.busy = true;
       this.error = false;
       this.errorDetail = "";
+      this.setupResult = null;
+      this.copied = false;
       this.creationKey = this.creationKey || uuid();
       try {
         const payload = {
           name: this.name,
+          owner_email: this.ownerEmail,
+          members: this.members.map(({ email, role }) => ({ email, role })),
+          plan: Number(this.grant.plan),
+          create_workspace: this.createWorkspace,
         };
-        if (this.owner) payload.owner = this.owner;
-        if (this.ownerEmail) payload.owner_email = this.ownerEmail;
-        if (this.grant.plan) {
-          payload.plan = Number(this.grant.plan);
-          payload.seat_limit = this.grant.seat_limit;
-          payload.reason = this.grant.reason;
-          if (this.grant.expires_at) payload.expires_at = this.grant.expires_at;
-        }
+        if (this.grant.seat_limit) payload.seat_limit = this.grant.seat_limit;
+        if (this.grant.reason) payload.reason = this.grant.reason;
+        if (this.grant.expires_at) payload.expires_at = this.grant.expires_at;
         const response = await this.$client.post(
-          "/organizations/admin/create/",
+          "/organizations/admin/setup/",
           payload,
           { headers: { "Idempotency-Key": this.creationKey } },
         );
         this.creationKey = null;
-        this.ownerSetupToken = response.data.owner_setup_token || "";
+        this.setupResult = {
+          name: response.data.name,
+          credentials: response.data.credentials || [],
+        };
         this.name = "";
-        this.owner = null;
         this.ownerEmail = "";
-        this.grant = { plan: "", seat_limit: 1, expires_at: "", reason: "" };
+        this.members = [];
+        this.createWorkspace = true;
+        this.grant = {
+          plan: this.grant.plan,
+          seat_limit: null,
+          expires_at: "",
+          reason: "",
+        };
         await this.load();
       } catch (error) {
         this.fail(error);
@@ -346,6 +455,56 @@ export default {
   margin-block: 24px;
 }
 
+.organization-setup__members {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px;
+  border: 1px solid var(--jadawel-border-color, #e0f1e7);
+  border-radius: 6px;
+}
+
+.organization-setup__members > :last-child {
+  justify-self: start;
+}
+
+.organization-setup__member {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 140px auto;
+  gap: 8px;
+  align-items: center;
+}
+
+.organizations-admin-page .organization-setup__checkbox {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.organization-setup small {
+  color: var(--jadawel-text-secondary, #66756d);
+}
+
+.organization-setup__result {
+  max-inline-size: 640px;
+  padding: 16px;
+  border: 1px solid var(--jadawel-primary-500, #278053);
+  border-radius: 12px;
+}
+
+.organization-setup__result table {
+  inline-size: 100%;
+  margin-block: 8px 12px;
+  border-collapse: collapse;
+}
+
+.organization-setup__result th,
+.organization-setup__result td {
+  padding: 6px 8px;
+  border-block-end: 1px solid var(--jadawel-border-color, #e0f1e7);
+  text-align: start;
+}
+
 .organizations-admin-page .organization-search {
   display: flex;
   gap: 12px;
@@ -393,6 +552,12 @@ export default {
   .organizations-admin-page section,
   .organizations-admin-page article {
     padding: 16px;
+  }
+  .organization-setup__member {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  .organization-setup__member input {
+    grid-column: 1 / -1;
   }
 }
 </style>

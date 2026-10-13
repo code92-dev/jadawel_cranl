@@ -21,6 +21,7 @@ term exists).
 | Organization | منظمة | Company or organization account. |
 | Complimentary access | وصول مجاني | Explicit administrator grant. |
 | Seat | مقعد | One licensed organization member. |
+| Temporary password | كلمة مرور مؤقتة | Generated when an administrator creates an account; shown once and changed by its owner after signing in. |
 | Activity log | سجل النشاط | Chronological record of organization and billing actions. |
 | Payment provider | مزود الدفع | External service such as Moyasar that processes payments. |
 | Provider health | حالة مزود الدفع | Safe configuration and reachability status. |

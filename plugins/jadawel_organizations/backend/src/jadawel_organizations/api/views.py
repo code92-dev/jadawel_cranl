@@ -27,6 +27,7 @@ from ..handlers import (
     remove_member,
     resend_owner_setup,
     revoke_invitation,
+    setup_organization,
     transition_to_personal,
     unassign_workspace_member,
     unbind_workspace,
@@ -54,6 +55,7 @@ from .serializers import (
     OrganizationUpdateSerializer,
     OrganizationWorkspaceSerializer,
     OwnerSetupSerializer,
+    SetupOrganizationSerializer,
     StartTeamSerializer,
     WorkspaceMemberAssignmentSerializer,
 )
@@ -181,6 +183,30 @@ class AdminOrganizationCreateView(APIView):
         if owner_setup_token:
             payload["owner_setup_token"] = owner_setup_token
         return Response(payload, status=status.HTTP_201_CREATED)
+
+
+class AdminOrganizationSetupView(APIView):
+    """Create an organization with its owner, members and workspace at once."""
+
+    permission_classes = [IsAdminUser]
+
+    def post(self, request: Request) -> Response:
+        serializer = SetupOrganizationSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        values = dict(serializer.validated_data)
+        values["creation_key"] = _creation_key(request, values.get("creation_key"))
+        setup = setup_organization(request.user, **values)
+        payload = organization_snapshot(setup.organization)
+        payload["workspace"] = (
+            {"id": setup.workspace.pk, "name": setup.workspace.name}
+            if setup.workspace
+            else None
+        )
+        payload["credentials"] = setup.credentials
+        response = Response(payload, status=status.HTTP_201_CREATED)
+        # The body can hold generated passwords.
+        response["Cache-Control"] = "no-store"
+        return response
 
 
 class AdminOwnerSetupView(APIView):
