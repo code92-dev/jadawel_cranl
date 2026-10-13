@@ -28,18 +28,40 @@ describe('The name at the top of the sidebar', () => {
   const isOpen = (wrapper, ref) =>
     wrapper.findComponent({ ref }).vm.getRootContext().isOpen()
 
-  test('on the homepage it leads home and the arrows open the menu', async () => {
+  test('on the homepage the name opens the menu', async () => {
     const wrapper = await testApp.mount(SidebarAllWorkspaces, {
       props: { workspaces: [workspace], selectedWorkspace: {} },
     })
 
     expect(nameOf(wrapper)).toBe('Aziz')
-    expect(
-      wrapper.get('.sidebar__workspaces-selector-link').attributes('href')
-    ).toBe(homeHref())
+    const name = wrapper.get('.sidebar__workspaces-selector-link')
+    // A link home would go nowhere: this already is the homepage.
+    expect(name.attributes('href')).toBeUndefined()
 
     expect(isOpen(wrapper, 'userContext')).toBe(false)
+    await name.trigger('click')
+    await flushPromises()
+    expect(isOpen(wrapper, 'userContext')).toBe(true)
+  })
+
+  test('on the homepage the arrows open the menu too', async () => {
+    const wrapper = await testApp.mount(SidebarAllWorkspaces, {
+      props: { workspaces: [workspace], selectedWorkspace: {} },
+    })
+
     await wrapper.get('.sidebar__workspaces-selector-toggle').trigger('click')
+    await flushPromises()
+    expect(isOpen(wrapper, 'userContext')).toBe(true)
+  })
+
+  test('on the homepage the keyboard opens the menu from the name', async () => {
+    const wrapper = await testApp.mount(SidebarAllWorkspaces, {
+      props: { workspaces: [workspace], selectedWorkspace: {} },
+    })
+
+    await wrapper
+      .get('.sidebar__workspaces-selector-link')
+      .trigger('keydown', { key: 'Enter' })
     await flushPromises()
     expect(isOpen(wrapper, 'userContext')).toBe(true)
   })

@@ -6,32 +6,31 @@
       :key="index"
     ></component>
     <!--
-      Jadawel: the name leads to this homepage, as it does inside a workspace,
-      and the arrows beside it open the menu (workspaces, settings, log out).
-      Collapsed, only the avatar is left, so it opens the menu.
+      Jadawel: this is the homepage, so a link home from the name would go
+      nowhere. The whole row opens the menu (workspaces, settings, log out)
+      instead, the arrows included; inside a workspace the name leads here.
     -->
     <div ref="userContextAnchor" class="sidebar__workspaces-selector">
       <a
-        v-if="collapsed"
         class="sidebar__workspaces-selector-link"
+        role="button"
+        tabindex="0"
+        :aria-label="$t('sidebar.openWorkspacesMenu')"
         @click="toggleUserContext()"
+        @keydown.enter.prevent="toggleUserContext()"
+        @keydown.space.prevent="toggleUserContext()"
       >
         <Avatar :initials="$filters.nameAbbreviation(name)"></Avatar>
-      </a>
-      <nuxt-link
-        v-else
-        class="sidebar__workspaces-selector-link"
-        :to="{ name: 'all-workspaces' }"
-      >
-        <Avatar :initials="$filters.nameAbbreviation(name)"></Avatar>
-        <span class="sidebar__workspaces-selector-selected-workspace">{{
-          name
-        }}</span>
         <span
-          v-if="unreadNotificationsInAnyWorkspace"
+          v-if="!collapsed"
+          class="sidebar__workspaces-selector-selected-workspace"
+          >{{ name }}</span
+        >
+        <span
+          v-if="!collapsed && unreadNotificationsInAnyWorkspace"
           class="sidebar__unread-notifications-icon"
         ></span>
-      </nuxt-link>
+      </a>
       <a
         v-show="!collapsed"
         v-tooltip="$t('sidebar.openWorkspacesMenu')"

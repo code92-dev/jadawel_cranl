@@ -80,13 +80,21 @@
   // Jadawel: the selector's own colour, which is white on a coloured theme.
   color: inherit;
 
+  // Jadawel: on the homepage the row opens the menu and has no href.
+  cursor: pointer;
+
   &:hover {
     text-decoration: none;
   }
+
+  &:focus-visible {
+    outline: 2px solid currentcolor;
+    outline-offset: 1px;
+  }
 }
 
-// Jadawel: the name is a link to the workspaces homepage, so the menu has its
-// own button.
+// Jadawel: inside a workspace the name is a link to the workspaces homepage,
+// so the menu has its own button.
 .sidebar__workspaces-selector-toggle {
   display: flex;
   align-items: center;
