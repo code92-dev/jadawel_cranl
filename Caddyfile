@@ -147,6 +147,43 @@ EOF
         respond 404
     }
 
+    # Build assets may be fetched from a second hostname (NUXT_APP_CDN_URL).
+    # CranL's edge never caches a request that carries a cookie, and the app sets
+    # one on its own host, so every one of the ~150 chunks of a page load went
+    # through to this container and the burst came back as 429s and 504s. A host
+    # the app never sets a cookie on is cached at the edge. Pages load these with
+    # `crossorigin`, and fonts are always fetched in CORS mode, so that host has
+    # to send CORS. `*` is safe: these are public build files, requested without
+    # credentials, and one fixed value keeps a single cached copy for every
+    # origin instead of a copy per `Origin`.
+    @build_assets path /_nuxt/* /fonts/*
+    header @build_assets Access-Control-Allow-Origin "*"
+
+    # Served from disk rather than proxied to Node, so a cold cache costs a file
+    # read instead of a Node request. Only for files that exist here: in the
+    # all-in-one image the frontend's output sits in this container, while a
+    # Caddy in its own container (docker-compose.yml) has no such directory and
+    # keeps proxying. `builds/` is the deploy manifest the client polls for new
+    # releases, so it keeps Nitro's short cache rather than `immutable`.
+    @build_assets_on_disk {
+        path /_nuxt/* /fonts/*
+        not path /_nuxt/builds/*
+        file {
+            root {$JADAWEL_WEB_FRONTEND_PUBLIC_ROOT:/jadawel/web-frontend/.output/public}
+        }
+    }
+    handle @build_assets_on_disk {
+        # Same value Nitro sends: every `/_nuxt` file name carries a content hash.
+        header /_nuxt/* Cache-Control "public, max-age=31536000, immutable"
+        # Fonts are not hashed, so a week rather than forever.
+        header /fonts/* Cache-Control "public, max-age=604800"
+        # gzip only, as Nitro did: the edge caches one copy per encoding.
+        encode gzip
+        file_server {
+            root {$JADAWEL_WEB_FRONTEND_PUBLIC_ROOT:/jadawel/web-frontend/.output/public}
+        }
+    }
+
     handle @is_jadawel_media {
         import jadawel_media_files
     }

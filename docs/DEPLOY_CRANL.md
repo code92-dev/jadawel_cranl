@@ -148,6 +148,7 @@ for the full working set and why each is needed.
 | `SECRET_KEY` | *generated* | Must be set explicitly. `jadawel.sh` otherwise generates one into `/jadawel/data/.secret`, which is ephemeral here — so every redeploy would invalidate all sessions. |
 | `JADAWEL_JWT_SIGNING_KEY` | *generated* | Same, via `.jwt_signing_key`. Regenerating it logs everyone out. |
 | `JADAWEL_PUBLIC_URL` | `https://jadawl.site` | Must exactly match the browser URL, scheme included, no trailing slash. |
+| `NUXT_APP_CDN_URL` | `https://jadawel-org-sudtap.cranl.net` | Hostname the browser fetches `/_nuxt/*` and `/fonts/*` from. Must be a host of this same app that the browser never holds a cookie for, so CranL's edge caches the files (see Troubleshooting, 429/504 on `/_nuxt`). No trailing slash. Unset, assets load from the page's own host. |
 | `DATABASE_URL` | *from managed Postgres* | Or the `DATABASE_HOST` / `PORT` / `NAME` / `USER` / `PASSWORD` set. |
 | `REDIS_URL` | *from managed Redis* | Or the `REDIS_HOST` / `PORT` / `PASSWORD` set. |
 | `JADAWEL_MCP_PROTECTION_REDIS_URL` | *leave unset* | Optional dedicated Redis vault. Unset, mask tokens live in the app's PostgreSQL and nothing else is needed. Never reuse `REDIS_URL`. |
@@ -303,3 +304,23 @@ confirm the running image allows `Idempotency-Key` in
 A CranL environment save alone does not recreate the running container.
 
 **Uploaded files disappear after a deploy** — no S3 configured. See §4.
+
+**`/_nuxt/*` files fail with 429 or 504 and the page never finishes loading** —
+the browser is fetching build assets from the app's own host. The app sets an
+`i18n-language` cookie there, and CranL's edge never caches a request that
+carries a cookie (`x-ggp-cache: BYPASS`), so every one of the ~150 chunks of a
+page load reaches the container and the edge refuses or times out the burst.
+Neither CranL's per-visitor rate limit nor a custom Allow rule changes this.
+Set `NUXT_APP_CDN_URL` (§4) to a cookie-less host of the same app; the page then
+references `<cdn>/_nuxt/…`, the edge answers those from its cache, and the
+bundled Caddy serves the misses from disk with `Access-Control-Allow-Origin: *`.
+Check from a shell:
+
+```bash
+curl -s https://app.jadawl.site/login | grep -o 'cdnURL:"[^"]*"'
+curl -sD- -o/dev/null https://jadawel-org-sudtap.cranl.net/_nuxt/<file>.js | grep -i 'x-ggp-cache\|access-control'
+```
+
+The second answers `MISS` once and `HIT` after. After a release, every chunk
+is a `MISS` for the first visitor; warming the cache (fetch each `/_nuxt` file
+named in the page once with `Accept-Encoding: gzip`) spares them that.
