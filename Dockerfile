@@ -17,7 +17,19 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-10-13 from commit 0bcbe2d3, tag 2.3.24-org-setup-themed-bar.
+# Published 2026-11-09 from commit e6699451, tag 2.3.25-edge-cacheable-assets.
+# Fixes pages failing to load with 429s and 504s on /_nuxt files. The app's
+# i18n-language cookie made CranL's edge skip its cache, so all ~150 chunks of
+# a page load went through to Node. The bundled Caddy now serves /_nuxt and
+# /fonts from disk with Access-Control-Allow-Origin: *, so NUXT_APP_CDN_URL can
+# point the page at a host without that cookie, which the edge caches
+# (docs/DEPLOY_CRANL.md). **No migrations. Environment: set
+# NUXT_APP_CDN_URL=https://jadawel-org-sudtap.cranl.net on CranL; unset, the
+# image behaves as before.**
+# Previous deployment pin (2.3.24-org-setup-themed-bar):
+# sha256:25380e367ae09b90f7ee6e6b24a6d6f737e69dddfb97d2488de2b6288783c58b.
+#
+# Previously published 2026-10-13 from commit 0bcbe2d3, tag 2.3.24-org-setup-themed-bar.
 # Admin -> Organizations sets an organization up in one step: owner, members,
 # seats and a workspace, everyone added at once with no invitation to accept;
 # emails without an account get one, with a temporary password shown once
@@ -427,7 +439,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:25380e367ae09b90f7ee6e6b24a6d6f737e69dddfb97d2488de2b6288783c58b
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:49fe6025d3cdb9f2b1fd240a184f313df19d3bdd959e976721e98a1d2cd89fe0
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
