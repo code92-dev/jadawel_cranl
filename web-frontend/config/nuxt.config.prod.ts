@@ -32,6 +32,34 @@ export default {
     // entrypoint lets the runtime use a small, explicitly bounded worker pool.
     preset: 'node-cluster',
   },
+  vite: {
+    ...baseConfig.vite,
+    $client: {
+      ...baseConfig.vite?.$client,
+      build: {
+        rolldownOptions: {
+          output: {
+            // Pack the client into a few large chunks instead of letting the
+            // bundler split it at every lazy import. Unsplit, a page preloaded
+            // ~90 of 225 files (55 under 5 KB), and CranL's edge fails every
+            // request once ~60 arrive at once with nothing cached, which it is
+            // again within minutes of a warm-up (docs/DEPLOY_CRANL.md,
+            // Troubleshooting). Packed, there are 23 files and a page preloads
+            // 15. `maxSize` counts source bytes: 4 MB gives pieces of 0.6-2 MB
+            // minified, while 1 MB still left 54 per page. The login page
+            // already loaded 7.9 of the 10.7 MB, so loading the rest up front
+            // costs a first visit ~0.6 MB gzipped.
+            codeSplitting: {
+              groups: [{ name: 'app', maxSize: 4_000_000 }],
+            },
+            // Modules merged into a chunk that loads early still run only when
+            // first imported, as they did from their own lazy chunk.
+            strictExecutionOrder: true,
+          },
+        },
+      },
+    },
+  },
   sourcemap: {
     // Server maps stay on: they are never served to a browser and they are what
     // makes a backend stack trace readable.
