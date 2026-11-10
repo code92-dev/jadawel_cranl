@@ -25,9 +25,12 @@ image: the monorepo cannot be built there (no Compose pack, Railpack finds no
 manifest, 4 GB RAM ceiling), so GitHub Actions builds it and CranL only pulls
 the result. Procedure in `docs/DEPLOY_CRANL.md`.
 
-Pushing code deploys nothing. The root `Dockerfile` pins an image by digest, so
-shipping is: push → run *Publish all-in-one image* → bump `ARG JADAWEL_IMAGE` →
-redeploy.
+Every push to `main` redeploys production: CranL rebuilds the root `Dockerfile`
+on each push. That file pins an image by digest, so new application code ships
+only through: push → run *Publish all-in-one image* → bump `ARG JADAWEL_IMAGE`
+→ push again. The pin commit deploys itself. Any other push to `main` restarts
+production on the same image, so don't push there casually. Environment changes
+made in the CranL dashboard still need a manual Redeploy.
 
 ### Coolify is decommissioned
 

@@ -77,7 +77,12 @@ The `prod-lite` variant is used deliberately. The full all-in-one image embeds
 Postgres and Redis under `/jadawel/data`, which on a host with no persistent
 volume means the database is destroyed on every redeploy.
 
-**Pushing code does not change what is deployed.** Publish first, then redeploy.
+**Every push to `main` redeploys production** (observed 2026-11-10: each of two
+pushes produced its own CranL deployment). The redeploy rebuilds the root
+`Dockerfile`, which pulls the pinned image, so application code changes only when
+the pin does. Publish first, then push the pin; that push is the deploy. Any
+other push to `main` restarts production on the same image. Environment changes
+in the dashboard are not pushes and still need a manual Redeploy.
 
 ## 1. Publish an image
 
@@ -182,12 +187,14 @@ redirects to `/signup` permanently, with no way in through the UI.
 
 ## Updating
 
-1. Push code.
+1. Push code to `main`. CranL redeploys at once, still on the old image.
 2. Run the publish workflow to build a new image tag.
-3. Bump `ARG JADAWEL_IMAGE` in the root `Dockerfile` and commit.
-4. Redeploy on CranL.
+3. Bump `ARG JADAWEL_IMAGE` in the root `Dockerfile`, commit and push. CranL
+   deploys this push by itself; no manual Redeploy is needed.
+4. Verify the behaviour on production rather than trusting CranL's `done`.
 
-Skipping step 2 or 3 redeploys the same image.
+Skipping step 2 or 3 redeploys the same image. Set any new environment variable
+in CranL and press Redeploy once the image is live.
 
 ## MCP protected fields: the mask-token vault
 

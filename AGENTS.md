@@ -5,10 +5,13 @@ Jadawel, self-hosted so that data stays inside Saudi Arabia. This repository is 
 the CranL deployment copy, so it carries the root `Dockerfile` and
 `.github/workflows/publish-image.yml` on top of the application.
 
-**Pushing code does not change what is deployed.** The root `Dockerfile` pulls a
-published image instead of building the monorepo, because the Nuxt production build
-is OOM-killed on a 4 GB plan. Shipping is three steps: run the _Publish all-in-one
-image_ workflow, bump `ARG JADAWEL_IMAGE`, redeploy. `docs/DEPLOY_CRANL.md` holds
+**Every push to `main` redeploys production, but only a new image pin changes the
+code.** CranL rebuilds the root `Dockerfile` on each push to `main`, and that file
+pulls a published image instead of building the monorepo, because the Nuxt
+production build is OOM-killed on a 4 GB plan. Shipping is: run the _Publish
+all-in-one image_ workflow, bump `ARG JADAWEL_IMAGE`, push; the pin commit deploys
+itself. Any other push to `main` restarts production on the same image.
+Environment changes in the CranL dashboard still need a manual Redeploy. `docs/DEPLOY_CRANL.md` holds
 the procedure and `cranl_fix.md` the environment set that actually boots.
 
 ## Layout

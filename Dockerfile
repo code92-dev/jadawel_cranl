@@ -7,8 +7,9 @@
 #
 # Consequences of that split, in order of how likely they are to bite:
 #
-#   1. Pushing code does not change what is deployed. Run the publish workflow
-#      first, then redeploy. A tag pinned below makes that explicit; `latest`
+#   1. Every push to main redeploys this file, but the code only changes when
+#      the pin below does. Run the publish workflow first, then push the pin;
+#      that push is the deploy. A digest pin makes that explicit; `latest`
 #      quietly deploys whatever was published last.
 #   2. This is the `prod-lite` variant: no embedded Postgres or Redis. The host
 #      must provide both, plus S3 for uploads — hosts without a persistent

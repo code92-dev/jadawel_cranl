@@ -33,7 +33,9 @@ CranL app "jadawel"  →  Bunny CDN edge  →  container :80 (Caddy)
    external: jadawel-postgres, jadawel-redis, jadawel-media (all Riyadh / Saudi-4)
 ```
 
-**Pushing code does not change what is deployed.** Publish a new image first.
+**Every push to `main` redeploys, but the code changes only with the image pin.**
+Publish a new image first, then push the pin bump; that push is the deploy
+(see docs/DEPLOY_CRANL.md).
 
 The image is the `prod-lite` target — no embedded Postgres or Redis, because
 CranL apps have no persistent volume and an embedded database would be destroyed
@@ -263,10 +265,10 @@ certificate on a port it cannot reach, which hangs the deploy.
    directly here diverges the two trees.
 2. Actions → **Publish all-in-one image** → Run workflow, with a new tag.
    Roughly 10 minutes.
-3. Bump `ARG JADAWEL_IMAGE` in the root `Dockerfile` to that tag and commit.
-   Leaving it at `latest` means a redeploy silently picks up whatever was
+3. Bump `ARG JADAWEL_IMAGE` in the root `Dockerfile` to that tag, commit and
+   push. Leaving it at `latest` means a redeploy silently picks up whatever was
    published last.
-4. Redeploy on CranL.
+4. CranL deploys that push by itself. Verify production afterwards.
 
 Skipping 2 or 3 redeploys the identical image.
 
