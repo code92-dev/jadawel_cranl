@@ -336,7 +336,13 @@ named in the page once with `Accept-Encoding: gzip`) spares them that.
 `/_nuxt` files** — the edge refuses one address once roughly 100–130 requests
 arrive together, even for files it has cached, and its bare 429 carries no
 `Access-Control-Allow-Origin`, so Chrome reports it as a CORS failure. A hard
-refresh skips the browser cache and requests every file at once. From
-2.3.26 the build emits no `<link rel="prefetch">` hints (53 per page before),
-which keeps a page near 90–115 requests. Every CranL deploy, a docs-only push
-to `main` included, empties the edge cache, so warm it again after each one.
+refresh skips the browser cache and requests every file at once. The edge
+also drops cached files within 30–45 minutes, and with nothing cached it fails
+every request once about 60 arrive together (504s and 429s, none served),
+while 48 all succeed. So keep a page's file count low: 2.3.26 dropped the
+`<link rel="prefetch">` hints (53 per page) and 2.3.27 packs the client into
+23 files (`vite.$client` code splitting in `nuxt.config.prod.ts`), so a page
+preloads 12–15. Measured after the 2.3.27 deploy with nothing cached: one page
+load 13/13 in under 2 s, four simultaneous loads 52/52, six 0/78. Check the
+count after changes that add lazy imports. Every deploy, a docs-only push to
+`main` included, empties the edge cache; warming it afterwards still helps.
