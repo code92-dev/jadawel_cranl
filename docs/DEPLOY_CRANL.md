@@ -331,3 +331,12 @@ curl -sD- -o/dev/null https://jadawel-org-sudtap.cranl.net/_nuxt/<file>.js | gre
 The second answers `MISS` once and `HIT` after. After a release, every chunk
 is a `MISS` for the first visitor; warming the cache (fetch each `/_nuxt` file
 named in the page once with `Accept-Encoding: gzip`) spares them that.
+
+**A hard refresh (Ctrl+F5) logs CORS errors and `429 (Too Many Requests)` for
+`/_nuxt` files** — the edge refuses one address once roughly 100–130 requests
+arrive together, even for files it has cached, and its bare 429 carries no
+`Access-Control-Allow-Origin`, so Chrome reports it as a CORS failure. A hard
+refresh skips the browser cache and requests every file at once. From
+2.3.26 the build emits no `<link rel="prefetch">` hints (53 per page before),
+which keeps a page near 90–115 requests. Every CranL deploy, a docs-only push
+to `main` included, empties the edge cache, so warm it again after each one.

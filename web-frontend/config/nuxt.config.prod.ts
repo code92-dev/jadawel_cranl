@@ -41,6 +41,22 @@ export default {
     // original source to anyone who appends `.map` to a chunk URL.
     client: 'hidden',
   },
+  hooks: {
+    ...baseConfig.hooks,
+    // Nuxt adds a `<link rel="prefetch">` to every page for each chunk a later
+    // navigation might need: 53 on top of the ~90 the page itself loads. A
+    // hard refresh requests all of them at once, and CranL's edge answers one
+    // address with 429 past roughly 100 simultaneous requests, so the hints
+    // pushed the page over the limit (docs/DEPLOY_CRANL.md, Troubleshooting).
+    // The renderer emits a prefetch link only for manifest entries marked
+    // `prefetch`; without it a chunk is fetched when it is first needed, from
+    // the edge cache.
+    'build:manifest'(manifest) {
+      for (const entry of Object.values(manifest)) {
+        entry.prefetch = false
+      }
+    },
+  },
   features: {
     // Nuxt inlines every stylesheet into the SSR response by default. That is a
     // good trade for a small stylesheet and a bad one here: the bundle is 1.8 MB
