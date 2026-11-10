@@ -18,7 +18,17 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-11-09 from commit e6699451, tag 2.3.25-edge-cacheable-assets.
+# Published 2026-11-10 from commit 5cd31baa, tag 2.3.26-no-prefetch.
+# Pages stop carrying 53 <link rel="prefetch"> hints for chunks a later
+# navigation might need. A hard refresh requested them all at once with the
+# ~90 files the page loads, and CranL's edge answers one address with 429 past
+# roughly 100 simultaneous requests (Chrome logged each as a CORS error, since
+# the edge's 429 has no CORS header). A lazy chunk now loads when first needed.
+# **No migrations, no environment changes.**
+# Previous deployment pin (2.3.25-edge-cacheable-assets):
+# sha256:49fe6025d3cdb9f2b1fd240a184f313df19d3bdd959e976721e98a1d2cd89fe0.
+#
+# Previously published 2026-11-09 from commit e6699451, tag 2.3.25-edge-cacheable-assets.
 # Fixes pages failing to load with 429s and 504s on /_nuxt files. The app's
 # i18n-language cookie made CranL's edge skip its cache, so all ~150 chunks of
 # a page load went through to Node. The bundled Caddy now serves /_nuxt and
@@ -440,7 +450,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:49fe6025d3cdb9f2b1fd240a184f313df19d3bdd959e976721e98a1d2cd89fe0
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:9117d1e917686339cac8931207de44cfa2a24e7cd6e78344e0d85e1b4dac0a60
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
