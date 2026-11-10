@@ -18,7 +18,18 @@
 #
 # See docs/DEPLOY_CRANL.md for the full deployment procedure.
 
-# Published 2026-11-10 from commit 5cd31baa, tag 2.3.26-no-prefetch.
+# Published 2026-11-10 from commit 82ec1f99, tag 2.3.27-packed-chunks.
+# The client is packed into 23 files instead of 225, so a page preloads about
+# 15 instead of ~90-110. CranL's edge drops its cache within minutes, and with
+# nothing cached it fails every request once about 60 arrive together, which
+# broke page loads between warm-ups. A first visit downloads ~0.6 MB more
+# (gzipped) because code that was lazy now comes up front; it still runs only
+# when first used. Checked locally: signup, onboarding, grid view, admin pages,
+# Arabic RTL. **No migrations, no environment changes.**
+# Previous deployment pin (2.3.26-no-prefetch):
+# sha256:9117d1e917686339cac8931207de44cfa2a24e7cd6e78344e0d85e1b4dac0a60.
+#
+# Previously published 2026-11-10 from commit 5cd31baa, tag 2.3.26-no-prefetch.
 # Pages stop carrying 53 <link rel="prefetch"> hints for chunks a later
 # navigation might need. A hard refresh requested them all at once with the
 # ~90 files the page loads, and CranL's edge answers one address with 429 past
@@ -450,7 +461,7 @@
 # reported the 2.7.2 deploy `done` while the old workers kept running, because
 # a digest-only edit to a `FROM` does not invalidate its build cache. Follow
 # the deploy with a reload, and verify behaviour rather than trusting `done`.
-ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:9117d1e917686339cac8931207de44cfa2a24e7cd6e78344e0d85e1b4dac0a60
+ARG JADAWEL_IMAGE=ghcr.io/code92-dev/jadawel_cranl@sha256:8bbe4cc5a1432341d12efc34a7486d9f963b71403293b3433b8e2ad8e77b2899
 
 # hadolint ignore=DL3006
 FROM ${JADAWEL_IMAGE}
